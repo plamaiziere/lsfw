@@ -1,0 +1,10 @@
+# IP of table <foo>
+self
+
+if0:broadcast
+fe80::1
+
+
+192.168.0.1/24
+no-route
+#

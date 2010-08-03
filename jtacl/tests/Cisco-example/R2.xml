@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+    Document   : R2.xml
+    Created on : 02 juin 2010
+    Author     : Patrick Lamaiziere
+    Description:
+		configuration of router R2.
+-->
+
+<equipment>
+	<!-- config file for this router 
+		(The configuration may be splited in several files).
+	-->
+	<file filename="./r2-confg" />
+	<!-- dump the lines taken in account by jtacl to this file.
+	-->
+	<!-- dump the lines of the configuration taken in account by jtacl to this file.
+	-->
+	<option key="dump-configuration" value="./r2-confg-dump" />
+</equipment>
+

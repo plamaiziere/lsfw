@@ -1,0 +1,124 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.univrennes1.cri.jtacl</groupId>
+	<artifactId>jtacl</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>jtacl</name>
+	<url>http://maven.apache.org</url>
+	<repositories>
+		<repository>
+			<id>codehaus</id>
+			<name>codehaus Project Repository</name>
+			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>codhaus</id>
+			<name>codehaus Project Repository</name>
+			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<build>
+		<plugins>
+			<plugin>
+				<!-- NOTE: We don't need a groupId specification because the group is
+				 org.apache.maven.plugins ...which is assumed by default.
+				-->
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>fr.univrennes1.cri.jtacl.App</mainClass>
+							<packageName>fr.univrennes1.cri.jtacl</packageName>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<!--
+				<version>2.0.2</version>
+				-->
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>fr.univrennes1.cri.jtacl.App</mainClass>
+							<packageName>fr.univrennes1.cri.jtacl</packageName>
+						</manifest>
+						<manifestEntries>
+							<mode>development</mode>
+							<url>${pom.url}</url>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<aggregate>true</aggregate>
+					<doclet>gr.spinellis.umlgraph.doclet.UmlGraphDoc</doclet>
+					<docletArtifact>
+						<groupId>gr.spinellis</groupId>
+						<artifactId>UmlGraph</artifactId>
+						<version>4.6</version>
+					</docletArtifact>
+					<additionalparam>
+						-inferrel
+						-inferdepvis
+						-quiet
+						-constructors
+						-types
+						-visibility
+						-postfixpackage
+						-nodefontsize 9
+						-nodefontpackagesize 7
+						-hide java.lang.*
+					</additionalparam>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jopt-simple</groupId>
+			<artifactId>jopt-simple</artifactId>
+			<version>3.2</version>
+		</dependency>
+		<dependency>
+			<!-- Parboiled does not provide a maven artifact, so we must
+			add it to the local repository by hand:
+			$ mvn -e install:install-file -Dfile=./parboiled-0.9.7.3.jar \
+				-DgroupId=org.parboiled -DartifactId=parboiled \n
+				-Dversion=0.9.7.3 -DgeneratePom=true -Dpackaging=jar
+			-->
+			<groupId>org.parboiled</groupId>
+			<artifactId>parboiled</artifactId>
+			<version>0.9.7.3</version>
+		</dependency>
+	</dependencies>
+</project>
+
+

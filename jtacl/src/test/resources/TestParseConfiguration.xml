@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+    Document   : TestParseConfiguration.xml
+    Created on : 6 juin 2010, 13:21
+    Author     : patrick
+    Description:
+        Test file for XMLConfigLoader.
+-->
+
+<jtacl>
+	<equipments>"
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.SimpleRouter"
+				   name="router1"
+				   comment="router #1"
+				   filename="foo"
+		/>"
+	</equipments>
+</jtacl>

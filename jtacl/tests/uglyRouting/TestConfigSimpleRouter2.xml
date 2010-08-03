@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+    Document   : TestBasicRouter.xml
+    Created on : 25 avril 2010, 09:28
+    Author     : Patrick Lamaiziere
+    Description:
+		configuration file to test SimpleRouter.
+-->
+
+<equipment>
+<iface name="eth0" comment="interface 0" ip="10.0.1.2" network="10.0.1.0/24"/>
+<iface name="eth1" comment="interface 1" ip="10.0.2.2" network="10.0.2.0/24"/>
+<iface name="eth2" comment="interface 2" ip="10.0.5.2" network="10.0.5.0/24"/>
+
+<!-- 10.0.0.0-->
+<route prefix="10.0.0.0/24" nexthop="10.0.1.1" metric="1" />
+<route prefix="10.0.0.0/24" nexthop="10.0.5.3" metric="2" />
+<route prefix="10.0.0.0/24" nexthop="10.0.2.4" metric="3" />
+
+<!-- 10.0.1.0-->
+<route prefix="10.0.1.0/24" nexthop="10.0.5.3" metric="1" />
+<route prefix="10.0.1.0/24" nexthop="10.0.2.4" metric="2" />
+
+<!-- 10.0.2.0-->
+<route prefix="10.0.2.0/24" nexthop="10.0.1.3" metric="2" />
+<route prefix="10.0.2.0/24" nexthop="10.0.5.3" metric="2" />
+
+<!-- 10.0.3.0-->
+<route prefix="10.0.3.0/24" nexthop="10.0.1.3" metric="1" />
+<route prefix="10.0.3.0/24" nexthop="10.0.2.4" metric="1" />
+<route prefix="10.0.3.0/24" nexthop="10.0.5.3" metric="1" />
+
+<!-- 10.0.4.0-->
+<route prefix="10.0.4.0/24" nexthop="10.0.2.4" metric="1" />
+<route prefix="10.0.4.0/24" nexthop="10.0.1.3" metric="2" />
+<route prefix="10.0.4.0/24" nexthop="10.0.5.3" metric="2" />
+
+<!-- 10.0.5.0-->
+<route prefix="10.0.5.0/24" nexthop="10.0.1.3" metric="1" />
+<route prefix="10.0.5.0/24" nexthop="10.0.2.4" metric="2" />
+
+</equipment>

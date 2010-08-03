@@ -1,0 +1,111 @@
+#
+# Icmp type name and number definition (IPv4)
+#
+#	
+# ICMP NAME	 	                             TYPE   CODE
+echo-reply                                      0   -1
+echorep                                         0   -1
+unreachable                                     3   -1
+unreach                                         3   -1
+net-unreachable                                 3    0
+net-unr                                         3    0
+host-unreachable                                3    1
+host-unr                                        3    1
+protocol-unreachable                            3    2
+proto-unr                                       3    2
+port-unreachable                                3    3
+port-unr                                        3    3
+packet-too-big                                  3    4
+needfrag                                        3    4
+source-route-failed                             3    5
+srcfail                                         3    5
+network-unknown                                 3    6
+net-unk                                         3    6
+host-unknown                                    3    7
+host-unk                                        3    7
+host-isolated                                   3    8
+isolate                                         3    8
+dod-net-prohibited                              3    9
+net-prohib                                      3    9
+dod-host-prohibited                             3   10
+host-prohib                                     3   10
+net-tos-unreachable                             3   11
+net-tos                                         3   11
+host-tos-unreachable                            3   12
+host-tos                                        3   12
+administratively-prohibited                     3   13
+filter-prohib                                   3   13
+host-precedence-unreachable                     3   14
+host-preced                                     3   14
+precedence-unreachable                          3   15
+cutoff-preced                                   3   15
+source-quench                                   4   -1
+squench                                         4   -1
+redirect                                        5   -1
+redir                                           5   -1
+net-redirect                                    5    0
+redir-net                                       5    0
+host-redirect                                   5    1
+redir-host                                      5    1
+net-tos-redirect                                5    2
+redir-tos-net                                   5    2
+host-tos-redirect                               5    3
+redir-tos-host                                  5    3
+alternate-address                               6   -1
+althost                                         6   -1
+echo                                            8   -1
+echoreq                                         8   -1
+router-advertisement                            9   -1
+routeradv                                       9   -1
+#normal router ad                               9    0
+normal-adv                                      9    0
+#does not route common traffic                  9   16
+common-adv                                      9   16
+router-solicitation                            10   -1
+routersol                                      10   -1
+#router-solicitation                           10    0
+time-exceeded                                  11   -1
+timex                                          11   -1
+ttl-exceeded                                   11    0
+transit                                        11    0
+#fragment reassembly timeout                   11    1
+reassemb                                       11    1
+parameter-problem                              12   -1
+paramprob                                      12   -1
+general-parameter-problem                      12    0
+badhead                                        12    0
+option-missing                                 12    1
+optmiss                                        12    1
+no-room-for-option                             12    2
+badlen                                         12    2
+timestamp-request                              13   -1
+timereq                                        13   -1
+timestamp-reply                                14   -1
+timerep                                        14   -1
+information-request                            15   -1
+inforeq                                        15   -1
+information-reply                              16   -1
+inforep                                        16   -1
+mask-request                                   17   -1
+maskrep                                        17   -1
+mask-reply                                     18   -1
+maskrep                                        18   -1
+#Reserved for security                         19   -1
+#Reserved for robustness                       2X
+traceroute                                     30   -1
+trace                                          30   -1
+# outbound forwarded ok                        30    0
+#no route for outbound: discarded              30    1
+conversion-error                               31   -1
+dataconv                                       31   -1
+mobile-redirect                                32   -1
+mobredir                                       32   -1
+ipv6-where                                     33   -1
+ipv6-here                                      34   -1
+mobregreq                                      35   -1
+mobregrep                                      36   -1
+skip                                           39   -1
+photuris                                       40   -1
+unknown-ind                                    40    1
+auth-fail                                      40    2
+decrypt-fail                                   40    3

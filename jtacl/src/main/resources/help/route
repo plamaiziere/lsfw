@@ -1,0 +1,21 @@
+--- route ---
+
+route [equipment] : displays the routes.
+
+  Without parameter, the route command displays the routes of all equipments.
+If an equipment is specified, displays the routes of this equipment only.
+
+  The format of the output depends on the equipment and may change.
+
+Example:
+--------
+
+  jtacl> route R1
+  Routes on R1
+  -------------------
+  IPv4 routes
+  10.0.0.0/24	10.0.0.0/24	0	eth0 - 10.0.0.1 - 10.0.0.0/24
+  10.0.1.0/24	10.0.1.0/24	0	eth1 - 10.0.1.1 - 10.0.1.0/24
+
+  IPv6 routes
+  (none)

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+    Document   : jtacl.xml
+    Created on : 02 juin 2010
+    Author     : Patrick Lamaiziere
+    Description:
+        Configuration file for jtacl.
+-->
+
+<jtacl>
+	<equipments>
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.cisco.router.CiscoRouter"
+				   name="R1"
+				   comment="router #1"
+				   filename="./R1.xml"/>
+
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.cisco.router.CiscoRouter"
+				   name="R2"
+				   comment="router #2"
+				   filename="./R2.xml"/>
+
+	</equipments>
+	<topology>
+		<tlink network="10.0.3.0/24" topology="R1|10.0.3.1" border="true" />
+		<tlink network="10.0.2.0/24" topology="R1|10.0.2.254" border="true" />
+	</topology>
+</jtacl>

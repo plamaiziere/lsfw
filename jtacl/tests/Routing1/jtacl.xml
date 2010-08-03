@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+    Document   : jtacl.xml
+    Created on : 25 avril 2010, 14:27
+    Author     : Patrick Lamaiziere
+    Description:
+        Configuration file for jtacl.
+-->
+
+<jtacl>
+	<equipments>
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.SimpleRouter"
+				   name="R1"
+				   comment="router #1"
+				   filename="./TestConfigSimpleRouter1.xml"/>
+
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.SimpleRouter"
+				   name="R2"
+				   comment="router #2"
+				   filename="./TestConfigSimpleRouter2.xml"/>
+
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.SimpleRouter"
+				   name="R3"
+				   comment="router #3"
+				   filename="./TestConfigSimpleRouter3.xml"/>
+
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.SimpleRouter"
+				   name="R4"
+				   comment="router #4"
+				   filename="./TestConfigSimpleRouter4.xml"/>
+
+	</equipments>
+</jtacl>

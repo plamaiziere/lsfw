@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+    Document   : R1.xml
+    Created on : 02 juin 2010
+    Author     : Patrick Lamaiziere
+    Description:
+		configuration of router R1.
+-->
+
+<equipment>
+	<!-- config file for this router 
+		(The configuration may be splited in several files).
+	-->
+	<file filename="./r1-confg" />
+
+	<!-- R1 gets its routes to Internet by BGP, so add a default route to Internet -->
+	<route prefix="0.0.0.0/0" nexthop="10.0.3.254" />
+
+	<!-- dump the lines of the configuration taken in account by jtacl to this file.
+	-->
+	<option key="dump-configuration" value="./r1-confg-dump" />
+</equipment>

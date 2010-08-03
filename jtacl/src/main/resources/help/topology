@@ -1,0 +1,57 @@
+--- topology ---
+
+  topology | t [connected | !connected] [equipment | IPaddress]
+
+  The topology command displays the topology of the network.
+
+Without parameter, the command displays all the topology.
+
+options:
+  connected  : displays connected networks.
+  !connected : displays non-connected networks
+               (network connecteds to only one equipment).
+
+  equipment  : name of the equipment to displays.
+  IpAddress  : IP address or network. Displays only networks
+               matching this address.
+
+  In Jtacl, the topology is described by some objects named 'network links',
+connecting network interfaces to each other by a 'network'.
+
+  A Network link contains the IP address of the network (such as 192.168.0.0/16)
+and a list of links to the interfaces connected via this network link.
+
+  A network link is 'connected' if it has more than one link to an interface,
+  Otherwise, it describes a leaf network.
+
+Examples:
+---------
+
+  Two routers, R1 and R2. R1 has a network 10.0.0.0/24 and is connected via
+the network 10.0.1.0/24 to R2.
+
+  The first line displays the topology of the network 10.0.0.0/24. It is
+connected to R1, interface eth0, IP address 10.0.0.1.
+  The second line displays the topology of the network 10.0.1.0/24. It is
+  connected to R1 and R2.
+
+  jtacl> topology
+  10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
+  10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}
+
+  jtacl> topology R1
+  10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
+  10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}
+
+  jtacl> t !connected
+  10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
+
+  jtacl> t connected
+  10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}
+
+  jtacl> t 10.0.0.5
+  10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
+
+  jtacl> t 10.0.0.0/23
+  10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
+  10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}

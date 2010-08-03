@@ -1,0 +1,27 @@
+--- define ---
+define | d [name = value] : define a variable that can be used as a macro.
+
+  Without parameter, 'define' displays all the current defined variables.
+define name = value allows to define a new variable named 'name' with the
+value 'value'
+
+  Variables can be used as a macro on the command line preceded by a '$'.
+
+  Variables can be defined in the main jtacl configuration file using the XML
+entity 'define':
+<define name="name" value="value" />
+
+  The 'DFLTEQUIPMENT' variable, if defined, is used as the default equipment
+specification in the probe command (see probe command).
+
+Example:
+--------
+
+jtacl> define EXTERN = equipment|interface
+jtacl> define
+EXTERN=equipment|interface
+jtacl> p on $EXTERN 1.2.3.4 192.168.0.1
+
+Or, to define the variable for each session:
+jtacl.xml
+<define name="EXTERN" value="equipment|interface" />

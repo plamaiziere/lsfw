@@ -1,0 +1,114 @@
+--- license ---
+
+Copyright (c) 2010, Université de Rennes 1
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the ESUP-Portail license as published by the
+ESUP-Portail consortium.
+
+Alternatively, this software may be distributed under the terms of BSD
+license.
+
+---------------------------------------
+ESUP-Portail license:
+ESUP-portail is a french academic project developed under the GPL (General 
+Public License) augmented according to the following :
+
+    * A binary or source file developped by ESUP-portail can be used or 
+compiled with products under Apache license.
+
+The official english text of the GPL can be found here : 
+http://www.gnu.org/licenses/gpl.html.
+
+A non official french translation can be found here : 
+http://www.linux-France.org/article/these/gpl.html.
+
+The different kinds of licenses governing the products developed by the Apache 
+foundation can be found here : http://www.apache.org/licenses.
+
+It follows that you can as well as use download contents as well modify and 
+redistribute them provided you respect the GPL terms.
+
+Downloading and using such contents do not provide any guaranty.
+
+Be sure that you have well understood the terms of the license before using 
+the contents it covers.
+----------------------------------------
+
+BSD license:
+Copyright (c) 2010, Université de Rennes 1. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+----------------------------------------
+
+Notice and credit.
+
+Parboiled
+---------
+(Apache License version 2.0, January 2004
+ http://www.apache.org/licenses/)
+
+Copyright (C) 2009 Mathias Doenitz
+
+This product includes software developed by
+Mathias Doenitz (http://www.parboiled.org/).
+
+Jopt-simple
+-----------
+
+(MIT License
+http://www.opensource.org/licenses/mit-license.php)
+
+Copyright 2004-2010 Paul R. Holser, Jr. All rights reserved.
+Licensed under The MIT License.
+
+IPy
+---
+
+IPNet class is mostly a translation in Java of IPy.
+
+(BSD License)
+http://pypi.python.org/pypi/IPy
+Copyright (c) 2006, INL
+Copyright (c) 2001-2005, Maximillian Dornseif
+All rights reserved.
+
+PacketFilter
+------------
+http://www.openbsd.org/
+
+PF rules are translated from parse.y (OpenBSD 4.7)
+
+(BSD License)
+$OpenBSD: parse.y,v 1.589 2010/03/23 13:31:29 henning Exp $
+
+Copyright (c) 2001 Markus Friedl.  All rights reserved.
+Copyright (c) 2001 Daniel Hartmeier.  All rights reserved.
+Copyright (c) 2001 Theo de Raadt.  All rights reserved.
+Copyright (c) 2002,2003 Henning Brauer. All rights reserved
+
+/etc/services /etc/protocols
+----------------------------
+was stolen from FreeBSD
+http://www.freebsd.org
+

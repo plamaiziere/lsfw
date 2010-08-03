@@ -1,0 +1,3 @@
+--- exit ---
+
+exit | e : Exit jtacl. Shortcut is 'e' or 'q', same as 'quit'.

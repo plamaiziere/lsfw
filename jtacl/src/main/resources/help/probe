@@ -1,0 +1,82 @@
+--- probe ---
+
+probe [on equipment-spec] source destination
+[tcp | udp] [portsource:][portdest]]
+[icmp [icmptype]]
+[icmp6 icmp6type]]
+[protocol]
+
+  The probe command probes the network from a source ip address to a destination ip
+address. Optionally, the protocol and protocol dependent options can be specified.
+
+on equipment-spec
+------------------
+  By default, Jtacl tries to find a network equipment where the probe will be
+injected using the source ip address. If there is zero or more than one candidat,
+Jtacl rejects the command with an error.
+
+  The 'on' keyword' allows to specify one interface on a network equipement
+where the probe must be injected. The equipment specification specifies the
+name of the equipment, followed by a '|' and then followed by the name
+of an interface or an ip address:
+
+equipments-spec: equipment'|'interface-name | ip address.
+
+  If an interface name is specified, Jtacl uses the source ip address of the
+probe to find a link on this interface (a link describes one network connected
+to an interface).
+
+  If an ip address is specified, Jtacl uses this ip address to find the link,
+regardless of the source ip address of the probe.
+
+Addresses
+---------
+  Source and destination addresses can be a hostname, an ip address or a
+network. If a hostname is specified, it is resolved first using DNS.
+
+Protocols
+---------
+
+  The protocol is specified using a number or the name of the protocol.
+Names are resolved using and internal database.
+
+udp/tcp
+-------
+  If the protocol is udp or tcp, port source and port destination can be added
+using the form [portsource:][portdest]
+
+  Port can be a number or the name of a service. Service are resolved using
+an internal services database.
+
+icmp/icmp6
+-----------
+  If the protocol is icmp or icmp6, the icmp-type or message can be added.
+
+  Icmp-type/icmp6-type can be a number or the name of an icmp-type or icmp
+message. Names are resolved using an internal database.
+
+Examples:
+---------
+
+  Probe from 192.168.1.2 to google, no protocol specification
+  jtacl> probe 192.168.1.2 www.google.com
+
+  Probe from the network 192.168.1.2/24 to google, no protocol specification
+  jtacl> probe 192.168.1.2/24 www.google.com
+
+  Same for tcp and http for the destination port.
+  jtacl> probe 192.168.1.2/24 www.google.com tcp http
+
+  Port source http
+  jtacl> probe 192.168.1.2/24 www.google.com tcp http:
+
+  Port source and port dest
+  jtacl> probe 192.168.1.2/24 www.google.com tcp 1024:http
+
+  Icmp echo
+  jtacl> probe 192.168.1.2/24 1.2.3.4 icmp echo
+
+  Probe from the equipment "router1", interface 'if0' using an equipment
+  specification
+  jtacl> probe on router1|if0 192.168.1.2/24 1.2.3.4 icmp echo
+ 

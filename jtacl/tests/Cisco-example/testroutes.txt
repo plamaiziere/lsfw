@@ -1,0 +1,5 @@
+probe expect routed 10.0.2.0/24 1.2.3.4
+probe expect !routed 10.0.3.0/24 1.2.3.4
+probe expect routed 192.168.0.0/24 1.2.3.4
+probe expect routed 192.168.1.0/24 1.2.3.4
+probe expect routed 192.168.2.0/24 1.2.3.4

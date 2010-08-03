@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+    Document   : jtacl.xml
+    Created on : 16 juillet 2010, 14:27
+    Author     : Patrick Lamaiziere
+    Description:
+        Configuration file for jtacl.
+-->
+
+<jtacl>
+	<equipments>
+		<equipment classname="fr.univrennes1.cri.jtacl.equipments.openbsd.PacketFilter"
+				   name="PF"
+				   comment="router #1"
+				   filename="./pf.xml"/>
+	</equipments>
+	<topology>
+		<!-- border of our network -->
+		<tlink network="10.0.0.0/24" topology="PF|10.0.0.1" border="true" />
+		<tlink network="fe90::/64" topology="PF|fe90::1" border="true" />
+	</topology>
+	<define name="EXTERN" value="PF|10.0.0.1" />
+
+</jtacl>
