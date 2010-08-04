@@ -2,7 +2,7 @@
 # Icmp type name and number definition (IPv4)
 #
 #	
-# ICMP NAME	 	                             TYPE   CODE
+# ICMP NAME                                  TYPE   CODE
 echo-reply                                      0   -1
 echorep                                         0   -1
 unreachable                                     3   -1

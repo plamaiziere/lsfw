@@ -1,8 +1,8 @@
 #
 # Icmp type name and number definition (IPv6)
 #
-#	
-# ICMP NAME	 	                             TYPE   CODE
+#
+# ICMP NAME                                  TYPE     CODE
 unreach                                         1     -1
 noroute-unr                                     1      0
 admin-unr                                       1      1
