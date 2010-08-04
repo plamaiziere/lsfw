@@ -421,8 +421,10 @@ public class PacketFilter extends GenericEquipment {
 						sroute + " " + ex.getMessage());
 			}
 			if (iface == null) {
-				throw new JtaclConfigurationException("Invalid route, nexthop" +
-						" is not on a subnet of this equipment: " + sroute);
+				Log.config().severe("Invalid route, nexthop" +
+						" is not on a subnet of this equipment: " + _name +
+						": " + sroute);
+				continue;
 			}
 			try {
 				link = iface.getLinkConnectedTo(nexthop);
