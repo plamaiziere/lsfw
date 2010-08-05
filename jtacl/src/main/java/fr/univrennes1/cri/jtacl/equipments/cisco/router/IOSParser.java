@@ -139,6 +139,7 @@ public class IOSParser extends CommonRules<Object> {
 			"ip address",
 			"ipv6 address",
 			"ip access-group",
+			"ipv6 traffic-filter",
 			"shutdown"
 		};
 
@@ -226,6 +227,7 @@ public class IOSParser extends CommonRules<Object> {
 					IfIpv6Address(),
 					IfIpAddress(),
 					IfIpAccessGroup(),
+					IfIpv6TrafficFilter(),
 					IfShutdown()
 			);
 	}
@@ -349,6 +351,41 @@ public class IOSParser extends CommonRules<Object> {
 						public boolean run(Context context) {
 							_direction  = context.getPrevText();
 							_ruleName = "ip access-group";
+							return true;
+						}
+					},
+					UntilEOI()
+				);
+	}
+
+	/**
+	 * Matches ipv6 traffic-filter  <br/>
+	 * reference Cisco: <br/>
+	 * ipv6 traffic-filter access-list in | out
+	 * @return a {@link Rule}
+	 */
+	public Rule IfIpv6TrafficFilter() {
+		return	Sequence(
+					String("ipv6"),
+					WhiteSpaces(),
+					String("traffic-filter"),
+					WhiteSpaces(),
+					StringAtom(),
+					new Action() {
+						public boolean run(Context context) {
+							_name = context.getPrevText();
+							return true;
+						}
+					},
+					WhiteSpaces(),
+					FirstOf(
+						String("in"),
+						String("out")
+					),
+					new Action() {
+						public boolean run(Context context) {
+							_direction  = context.getPrevText();
+							_ruleName = "ipv6 traffic-filter";
 							return true;
 						}
 					},
@@ -1172,6 +1209,5 @@ public class IOSParser extends CommonRules<Object> {
 					}
 			);
 		}
-
 
 }

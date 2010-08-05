@@ -61,19 +61,31 @@ public class CiscoRouter extends GenericEquipment {
 		protected String _name;
 		protected String _description;
 		protected boolean _shutdown;
-		protected ArrayList<AccessGroup> _accessGroupIn
+		protected ArrayList<AccessGroup> _accessGroup4In
 				= new ArrayList<AccessGroup>();
-		protected ArrayList<AccessGroup> _accessGroupOut
+		protected ArrayList<AccessGroup> _accessGroup4Out
+				= new ArrayList<AccessGroup>();
+		protected ArrayList<AccessGroup> _accessGroup6In
+				= new ArrayList<AccessGroup>();
+		protected ArrayList<AccessGroup> _accessGroup6Out
 				= new ArrayList<AccessGroup>();
 
 		protected ArrayList<IPNet> _ipAddresses = new ArrayList<IPNet>();
 
-		public ArrayList<AccessGroup> getAccessGroupIn() {
-			return _accessGroupIn;
+		public ArrayList<AccessGroup> getAccessGroup4In() {
+			return _accessGroup4In;
 		}
 
-		public ArrayList<AccessGroup> getAccessGroupOut() {
-			return _accessGroupOut;
+		public ArrayList<AccessGroup> getAccessGroup4Out() {
+			return _accessGroup4Out;
+		}
+
+		public ArrayList<AccessGroup> getAccessGroup6In() {
+			return _accessGroup4In;
+		}
+
+		public ArrayList<AccessGroup> getAccessGroup6Out() {
+			return _accessGroup4Out;
 		}
 
 		public Iface getIface() {
@@ -293,10 +305,32 @@ public class CiscoRouter extends GenericEquipment {
 							AccessGroup group = new AccessGroup(name, direction);
 							switch (direction) {
 								case IN:
-									curCsIface.getAccessGroupIn().add(group);
+									curCsIface.getAccessGroup4In().add(group);
 									break;
 								case OUT:
-									curCsIface.getAccessGroupOut().add(group);
+									curCsIface.getAccessGroup4Out().add(group);
+									break;
+							}
+						}
+
+						/*
+						 * ipv6 traffic-filter
+						 */
+						if (rule.equals("ipv6 traffic-filter")) {
+							String name = parser.getName();
+							String sdirection = parser.getDirection();
+							Direction direction;
+							if (sdirection.equals("in"))
+								direction = Direction.IN;
+							else
+								direction = Direction.OUT;
+							AccessGroup group = new AccessGroup(name, direction);
+							switch (direction) {
+								case IN:
+									curCsIface.getAccessGroup6In().add(group);
+									break;
+								case OUT:
+									curCsIface.getAccessGroup6Out().add(group);
 									break;
 							}
 						}
@@ -994,13 +1028,24 @@ public class CiscoRouter extends GenericEquipment {
 		 */
 		CiscoIface csIface = _ciscoIfaces.get(ifaceName);
 		List<AccessGroup> agroups = null;
-		switch (direction) {
-			case IN:
-				agroups = csIface.getAccessGroupIn();
-				break;
-			case OUT:
-				agroups = csIface.getAccessGroupOut();
-				break;
+		if (probe.isIPv4()) {
+			switch (direction) {
+				case IN:
+					agroups = csIface.getAccessGroup4In();
+					break;
+				case OUT:
+					agroups = csIface.getAccessGroup4Out();
+					break;
+			}
+		} else {
+			switch (direction) {
+				case IN:
+					agroups = csIface.getAccessGroup6In();
+					break;
+				case OUT:
+					agroups = csIface.getAccessGroup6Out();
+					break;
+			}
 		}
 
 		/*
