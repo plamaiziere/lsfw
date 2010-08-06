@@ -282,14 +282,6 @@ public class PfParser extends PfBaseParser {
 			}
 		}
 		return exRule;
-/*
- * XXX
-		RuleText rt = new RuleText();
-		rt.setCharCount(lindex);
-		rt.setText(exRule.expandedToString());
-		rt.setLineCount(lineRead);
-		return rt;
- */
  	}
 
 	/**
@@ -319,7 +311,8 @@ public class PfParser extends PfBaseParser {
 			"include ",
 			"load ",
 			"table ",
-			"anchor "
+			"anchor ",
+			"set skip"
 		};
 
 		for (String s: should) {
@@ -530,6 +523,7 @@ public class PfParser extends PfBaseParser {
 					SkipSpaces(),
 					FirstOf(
 						PfMacro(),
+						PfOption(),
 						PfInclude(),
 						PfRule(),
 						PfTableDef(),
@@ -825,6 +819,37 @@ public class PfParser extends PfBaseParser {
 					}
 				},
 				UntilEOI()
+			);
+	}
+
+	/**
+	 * Matches option: set skip interface
+	 *
+	 * @return a Rule
+	 */
+	public Rule PfOption() {
+		return
+			/*
+			 * set skip interface
+			 */
+			Sequence(
+				SET(),
+				WhiteSpace(),
+				SKIP(),
+				WhiteSpace(),
+				new Action() {
+					public boolean run(Context context) {
+						_pfRule = new RuleTemplate();
+						return true;
+					}
+				},
+				PfInterface(),
+				new Action() {
+					public boolean run(Context context) {
+						_ruleName = "option set skip";
+						return true;
+					}
+				}
 			);
 	}
 

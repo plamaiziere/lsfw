@@ -171,6 +171,11 @@ public class PacketFilter extends GenericEquipment {
 	protected HashMap<String, PfIface> _pfIfaces = new HashMap<String, PfIface>();
 
 	/*
+	 * skipped interfaces
+	 */
+	protected Map<String, String> _skippedIfaces = new HashMap<String, String>();
+
+	/*
 	 * pf.conf mapped into a string
 	 */
 	protected ConfigurationFile _pfConf;
@@ -1423,6 +1428,23 @@ public class PacketFilter extends GenericEquipment {
 		_curAnchor = saveContext;
 	}
 
+	protected void ruleSetSkip(RuleTemplate ruleTpl) {
+		/*
+		 * put the interfaces into the skipped interface map
+		 */
+		if (ruleTpl.getIfList() != null) {
+			StringsList ifList = parseIfList(ruleTpl.getIfList());
+			for (String iface: ifList) {
+				if (!_skippedIfaces.containsKey(iface))
+					_skippedIfaces.put(iface, iface);
+			}
+		 }
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("skipped:" + _skippedIfaces);
+		}
+	}
+
 	protected void parse(ConfigurationFile cfg) {
 		ParsingResult<?> result;
 		PfParser parser = Parboiled.createParser(PfParser.class);
@@ -1552,6 +1574,12 @@ public class PacketFilter extends GenericEquipment {
 				}
 
 				if (!hasOptParseOnly()) {
+					/*
+					 * set skip
+					 */
+					if (rule.equals("option set skip")) {
+						ruleSetSkip(parser.getPfRule());
+					}
 					/*
 					 * pfrule
 					 */
@@ -2298,6 +2326,15 @@ public class PacketFilter extends GenericEquipment {
 		String interfaceDesc = link.getIface().getName() + " (" +
 			link.getIface().getComment() + ")";
 		ProbeResults probeResults = probe.getResults();
+
+		/*
+		 * skipped interface
+		 */
+		if (_skippedIfaces.containsKey(link.getIface().getName())) {
+			probeResults.setAclResult(direction, AclResult.ACCEPT);
+			probeResults.setInterface(direction, interfaceDesc + " SKIPPED");
+			return;
+		}
 
 		/*
 		 * filter context

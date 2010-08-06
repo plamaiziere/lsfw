@@ -3231,4 +3231,38 @@ public class PfParserTest extends TestCase {
 		}
 
 	}
+
+	/**
+	 * test of rule PfOptionSetSkip
+	 */
+	public void testPfOptionSetSkip() {
+		System.out.println("PfOptionSetSkip");
+		String line;
+		RuleTemplate rule;
+
+		line = "set skip on IFACE";
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			rule = parser.getPfRule();
+			assertEquals("IFACE", rule.getIfList().get(0));
+			assertEquals("option set skip", parser.getRuleName());
+		}
+
+		line = "set skip on { IFACE0 IFACE1 }";
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			rule = parser.getPfRule();
+			assertEquals("IFACE0", rule.getIfList().get(0));
+			assertEquals("IFACE1", rule.getIfList().get(1));
+			assertEquals("option set skip", parser.getRuleName());
+		}
+
+	}
+
 }
