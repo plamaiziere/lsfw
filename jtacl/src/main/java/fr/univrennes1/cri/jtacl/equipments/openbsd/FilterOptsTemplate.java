@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
-import fr.univrennes1.cri.jtacl.equipments.cisco.router.AccessListElement;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.ArrayList;
 import java.util.List;
