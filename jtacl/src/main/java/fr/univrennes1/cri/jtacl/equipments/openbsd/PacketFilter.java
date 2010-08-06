@@ -141,6 +141,30 @@ public class PacketFilter extends GenericEquipment {
 
 	}
 
+	protected class TableToLoad {
+		protected String _name;
+		protected String _anchorName;
+		protected StringsList _files = new StringsList();
+
+		protected TableToLoad(String name, String anchorName) {
+			_name = name;
+			_anchorName = anchorName;
+		}
+
+		public String getAnchorName() {
+			return _anchorName;
+		}
+
+		public StringsList getFiles() {
+			return _files;
+		}
+
+		public String getName() {
+			return _name;
+		}
+
+	}
+
 	/*
 	 * interfaces
 	 */
@@ -157,7 +181,7 @@ public class PacketFilter extends GenericEquipment {
 	protected StringsList _dirMap = new StringsList();
 
 	/*
-	 * List of files maped.
+	 * List of files mapped.
 	 */
 	protected Map<String, String> _fileMap = new HashMap<String, String>();
 
@@ -167,15 +191,15 @@ public class PacketFilter extends GenericEquipment {
 	protected ParseContext _parseContext = new ParseContext();
 
 	/**
-	 * Map of table's filenames
+	 * Tables to load from file.
 	 */
-	protected Map<String, StringsList> _fileTables = 
-			new HashMap<String, StringsList>();
+	protected Map<String, TableToLoad> _tablesToLoad =
+			new HashMap<String, TableToLoad>();
 
 	/**
-	 * Map of anchor's filename
+	 * Anchors to load from file.
 	 */
-	protected Map<String, String> _fileAnchors =
+	protected Map<String, String> _anchorsToLoad =
 			new HashMap<String, String>();
 
 	/**
@@ -369,10 +393,10 @@ public class PacketFilter extends GenericEquipment {
 		try {
 			sroutes.readFromFile(fileName);
 		} catch (FileNotFoundException ex) {
-			throw new JtaclConfigurationException("no such routes file: " +
+			throw new JtaclConfigurationException("No such routes file: " +
 					fileName);
 		} catch (IOException ex) {
-			throw new JtaclConfigurationException("cannot read routes file: " +
+			throw new JtaclConfigurationException("Cannot read routes file: " +
 					fileName);
 		}
 		for (String sroute: sroutes) {
@@ -455,16 +479,16 @@ public class PacketFilter extends GenericEquipment {
 		Element e = (Element) list.item(0);
 		String filename = e.getAttribute("filename");
 		if (filename.isEmpty())
-			throw new JtaclConfigurationException("Missing file name");
+			throw new JtaclConfigurationException("Missing pfconf file name");
 		
 		_pfConf = new ConfigurationFile();
 		try {
 			_pfConf.readFromFile(filename);
 		} catch (FileNotFoundException ex) {
-				throw new JtaclConfigurationException("File not found: " +
+				throw new JtaclConfigurationException("pfconf file not found: " +
 					filename);
 		} catch (IOException ex) {
-				throw new JtaclConfigurationException("Cannot read file: " +
+				throw new JtaclConfigurationException("Cannot read pfconf file: " +
 					filename);
 		}
 
@@ -478,11 +502,11 @@ public class PacketFilter extends GenericEquipment {
 			e = (Element) list.item(0);
 			filename = e.getAttribute("filename");
 			if (filename.isEmpty())
-				throw new JtaclConfigurationException("Missing file name");
+				throw new JtaclConfigurationException("Missing routes-file file name");
 
 			File file = new File(filename);
 			if (!file.exists() || !file.isFile())
-				throw new JtaclConfigurationException("No such file: " + filename);
+				throw new JtaclConfigurationException("No such routes-file: " + filename);
 			_routesFile = filename;
 		}
 
@@ -494,10 +518,10 @@ public class PacketFilter extends GenericEquipment {
 			e = (Element) list.item(i);
 			String directory = e.getAttribute("directory");
 			if (directory.isEmpty())
-				throw new JtaclConfigurationException("Missing directory");
+				throw new JtaclConfigurationException("Missing dirmap directory");
 			File file = new File(directory);
 			if (!file.exists() || !file.isDirectory())
-				throw new JtaclConfigurationException("No such directory: " +
+				throw new JtaclConfigurationException("No such dirmap directory: " +
 					directory);
 
 			_dirMap.add(directory);
@@ -517,7 +541,7 @@ public class PacketFilter extends GenericEquipment {
 				throw new JtaclConfigurationException("Missing 'to' file");
 			File file = new File(to);
 			if (!file.exists() || !file.isFile())
-				throw new JtaclConfigurationException("No such file: " + to);
+				throw new JtaclConfigurationException("No such 'to' file: " + to);
 
 			_fileMap.put(from, to);
 		}
@@ -529,9 +553,11 @@ public class PacketFilter extends GenericEquipment {
 		for (int i = 0; i < list.getLength(); i++) {
 			e = (Element) list.item(i);
 			String name = e.getAttribute("name");
+			String anchorName = e.getAttribute("anchor");
 			filename = e.getAttribute("filename");
 
-			String s = "name: " + name + " filename: " + filename;
+			String s = "name: " + name + " anchor: " + anchorName +
+					" filename: " + filename;
 
 			if (name.isEmpty())
 				throw new JtaclConfigurationException("Missing table name: " + s);
@@ -543,12 +569,14 @@ public class PacketFilter extends GenericEquipment {
 			if (!file.exists() || !file.isFile())
 				throw new JtaclConfigurationException("No such file: " + s);
 
-			StringsList slist = _fileTables.get(name);
-			if (slist == null) {
-				slist = new StringsList();
-				_fileTables.put(name, slist);
+
+			String tkey = anchorName + "/" + name;
+			TableToLoad toLoad = _tablesToLoad.get(anchorName + "/" + name);
+			if (toLoad == null) {
+				toLoad = new TableToLoad(name, anchorName);
+				_tablesToLoad.put(tkey, toLoad);
 			}
-			slist.add(filename);
+			toLoad.getFiles().add(filename);
 		}
 
 		/*
@@ -570,18 +598,57 @@ public class PacketFilter extends GenericEquipment {
 
 			File file = new File(filename);
 			if (!file.exists() || !file.isFile())
-				throw new JtaclConfigurationException("No such file: " + s);
+				throw new JtaclConfigurationException("No such anchor file: " + s);
 
-			if (!_fileAnchors.containsKey(name))
-				_fileAnchors.put(name, filename);
+			if (!_anchorsToLoad.containsKey(name))
+				_anchorsToLoad.put(name, filename);
 		}
 
 	}
 
+	protected void loadTables() {
+		for (String n:  _tablesToLoad.keySet()) {
+			TableToLoad toLoad = _tablesToLoad.get(n);
+			String anchorName = toLoad.getAnchorName();
+			String tableName = toLoad.getName();
+			/*
+			 * anchor to use
+			 */
+			PfAnchor anchor;
+			if (anchorName.isEmpty())
+				anchor = _rootAnchor;
+			else {
+ 				anchor = _rootAnchor.findOrCreateAnchor(anchorName);
+				if (anchor == null)
+					throwCfgException("Table: " + tableName +
+							" cannot access anchor: " + anchorName);
+			}
+			PfTable table = new PfTable();
+			table.setName(tableName);
+			table.setConfigurationLine("");
+			table.setText("");
+			anchor.addTable(table);
+			/*
+			 * load each file
+			 */
+			for (String fileName: toLoad.getFiles()) {
+				PfIpSpec ipspec = loadTable(fileName);
+				table.getIpspec().addAll(ipspec);
+			}
+
+			if (Log.debug().isLoggable(Level.INFO)) {
+				String s = "table: " + table.getName() + " " + table.getFileNames() +
+					"\nip=" + table.getIpspec();
+				Log.debug().info(s);
+			}
+		}
+	}
+
 	protected void loadAnchors() {
 
-		for (String anchorName: _fileAnchors.keySet()) {
-			String fileName = _fileAnchors.get(anchorName);
+		_curAnchor = _rootAnchor;
+		for (String anchorName: _anchorsToLoad.keySet()) {
+			String fileName = _anchorsToLoad.get(anchorName);
 			ruleLoadAnchor(anchorName, fileName);
 		}
 	}
@@ -1581,6 +1648,7 @@ public class PacketFilter extends GenericEquipment {
 		_curAnchor = _rootAnchor;
 		parse(_pfConf);
 		loadAnchors();
+		loadTables();
 		routeDirectlyConnectedNetworks();
 		if (_routesFile != null)
 			loadRoutesFromFile(_routesFile);
