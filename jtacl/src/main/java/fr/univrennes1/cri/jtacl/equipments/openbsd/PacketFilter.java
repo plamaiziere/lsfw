@@ -930,7 +930,7 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		for (String ifname: ifList) {
 			if (!_pfIfaces.containsKey(ifname)) {
-				throwCfgException("unknown interface: " + ifname);
+				warnConfig("unknown interface: " + ifname);
 			}
 		}
 		return ifList;
