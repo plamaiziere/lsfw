@@ -327,7 +327,7 @@ public class GenericEquipment extends NetworkEquipment {
 			IfaceLinksByIp links = iface.getLinks();
 			for (IfaceLink link: links.values()) {
 				/*
-				 * add a route to directely connected network.
+				 * add a route to directly connected network.
 				 */
 				IPNet network = link.getNetwork();
 				Route<IfaceLink> route = new Route<IfaceLink>(network, network, 0, link);
