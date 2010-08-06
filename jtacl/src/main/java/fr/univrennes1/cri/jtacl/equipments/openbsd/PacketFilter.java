@@ -186,11 +186,6 @@ public class PacketFilter extends GenericEquipment {
 	 String _routesFile;
 
 	/**
-	 * Anchors stack
-	 */
-	protected Deque<PfAnchor> _anchors = new ArrayDeque<PfAnchor>();
-
-	/**
 	 * The root anchor
 	 */
 	protected PfAnchor _rootAnchor;
@@ -1246,17 +1241,11 @@ public class PacketFilter extends GenericEquipment {
 		table.setName(name);
 
 		/*
-		 * filenames
+		 * Translate filenames
 		 */
-		StringsList fileNames = _fileTables.get(name);
-		if (fileNames == null) {
-			fileNames = new StringsList();
-			/*
-			 * Translate filenames
-			 */
-			for (String n: tableTpl.getFileNames()) {
-				fileNames.add(translateFileName(n));
-			}
+		StringsList fileNames = new StringsList();
+		for (String n: tableTpl.getFileNames()) {
+			fileNames.add(translateFileName(n));
 		}
 		/*
 		 * load each file
