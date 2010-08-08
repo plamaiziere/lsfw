@@ -43,11 +43,18 @@
 -->
 
 <!-- mapping of file names -->
+<dirmap directory="./files" />
 <filemap from="/etc/pf/foo1" to="./files/tfiles1" />
 <filemap from="/etc/pf/foo2" to="./files/tfiles2" />
 <filemap from="/etc/pf/anchor1" to="./files/anchor1" />
 
 <!-- anchors to read from a file -->
 <anchor name="/anchor1/anchor2" filename="./files/anchor2" />
+
+<!-- tables to read from a file -->
+<table name="tableFoo" anchor="" filename="./files/tfiles1" />
+<table name="tableFoo" anchor="" filename="./files/tfiles2" />
+<table name="tableFoo" anchor="/anchor1/anchor2" filename="./files/tfiles2" />
+<table name="bad" filename = "./files/tfiles1" />
 
 </equipment>
