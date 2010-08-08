@@ -1,5 +1,5 @@
 --- option ---
-option | o [option-name = value] : display or set jtacl's option.
+option | o [option-name = value] : Displays or sets Jtacl options.
 
   Without parameter, option displays the current value of each option.
 
@@ -10,13 +10,10 @@ Jtacl defines five options.
   - maxhop
 
 * option config.level:
-The level of the loger used while reading configuration or parsing files.
+The level of the logger used while reading configuration or parsing files.
 
 * option debug.level:
-The level of the debuging logger.
-
-* option debug.level:
-The level of the debuging logger.
+The level of the debugging logger.
 
 * option notify.level:
 The level of the notify logger used when using the application.
@@ -26,9 +23,9 @@ Possible values for logger option are (from less to high):
 
 * option maxhop:
   The maximum number of probing. This number is decremented each time a probing
-is done, if this number reaches 0, the probing is aborted with an error.
-  This option could be usefull to abort probing loops, if set to '-1'
+is done. If this number reaches 0, the probing is aborted with an error.
+  This option can be useful to abort probing loop. If set to '-1'
 there is no limit.
 
-Options can be specified on the shell command line using the switch
+Options can be specified on the Jtacl command line using the switch
 "--option option-name=value".

@@ -1,11 +1,11 @@
 --- help ---
 
-define	     : define a variable that can be used as a macro.
-exit         : exit jtacl.
-help [topic] : display the [topic] help.
+define	     : defines a variable that can be used as a macro.
+exit         : exits jtacl.
+help [topic] : displays the [topic] help.
 license      : license informations.
-option       : set or display option.
-probe        : probe the network from a source to a destination.
-quit         : quit jtacl (same as exit).
-route        : show the routes defined on the equipments.
-topology     : show the topology of the network.
+option       : sets or displays option.
+probe        : probes the network from a source to a destination.
+quit         : quits jtacl (same as exit).
+route        : shows the routes.
+topology     : shows the topology of the network.

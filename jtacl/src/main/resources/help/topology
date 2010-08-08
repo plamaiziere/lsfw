@@ -9,9 +9,9 @@ Without parameter, the command displays all the topology.
 options:
   connected  : displays connected networks.
   !connected : displays non-connected networks
-               (network connecteds to only one equipment).
+               (network connected to only one equipment).
 
-  equipment  : name of the equipment to displays.
+  equipment  : name of the equipment to display.
   IpAddress  : IP address or network. Displays only networks
                matching this address.
 
@@ -22,7 +22,7 @@ connecting network interfaces to each other by a 'network'.
 and a list of links to the interfaces connected via this network link.
 
   A network link is 'connected' if it has more than one link to an interface,
-  Otherwise, it describes a leaf network.
+  otherwise, it describes a leaf network.
 
 Examples:
 ---------

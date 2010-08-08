@@ -1,6 +1,6 @@
 --- route ---
 
-route [equipment] : displays the routes.
+route [equipment] : Displays the routes.
 
   Without parameter, the route command displays the routes of all equipments.
 If an equipment is specified, displays the routes of this equipment only.

@@ -1,56 +1,57 @@
 --- probe ---
 
 probe [on equipment-spec] source destination
-[tcp | udp] [portsource:][portdest]]
-[icmp [icmptype]]
-[icmp6 icmp6type]]
+[tcp | udp [portsource:][portdest]] |
+[icmp [icmptype]] |
+[icmp6 icmp6type]] |
 [protocol]
 
-  The probe command probes the network from a source ip address to a destination ip
-address. Optionally, the protocol and protocol dependent options can be specified.
+  The probe command probes the network from a source IP address to a destination IP
+address. Optionally, the protocol and dependent options can be specified.
 
 on equipment-spec
 ------------------
   By default, Jtacl tries to find a network equipment where the probe will be
-injected using the source ip address. If there is zero or more than one candidat,
+injected using the source IP address. If there is zero or more than one candidate,
 Jtacl rejects the command with an error.
 
-  The 'on' keyword' allows to specify one interface on a network equipement
-where the probe must be injected. The equipment specification specifies the
+  The 'on' keyword allows to specify one interface on a network equipement
+where the probe will be injected. The equipment specification specifies the
 name of the equipment, followed by a '|' and then followed by the name
-of an interface or an ip address:
+of an interface or an IP address:
 
 equipments-spec: equipment'|'interface-name | ip address.
 
-  If an interface name is specified, Jtacl uses the source ip address of the
+  If an interface name is specified, Jtacl uses the source IP address of the
 probe to find a link on this interface (a link describes one network connected
 to an interface).
-
-  If an ip address is specified, Jtacl uses this ip address to find the link,
-regardless of the source ip address of the probe.
+  If an IP address is specified, Jtacl uses this IP address to find the link,
+regardless of the source IP address of the probe.
+  If the DFLTEQUIPMENT variable is defined, Jtack uses this variable as a default
+equipment specification when no candidate link is found.
 
 Addresses
 ---------
-  Source and destination addresses can be a hostname, an ip address or a
-network. If a hostname is specified, it is resolved first using DNS.
+  Source and destination addresses can be a hostname, an IP address or a
+network. If a hostname is specified, it is resolved using DNS.
 
-Protocols
----------
+Protocol
+--------
 
   The protocol is specified using a number or the name of the protocol.
-Names are resolved using and internal database.
+Names are resolved using an internal database.
 
 udp/tcp
 -------
-  If the protocol is udp or tcp, port source and port destination can be added
+  If the protocol is udp or tcp, port source and port destination can be specified
 using the form [portsource:][portdest]
 
-  Port can be a number or the name of a service. Service are resolved using
+  Port can be a number or the name of a service. Services are resolved using
 an internal services database.
 
 icmp/icmp6
 -----------
-  If the protocol is icmp or icmp6, the icmp-type or message can be added.
+  If the protocol is icmp or icmp6, the icmp-type or icmp message can be added.
 
   Icmp-type/icmp6-type can be a number or the name of an icmp-type or icmp
 message. Names are resolved using an internal database.
