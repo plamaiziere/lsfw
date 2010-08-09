@@ -36,6 +36,7 @@ public class IPProtocols extends ArrayList<IPProtoEnt> {
 	 * Common protocols
 	 */
 	protected int _ip;
+	protected int _ipv6;
 	protected int _icmp;
 	protected int _icmp6;
 	protected int _tcp;
@@ -136,6 +137,7 @@ public class IPProtocols extends ArrayList<IPProtoEnt> {
 		 * common protocols
 		 */
 		_ip = protocolLookup("ip");
+		_ipv6 = protocolLookup("ipv6");
 		_icmp = protocolLookup("icmp");
 		_icmp6 = protocolLookup("icmp6");
 		_tcp = protocolLookup("tcp");
@@ -170,6 +172,14 @@ public class IPProtocols extends ArrayList<IPProtoEnt> {
 	 */
 	public int IP() {
 		return _ip;
+	}
+
+	/**
+	 * Value for IPv6;
+	 * @return the value for the protocol IPv6.
+	 */
+	public int IPV6() {
+		return _ipv6;
 	}
 
 	/**
