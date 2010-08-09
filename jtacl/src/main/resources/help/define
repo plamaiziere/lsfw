@@ -12,7 +12,10 @@ value 'value'
 <define name="name" value="value" />
 
   The 'DFLTEQUIPMENT' variable, if defined, is used as the default equipment
-specification in the probe command (see probe command).
+specification in the probe command (see probe command) for IPv4.
+
+  The 'DFLTEQUIPMENT6' variable, if defined, is used as the default equipment
+specification in the probe command (see probe command) for IPv6.
 
 Example:
 --------

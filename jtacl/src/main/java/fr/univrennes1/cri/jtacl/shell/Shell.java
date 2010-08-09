@@ -437,6 +437,15 @@ public class Shell {
 			}
 		}
 
+		/*
+		 * Check address family
+		 */
+		if (!sourceAddress.sameIPVersion(destinationAdress)) {
+			System.out.println("Error: source address and destination address" +
+					" must have the same address family");
+			return;
+		}
+
 		/* 
 		 * We can specify where we want to inject the probes.
 		 */
@@ -455,7 +464,11 @@ public class Shell {
 				/*
 				 * use the DFLTEQUIPMENT variable if defined.
 				 */
-				String defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT");
+				String defaultEquipment;
+				if (sourceAddress.isIPv4())
+					 defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT");
+				else
+					defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT6");
 				if (defaultEquipment != null) {
 					ilinks = getIfaceLinksByEquipmentSpec(sourceAddress, defaultEquipment);
 					// error

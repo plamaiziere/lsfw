@@ -28,7 +28,9 @@ to an interface).
   If an IP address is specified, Jtacl uses this IP address to find the link,
 regardless of the source IP address of the probe.
   If the DFLTEQUIPMENT variable is defined, Jtack uses this variable as a default
-equipment specification when no candidate link is found.
+equipment specification when no candidate link is found for IPv4 addresses.
+  If the DFLTEQUIPMENT6 variable is defined, Jtack uses this variable as a default
+equipment specification when no candidate link is found for IPv6 addresses.
 
 Addresses
 ---------
