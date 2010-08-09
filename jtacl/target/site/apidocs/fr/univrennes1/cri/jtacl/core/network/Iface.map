@@ -1,0 +1,10 @@
+<map id="G" name="G">
+<area shape="rect" id="c8934" href="../monitor/Monitor.html" title="&lt;TABLE&gt;" alt="" coords="525,523,606,592"/>
+<area shape="rect" id="c8952" href="./IfaceLinksByIp.html" title="&lt;TABLE&gt;" alt="" coords="103,395,225,464"/>
+<area shape="rect" id="c8953" href="./NetworkEquipment.html" title="&lt;TABLE&gt;" alt="" coords="269,395,862,464"/>
+<area shape="rect" id="c8954" href="./Iface.html" title="&lt;TABLE&gt;" alt="" coords="16,267,536,336"/>
+<area shape="rect" id="c8955" href="./IfaceLink.html" title="&lt;TABLE&gt;" alt="" coords="593,139,999,208"/>
+<area shape="rect" id="c8972" href="../../equipments/cisco/pix/Pix.CiscoIface.html" title="&lt;TABLE&gt;" alt="" coords="217,139,335,208"/>
+<area shape="rect" id="c8984" href="../../equipments/cisco/router/CiscoRouter.CiscoIface.html" title="&lt;TABLE&gt;" alt="" coords="379,139,549,208"/>
+<area shape="rect" id="c9005" href="../../equipments/openbsd/PfIface.html" title="&lt;TABLE&gt;" alt="" coords="725,11,867,80"/>
+</map>
