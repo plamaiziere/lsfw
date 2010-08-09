@@ -19,7 +19,6 @@ import fr.univrennes1.cri.jtacl.core.monitor.ProbesList;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.io.CharArrayWriter;
 import java.io.PrintWriter;
 
@@ -34,33 +33,6 @@ public class ShellReport {
 
 	public ShellReport(ProbesTracker tracker) {
 		_tracker = tracker;
-	}
-
-	public String showAllProbes(ProbesByUid probes) {
-		CharArrayWriter swriter = new CharArrayWriter();
-		PrintWriter writer = new PrintWriter(swriter);
-//		SortedMap probesSet = new SortedSet(probes.keySet());
-
-//		Collections.sort(probesSet);
-
-		for (Probe probe: probes.values()) {
-			IfaceLink iFrom = probe.getIncomingLink();
-			IfaceLink iTo = probe.getOutgoingLink();
-			IPNet nextHop = probe.getNextHop();
-			NetworkEquipment equipment = (iFrom != null) ? iFrom.getIface().getEquipment() : null;
-
-			String str = "<probe #" + probe.getUid() +">";
-			str += " p #";
-			str += (probe.getParentProbe() != null ) ? probe.getParentProbe().getUid() : "-1";
-			str += " ttl: " + probe.getTimeToLive();
-			str += " on: ";
-			str += (equipment != null) ? equipment.getName() : "XXX";
-			str += " path: " + probe.showPath();
-			writer.println(str);
-		}
-		writer.println();
-		writer.flush();
-		return swriter.toString();
 	}
 
 	public String showPath(ProbesList probes) {
@@ -167,8 +139,6 @@ public class ShellReport {
 			writer.println("-------- Looping probes -------");
 			writer.print(showResultingProbes(loopingProbes, verbose));
 		}
-
-		writer.println("Global ACL result is: " + _tracker.getAclResult());
 
 		writer.flush();
 		return swriter.toString();
