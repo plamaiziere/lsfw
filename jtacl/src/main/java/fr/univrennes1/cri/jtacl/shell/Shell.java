@@ -537,7 +537,10 @@ public class Shell {
 				/*
 				 * if tcp or udp we want to match ip too. 
 				 */
-				protocols.add(ipProtocols.IP());
+				if (sourceAddress.isIPv4())
+					protocols.add(ipProtocols.IP());
+				else
+					protocols.add(ipProtocols.IPV6());
 				if (sprotoSource != null) {
 					protoSource = ipServices.serviceLookup(sprotoSource, sprotocol);
 					if (protoSource.intValue() == -1) {
@@ -559,7 +562,8 @@ public class Shell {
 			/*
 			 * if ip we want to match tcp and udp too
 			 */
-			if (sprotocol.equalsIgnoreCase("ip")) {
+			if (sprotocol.equalsIgnoreCase("ip") ||
+					sprotocol.equalsIgnoreCase("ipv6")) {
 				protocols.add(ipProtocols.TCP());
 				protocols.add(ipProtocols.UDP());
 			}
