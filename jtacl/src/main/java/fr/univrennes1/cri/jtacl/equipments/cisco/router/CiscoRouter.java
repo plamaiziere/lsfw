@@ -81,11 +81,11 @@ public class CiscoRouter extends GenericEquipment {
 		}
 
 		public ArrayList<AccessGroup> getAccessGroup6In() {
-			return _accessGroup4In;
+			return _accessGroup6In;
 		}
 
 		public ArrayList<AccessGroup> getAccessGroup6Out() {
-			return _accessGroup4Out;
+			return _accessGroup6Out;
 		}
 
 		public Iface getIface() {
@@ -1063,7 +1063,7 @@ public class CiscoRouter extends GenericEquipment {
 					break;
 				}
 			}
-			// access group don't match
+			// access group doesn't match
 			if (!mgroup)
 				continue;
 
