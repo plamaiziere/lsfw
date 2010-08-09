@@ -502,7 +502,6 @@ public class Shell {
 			expect = "";
 
 		IfaceLink ilink = ilinks.get(0);
-		NetworkEquipment equipment = ilink.getIface().getEquipment();
 
 		/*
 		 * build the probe request
