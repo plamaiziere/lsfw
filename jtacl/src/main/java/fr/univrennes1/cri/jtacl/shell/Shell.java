@@ -16,6 +16,7 @@ package fr.univrennes1.cri.jtacl.shell;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
+import fr.univrennes1.cri.jtacl.core.monitor.AclResult;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbesTracker;
@@ -69,7 +70,6 @@ public class Shell {
 	protected boolean _testMode;
 	protected boolean _verbose;
 	protected Probing _lastProbing;
-	protected boolean _probeResult;
 	protected boolean _testResult;
 
 	static public final int EXIT_SUCCESS = 0;
@@ -402,7 +402,7 @@ public class Shell {
 		}
 	}
 
-	public void probeCommand(ShellParser command) {
+	public boolean probeCommand(ShellParser command) {
 
 		IPNet sourceAddress;
 		try {
@@ -417,7 +417,7 @@ public class Shell {
 				sourceAddress = new IPNet(inet.getHostAddress());
 			} catch (UnknownHostException ex1) {
 				System.out.println("Error: " + ex1.getMessage());
-				return;
+				return false;
 			}
 		}
 		IPNet destinationAdress;
@@ -433,7 +433,7 @@ public class Shell {
 				destinationAdress = new IPNet(inet.getHostAddress());
 			} catch (UnknownHostException ex1) {
 				System.out.println("Error: " + ex1.getMessage());
-				return;
+				return false;
 			}
 		}
 
@@ -443,7 +443,7 @@ public class Shell {
 		if (!sourceAddress.sameIPVersion(destinationAdress)) {
 			System.out.println("Error: source address and destination address" +
 					" must have the same address family");
-			return;
+			return false;
 		}
 
 		/* 
@@ -454,7 +454,7 @@ public class Shell {
 			ilinks = getIfaceLinksByEquipmentSpec(sourceAddress, command.getEquipments());
 			// error
 			if (ilinks == null)
-				return;
+				return false;
 		} else {
 			/*
 			 * try to find a network link that matches the source IP address.
@@ -473,15 +473,15 @@ public class Shell {
 					ilinks = getIfaceLinksByEquipmentSpec(sourceAddress, defaultEquipment);
 					// error
 					if (ilinks == null)
-						return;
+						return false;
 				} else {
 					System.out.println("No network matches");
-					return;
+					return false;
 				}
 			} else {
 				if (nlinks.size() > 1) {
 					System.out.println("Too many networks match this source IP address");
-					return;
+					return false;
 				}
 				ilinks = nlinks.get(0).getIfaceLinks();
 			}
@@ -489,12 +489,12 @@ public class Shell {
 
 		if (ilinks.isEmpty()) {
 			System.out.println("No link found");
-			return;
+			return false;
 		}
 
 		if (ilinks.size() > 1) {
 			System.out.println("Too many links");
-			return;
+			return false;
 		}
 
 		String expect = command.getProbeExpect();
@@ -522,7 +522,7 @@ public class Shell {
 			protocol = ipProtocols.protocolLookup(sprotocol);
 			if (protocol.intValue() == -1)  {
 				System.out.println("unknown protocol: " + sprotocol);
-				return;
+				return false;
 			}
 			List<Integer> protocols = new ArrayList<Integer>();
 			request.setProtocols(protocols);
@@ -544,7 +544,7 @@ public class Shell {
 					protoSource = ipServices.serviceLookup(sprotoSource, sprotocol);
 					if (protoSource.intValue() == -1) {
 						System.out.println("unknown service: " + sprotoSource);
-						return;
+						return false;
 					}
 					request.setSourcePort(protoSource);
 				}
@@ -552,7 +552,7 @@ public class Shell {
 					protoDest = ipServices.serviceLookup(sprotoDest, sprotocol);
 					if (protoDest.intValue() == -1) {
 						System.out.println("unknown service: " + sprotoDest);
-						return;
+						return false;
 					}
 					request.setDestinationPort(protoDest);
 				}
@@ -583,7 +583,7 @@ public class Shell {
 					if (icmpEnt == null) {
 						System.out.println("unknown icmp-type or message: "
 							+ sprotoSource);
-						return;
+						return false;
 					}
 					request.setSubType(icmpEnt.getIcmp());
 					request.setCode(icmpEnt.getCode());
@@ -591,33 +591,151 @@ public class Shell {
 			}
 		}
 
+		/*
+		 * probe
+		 */
 		_monitor.resetProbing();
 		_monitor.newProbing(ilink, sourceAddress, destinationAdress, request);
 		_lastProbing = _monitor.startProbing();
 
-		_probeResult = true;
+		/*
+		 * results
+		 */
+		/*
+		 * acl counters
+		 */
+		int accepted = 0;
+		int denied = 0;
+		int may = 0;
+		/*
+		 * routing counters
+		 */
+		int routed = 0;
+		int notrouted = 0;
+		int routeunknown =0;
+
+		/*
+		 * each tracker
+		 */
 		for (ProbesTracker tracker: _lastProbing) {
 			if (!_testMode) {
 				ShellReport report = new ShellReport((tracker));
-				System.out.println(report.showResults(_verbose));
+				System.out.print(report.showResults(_verbose));
 			}
-			RoutingResult routingResult = tracker.getRoutingResult();
-			if (expect.equalsIgnoreCase("ROUTED") &&
-					routingResult != RoutingResult.ROUTED)
-				_probeResult = false;
-			if (expect.equalsIgnoreCase("!ROUTED") &&
-					routingResult == RoutingResult.ROUTED)
-				_probeResult = false;
-			if (expect.equalsIgnoreCase("NONE-ROUTED") &&
-					routingResult != RoutingResult.NOTROUTED)
-				_probeResult = false;
-			if (expect.equalsIgnoreCase("!NONE-ROUTED") &&
-					routingResult == RoutingResult.NOTROUTED)
-				_probeResult = false;
+			switch (tracker.getAclResult()) {
+				case ACCEPT:	accepted++;
+								break;
+				case DENY:		denied++;
+								break;
+				case MAY:		may++;
+								break;
+			}
+			switch (tracker.getRoutingResult()) {
+				case ROUTED:	routed++;
+								break;
+				case NOTROUTED:	notrouted++;
+								break;
+				default:
+								routeunknown++;
+			}
 		}
-		if (!_probeResult)
-			_testResult = false;
+		/*
+		 * Global ACL result
+		 */
+		AclResult aclResult = AclResult.MAY;
+		/*
+		 * one result was MAY
+		 */
+		if (may > 0) {
+			aclResult = AclResult.MAY;
+		} else {
+			/*
+			 * some probes were accepted and some were denied => MAY
+			 */
+			if (accepted > 0 && denied > 0) {
+				aclResult = AclResult.MAY;
+			} else {
+				/*
+				 * all probes were accepted => ACCEPT
+				 */
+				if (accepted > 0) {
+					aclResult = AclResult.ACCEPT;
+				}
+				/*
+				 * all probes were denied => DENY
+				 */
+				if (denied > 0) {
+					aclResult = AclResult.DENY;
+				}
+			}
+		}
 
+		/*
+		 * Global routing result
+		 */
+		RoutingResult routingResult = RoutingResult.UNKNOWN;
+		/*
+		 * one result was UNKNOWN.
+		 */
+		if (routeunknown > 0) {
+			routingResult = RoutingResult.UNKNOWN;
+		} else {
+			/*
+			 * some probes were routed, and some not => UNKNOWN
+			 */
+			if (routed > 0 && notrouted > 0) {
+				routingResult = RoutingResult.UNKNOWN;
+			} else {
+				/*
+				 * all probes were routed => ROUTED
+				 */
+				if (routed > 0) {
+					routingResult = RoutingResult.ROUTED;
+				}
+				/*
+				 * all probes were not routed => NOTROUTED
+				 */
+				if (notrouted > 0) {
+					routingResult = RoutingResult.NOTROUTED;
+				}
+			}
+		}
+
+		if (!_testMode) {
+			System.out.println("Global ACL result is: " + aclResult);
+			System.out.println("Global routing result is: " + routingResult);
+			System.out.println();
+		}
+
+		boolean testExpect = false;
+		boolean notExpect = expect.startsWith("!");
+		if (notExpect && expect.length() > 1)
+			expect = expect.substring(1);
+
+		if (expect.equalsIgnoreCase("ROUTED") &&
+				routingResult == RoutingResult.ROUTED)
+			testExpect = true;
+		if (expect.equalsIgnoreCase("NONE-ROUTED") &&
+				routingResult == RoutingResult.NOTROUTED)
+			testExpect = true;
+		if (expect.equalsIgnoreCase("UNKNOWN") &&
+				routingResult == RoutingResult.UNKNOWN)
+			testExpect = true;
+
+		if (expect.equalsIgnoreCase("ACCEPT") &&
+				aclResult == AclResult.ACCEPT)
+			testExpect = true;
+		if (expect.equalsIgnoreCase("DENY") &&
+				aclResult == AclResult.DENY)
+			testExpect = true;
+
+		if (expect.equalsIgnoreCase("MAY") &&
+				aclResult == AclResult.MAY)
+				testExpect = true;
+
+		if (notExpect)
+			testExpect = !testExpect;
+		return testExpect;
 	}
 
 	public void parseShellCommand(String commandLine) {
@@ -647,8 +765,17 @@ public class Shell {
 			System.out.println("Goodbye!");
 			System.exit(0);
 		}
-		if (_parser.getCommand().equals("probe"))
-			probeCommand(_parser);
+		if (_parser.getCommand().equals("probe")) {
+			boolean test = probeCommand(_parser);
+			if (_testMode) {
+				if (!test) {
+					_testResult = false;
+					System.out.println(commandLine + " [FAILED]");
+				} else {
+					System.out.println(commandLine + " [OK]");
+				}
+			}
+		}
 		if (_parser.getCommand().equals("option"))
 			optionCommand(_parser);
 		if (_parser.getCommand().equals("topology"))
@@ -701,12 +828,6 @@ public class Shell {
 			}
 			commandLine = commandLine.trim();
 			parseShellCommand(commandLine);
-			if (_testMode) {
-				if (!_probeResult)
-					System.out.println(commandLine + " [FAILED]");
-				else
-					System.out.println(commandLine + " [OK]");
-			}
 		}
 		try {
 			dataIn.close();
