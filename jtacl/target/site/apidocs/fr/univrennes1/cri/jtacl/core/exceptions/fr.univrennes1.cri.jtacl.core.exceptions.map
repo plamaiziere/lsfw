@@ -1,7 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="c551" href="./JtaclConfigurationException.html" title="&lt;TABLE&gt;" alt="" coords="16,139,304,208"/>
-<area shape="rect" id="c552" href="./JtaclRoutingException.html" title="&lt;TABLE&gt;" alt="" coords="349,139,605,208"/>
-<area shape="rect" id="c553" href="./JtaclTopologyException.html" title="&lt;TABLE&gt;" alt="" coords="650,139,915,208"/>
-<area shape="rect" id="c554" href="./JtaclInternalException.html" title="&lt;TABLE&gt;" alt="" coords="959,139,1214,208"/>
-<area shape="rect" id="c555" href="./JtaclRuntimeException.html" title="&lt;TABLE&gt;" alt="" coords="501,11,758,80"/>
-</map>

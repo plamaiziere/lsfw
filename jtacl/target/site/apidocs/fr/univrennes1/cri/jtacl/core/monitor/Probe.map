@@ -1,9 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="c7323" href="../../lib/ip/IPNet.html" title="&lt;TABLE&gt;" alt="" coords="15,367,369,465"/>
-<area shape="rect" id="c7345" href="./ProbePosition.html" title="&lt;TABLE&gt;" alt="" coords="252,239,369,308"/>
-<area shape="rect" id="c7346" href="./ProbeResults.html" title="&lt;TABLE&gt;" alt="" coords="414,239,527,308"/>
-<area shape="rect" id="c7347" href="./ProbeRequest.html" title="&lt;TABLE&gt;" alt="" coords="572,239,689,308"/>
-<area shape="rect" id="c7350" href="./ProbesByUid.html" title="&lt;TABLE&gt;" alt="" coords="789,381,901,451"/>
-<area shape="rect" id="c7351" href="./Probe.html" title="&lt;TABLE&gt;" alt="" coords="169,81,932,180"/>
-<area shape="rect" id="c7353" href="./ProbesTracker.html" title="&lt;TABLE&gt;" alt="" coords="785,239,906,308"/>
-</map>
