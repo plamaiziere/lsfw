@@ -37,22 +37,64 @@ import java.util.logging.Level;
 import org.w3c.dom.Document;
 
 /**
+ * The Monitor is the main class of Jtacl.<br/>
+ * It creates network equipments according to the configuration.<br/>
+ * Builds the topology.<br/>
+ * Handles define and option.<br/>
+ * Handles name databases.<br/>
+ * Dispatches probes between network equipments.<br/>
+ * Does the probing.
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class Monitor {
 
+	/**
+	 * singleton
+	 */
 	protected static Monitor _instance = new Monitor();
+
+	/**
+	 * Returns the singleton instance.
+	 * @return the singleton instance.
+	 */
 	public static Monitor getInstance() {
 		return _instance;
 	}
 
+	/**
+	 * configuration XML document
+	 */
 	protected Document _xmlConfiguration;
+
+	/**
+	 * Hop counter
+	 */
 	protected int _hopCount;
+
+	/**
+	 * Jtacl options
+	 */
 	protected Options _options;
+
+	/**
+	 * defined variable
+	 */
 	protected Map<String, String> _defines;
+
+	/**
+	 * Map of the network equipments.
+	 */
 	protected NetworkEquipmentsByName _equipments;
+
+	/**
+	 * The topology of the network
+	 */
 	protected Topology _topology;
+
+	/**
+	 * Probing collection.
+	 */
 	protected Probing _probing;
 
 	protected Monitor() {
@@ -63,6 +105,10 @@ public class Monitor {
 		_probing = new Probing();
 	}
 
+	/**
+	 * Reads the protocols database.
+	 * @param stream stream to read.
+	 */
 	protected void readProtocols(InputStream stream) {
 		try {
 			IPProtocols.getInstance().readProtocols(stream);
@@ -75,6 +121,10 @@ public class Monitor {
 		}
 	}
 
+	/**
+	 * Reads the services database.
+	 * @param stream stream to read.
+	 */
 	protected void readServices(InputStream stream) {
 		try {
 			IPServices.getInstance().readServices(stream);
@@ -87,6 +137,11 @@ public class Monitor {
 		}
 	}
 
+	/**
+	 * Reads the icmp-types and messages database.
+	 * @param ipIcmp database to be loaded.
+	 * @param stream stream to read.
+	 */
 	protected void readIcmp(IPIcmp ipIcmp, InputStream stream) {
 		try {
 			ipIcmp.readIcmp(stream);
@@ -99,7 +154,15 @@ public class Monitor {
 		}
 	}
 
-
+	/**
+	 * Creates a new instance of the network equipment described in argument.
+	 * @param className className of the equipment.
+	 * @param equipmentName the name of the equipment.
+	 * @param equipmentComment the comment of the equipment.
+	 * @param fileName the filename of the equipment.
+	 * @return the newly created equipment.
+	 * @throws JtaclConfigurationException on error.
+	 */
 	public NetworkEquipment createNetworkEquipment(String className,
 			String equipmentName,
 			String equipmentComment,
@@ -148,6 +211,14 @@ public class Monitor {
 		return equipment;
 	}
 
+	/**
+	 * Creates and adds a new instance of the network equipment described in argument.
+	 * @param className className of the equipment.
+	 * @param equipmentName the name of the equipment.
+	 * @param equipmentComment the comment of the equipment.
+	 * @param fileName the filename of the equipment.
+	 * @throws JtaclConfigurationException on error.
+	 */
 	public void addEquipment(String className,	String equipmentName,
 			String equipmentComment, String fileName) {
 
@@ -162,14 +233,26 @@ public class Monitor {
 		_equipments.put(eq);
 	}
 
+	/**
+	 * Returns a map of the network equipments handled by the monitor.
+	 * @return a map of the network equipments handled by the monitor.
+	 */
 	public NetworkEquipmentsByName getEquipments() {
 		return _equipments;
 	}
 
+	/**
+	 * Returns the probing done by the monitor.
+	 * @return the probing done by the monitor.
+	 */
 	public Probing getProbing() {
 		return _probing;
 	}
 
+	/**
+	 * Configures the monitor.
+	 * @param fileName filename of the configuration file.
+	 */
 	public void configure(String fileName) {
 
 		/*
@@ -207,6 +290,9 @@ public class Monitor {
 		config.loadDefines(_xmlConfiguration);
 	}
 
+	/**
+	 * Initializes the monitor.
+	 */
 	public void init() {
 		
 		for (String name : _equipments.keySet()) {
@@ -220,16 +306,26 @@ public class Monitor {
 		_topology.makeTopology();
 	}
 
+	/**
+	 * Returns the topology.
+	 * @return the topology.
+	 */
 	public Topology getTopology() {
 		return _topology;
 	}
 
+	/**
+	 * Receives a probe coming from an equipment.
+	 * @param link probe's incoming link
+	 * @param probe the probe received
+	 * @param nextHop the nexthop to use. Can be null.
+	 */
 	public void receiveProbe(IfaceLink link, Probe probe, IPNet nextHop) {
 
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info(probe.uidToString() +
 				" received from: " + link.getIface().getEquipment().getName() + " "
-				+ link.toString() + " to: " + nextHop.toString(":i"));
+				+ link.toString() + " to: " + nextHop.toString("::i"));
 
 		/*
 		 * Ensure that the probing is done
@@ -289,6 +385,11 @@ public class Monitor {
 		sendProbe(nextHopLink, nextProbe);
 	}
 
+	/**
+	 * Sends a probe to a link.
+	 * @param link link to use.
+	 * @param probe probe to send.
+	 */
 	public void sendProbe(IfaceLink link, Probe probe) {
 
 		/*
@@ -344,10 +445,17 @@ public class Monitor {
 		link.incoming(probe);
 	}
 
+	/**
+	 * Resets the probing queue.
+	 */
 	public void resetProbing() {
 		_probing.clear();
 	}
 
+	/**
+	 * Starts the probing.
+	 * @return the result of the probing.
+	 */
 	public Probing startProbing() {
 
 		Probing result = new Probing();
@@ -369,6 +477,13 @@ public class Monitor {
 		return result;
 	}
 
+	/**
+	 * Queues a new probing.
+	 * @param link link to use.
+	 * @param sourceAddress source IP address of the probing.
+	 * @param destinationAddress destination of the probing.
+	 * @param request the request of the probing.
+	 */
 	public void newProbing(IfaceLink link, IPNet sourceAddress,
 			IPNet destinationAddress, ProbeRequest request) {
 		
@@ -378,11 +493,19 @@ public class Monitor {
 		tracker.setRootProbe(probe);
 		_probing.add(tracker);
 	}
-	
+
+	/**
+	 * Returns the options.
+	 * @return the options.
+	 */
 	public Options getOptions() {
 		return _options;
 	}
 
+	/**
+	 * Returns the defined variables.
+	 * @return the defined variables.
+	 */
 	public Map<String, String> getDefines() {
 		return _defines;
 	}

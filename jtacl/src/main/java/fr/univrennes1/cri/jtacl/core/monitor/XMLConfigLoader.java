@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
+ * This call is a helper to read the configuration of the monitor.
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
