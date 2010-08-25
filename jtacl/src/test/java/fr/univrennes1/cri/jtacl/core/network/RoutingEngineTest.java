@@ -51,6 +51,20 @@ public class RoutingEngineTest extends TestCase {
 	}
 
 	/**
+	 * Test of addSourceRoute method, of class RoutingEngine.
+	 */
+	public void testAddSourceRoute() throws UnknownHostException {
+		System.out.println("addSourceRoute");
+		RoutingEngine rn = new RoutingEngine();
+
+		IPNet prefix = new IPNet("192.168.0.0/24");
+		IPNet nextHop = new IPNet("192.168.1.0");
+		Route<Iface> route = new Route(prefix, nextHop, 1, null);
+		rn.addSourceRoute(route);
+	}
+	
+
+	/**
 	 * Test of getRoutes method, of class RoutingEngine.
 	 */
 	public void testGetRoutes() throws Exception {
@@ -83,6 +97,24 @@ public class RoutingEngineTest extends TestCase {
 		destination = new IPNet("192.168.0.0/24");
 		result = rn.getRoutes(destination);
 		assertTrue(result.size() == 2);
+	}
+
+	/**
+	 * Test of getSourceRoutes method, of class RoutingEngine.
+	 */
+	public void testSourceGetRoutes() throws Exception {
+		System.out.println("getSourceRoutes");
+		RoutingEngine rn = new RoutingEngine();
+
+		IPNet prefix = new IPNet("192.168.0.0/24");
+		IPNet nextHop = new IPNet("192.168.1.1");
+		Route<Iface> route = new Route(prefix, nextHop, 1, this);
+		rn.addSourceRoute(route);
+
+		IPNet address = new IPNet("192.168.0.1");
+		Routes result = rn.getSourceRoutes(address);
+		assertTrue(result.size() == 1);
+		assertEquals(route, result.get(0));
 	}
 
 }

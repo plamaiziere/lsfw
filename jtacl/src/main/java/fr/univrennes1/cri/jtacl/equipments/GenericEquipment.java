@@ -164,7 +164,101 @@ public class GenericEquipment extends NetworkEquipment {
 	}
 
 	/**
-	 * Loads routes from an XML document.
+	 * Creates a route from an XML element.
+	 * @param element XML element.
+	 * @return a new route
+	 */
+	protected Route<IfaceLink> routeFromXmlElement(Element element) {
+		String tagName = element.getTagName();
+		String sprefix = element.getAttribute("prefix");
+		String snexthop = element.getAttribute("nexthop");
+		String smetric = element.getAttribute("metric");
+		String sLink = element.getAttribute("link");
+
+		String s = "equipment: " + _name +
+				" " + tagName +
+				" prefix: " + sprefix +
+				" nexthop: " + snexthop +
+				" link: " + sLink +
+				" metric: " + smetric;
+
+		if (sprefix.isEmpty())
+			throw new JtaclConfigurationException("Missing route prefix: " + s);
+
+		if (snexthop.isEmpty())
+			throw new JtaclConfigurationException("Missing route nexthop: " + s);
+
+		if (smetric.isEmpty())
+			smetric="1";
+
+		IPNet prefix;
+		try {
+			prefix = new IPNet(sprefix);
+		} catch (UnknownHostException ex) {
+			throw new JtaclConfigurationException("Invalid route prefix: " + s);
+		}
+
+		IPNet nexthop;
+		try {
+			nexthop = new IPNet(snexthop);
+		} catch (UnknownHostException ex) {
+			throw new JtaclConfigurationException("Invalid route nexthop: " + s);
+		}
+
+		int metric;
+		try {
+			metric = Integer.valueOf(smetric);
+		} catch (NumberFormatException ex) {
+			throw new JtaclConfigurationException("Invalid route metric: " + s);
+		}
+
+		Iface iface = null;
+		IfaceLink link = null;
+
+		/*
+		 * If no link was specified, use the directly connected network
+		 * containing nextHop
+		 */
+		if (sLink.isEmpty()) {
+			try {
+				iface = getIfaceConnectedTo(nexthop);
+			} catch (UnknownHostException ex) {
+				throw new JtaclConfigurationException("Invalid route " +
+						s + " " + ex.getMessage());
+			}
+			if (iface == null) {
+				throw new JtaclConfigurationException("Invalid route, nexthop" +
+						" is not on a subnet of this equipment: " + s);
+			}
+
+			try {
+				link = iface.getLinkConnectedTo(nexthop);
+			} catch (UnknownHostException ex) {
+				throw new JtaclConfigurationException("Invalid route " +
+						s + " " + ex.getMessage());
+			}
+		} else {
+			/*
+			 * link specified
+			 */
+			IPNet ip = null;
+			try {
+				ip = new IPNet(sLink);
+			} catch (UnknownHostException ex) {
+				throw new JtaclConfigurationException("Invalid route " +
+						s + " " + ex.getMessage());
+			}
+			link = getIfaceLink(ip);
+		}
+
+		if (link == null)
+			throw new JtaclConfigurationException("Invalid route: coud not find link " + s);
+
+		Route<IfaceLink> route = new Route<IfaceLink>(prefix, nexthop, metric, link);
+		return route;
+	}
+	/**
+	 * Loads routes and source-routes from an XML document.
 	 * @param doc document to use.
 	 * @throws JtaclConfigurationException if error occurs.
 	 */
@@ -173,97 +267,18 @@ public class GenericEquipment extends NetworkEquipment {
 		NodeList list = doc.getElementsByTagName("route");
 		for (int i = 0; i < list.getLength(); i++) {
 			Element e = (Element) list.item(i);
-			String sprefix = e.getAttribute("prefix");
-			String snexthop = e.getAttribute("nexthop");
-			String smetric = e.getAttribute("metric");
-			String sLink = e.getAttribute("link");
-
-			String s = "equipment: " + _name +
-					" prefix: " + sprefix +
-					" nexthop: " + snexthop +
-					" link: " + sLink +
-					" metric: " + smetric;
-
-			if (sprefix.isEmpty())
-				throw new JtaclConfigurationException("Missing route prefix: " + s);
-
-			if (snexthop.isEmpty())
-				throw new JtaclConfigurationException("Missing route nexthop: " + s);
-
-			if (smetric.isEmpty())
-				smetric="1";
-
-			IPNet prefix;
-			try {
-				prefix = new IPNet(sprefix);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid route prefix: " + s);
-			}
-
-			IPNet nexthop;
-			try {
-				nexthop = new IPNet(snexthop);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid route nexthop: " + s);
-			}
-
-			int metric;
-			try {
-				metric = Integer.valueOf(smetric);
-			} catch (NumberFormatException ex) {
-				throw new JtaclConfigurationException("Invalid route metric: " + s);
-			}
-
-			Iface iface = null;
-			IfaceLink link = null;
-
-			/*
-			 * If no link was specified, use the directly connected network
-			 * containing nextHop
-			 */
-			if (sLink.isEmpty()) {
-				try {
-					iface = getIfaceConnectedTo(nexthop);
-				} catch (UnknownHostException ex) {
-					throw new JtaclConfigurationException("Invalid route " +
-							s + " " + ex.getMessage());
-				}
-				if (iface == null) {
-					throw new JtaclConfigurationException("Invalid route, nexthop" +
-							" is not on a subnet of this equipment: " + s);
-				}
-
-				try {
-					link = iface.getLinkConnectedTo(nexthop);
-				} catch (UnknownHostException ex) {
-					throw new JtaclConfigurationException("Invalid route " +
-							s + " " + ex.getMessage());
-				}
-			} else {
-				/*
-				 * link specified
-				 */
-				IPNet ip = null;
-				try {
-					ip = new IPNet(sLink);
-				} catch (UnknownHostException ex) {
-					throw new JtaclConfigurationException("Invalid route " +
-							s + " " + ex.getMessage());
-				}
-				link = getIfaceLink(ip);
-			}
-
-			/*
-			 * add the route.
-			 */
-			if (link == null)
-				throw new JtaclConfigurationException("Invalid route: coud not find link " + s);
-
-			Route<IfaceLink> route = new Route<IfaceLink>(prefix, nexthop, metric, link);
+			Route<IfaceLink> route = routeFromXmlElement(e);
 			Log.debug().info(_name + " add route: " + route.toString());
 			_routingEngine.addRoute(route);
+		}
 
-		} // for
+		list = doc.getElementsByTagName("source-route");
+		for (int i = 0; i < list.getLength(); i++) {
+			Element e = (Element) list.item(i);
+			Route<IfaceLink> route = routeFromXmlElement(e);
+			Log.debug().info(_name + " add source-route: " + route.toString());
+			_routingEngine.addSourceRoute(route);
+		}
 	}
 
 	/**

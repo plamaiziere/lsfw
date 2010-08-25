@@ -55,64 +55,53 @@ public class RoutingEngine implements ShowableRoutes {
 
 	private RoutingTable _routingTableIPv4;
 	private RoutingTable _routingTableIPv6;
+	private RoutingTable _sourceRoutingTableIPv4;
+	private RoutingTable _sourceRoutingTableIPv6;
 
 	private RoutingTable routingTable(IPversion version) {
 		return (version == IPversion.IPV4) ? _routingTableIPv4 : _routingTableIPv6;
 	}
 
+	private RoutingTable sourceRoutingTable(IPversion version) {
+		return (version == IPversion.IPV4) ? _sourceRoutingTableIPv4 :
+			_sourceRoutingTableIPv6;
+	}
+
 	private void showRoute(PrintWriter writer, Route route) {
-		writer.print(route.getPrefix().toString("::") + "\t");
-		writer.print(route.getNextHop().toString("i::") + "\t");
-		writer.print(route.getMetric() + "\t");
-		writer.print(route.getLink());
+		writer.print(route.getPrefix().toString("") + " ");
+		writer.print(route.getNextHop().toString("i") + " ");
+		writer.print(route.getMetric());
+		writer.print(" link = " + route.getLink());
 		writer.println();
 	}
 
-	/**
-	 * Creates a new {@link RoutingEngine} instance.
-	 */
-	public RoutingEngine() {
-		_routingTableIPv4 = new RoutingTable();
-		_routingTableIPv6 = new RoutingTable();
-	}
-
-	/**
-	 * Adds a route into this {@link RoutingEngine} instance.
-	 * @param route the {@link Route} to add.
-	 */
-	public void addRoute(Route route) {
-		RoutingTable table = routingTable(route.getPrefix().getIpVersion());
-		Integer prefixKey = route.getPrefix().hashCode();
-		RoutingTableItem routingItem =  table.get(prefixKey);
-
-		if(routingItem == null) {
-			routingItem = new RoutingTableItem(route.getPrefix());
-			table.put(prefixKey, routingItem);
+	private void showRoutingTable(PrintWriter writer, RoutingTable table) {
+		ArrayList<RoutingTableItem> stable = new ArrayList<RoutingTableItem>();
+		stable.addAll(table.values());
+		Collections.sort(stable);
+		if (stable.isEmpty())
+			writer.println("(none)");
+		for (RoutingTableItem routeItem: stable) {
+			for (Route route: routeItem._routes) {
+				showRoute(writer, route);
+			}
 		}
-		routingItem._routes.add(route);
 	}
 
-	/**
-	 * Returns the routes that match this destination.
-	 * @param destination the {@link IPNet} IP address of the destination.
-	 * @return a {@link Routes} list containing the routes. The list could be
-	 * empty but not null.
-	 * @throws JtaclRoutingException if problem occurs.
-	 */
-	public Routes getRoutes(IPNet destination) {
+	private Routes getRoutes(IPNet address, RoutingTable table) {
 
 		/*
 		 * The algorithm used is quite stupid.
-		 * We try to find routes starting with the destination prefixlen.
-		 * If no routes have been found, try with prefixlen - 1, until all
+		 * We try to find routes starting with the address prefixlen.
+		 * If no routes has been found, try with prefixlen - 1, until all
 		 * prefixlen have been tested.
 		 */
 		IPNet previous = null;
-		for (int i = destination.getPrefixLen(); i >= 0; i--) {
+		for (int i = address.getPrefixLen(); i >= 0; i--) {
 			// prefix of the destination
 			IPNet prefix;
 			try {
-				prefix = new IPNet(destination.getIP(), destination.getIpVersion(), i);
+				prefix = new IPNet(address.getIP(), address.getIpVersion(), i);
 				prefix = prefix.networkAddress();
 				/*
 				 * Do not test again if the network is the same as the
@@ -126,7 +115,6 @@ public class RoutingEngine implements ShowableRoutes {
 			}
 			// search the prefix in the routing table
 			Integer prefixKey = prefix.hashCode();
-			RoutingTable table = routingTable(destination.getIpVersion());
 			RoutingTableItem routeItem = table.get(prefixKey);
 			if (routeItem != null) {
 				Routes routes = new Routes();
@@ -137,9 +125,12 @@ public class RoutingEngine implements ShowableRoutes {
 					 */
 					if (route.getLink() == null) {
 						IPNet nexthop = route.getNextHop();
+						/*
+						 * XXX: nexthop is a destination
+						 */
 						Routes resolv = getRoutes(nexthop);
 						if (resolv != null)
-							routes.addAll(getRoutes(nexthop));
+							routes.addAll(resolv);
 					} else
 						routes.add(route);
 				}
@@ -162,43 +153,113 @@ public class RoutingEngine implements ShowableRoutes {
 		return new Routes();
 	}
 
+
 	/**
-	 * Returns the routes that match the destination of an {@link Probe} probe.
-	 * @param probe a {@link Probe} probe containing the destination.
+	 * Creates a new {@link RoutingEngine} instance.
+	 */
+	public RoutingEngine() {
+		_routingTableIPv4 = new RoutingTable();
+		_routingTableIPv6 = new RoutingTable();
+		_sourceRoutingTableIPv4 = new RoutingTable();
+		_sourceRoutingTableIPv6 = new RoutingTable();
+	}
+
+	/**
+	 * Adds a route into this {@link RoutingEngine} instance.
+	 * @param route the {@link Route} to add.
+	 */
+	public void addRoute(Route route) {
+		RoutingTable table = routingTable(route.getPrefix().getIpVersion());
+		Integer prefixKey = route.getPrefix().hashCode();
+		RoutingTableItem routingItem =  table.get(prefixKey);
+
+		if(routingItem == null) {
+			routingItem = new RoutingTableItem(route.getPrefix());
+			table.put(prefixKey, routingItem);
+		}
+		routingItem._routes.add(route);
+	}
+
+	/**
+	 * Adds a source route into this {@link RoutingEngine} instance.
+	 * @param route the {@link Route} to add.
+	 */
+	public void addSourceRoute(Route route) {
+		RoutingTable table = sourceRoutingTable(route.getPrefix().getIpVersion());
+		Integer prefixKey = route.getPrefix().hashCode();
+		RoutingTableItem routingItem =  table.get(prefixKey);
+
+		if(routingItem == null) {
+			routingItem = new RoutingTableItem(route.getPrefix());
+			table.put(prefixKey, routingItem);
+		}
+		routingItem._routes.add(route);
+	}
+
+	/**
+	 * Returns the routes that match this destination.
+	 * @param destination the {@link IPNet} IP address of the destination.
+	 * @return a {@link Routes} list containing the routes. The list could be
+	 * empty but not null.
+	 * @throws JtaclRoutingException if problem occurs.
+	 */
+	public Routes getRoutes(IPNet destination) {
+
+		RoutingTable table = routingTable(destination.getIpVersion());
+		return getRoutes(destination, table);
+	}
+
+	/**
+	 * Returns the source routes that match this source address.
+	 * @param source the {@link IPNet} IP address of the source.
+	 * @return a {@link Routes} list containing the routes. The list could be
+	 * empty but not null.
+	 * @throws JtaclRoutingException if problem occurs.
+	 */
+	public Routes getSourceRoutes(IPNet source) {
+
+		RoutingTable table = sourceRoutingTable(source.getIpVersion());
+		return getRoutes(source, table);
+	}
+
+	/**
+	 * Returns the source-routes or routes for a {@link Probe} probe
+	 * @param probe a {@link Probe} probe containing the source/destination.
 	 * @return a {@link Routes} list containing the routes. The list could be
 	 * empty but not null.
 	 * @throws JtaclRoutingException if problem occurs.
 	 */
 	public Routes getRoutes(Probe probe) {
+		Routes sourceRoutes = getSourceRoutes(probe.getSourceAddress());
+		if (!sourceRoutes.isEmpty())
+			return sourceRoutes;
+
 		return getRoutes(probe.getDestinationAddress());
 	}
 
 	public String showRoutes() {
 		CharArrayWriter swriter = new CharArrayWriter();
 		PrintWriter writer = new PrintWriter(swriter);
-		writer.println("IPv4 routes");
-		ArrayList<RoutingTableItem> table = new ArrayList<RoutingTableItem>();
-		table.addAll(routingTable(IPversion.IPV4).values());
-		Collections.sort(table);
-		if (table.isEmpty())
-			writer.println("(none)");
-		for (RoutingTableItem routeItem: table) {
-			for (Route route: routeItem._routes) {
-				showRoute(writer, route);
-			}
+
+		if (!_sourceRoutingTableIPv4.isEmpty()) {
+			writer.println("IPv4 source-routes");
+			showRoutingTable(writer, _sourceRoutingTableIPv4);
+			writer.println();
 		}
-		writer.println();
-		writer.println("IPv6 routes");
-		table.clear();
-		table.addAll(routingTable(IPversion.IPV6).values());
-		Collections.sort(table);
-		if (table.isEmpty())
-			writer.println("(none)");
-		for (RoutingTableItem routeItem: table) {
-			for (Route route: routeItem._routes) {
-				showRoute(writer, route);
-			}
-			writer.println("");
+		if (!_routingTableIPv4.isEmpty()) {
+			writer.println("IPv4 routes");
+			showRoutingTable(writer, _routingTableIPv4);
+			writer.println();
+		}
+		if (!_sourceRoutingTableIPv6.isEmpty()) {
+			writer.println("IPv6 source-routes");
+			showRoutingTable(writer, _sourceRoutingTableIPv6);
+			writer.println();
+		}
+		if (!_routingTableIPv6.isEmpty()) {
+			writer.println("IPv6 routes");
+			showRoutingTable(writer, _routingTableIPv6);
+			writer.println();
 		}
 		writer.flush();
 		return swriter.toString();
