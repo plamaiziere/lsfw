@@ -158,15 +158,8 @@ public class Shell {
 			 * by IP address
 			 */
 			if (ipaddress  != null) {
-				try {
-					if (link.getIp().equals(ipaddress) ||
-						link.getNetwork().networkContains(ipaddress)) {
-						resLinks.add(link);
-					}
-				} catch (UnknownHostException ex) {
-					// should not happen, just in case.
-					throw new JtaclInternalException("Invalid network in " +
-						link.getNetwork().toString());
+				if (link.getIp().equals(ipaddress)) {
+					resLinks.add(link);
 				}
 				continue;
 			}
