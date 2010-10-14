@@ -134,23 +134,11 @@ public class Shell {
 			 */
 			if (iface != null) {
 				if (link.getIface().getName().equals(ifaceName)) {
-					if (sourceIP != null) {
-						/*
-						 * and by source IP address
-						 */
-						try {
-							if (link.getIp().equals(sourceIP) ||
-									link.getNetwork().networkContains(sourceIP))
-								resLinks.add(link);
-
-						} catch (UnknownHostException ex) {
-								// should not happen, just in case.
-								throw new JtaclInternalException("Invalid network in " +
-									link.getNetwork().toString());
-						}
-					} else {
-						resLinks.add(link);
-					}
+					/*
+					 * pick up the first link
+					 */
+					resLinks.add(link);
+					break;
 				}
 				continue;
 			}
