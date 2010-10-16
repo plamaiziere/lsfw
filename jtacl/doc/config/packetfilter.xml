@@ -38,8 +38,8 @@
 	<!-- routing engine -->
 	<routing>
 		<!-- 
-			path to a file containing some “route add” commands in the format 
-			“route add network nexthop”.
+			path to a file containing some "route add" commands in the format 
+			"route add network nexthop".
 		-->
 		<routes-file filename="/pathtofile/file" />
 		<!-- 
