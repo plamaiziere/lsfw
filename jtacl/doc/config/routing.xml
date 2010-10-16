@@ -1,0 +1,43 @@
+<!--
+	Document   : routing.xml
+	Created on : 16 octobre 2010, 13:10
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the routing engine configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/commonrouting
+-->
+
+<routing>
+
+<!-- route definition 
+
+<route prefix="network" nexthop="nexthop-address" link="link-address" metric="number" />
+
+network			: the prefix of the route.
+nexthop-address	: the IP address of the next-hop.
+link-address	: the ip address of the link to reach the next-hop. If the next-hop is not on a directly connected network, link can be used to specify the ip address of the interface to reach the next-hop.
+metric			: a number to indicate the metric (not used at the moment) of the route.
+
+The attributes link and metric are optional.
+-->
+
+<route prefix="IPaddress/Netmask" nexthop="IPaddress" />
+<route prefix="IPaddress/Netmask" nexthop="IPaddress" link="IPaddress" />
+
+
+<!-- source-route definition
+
+<source-route prefix="network" nexthop="nexthop-address" link="link-address" metric="number" />
+
+network			: the prefix of the route.
+nexthop-address	: the IP address of the next-hop.
+link-address	: the ip address of the link to reach the next-hop. If the next-hop is not on a directly connected network, link can be used to specify the ip address of the interface to reach the next-hop.
+metric			: a number to indicate the metric (not used at the moment) of the route.
+
+The attributes link and metric are optional.
+-->
+
+<source-route prefix="IPaddress/Netmask" nexthop="IPaddress" />
+<source-route prefix="IPaddress/Netmask" nexthop="IPaddress" link="IPaddress" />
+
+</routing>

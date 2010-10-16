@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : simplerouter.xml
+	Created on : 16 octobre 2010, 12:32
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the SimpleRouter configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/simplerouter
+-->
+
+<equipment>
+
+	<!-- definitions of the interfaces -->
+	<iface name="eth0" comment="interface 0" ip="IPaddress" network="IPaddress/Netmask"/>
+	<!-- when adding an IP to an already defined interface, "comment" attribute is optional -->
+	<iface name="eth0" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<iface name="eth1" comment="interface 1" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<!-- routing engine -->
+	<routing>
+		<!-- 
+			Add routing engine definitions here.
+			See the file routing.xml
+			https://listes.cru.fr/wiki/jtacl/public/commonrouting
+		-->
+	</routing>
+
+</equipment>

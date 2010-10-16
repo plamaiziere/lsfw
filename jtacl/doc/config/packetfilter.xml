@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : packetfilter.xml
+	Created on : 16 octobre 2010, 12:50
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the PacketFilter configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/packetfilter
+-->
+
+<equipment>
+
+	<!-- interfaces -->
+	 
+	<!-- interface groups is optional -->
+	<iface name="if0" comment="interface 0" ip="IPaddress"
+		network="IPaddress/Netmask" groups="group1 group2 groupn" />
+
+	<!-- PacketFilter file (pf.conf) --> 
+	<pfconf filename="./pf.conf" />
+
+	<!-- mapping of file names -->
+	<dirmap directory="./files" />
+	<filemap from="/etc/pf/foo1" to="./files/tfiles1" />
+	<filemap from="/etc/pf/foo2" to="./files/tfiles2" />
+	<filemap from="/etc/pf/anchor1" to="./files/anchor1" />
+
+	<!-- anchors to read from a file -->
+	<anchor name="/anchor1/anchor2" filename="./files/anchor2" />
+
+	<!-- tables to read from a file -->
+	<table name="tableFoo" anchor="" filename="./files/tfiles1" />
+	<table name="tableFoo" anchor="" filename="./files/tfiles2" />
+	<table name="tableFoo" anchor="/anchor1/anchor2" filename="./files/tfiles2" />
+	<table name="bad" filename = "./files/tfiles1" />
+
+	<!-- routing engine -->
+	<routing>
+		<!-- 
+			path to a file containing some “route add” commands in the format 
+			“route add network nexthop”.
+		-->
+		<routes-file filename="/pathtofile/file" />
+		<!-- 
+			Add routing engine definitions here.
+			See the file routing.xml
+			https://listes.cru.fr/wiki/jtacl/public/commonrouting
+		-->
+	</routing>
+
+	<!-- options -->
+	<options>
+		<!-- 
+			Add options definitions here.
+			See the file options.xml
+			https://listes.cru.fr/wiki/jtacl/public/commonoptions
+
+			Nb: PacketFilter does not handle the filter option
+		-->
+	</options>
+
+		
+</equipment>

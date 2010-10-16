@@ -1,0 +1,43 @@
+<!--
+	Document   : options.xml
+	Created on : 16 octobre 2010, 13:16
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the options configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/commonoptions
+-->
+
+<options>
+
+<!-- filters
+Filters allow to skip and ignore lines matching a pattern in the native configuration file of the equipment.
+
+<filter pattern="pattern" />
+Pattern format documentation: http://download-llnw.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html
+Several filters can be specified by using more than one <filter> entity.
+
+-->
+<filter pattern="pattern" />
+
+<!-- options
+Options are defined using the <option> XML entity:
+
+<option key="akey" value="avalue" />
+The attribute key specifies the name of the option. The attribute value specifies the value to set.
+
+An equipment can define its own options and they are two options defined by default:
+
++ parse-only
+<option key="parse-only" value="true" />
+This option specifies that the equipment module must only parse files without doing any interpretation.
+Useful for testing and debugging.
+
++ dump-configuration
+<option key="dump-configuration" value="path-to-a-file" />
+This option allows to dump each line recognized by a module to a file specified in the attribute value.
+
+-->
+<option key="parse-only" value="true" />
+<option key="dump-configuration" value="path-to-a-file" />
+
+</options>

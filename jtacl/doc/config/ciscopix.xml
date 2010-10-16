@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : ciscopix.xml
+	Created on : 16 octobre 2010, 12:45
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the Cisco PIX configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/pix
+-->
+
+<equipment>
+
+	<!-- list of the native Cisco files of the firewall -->
+	<file filename="/pathtofile/file1" />
+	<file filename="/pathtofile/file2" />
+
+	<!-- routing engine -->
+	<routing>
+		<!-- 
+			Add routing engine definitions here.
+			See the file routing.xml
+			https://listes.cru.fr/wiki/jtacl/public/commonrouting
+		-->
+	</routing>
+
+	<!-- options -->
+	<options>
+		<!-- 
+			Add options definitions here.
+			See the file options.xml
+			https://listes.cru.fr/wiki/jtacl/public/commonoptions
+		-->
+	</options>
+
+</equipment>
