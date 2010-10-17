@@ -22,9 +22,9 @@ of an interface or an IP address:
 
 equipments-spec: equipment'|'interface-name | ip address.
 
-  If an interface name is specified, Jtacl uses the source IP address of the
-probe to find a link on this interface (a link describes one network connected
-to an interface).
+  If an interface name is specified, Jtacl uses the first link available on this
+interface, regardless of the source IP address of the probe (a link describes
+one network connected to an interface).
   If an IP address is specified, Jtacl uses this IP address to find the link,
 regardless of the source IP address of the probe.
   If the DFLTEQUIPMENT variable is defined, Jtack uses this variable as a default
