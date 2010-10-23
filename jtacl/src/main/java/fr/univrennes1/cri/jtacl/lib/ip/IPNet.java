@@ -14,9 +14,13 @@
 package fr.univrennes1.cri.jtacl.lib.ip;
 
 import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Class and tools to deal with IPv4 and IPv6 addresses and networks.<br/>
@@ -341,31 +345,40 @@ public class IPNet implements Comparable {
 		*/
 	}
 
-	protected void makeFromNetMask(String data, String sip, String smask)
+	protected static int getPrefixFromNetmask(String smask, IPversion ipVersion)
 			throws UnknownHostException {
 
 		int prefix;
-		IPNetParseResult result = parseAddress(sip);
-
 		/*
-		 * check if the netmask is like a.b.c.d/255.255.255.0 
+		 * check if the netmask is like a.b.c.d/255.255.255.0
 		 */
 		int pos = smask.indexOf('.');
 		if (pos >= 0) {
 			IPNetParseResult netmask = parseAddress(smask);
 			if (netmask.ipVersion != IPversion.IPV4)
-				throw new UnknownHostException("Netmask must be IPv4: " + data);
-			if (result.ipVersion != IPversion.IPV4)
-				throw new UnknownHostException("Dot netmask with not an IPv4 address: " + data);
+				throw new UnknownHostException("Netmask must be IPv4: " + smask);
+			if (ipVersion != IPversion.IPV4)
+				throw new UnknownHostException("Dot netmask with not an IPv4 address: " + smask);
 			prefix = IP.netmaskToPrefixLen(netmask.ipInt);
 		} else {
 			// cidr notation /n
 			try {
 				prefix = Integer.parseInt(smask);
 			} catch (NumberFormatException e) {
-				throw new UnknownHostException("Netmask must contain numbers: " + data);
+				throw new UnknownHostException("Netmask must contain numbers: " + smask);
 			}
+			if (!IP.isValidPrefixLen(prefix, ipVersion))
+				throw new UnknownHostException("Invalid prefix 0 <= prefix <= " +
+					IP.maxPrefixLen(ipVersion) + smask);
 		}
+		return prefix;
+	}
+
+	protected void makeFromNetMask(String data, String sip, String smask)
+			throws UnknownHostException {
+
+		IPNetParseResult result = parseAddress(sip);
+		int prefix = getPrefixFromNetmask(smask, result.ipVersion);
 		makeIP(result.ipInt, result.ipVersion, prefix);
 	}
 
@@ -459,6 +472,70 @@ public class IPNet implements Comparable {
 			}
 		}
 		throw new UnknownHostException("Can't parse IP Address: " + data);
+	}
+
+	/**
+	 * Given the name of a host, returns a list of its IP addresses
+	 * matching the IP version in argument.
+	 * If the name of the host contains a mask, the mask is applied to the
+	 * resulting ip addresses.
+	 * @param hostname the name of the host
+	 * @param ipVersion the IP version of the addresses to return.
+	 * @return a list of all the IP addresses for a given host name.
+	 * @throws UnknownHostException if no IP address for the host could be
+	 *  found, or if a scope_id was specified for a global IPv6 address.
+	 * @throws SecurityException if a security manager exists and its
+	 * checkConnect method doesn't allow the operation.
+	 * @see InetAddress
+	 */
+	public static List<IPNet> getAllByName(String hostname, IPversion ipVersion)
+			throws UnknownHostException {
+
+		String split [] = hostname.split("/");
+		int prefix = -1;
+
+		// netmask specification ?
+		if (split.length > 2)
+			throw new UnknownHostException("Only one '/' allowed in IP Address: " +
+				hostname);
+
+		if (split.length == 2)
+			prefix = getPrefixFromNetmask(split[1], ipVersion);
+
+		InetAddress inet [] = InetAddress.getAllByName(split[0]);
+		ArrayList<IPNet> addresses = new ArrayList<IPNet>();
+		for (InetAddress addr: inet) {
+			if ((addr instanceof Inet4Address && ipVersion == IPversion.IPV4) ||
+				(addr instanceof Inet6Address && ipVersion == IPversion.IPV6)) {
+				IPNet address = new IPNet(addr.getHostAddress());
+				if (prefix != -1)
+					address = address.setMask(prefix);
+				addresses.add(address);
+			}
+		}
+		if (addresses.isEmpty())
+			throw new UnknownHostException(split[0]);
+		return addresses;
+	}
+
+	/**
+	 * Given the name of a host, returns its IP address matching the IP
+	 * version in argument.
+	 * If the name of the host contains a mask, the mask is applied to the
+	 * resulting ip address.
+	 * @param hostname the name of the host
+	 * @param ipVersion the IP version of the address to return.
+	 * @return the IP address for a given host name.
+	 * @throws UnknownHostException if no IP address for the host could be
+	 *  found, or if a scope_id was specified for a global IPv6 address.
+	 * @throws SecurityException if a security manager exists and its
+	 * checkConnect method doesn't allow the operation.
+	 * @see InetAddress
+	 */
+	public static IPNet getByName(String hostname, IPversion ipVersion)
+			throws UnknownHostException {
+
+		return getAllByName(hostname, ipVersion).get(0);
 	}
 
 	/**
