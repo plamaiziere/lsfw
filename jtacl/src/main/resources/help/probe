@@ -1,6 +1,6 @@
 --- probe ---
 
-probe [on equipment-spec] source destination
+probe|probe6 [on equipment-spec] source destination
 [tcp | udp [portsource:][portdest]] |
 [icmp [icmptype]] |
 [icmp6 icmp6type]] |
@@ -11,10 +11,6 @@ address. Optionally, the protocol and dependent options can be specified.
 
 on equipment-spec
 ------------------
-  By default, Jtacl tries to find a network equipment where the probe will be
-injected using the source IP address. If there is zero or more than one candidate,
-Jtacl rejects the command with an error.
-
   The 'on' keyword allows to specify one interface on a network equipement
 where the probe will be injected. The equipment specification specifies the
 name of the equipment, followed by a '|' and then followed by the name
@@ -35,7 +31,16 @@ equipment specification when no candidate link is found for IPv6 addresses.
 Addresses
 ---------
   Source and destination addresses can be a hostname, an IP address or a
-network. If a hostname is specified, it is resolved using DNS.
+network. If a hostname is specified, it is resolved using DNS. The probe command
+uses IPv4 resolution and the probe6 command uses IPv6 resolution.
+
+  By default, Jtacl tries to find a network equipment where the probe will be
+injected using the source IP address of the probe. If there is zero or more than
+one candidate, Jtacl rejects the command with an error.
+
+  The "=host/mask" notation in the source address of the probe specifies to
+use the host address (instead the network address) when looking for the
+equipment where the probe will be injected.
 
 Protocol
 --------
@@ -82,4 +87,14 @@ Examples:
   Probe from the equipment "router1", interface 'if0' using an equipment
   specification
   jtacl> probe on router1|if0 192.168.1.2/24 1.2.3.4 icmp echo
- 
+
+  Probe from "www.afnic.fr" (IpV4), applying a netmask.
+  jtacl> probe www.afnic.fr/16 1.2.3.4
+
+  Probe from "www.afnic.fr" (IpV6), applying a netmask.
+  jtacl> probe6 www.afnic.fr/16 ::1
+
+  Probe from 192.168.1.2/24, but use the host address 192.168.1.2 to find the
+  equipment where the probe should be injected (instead using the network
+  192.168.1.0/24).
+  jtacl> probe =192.168.1.2/24 1.2.3.4

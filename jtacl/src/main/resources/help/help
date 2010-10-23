@@ -5,7 +5,7 @@ exit         : exits jtacl.
 help [topic] : displays the [topic] help.
 license      : license informations.
 option       : sets or displays option.
-probe        : probes the network from a source to a destination.
+probe|probe6 : probes the network from a source to a destination.
 quit         : quits jtacl (same as exit).
 route        : shows the routes.
 topology     : shows the topology of the network.
