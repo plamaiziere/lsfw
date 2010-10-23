@@ -29,6 +29,7 @@ import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
+import fr.univrennes1.cri.jtacl.core.topology.Topology;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
@@ -36,13 +37,13 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
+import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import static java.util.Arrays.* ;
@@ -385,17 +386,34 @@ public class Shell {
 
 	public boolean probeCommand(ShellParser command) {
 
+		IPversion ipVersion;
+		if (command.getCommand().equals("probe6"))
+			ipVersion = IPversion.IPV6;
+		else
+			ipVersion = IPversion.IPV4;
+
+		String sSourceAddress = command.getSrcAddress();
+		/*
+		 * =host or =addresse in source addresse
+		 */
+		boolean equalSourceAddress;
+		if (sSourceAddress.startsWith("=")) {
+			equalSourceAddress = true;
+			sSourceAddress = sSourceAddress.substring(1);
+		} else {
+			equalSourceAddress = false;
+		}
+
 		IPNet sourceAddress;
 		try {
-			sourceAddress = new IPNet(command.getSrcAddress());
+			sourceAddress = new IPNet(sSourceAddress);
 		} catch (UnknownHostException ex) {
 			try {
 				// not an IP try to resolve as a host.
-				InetAddress inet = InetAddress.getByName(command.getSrcAddress());
+				sourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
 				if (!_testMode)
-					System.out.println(command.getSrcAddress() + " => " +
-						inet.getHostAddress());
-				sourceAddress = new IPNet(inet.getHostAddress());
+					System.out.println(sSourceAddress + " => " +
+						sourceAddress.toString("::i"));
 			} catch (UnknownHostException ex1) {
 				System.out.println("Error: " + ex1.getMessage());
 				return false;
@@ -407,11 +425,10 @@ public class Shell {
 		} catch (UnknownHostException ex) {
 			try {
 				// not an IP try to resolve as a host.
-				InetAddress inet = InetAddress.getByName(command.getDestAddress());
+				destinationAdress = IPNet.getByName(command.getDestAddress(), ipVersion);
 				if (!_testMode)
 					System.out.println(command.getDestAddress() + " => " +
-						inet.getHostAddress());
-				destinationAdress = new IPNet(inet.getHostAddress());
+						destinationAdress.toString("::i"));
 			} catch (UnknownHostException ex1) {
 				System.out.println("Error: " + ex1.getMessage());
 				return false;
@@ -440,7 +457,18 @@ public class Shell {
 			/*
 			 * try to find a network link that matches the source IP address.
 			 */
-			NetworkLinks nlinks = _monitor.getTopology().getNetworkLinksByIP(sourceAddress);
+			NetworkLinks nlinks;
+			Topology topology = _monitor.getTopology();
+			if (!equalSourceAddress) {
+				nlinks = topology.getNetworkLinksByIP(sourceAddress);
+			} else {
+				try {
+					nlinks = topology.getNetworkLinksByIP(sourceAddress.hostAddress());
+				}  catch (UnknownHostException ex1) {
+					System.out.println("Error: " + ex1.getMessage());
+					return false;
+				}
+			}
 			if (nlinks.isEmpty()) {
 				/*
 				 * use the DFLTEQUIPMENT variable if defined.
@@ -746,7 +774,8 @@ public class Shell {
 			System.out.println("Goodbye!");
 			System.exit(0);
 		}
-		if (_parser.getCommand().equals("probe")) {
+		if (_parser.getCommand().equals("probe") ||
+			  _parser.getCommand().equals("probe6")) {
 			boolean test = probeCommand(_parser);
 			if (_testMode) {
 				if (!test) {

@@ -37,6 +37,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _helpTopic;
 	protected String _topologyOption;
 	protected String _probeExpect;
+	protected boolean _probe6flag;
 
 	public void clear() {
 		_command = "";
@@ -324,7 +325,31 @@ public class ShellParser extends CommonRules<Object> {
 
 	Rule CommandProbe() {
 		return Sequence(
+				new Action() {
+					public boolean run(Context context) {
+						_probe6flag = false;
+						return true;
+					}
+				},
 				FirstOf(
+					Sequence(
+						StringIgnoreCase("probe6"),
+						new Action() {
+							public boolean run(Context context) {
+								_probe6flag = true;
+								return true;
+							}
+						}
+					),
+					Sequence(
+						StringIgnoreCase("p6"),
+						new Action() {
+							public boolean run(Context context) {
+								_probe6flag = true;
+								return true;
+							}
+						}
+					),
 					StringIgnoreCase("probe"),
 					StringIgnoreCase("p")
 				),
@@ -355,7 +380,10 @@ public class ShellParser extends CommonRules<Object> {
 				Eoi(),
 				new Action() {
 					public boolean run(Context context) {
-						_command = "probe";
+						if (_probe6flag)
+							_command = "probe6";
+						else
+							_command ="probe";
 						return true;
 					}
 				}
