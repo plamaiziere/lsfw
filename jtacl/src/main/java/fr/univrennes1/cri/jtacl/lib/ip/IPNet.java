@@ -295,7 +295,7 @@ public class IPNet implements Comparable {
 
 		if (!IP.isValidPrefixLen(prefixLen, ipVersion))
 			throw new UnknownHostException("Invalid prefix length 0 <= prefix <= " +
-					IP.maxPrefixLen(ipVersion) + ip);
+					IP.maxPrefixLen(ipVersion) + " :" + ip);
 
 		_ip = ip;
 		_prefixLen = prefixLen;
@@ -369,7 +369,7 @@ public class IPNet implements Comparable {
 			}
 			if (!IP.isValidPrefixLen(prefix, ipVersion))
 				throw new UnknownHostException("Invalid prefix 0 <= prefix <= " +
-					IP.maxPrefixLen(ipVersion) + smask);
+					IP.maxPrefixLen(ipVersion) + " :" + smask);
 		}
 		return prefix;
 	}
