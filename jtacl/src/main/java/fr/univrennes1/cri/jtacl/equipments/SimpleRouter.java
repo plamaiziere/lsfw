@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments;
 
+import fr.univrennes1.cri.jtacl.equipments.Generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.AccessControlList;
 import fr.univrennes1.cri.jtacl.core.monitor.AclResult;
