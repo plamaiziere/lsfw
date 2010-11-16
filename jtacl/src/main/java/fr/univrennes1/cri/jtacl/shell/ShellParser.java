@@ -38,6 +38,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _topologyOption;
 	protected String _probeExpect;
 	protected boolean _probe6flag;
+	protected String _subCommand;
 
 	public void clear() {
 		_command = "";
@@ -52,6 +53,7 @@ public class ShellParser extends CommonRules<Object> {
 		_helpTopic = null;
 		_topologyOption = null;
 		_probeExpect = null;
+		_subCommand = null;
 	}
 
 	public String getCommand() {
@@ -102,6 +104,10 @@ public class ShellParser extends CommonRules<Object> {
 		return _probeExpect;
 	}
 
+	public String getSubCommand() {
+		return _subCommand;
+	}
+
 	Rule CommandLine() {
 		return FirstOf(
 				CommandProbe(),
@@ -110,7 +116,8 @@ public class ShellParser extends CommonRules<Object> {
 				CommandOption(),
 				CommandTopology(),
 				CommandRoute(),
-				CommandHelp()
+				CommandHelp(),
+				CommandEquipment()
 			);
 	}
 
@@ -321,6 +328,32 @@ public class ShellParser extends CommonRules<Object> {
 
 	Rule Special() {
 		return CharSet('=', ',', ':');
+	}
+
+	Rule CommandEquipment() {
+		return Sequence(
+			FirstOf(
+				StringIgnoreCase("equipment"),
+				StringIgnoreCase("eq")
+			),
+			WhiteSpaces(),
+			StringAtom(),
+			new Action() {
+				public boolean run(Context context) {
+					_equipments = context.getPrevText();
+					return true;
+				}
+			},
+			SkipSpaces(),
+			UntilEOI(),
+			new Action() {
+				public boolean run(Context context) {
+					_subCommand = context.getPrevText();
+					_command = "equipment";
+					return true;
+				}
+			}
+		);
 	}
 
 	Rule CommandProbe() {

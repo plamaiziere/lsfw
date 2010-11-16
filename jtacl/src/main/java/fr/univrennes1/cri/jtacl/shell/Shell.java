@@ -384,6 +384,18 @@ public class Shell {
 		}
 	}
 
+	public void equipmentCommand(ShellParser command) {
+
+		String equipmentName = command.getEquipments();
+		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
+		if (equipment == null) {
+			System.out.println("No such equipment: " + equipmentName);
+			return;
+		}
+
+		System.out.println(equipment.shellCommand(command.getSubCommand()));
+	}
+
 	public boolean probeCommand(ShellParser command) {
 
 		IPversion ipVersion;
@@ -796,6 +808,8 @@ public class Shell {
 			helpCommand(_parser);
 		if (_parser.getCommand().equals("define"))
 			defineCommand(_parser);
+		if (_parser.getCommand().equals("equipment"))
+			equipmentCommand(_parser);
 	}
 
 	protected void printUsage() {

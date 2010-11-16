@@ -219,4 +219,17 @@ public class NetworkEquipment {
 		throw new UnsupportedOperationException("Equipments must override this method");
 	}
 
+	/**
+	 * Interprets and runs a shell command. This method is called by the shell
+	 * and could be overrided to implement commands specific to the equipment.
+	 * @param command the command to run.
+	 * @return the output of the command
+	 */
+	public String shellCommand(String command) {
+		/*
+		 * do nothing by default
+		 */
+		return "Undefined shell command";
+	}
+
 }
