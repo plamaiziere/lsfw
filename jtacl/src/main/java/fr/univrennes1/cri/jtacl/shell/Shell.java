@@ -396,6 +396,28 @@ public class Shell {
 		System.out.println(equipment.shellCommand(command.getSubCommand()));
 	}
 
+	public void reloadCommand(ShellParser command) {
+
+		String equipmentName = command.getEquipments();
+
+		if (equipmentName == null) {
+			_monitor.reload();
+			return;
+		}
+
+		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
+		if (equipment == null) {
+			System.out.println("No such equipment: " + equipmentName);
+			return;
+		}
+
+		try {
+			_monitor.reloadEquipment(equipment);
+		} catch (JtaclRuntimeException ex) {
+			System.err.println("Error: " + ex.getMessage());
+		}
+	}
+
 	public boolean probeCommand(ShellParser command) {
 
 		IPversion ipVersion;
@@ -810,6 +832,8 @@ public class Shell {
 			defineCommand(_parser);
 		if (_parser.getCommand().equals("equipment"))
 			equipmentCommand(_parser);
+		if (_parser.getCommand().equals("reload"))
+			reloadCommand(_parser);
 	}
 
 	protected void printUsage() {

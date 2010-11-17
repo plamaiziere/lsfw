@@ -117,7 +117,8 @@ public class ShellParser extends CommonRules<Object> {
 				CommandTopology(),
 				CommandRoute(),
 				CommandHelp(),
-				CommandEquipment()
+				CommandEquipment(),
+				CommandReload()
 			);
 	}
 
@@ -350,6 +351,31 @@ public class ShellParser extends CommonRules<Object> {
 				public boolean run(Context context) {
 					_subCommand = context.getPrevText();
 					_command = "equipment";
+					return true;
+				}
+			}
+		);
+	}
+
+	Rule CommandReload() {
+		return Sequence(
+			StringIgnoreCase("reload"),
+			Optional(
+				Sequence(
+					WhiteSpaces(),
+					StringAtom(),
+					new Action() {
+						public boolean run(Context context) {
+							_equipments = context.getPrevText();
+							return true;
+						}
+					}
+				)
+			),
+			Eoi(),
+			new Action() {
+				public boolean run(Context context) {
+					_command = "reload";
 					return true;
 				}
 			}

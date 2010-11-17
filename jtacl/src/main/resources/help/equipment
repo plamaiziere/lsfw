@@ -1,0 +1,10 @@
+--- equipment ---
+equipment | eq equipment-name command : Runs a command on the specified equipment.
+
+  The equipment command allows to runs a specific command on one equipment.
+  The commands allowed depend on the type of the equipment.
+
+Example:
+--------
+
+(Equipment commands are not yet implemented)

@@ -70,6 +70,11 @@ public class Monitor {
 	 * configuration XML document
 	 */
 	protected Document _xmlConfiguration;
+	
+	/**
+	 * configuration file name
+	 */
+	protected String _configurationFileName;
 
 	/**
 	 * Hop counter
@@ -235,7 +240,7 @@ public class Monitor {
 
 	}
 
-	protected void loadTopology(Document doc) {
+	protected void loadTopology(Document doc, Topology topology) {
 
 		NodeList list = doc.getElementsByTagName("tlink");
 		for (int i = 0; i < list.getLength(); i++) {
@@ -257,7 +262,7 @@ public class Monitor {
 				throw new JtaclConfigurationException("Missing network: " + s);
 
 			boolean border = Boolean.parseBoolean(sBorder);
-			getTopology().addTopologicalLink(border, sNetwork, sTopology);
+			topology.addTopologicalLink(border, sNetwork, sTopology);
 
 		}
 	}
@@ -369,9 +374,10 @@ public class Monitor {
 	 * @param equipmentName the name of the equipment.
 	 * @param equipmentComment the comment of the equipment.
 	 * @param fileName the filename of the equipment.
+	 * @return the newly created network equipment.
 	 * @throws JtaclConfigurationException on error.
 	 */
-	public void addEquipment(String className,	String equipmentName,
+	public NetworkEquipment addEquipment(String className,	String equipmentName,
 			String equipmentComment, String fileName) {
 
 		String s = "className: " + className + " name: " + equipmentName +
@@ -383,6 +389,7 @@ public class Monitor {
 				equipmentComment, fileName);
 
 		_equipments.put(eq);
+		return eq;
 	}
 
 	/**
@@ -407,6 +414,8 @@ public class Monitor {
 	 */
 	public void configure(String fileName) {
 
+		_configurationFileName = fileName;
+		
 		/*
 		 * Read the protocols from ressources.
 		 */
@@ -452,8 +461,63 @@ public class Monitor {
 			_topology.registerNetworkequipment(eq);
 		}
 
-		loadTopology(_xmlConfiguration);
+		loadTopology(_xmlConfiguration, _topology);
 		_topology.makeTopology();
+	}
+	
+	/**
+	 * Reload the monitor
+	 */
+	public void reload() {
+		_options = new Options();
+		_defines = new HashMap<String, String>();
+		_equipments = new NetworkEquipmentsByName();
+		_topology = new Topology();
+		_probing = new Probing();
+		configure(_configurationFileName);
+		init();
+	}
+
+	/**
+	 * Reload an equipment
+	 */
+	public void reloadEquipment(NetworkEquipment equipment) {
+
+		/*
+		 * new configuration
+		 */
+		Topology topology = new Topology();
+		NetworkEquipmentsByName equipments = new NetworkEquipmentsByName();
+
+		/*
+		 * create a new equipment to replace the older
+		 */
+		NetworkEquipment newEq = createNetworkEquipment(
+				equipment.getClass().getName(),
+				equipment.getName(),
+				equipment.getComment(),
+				equipment.getConfigurationFileName()
+			);
+		newEq.configure();
+
+		/*
+		 * build the topology
+		 */
+		topology.registerNetworkequipment(newEq);
+		equipments.put(newEq);
+		for (NetworkEquipment eq: _equipments.values()) {
+			if (eq == equipment)
+				continue;
+			topology.registerNetworkequipment(eq);
+			equipments.put(eq);
+		}
+
+		Document xmlConfiguration = XMLUtils.getXMLDocument(_configurationFileName);
+		loadTopology(xmlConfiguration, topology);
+		topology.makeTopology();
+
+		_topology = topology;
+		_equipments = equipments;
 	}
 
 	/**
