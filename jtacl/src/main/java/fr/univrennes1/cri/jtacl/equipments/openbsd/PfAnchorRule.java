@@ -68,7 +68,7 @@ public class PfAnchorRule extends PfGenericRule {
 
 	/**
 	 * Sets the inlined flag of this rule.
-	 * @param _inlined flag to set.
+	 * @param inlined flag to set.
 	 */
 	public void setInlined(boolean inlined) {
 		_inlined = inlined;
@@ -90,7 +90,7 @@ public class PfAnchorRule extends PfGenericRule {
 	 * Sets the name of the anchor associated to this rule.
 	 * ie the anchorname used in the rule using path and modifier,
 	 * may be null for inlined anchor).
-	 * @param _name name to set.
+	 * @param anchorName name to set.
 	 */
 	public void setAnchorName(String anchorName) {
 		_anchorName = anchorName;

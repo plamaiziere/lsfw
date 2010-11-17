@@ -63,7 +63,7 @@ public class ProbeRequest {
 
 	/**
 	 * Sets the internet protocols we should match.
-	 * @param protocol protocols value to set. Null designates any protocols.
+	 * @param protocols protocols value to set. Null designates any protocol.
 	 */
 	public void setProtocols(List<Integer> protocols) {
 		_protocols = protocols;
@@ -113,7 +113,7 @@ public class ProbeRequest {
 	/**
 	 * Returns the source port.
 	 * (null = any)
-	 * @returns the source port.
+	 * @return the source port.
 	 * (null = any)
 	 */
 	public Integer getSourcePort() {
@@ -131,7 +131,7 @@ public class ProbeRequest {
 	/**
 	 * Returns the destination port.
 	 * (null = any)
-	 * @returns the destination port.
+	 * @return the destination port.
 	 * (null = any)
 	 */
 	public Integer getDestinationPort() {

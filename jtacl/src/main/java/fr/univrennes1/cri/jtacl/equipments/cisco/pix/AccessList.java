@@ -138,7 +138,7 @@ public class AccessList {
 
 	/**
 	 * Sets the access-group associated to this acl.
-	 * @return the access-group to associate.
+	 * @param group the access-group to associate.
 	 */
 	public void setAccessGroup(AccessGroup group) {
 		_accessGroup = group;
@@ -186,7 +186,7 @@ public class AccessList {
 
 	/**
 	 * Sets the destination network-group of this acl.
-	 * @return destination network-group to set this acl.
+	 * @param destNetworkGroup destination network-group to set.
 	 */
 	public void setDestNetworkGroup(NetworkObjectGroup destNetworkGroup) {
 		_destNetworkGroup = destNetworkGroup;
@@ -219,7 +219,6 @@ public class AccessList {
 	/**
 	 * Sets the destination service-group of this acl.
 	 * @param destServiceGroup destination service-group to set.
-	 * @return the destination service-group of this acl.
 	 */
 	public void setDestServiceGroup(ServiceObjectGroup destServiceGroup) {
 		_destServiceGroup = destServiceGroup;

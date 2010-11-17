@@ -2210,7 +2210,7 @@ public class PfParser extends PfBaseParser {
 	 * Matches proto_item
 	 * proto_item	: protoval
 	 *
-	 * @return
+	 * @return a Rule
 	 */
 	public Rule PfProtoItem() {
 		return

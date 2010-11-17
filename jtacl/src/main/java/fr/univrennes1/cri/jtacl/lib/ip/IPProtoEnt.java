@@ -46,7 +46,7 @@ public class IPProtoEnt {
 
 	/**
 	 * Returns the list of the aliases of this protocol.
-	 * @return a {@link List<String>} containing the aliases. The list could be empty but not nul.
+	 * @return a List<String> containing the aliases. The list could be empty but not nul.
 	 */
 	public List<String> getAliases() {
 		return _aliases;

@@ -20,8 +20,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 /**
  * A TopologicalLink is a hint given by configuration to help connecting
  * equipments to each others.<br/>
- * It connects {@link NetworkEquipment} equipments via the IP address of their
- * {@link IfaceLink}.
+ * It connects {@link IfaceLinks} links of the equipments via the IP address.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class TopologicalLink {

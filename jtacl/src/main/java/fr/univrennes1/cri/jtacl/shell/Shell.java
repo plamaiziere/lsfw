@@ -84,8 +84,8 @@ public class Shell {
 	 * The format of the 'equipment specification' string is:
 	 * equipment-name'|'[iface-name|IPaddress]
 	 *
-	 * @param EquipmentSpec Equipment specification used to filter.
-	 * @return a {@link ifaceLinks} list containing the links.
+	 * @param EquipmentSpecification Equipment specification used to filter.
+	 * @return a {@link IfaceLinks} list containing the links.
 	 */
 	protected IfaceLinks getIfaceLinksByEquipmentSpec(IPNet sourceIP,
 			String EquipmentSpecification) {
