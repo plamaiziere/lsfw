@@ -27,6 +27,8 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -35,6 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * The Monitor is the main class of Jtacl.<br/>
@@ -151,6 +155,154 @@ public class Monitor {
 		} catch (NumberFormatException ex) {
 			throw new JtaclConfigurationException("Error in icmp file " +
 				 ex.getMessage());
+		}
+	}
+
+	protected void loadConfiguration(Document doc) {
+		NodeList list = doc.getElementsByTagName("services");
+		if (list.getLength() > 0) {
+			Element e = (Element) list.item(0);
+			String fileName = e.getAttribute("filename");
+
+			if (fileName.isEmpty())
+				throw new JtaclConfigurationException("Missing services filename");
+
+			InputStream stream =null;
+			try {
+				stream = new FileInputStream(fileName);
+			} catch (FileNotFoundException ex) {
+				throw new JtaclConfigurationException("services file not found: " +
+						fileName);
+			}
+			readServices(stream);
+		}
+
+		list = doc.getElementsByTagName("protocols");
+		if (list.getLength() > 0) {
+			Element e = (Element) list.item(0);
+			String fileName = e.getAttribute("filename");
+
+			if (fileName.isEmpty())
+				throw new JtaclConfigurationException("Missing protocols filename");
+
+			InputStream stream =null;
+			try {
+				stream = new FileInputStream(fileName);
+			} catch (FileNotFoundException ex) {
+				throw new JtaclConfigurationException("protocols file not found: " +
+						fileName);
+			}
+			readProtocols(stream);
+		}
+
+		list = doc.getElementsByTagName("icmp4");
+		if (list.getLength() > 0) {
+			Element e = (Element) list.item(0);
+			String fileName = e.getAttribute("filename");
+
+			if (fileName.isEmpty())
+				throw new JtaclConfigurationException("Missing icmp filename");
+
+			InputStream stream =null;
+			try {
+				stream = new FileInputStream(fileName);
+			} catch (FileNotFoundException ex) {
+				throw new JtaclConfigurationException("icmp file not found: " +
+						fileName);
+			}
+			IPIcmp icmp = IPIcmp4.getInstance();
+			readIcmp(icmp, stream);
+		}
+
+		list = doc.getElementsByTagName("icmp6");
+		if (list.getLength() > 0) {
+			Element e = (Element) list.item(0);
+			String fileName = e.getAttribute("filename");
+
+			if (fileName.isEmpty())
+				throw new JtaclConfigurationException("Missing icmp filename");
+
+			InputStream stream =null;
+			try {
+				stream = new FileInputStream(fileName);
+			} catch (FileNotFoundException ex) {
+				throw new JtaclConfigurationException("icmp file not found: " +
+						fileName);
+			}
+			IPIcmp icmp = IPIcmp6.getInstance();
+			readIcmp(icmp, stream);
+		}
+
+	}
+
+	protected void loadTopology(Document doc) {
+
+		NodeList list = doc.getElementsByTagName("tlink");
+		for (int i = 0; i < list.getLength(); i++) {
+			Element e = (Element) list.item(i);
+			String sTopology = e.getAttribute("topology");
+			String sNetwork = e.getAttribute("network");
+			String sBorder = e.getAttribute("border");
+
+			String s = "Topology: " + sTopology + " network: " + sNetwork +
+				" border: " + sBorder;
+
+			if (sBorder.isEmpty())
+				sBorder = "false";
+
+			if (sTopology.isEmpty())
+				throw new JtaclConfigurationException("Missing topology: " + s);
+
+			if (sNetwork.isEmpty())
+				throw new JtaclConfigurationException("Missing network: " + s);
+
+			boolean border = Boolean.parseBoolean(sBorder);
+			getTopology().addTopologicalLink(border, sNetwork, sTopology);
+
+		}
+	}
+
+	protected void loadEquipments(Document doc) {
+
+		NodeList list = doc.getElementsByTagName("equipment");
+		for (int i = 0; i < list.getLength(); i++) {
+			Element e = (Element) list.item(i);
+			String className = e.getAttribute("classname");
+			String name = e.getAttribute("name");
+			String comment = e.getAttribute("comment");
+			String fileName = e.getAttribute("filename");
+
+			String s = "className: " + className + " name: " + name +
+					" comment: " + comment + " filename: " + fileName;
+			if (className.isEmpty())
+				throw new JtaclConfigurationException("Missing equipment classname: " + s);
+
+			if (name.isEmpty())
+				throw new JtaclConfigurationException("Missing equipment name: " + s);
+
+			if (comment.isEmpty())
+				throw new JtaclConfigurationException("Missing equipment comment: " + s);
+
+			if (fileName.isEmpty())
+				throw new JtaclConfigurationException("Missing equipment configuration file: " + s);
+
+			addEquipment(className, name, comment, fileName);
+		}
+	}
+
+	protected void loadDefines(Document doc) {
+		NodeList list = doc.getElementsByTagName("define");
+		for (int i = 0; i < list.getLength(); i++) {
+			Element e = (Element) list.item(i);
+			String name = e.getAttribute("name");
+			String value = e.getAttribute("value");
+			if (name.isEmpty())
+				throw new JtaclConfigurationException("Missing define name");
+
+			if (value.isEmpty())
+				throw new JtaclConfigurationException("Missing define value");
+
+			getDefines().put(name, value);
 		}
 	}
 
@@ -284,10 +436,9 @@ public class Monitor {
 		 * Read the XML configuration file.
 		 */
 		_xmlConfiguration = XMLUtils.getXMLDocument(fileName);
-		XMLConfigLoader config = new XMLConfigLoader(this);
-		config.loadConfiguration(_xmlConfiguration);
-		config.loadEquipments(_xmlConfiguration);
-		config.loadDefines(_xmlConfiguration);
+		loadConfiguration(_xmlConfiguration);
+		loadEquipments(_xmlConfiguration);
+		loadDefines(_xmlConfiguration);
 	}
 
 	/**
@@ -301,8 +452,7 @@ public class Monitor {
 			_topology.registerNetworkequipment(eq);
 		}
 
-		XMLConfigLoader config = new XMLConfigLoader(this);
-		config.loadTopology(_xmlConfiguration);
+		loadTopology(_xmlConfiguration);
 		_topology.makeTopology();
 	}
 
