@@ -789,6 +789,26 @@ public class Shell {
 		// macro substitution
 		String subs = substitute(commandLine);
 
+		// tee redirection
+		boolean teeAppend = false;
+		String teeFile = null;
+		int p = subs.lastIndexOf("|>>");
+		if (p != -1) {
+			teeAppend = true;
+			teeFile = subs.substring(p + 3);
+			teeFile = teeFile.trim();
+			subs = subs.substring(0, p ).trim();
+
+		} else {
+			p = subs.lastIndexOf("|>");
+			if (p != -1) {
+				teeAppend = false;
+				teeFile = subs.substring(p + 2);
+				teeFile = teeFile.trim();
+				subs = subs.substring(0, p ).trim();
+			}
+		}
+
 		// empty command
 		if (subs.isEmpty())
 			return;
@@ -804,6 +824,19 @@ public class Shell {
 					buf.extract(0, error.getStartIndex()));
 			}
 		}
+		
+		/*
+		 * tee stdout
+		 */
+		if (teeFile != null) {
+			try {
+				ShellConsole.out().tee(teeFile, teeAppend);
+			} catch (FileNotFoundException ex) {
+				System.out.println("Cannot open file: " + teeFile);
+				return;
+			}
+		}
+
 		if (_parser.getCommand().equals("quit")) {
 			System.out.println("Goodbye!");
 			System.exit(0);
@@ -834,6 +867,17 @@ public class Shell {
 			equipmentCommand(_parser);
 		if (_parser.getCommand().equals("reload"))
 			reloadCommand(_parser);
+
+		/*
+		 * 'untee' stdout
+		 */
+		if (teeFile != null) {
+			try {
+				ShellConsole.out().unTee();
+			} catch (IOException ex) {
+				System.out.println("Cannot unTee file: " + teeFile);
+			}
+		}
 	}
 
 	protected void printUsage() {
@@ -886,7 +930,7 @@ public class Shell {
 
 	public void run(String[] args) {
 		try {
-
+			ShellConsole.install();
 			OptionSet option = _optParser.parse(args);
 			String configFile = null;
 			_testMode = option.has("test");

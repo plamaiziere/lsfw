@@ -1,0 +1,12 @@
+--- builtin shell ---
+
+The builtin shell allows to 'tee' the output of a command to a file. A tee is
+specified by the string '|>' or '|>>', followed by a filename.
+
+ |> filename : override the file.
+ |>> filename : append to the file.
+
+Examples:
+--------
+  jtacl> topology |> topology.txt
+  jtacl> topology |>> topology.txt

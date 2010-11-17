@@ -10,4 +10,5 @@ probe|probe6 : probes the network from a source to a destination.
 quit         : quits jtacl (same as exit).
 reload       : reloads the configuration of an equipment.
 route        : shows the routes.
+shell        : help for the builtin shell
 topology     : shows the topology of the network.
