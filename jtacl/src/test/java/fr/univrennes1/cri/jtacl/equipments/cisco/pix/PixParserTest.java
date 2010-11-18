@@ -576,6 +576,21 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	}
 
 	/**
+	 * Test of Description, of class PixParser.
+	 */
+	public void testDescription() {
+		System.out.println("Description");
+		String line = "description something something";
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			assertEquals("description", parser.getRuleName());
+			assertEquals("something something", parser.getName());
+		}
+	}
+
+	/**
 	 * Test of AccessListAcl, of class PixParser.
 	 */
 	public void testAccessListAcl() throws IOException {
