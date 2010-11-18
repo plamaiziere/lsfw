@@ -56,6 +56,7 @@ public class ProtocolObjectGroup extends ObjectGroup {
 	 */
 	public ProtocolObjectGroup expand() {
 		ProtocolObjectGroup group = new ProtocolObjectGroup(_groupId);
+		group.setDescription(_description);
 
 		for (ObjectGroupItem obj: this) {
 			if (obj.isGroup())

@@ -77,6 +77,7 @@ public class EnhancedServiceObjectGroup extends ObjectGroup {
 	 */
 	public EnhancedServiceObjectGroup expand() {
 		EnhancedServiceObjectGroup group = new EnhancedServiceObjectGroup(_groupId);
+		group.setDescription(_description);
 
 		for (ObjectGroupItem obj: this) {
 			if (obj.isGroup())

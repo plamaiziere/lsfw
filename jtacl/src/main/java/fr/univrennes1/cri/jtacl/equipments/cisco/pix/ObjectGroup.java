@@ -23,6 +23,7 @@ import java.util.ArrayList;
 public class ObjectGroup extends ArrayList<ObjectGroupItem> {
 
 	protected String _groupId;
+	protected String _description;
 	protected ObjectGroupType _type;
 
 	/**
@@ -50,6 +51,22 @@ public class ObjectGroup extends ArrayList<ObjectGroupItem> {
 	 */
 	public ObjectGroupType getType() {
 		return _type;
+	}
+
+	/**
+	 * Returns the description of this group.
+	 * @return the description of this group.
+	 */
+	public String getDescription() {
+		return _description;
+	}
+
+	/**
+	 * Sets the description of this group.
+	 * @param description description to set.
+	 */
+	public void setDescription(String description) {
+		_description = description;
 	}
 
 }

@@ -53,6 +53,7 @@ public class IcmpObjectGroup extends ObjectGroup {
 	 */
 	public IcmpObjectGroup expand() {
 		IcmpObjectGroup group = new IcmpObjectGroup(_groupId);
+		group.setDescription(_description);
 
 		for (ObjectGroupItem obj: this) {
 			if (obj.isGroup())

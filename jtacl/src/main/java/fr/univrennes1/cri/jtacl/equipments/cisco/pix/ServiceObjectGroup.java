@@ -83,7 +83,8 @@ public class ServiceObjectGroup extends ObjectGroup {
 	 */
 	public ServiceObjectGroup expand() {
 		ServiceObjectGroup group = new ServiceObjectGroup(_groupId, _protocol);
-
+		group.setDescription(_description);
+		
 		for (ObjectGroupItem obj: this) {
 			if (obj.isGroup())
 				group.addAll(((ServiceObjectGroup)obj.getGroup()).expand());

@@ -141,7 +141,8 @@ public class PixParser extends CommonRules<Object> {
 			"icmp-object",
 			"access-group",
 			"group-object",
-			"access-list"
+			"access-list",
+			"description"
 		};
 
 		for (String s: should) {
@@ -367,7 +368,8 @@ public class PixParser extends CommonRules<Object> {
 				IcmpObject(),
 				AccessGroup(),
 				AccessListRemark(),
-				AccessListAcl()
+				AccessListAcl(),
+				Description()
 			);
 	}
 
@@ -540,6 +542,27 @@ public class PixParser extends CommonRules<Object> {
 						}
 					},
 					Eoi()
+				);
+	}
+
+	/**
+	 * Match command description. <br/>
+	 * reference Cisco: <br/>
+	 * description text
+	 * @return a {@link Rule}
+	 */
+	public Rule Description() {
+		return Sequence(
+					String("description"),
+					WhiteSpaces(),
+					UntilEOI(),
+					new Action() {
+						public boolean run(Context context) {
+							_name = context.getPrevText();
+							_ruleName = "description";
+							return true;
+						}
+					}
 				);
 	}
 

@@ -477,6 +477,16 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 }
 
 	/*
+	 * description in object-group
+	 */
+	private void ruleDescription(PixParser parser) {
+		if (_lastGroup == null)
+			return;
+		if (_lastGroup.getDescription() == null)
+			_lastGroup.setDescription(parser.getName());
+	}
+
+	/*
 	 * group-object groupid
 	 */
 	private void ruleGroupObjectGroupID(PixParser parser) {
@@ -931,6 +941,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						rule.equals("service-object") ||
 						rule.equals("icmp-object"))
 					ruleOtherObject(parser);
+
+				/*
+				 * description for object-group
+				 */
+				if (rule.equals("description"))
+					ruleDescription(parser);
 
 				/*
 				 * group-object

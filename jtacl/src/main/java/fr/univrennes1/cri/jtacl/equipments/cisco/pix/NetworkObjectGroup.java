@@ -58,6 +58,7 @@ public class NetworkObjectGroup extends ObjectGroup {
 	 */
 	public NetworkObjectGroup expand() {
 		NetworkObjectGroup group = new NetworkObjectGroup(_groupId);
+		group.setDescription(_description);
 
 		for (ObjectGroupItem obj: this) {
 			if (obj.isGroup())
