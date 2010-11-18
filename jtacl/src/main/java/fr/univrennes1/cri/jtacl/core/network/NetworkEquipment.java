@@ -223,13 +223,12 @@ public class NetworkEquipment {
 	 * Interprets and runs a shell command. This method is called by the shell
 	 * and could be overrided to implement commands specific to the equipment.
 	 * @param command the command to run.
-	 * @return the output of the command
 	 */
-	public String shellCommand(String command) {
+	public void shellCommand(String command) {
 		/*
 		 * do nothing by default
 		 */
-		return "Undefined shell command";
+		System.out.println("Unknown equipment command");
 	}
 
 }

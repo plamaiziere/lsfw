@@ -393,7 +393,7 @@ public class Shell {
 			return;
 		}
 
-		System.out.println(equipment.shellCommand(command.getSubCommand()));
+		equipment.shellCommand(command.getSubCommand());
 	}
 
 	public void reloadCommand(ShellParser command) {
