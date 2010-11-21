@@ -55,17 +55,28 @@ public class IPIcmp extends ArrayList<IPIcmpEnt> {
  	}
 
 	/**
+	 * Returns the entry associated to the icmp-type and code number in argument.
+	 * @param number the number of the icmp type.
+	 * @param code the code of the icmp type (-1: no code)
+	 * @return An {@link IPIcmpEnt} entry describing the icmp type.
+	 * Returns null if there is no icmp type matching this icmp-type and code.
+	 */
+	public IPIcmpEnt getIcmpByNumber(int number, int code) {
+		for (IPIcmpEnt ent: this) {
+			if (ent._icmp == number && ent._code == code)
+				return ent;
+		}
+		return null;
+ 	}
+
+	/**
 	 * Returns the entry associated to the icmp type number in argument.
 	 * @param icmp number of the icmp-type
 	 * @return An {@link IPIcmpEnt} entry describing the icmp-type.
 	 * Returns null if there is no icmp-type matching this icmp-type number.
 	 */
 	public IPIcmpEnt getIcmpByNumber(int icmp) {
-		for (IPIcmpEnt ent: this) {
-			if (ent._icmp == icmp)
-				return ent;
-		}
-		return null;
+		return getIcmpByNumber(icmp, -1);
  	}
 
 	/**
