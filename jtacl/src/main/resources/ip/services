@@ -198,10 +198,14 @@ hostname	101/tcp	   hostnames	#NIC Host Name Server
 hostname	101/udp	   hostnames	#NIC Host Name Server
 iso-tsap	102/tcp	   tsap		#ISO-TSAP Class 0
 iso-tsap	102/udp	   tsap		#ISO-TSAP Class 0
-gppitnp		103/tcp	   #Genesis Point-to-Point Trans Net
-gppitnp		103/udp	   #Genesis Point-to-Point Trans Net
-acr-nema	104/tcp	   #ACR-NEMA Digital Imag. & Comm. 300
-acr-nema	104/udp	   #ACR-NEMA Digital Imag. & Comm. 300
+x400		103/tcp	   # ISO E-mail
+x400-snd	104/tcp
+#PROBLEMS!==============================================================
+#gppitnp	103/tcp	   #Genesis Point-to-Point Trans Net
+#gppitnp	103/udp	   #Genesis Point-to-Point Trans Net
+#acr-nema	104/tcp	   #ACR-NEMA Digital Imag. & Comm. 300
+#acr-nema	104/udp	   #ACR-NEMA Digital Imag. & Comm. 300
+#PROBLEMS!==============================================================
 csnet-ns	105/tcp	   cso-ns cso	#Mailbox Name Nameserver
 csnet-ns	105/udp	   cso-ns cso	#Mailbox Name Nameserver
 pop3pw		106/tcp	   3com-tsmux	#Eudora compatible PW changer
@@ -418,8 +422,8 @@ qmtp		209/udp	   #The Quick Mail Transfer Protocol
 #tam		209/tcp	   #Trivial Authenticated Mail Protocol
 #tam		209/udp	   #Trivial Authenticated Mail Protocol
 #PROBLEMS!==============================================================
-z39.50		210/tcp	   wais		#ANSI Z39.50
-z39.50		210/udp	   wais		#ANSI Z39.50
+z39.50		210/tcp	   wais	z3950	#ANSI Z39.50
+z39.50		210/udp	   wais	z3950	#ANSI Z39.50
 914c/g		211/tcp	   #Texas Instruments 914C/G Terminal
 914c/g		211/udp	   #Texas Instruments 914C/G Terminal
 anet		212/tcp	   #ATEXSSTR
@@ -2196,6 +2200,7 @@ iscsi-target	3260/tcp   # iSCSI port
 iscsi-target	3260/udp   # iSCSI port
 ccmail		3264/tcp   #cc:mail/lotus
 ccmail		3264/udp   #cc:mail/lotus
+mysql		3306/tcp   # MySQL
 dec-notes	3333/tcp   #DEC Notes
 dec-notes	3333/udp   #DEC Notes
 rdp		3389/tcp   #Microsoft Remote Desktop Protocol

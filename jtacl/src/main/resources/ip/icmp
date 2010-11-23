@@ -87,7 +87,7 @@ inforeq                                        15   -1
 information-reply                              16   -1
 inforep                                        16   -1
 mask-request                                   17   -1
-maskrep                                        17   -1
+maskreq                                        17   -1
 mask-reply                                     18   -1
 maskrep                                        18   -1
 #Reserved for security                         19   -1

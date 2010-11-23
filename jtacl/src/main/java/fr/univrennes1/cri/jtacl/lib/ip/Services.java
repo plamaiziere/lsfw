@@ -64,13 +64,16 @@ public class Services extends ArrayList<IPServEnt> {
 	/**
 	 * Returns the entry associated to the service port and protocol in argument.
 	 * @param port the port number of the service.
-	 * @param proto the name of the protocol (udp/tcp)
+	 * @param proto the name of the protocol (udp/tcp). If null, the first entry
+	 * matching the port is returned.
 	 * @return An {@link IPServEnt} entry describing the service.
 	 * Returns null if there is no service matching this port number and this protocol.
 	 */
 	public IPServEnt getServByPort(int port, String proto) {
 		for (IPServEnt ent: this) {
-			if (ent._port == port && ent._proto.equalsIgnoreCase(proto))
+			if (proto != null && !ent._proto.equalsIgnoreCase(proto))
+				continue;
+			if (ent._port == port)
 				return ent;
 		}
 		return null;

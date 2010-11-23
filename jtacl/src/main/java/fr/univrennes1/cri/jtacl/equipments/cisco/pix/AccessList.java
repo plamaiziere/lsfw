@@ -113,6 +113,11 @@ public class AccessList {
 	protected boolean _inactive;
 
 	/**
+	 * remark
+	 */
+	protected String _remark;
+
+	/**
 	 * Constructs a new access list with the access-list id in argument.
 	 * @param accessListId access-list id of the acl.
 	 */
@@ -401,5 +406,29 @@ public class AccessList {
 	public void setIcmpGroup(IcmpObjectGroup icmpGroup) {
 		_icmpGroup = icmpGroup;
 	}
-	
+
+	/**
+	 * Get the remark of this acl.
+	 * @return the remark of this acl
+	 */
+	public String getRemark() {
+		return _remark;
+	}
+
+	/**
+	 * Returns true if this acl is a remark
+	 * @return true if this acl is a remark
+	 */
+	public boolean isRemark() {
+		return _remark != null;
+	}
+
+	/**
+	 * Sets the remark of this acl.
+	 * @param remark remark to set
+	 */
+	public void setRemark(String remark) {
+		_remark = remark;
+	}
+
 }

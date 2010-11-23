@@ -109,4 +109,29 @@ public class PortObject {
 		return false;
 	}
 
+	/**
+	 * Returns the first port of this port object.
+	 * @return the first port of this port object.
+	 */
+	public int getFirstPort() {
+		return _firstPort;
+	}
+
+	/**
+	 * Returns the last port of this port object.
+	 * Valid if operator == RANGE
+	 * @return the last port of this port object.
+	 */
+	public int getLastPort() {
+		return _lastPort;
+	}
+
+	/**
+	 * Returns the operator of this port object.
+	 * @return the operator of this port object.
+	 */
+	public String getOperator() {
+		return _operator;
+	}
+
 }

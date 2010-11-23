@@ -947,17 +947,28 @@ public class PixParser extends CommonRules<Object> {
 	 */
 	public Rule AccessListRemark() {
 		return Sequence(
-					String("access-list"),
-					WhiteSpaces(),
-					ZeroOrMore(
-						Sequence(
-							TestNot(String("remark")),
-							Any()
-						)
-					),
-					String("remark"),
 					new Action() {
 						public boolean run(Context context) {
+							_acl = new AclTemplate();
+							return true;
+						}
+					},
+					String("access-list"),
+					WhiteSpaces(),
+					StringAtom(),
+					new Action() {
+						public boolean run(Context context) {
+							_acl.setAccessListId(context.getPrevText());
+							return true;
+						}
+					},
+					WhiteSpaces(),
+					String("remark"),
+					SkipSpaces(),
+					UntilEOI(),
+					new Action() {
+						public boolean run(Context context) {
+							_acl.setRemark(context.getPrevText());
 							_ruleName = "access-list remark";
 							return true;
 						}

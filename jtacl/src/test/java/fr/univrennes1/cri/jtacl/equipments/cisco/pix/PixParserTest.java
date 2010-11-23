@@ -557,7 +557,7 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	 */
 	public void testAccessListRemark() {
 		System.out.println("AccessListRemark");
-		String line = "access-list something something remark something something";
+		String line = "access-list ID remark something something";
 		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
@@ -565,7 +565,7 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			assertEquals("access-list remark", parser.getRuleName());
 		}
 
-		line = "access-list remark something something something something";
+		line = "access-list ID remark something something something something";
 		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);

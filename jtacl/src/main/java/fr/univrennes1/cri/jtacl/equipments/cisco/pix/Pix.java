@@ -651,6 +651,15 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				_parseContext.getLine());
 
 		/*
+		 * remark
+		 */
+		if (tpl.getRemark() != null) {
+			acl.setRemark(tpl.getRemark());
+			_accessLists.add(acl);
+			return;
+		}
+
+		/*
 		 * action (permit, deny)
 		 */
 		acl.setAction(tpl.getAction());
@@ -977,7 +986,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				/*
 				 * acl
 				 */
-				if (rule.equals("access-list acl"))
+				if (rule.equals("access-list acl") ||
+						rule.equals("access-list remark"))
 					ruleAcl(parser.getAcl());
 
 			} else {
@@ -1321,7 +1331,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			/*
 			 * acl matches any access group?
 			 */
-			if (aclAccessGroup != null && agroups.contains(aclAccessGroup)) {
+			if (!acl.isRemark() && aclAccessGroup != null &&
+					agroups.contains(aclAccessGroup)) {
 				MatchResult match = MatchResult.NOT;
 				try {
 					match = probeFilter(probe, acl, direction);

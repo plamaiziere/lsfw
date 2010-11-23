@@ -45,6 +45,7 @@ public class AclTemplate {
 	private String _icmp;
 	private String _icmpGroup;
 	private boolean _inactive;
+	private String _remark;
 
 	public String getAccessListId() {
 		return _accessListId;
@@ -236,6 +237,14 @@ public class AclTemplate {
 
 	public void setSrcServiceGroup(String srcServiceGroup) {
 		_srcServiceGroup = srcServiceGroup;
+	}
+
+	public String getRemark() {
+		return _remark;
+	}
+
+	public void setRemark(String remark) {
+		_remark = remark;
 	}
 
 }
