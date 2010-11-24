@@ -1061,11 +1061,14 @@ public class PacketFilter extends GenericEquipment {
 		int code = -1;
 		String scode = item.getIcmpCode();
 		if (scode != null) {
-			try {
-				code = Integer.valueOf(scode);
-			} catch (NumberFormatException ex) {
+			IPIcmpEnt ent = af == AddressFamily.INET ? parseIcmp4(scode) :
+				parseIcmp6(scode);
+			code = ent.getCode();
+			/*
+			 * not a code
+			 */
+			if (code == -1)
 				throwCfgException("invalid icmp code: " + scode);
-			}
 		}
 		String sicmp = item.getIcmpType();
 		IPIcmpEnt ent = af == AddressFamily.INET ? parseIcmp4(sicmp) :
