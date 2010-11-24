@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 
 /**
  * Describes an access list element (ACE).
@@ -78,11 +79,20 @@ public class AccessListElement {
 	 */
 	protected Integer _code;
 
-
 	/**
 	 * true if the acl is inactive
 	 */
 	protected boolean _inactive;
+
+	/**
+	 * TCP flags keyword (null | match-any | match-all)
+	 */
+	protected String _tcpKeyword;
+
+	/**
+	 * TCP flags (+syn, -ack, ...)
+	 */
+	protected StringsList _tcpFlags = new StringsList();
 
 	/**
 	 * Constructs a new ace.
@@ -288,5 +298,30 @@ public class AccessListElement {
 		_code = code;
 	}
 
-	
+	/**
+	 * Returns the list tcp flags needed for this ACE.
+	 * (+ack, -ack, ...)
+	 * @return a non null List containing the flags.
+	 */
+	public StringsList getTcpFlags() {
+		return _tcpFlags;
+	}
+
+	/**
+	 * Returns the keyword associated to the tcp flags:
+	 * match-any or match-all
+	 * @return the keyword associated with the tcp flags.
+	 */
+	public String getTcpKeyword() {
+		return _tcpKeyword;
+	}
+
+	/**
+	 * Sets the keyword associated to the tcp flags.
+	 * @param tcpKeyword keyword to set.
+	 */
+	public void setTcpKeyword(String tcpKeyword) {
+		_tcpKeyword = tcpKeyword;
+	}
+
 }

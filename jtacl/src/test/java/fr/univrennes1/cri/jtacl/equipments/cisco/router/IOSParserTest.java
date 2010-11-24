@@ -381,6 +381,31 @@ public class IOSParserTest extends TestCase {
 			assertEquals("PORT", ace.getDstFirstPort());
 			assertEquals("ace extended", parser.getRuleName());
 		}
+
+		line = "permit tcp SRCIP SRCMASK DESTIP DESTMASK eq PORT established";
+		context.setAclType(AclType.IPEXT);
+		context.setIpVersion(IPversion.IPV4);
+
+		parser.clear();
+		parser.setAclContext(context);
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAclTemplate();
+			ace = parser.getAceTemplate();
+			assertEquals(null, acl);
+			assertEquals("permit", ace.getAction());
+			assertEquals("tcp", ace.getProtocol());
+			assertEquals("SRCIP", ace.getSrcIp());
+			assertEquals("SRCMASK", ace.getSrcIpMask());
+			assertEquals("DESTIP", ace.getDstIp());
+			assertEquals("DESTMASK", ace.getDstIpMask());
+			assertEquals("eq", ace.getDstPortOperator());
+			assertEquals("PORT", ace.getDstFirstPort());
+			assertEquals("established", ace.getTcpKeyword());
+			assertEquals("ace extended", parser.getRuleName());
+		}
+
 		
 		line = "permit tcp any eq SRCPORT any gt DESTPORT";
 		context.setAclType(AclType.IPEXT);
@@ -407,6 +432,33 @@ public class IOSParserTest extends TestCase {
 			assertEquals("ace extended", parser.getRuleName());
 		}
 
+		line = "permit tcp any eq SRCPORT any gt DESTPORT established";
+		context.setAclType(AclType.IPEXT);
+		context.setIpVersion(IPversion.IPV4);
+
+		parser.clear();
+		parser.setAclContext(context);
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAclTemplate();
+			ace = parser.getAceTemplate();
+			assertEquals(null, acl);
+			assertEquals("permit", ace.getAction());
+			assertEquals("tcp", ace.getProtocol());
+			assertEquals("any", ace.getSrcIp());
+			assertEquals(null, ace.getSrcIpMask());
+			assertEquals("eq", ace.getSrcPortOperator());
+			assertEquals("SRCPORT", ace.getSrcFirstPort());
+			assertEquals("any", ace.getDstIp());
+			assertEquals(null, ace.getDstIpMask());
+			assertEquals("gt", ace.getDstPortOperator());
+			assertEquals("DESTPORT", ace.getDstFirstPort());
+			assertEquals("established", ace.getTcpKeyword());
+			assertEquals("ace extended", parser.getRuleName());
+		}
+
+
 		line = "access-list 100 permit tcp any any";
 
 		parser.clear();
@@ -422,6 +474,125 @@ public class IOSParserTest extends TestCase {
 			assertEquals(null, ace.getSrcIpMask());
 			assertEquals("any", ace.getDstIp());
 			assertEquals(null, ace.getDstIpMask());
+			assertEquals("access-list", parser.getRuleName());
+		}
+
+		line = "access-list 100 permit tcp any any established";
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAclTemplate();
+			ace = parser.getAceTemplate();
+			assertEquals(100, acl.getNumber().intValue());
+			assertEquals("permit", ace.getAction());
+			assertEquals("tcp", ace.getProtocol());
+			assertEquals("any", ace.getSrcIp());
+			assertEquals(null, ace.getSrcIpMask());
+			assertEquals("any", ace.getDstIp());
+			assertEquals(null, ace.getDstIpMask());
+			assertEquals("established", ace.getTcpKeyword());
+			assertEquals("access-list", parser.getRuleName());
+		}
+
+		line = "access-list 100 permit tcp any any ack rst psh fin syn urg";
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAclTemplate();
+			ace = parser.getAceTemplate();
+			assertEquals(100, acl.getNumber().intValue());
+			assertEquals("permit", ace.getAction());
+			assertEquals("tcp", ace.getProtocol());
+			assertEquals("any", ace.getSrcIp());
+			assertEquals(null, ace.getSrcIpMask());
+			assertEquals("any", ace.getDstIp());
+			assertEquals(null, ace.getDstIpMask());
+			assertEquals("match-any", ace.getTcpKeyword());
+			assertEquals("+ack", ace.getTcpFlags().get(0));
+			assertEquals("+rst", ace.getTcpFlags().get(1));
+			assertEquals("+psh", ace.getTcpFlags().get(2));
+			assertEquals("+fin", ace.getTcpFlags().get(3));
+			assertEquals("+syn", ace.getTcpFlags().get(4));
+			assertEquals("+urg", ace.getTcpFlags().get(5));
+			assertEquals("access-list", parser.getRuleName());
+		}
+
+		line = "access-list 100 permit tcp any any match-any +ack +rst +psh +fin +syn +urg";
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAclTemplate();
+			ace = parser.getAceTemplate();
+			assertEquals(100, acl.getNumber().intValue());
+			assertEquals("permit", ace.getAction());
+			assertEquals("tcp", ace.getProtocol());
+			assertEquals("any", ace.getSrcIp());
+			assertEquals(null, ace.getSrcIpMask());
+			assertEquals("any", ace.getDstIp());
+			assertEquals(null, ace.getDstIpMask());
+			assertEquals("match-any", ace.getTcpKeyword());
+			assertEquals("+ack", ace.getTcpFlags().get(0));
+			assertEquals("+rst", ace.getTcpFlags().get(1));
+			assertEquals("+psh", ace.getTcpFlags().get(2));
+			assertEquals("+fin", ace.getTcpFlags().get(3));
+			assertEquals("+syn", ace.getTcpFlags().get(4));
+			assertEquals("+urg", ace.getTcpFlags().get(5));
+			assertEquals("access-list", parser.getRuleName());
+		}
+
+		line = "access-list 100 permit tcp any any match-all +ack +rst +psh +fin +syn +urg";
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAclTemplate();
+			ace = parser.getAceTemplate();
+			assertEquals(100, acl.getNumber().intValue());
+			assertEquals("permit", ace.getAction());
+			assertEquals("tcp", ace.getProtocol());
+			assertEquals("any", ace.getSrcIp());
+			assertEquals(null, ace.getSrcIpMask());
+			assertEquals("any", ace.getDstIp());
+			assertEquals(null, ace.getDstIpMask());
+			assertEquals("match-all", ace.getTcpKeyword());
+			assertEquals("+ack", ace.getTcpFlags().get(0));
+			assertEquals("+rst", ace.getTcpFlags().get(1));
+			assertEquals("+psh", ace.getTcpFlags().get(2));
+			assertEquals("+fin", ace.getTcpFlags().get(3));
+			assertEquals("+syn", ace.getTcpFlags().get(4));
+			assertEquals("+urg", ace.getTcpFlags().get(5));
+			assertEquals("access-list", parser.getRuleName());
+		}
+
+		line = "access-list 100 permit tcp any any match-all -ack -rst -psh -fin -syn -urg";
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAclTemplate();
+			ace = parser.getAceTemplate();
+			assertEquals(100, acl.getNumber().intValue());
+			assertEquals("permit", ace.getAction());
+			assertEquals("tcp", ace.getProtocol());
+			assertEquals("any", ace.getSrcIp());
+			assertEquals(null, ace.getSrcIpMask());
+			assertEquals("any", ace.getDstIp());
+			assertEquals(null, ace.getDstIpMask());
+			assertEquals("match-all", ace.getTcpKeyword());
+			assertEquals("-ack", ace.getTcpFlags().get(0));
+			assertEquals("-rst", ace.getTcpFlags().get(1));
+			assertEquals("-psh", ace.getTcpFlags().get(2));
+			assertEquals("-fin", ace.getTcpFlags().get(3));
+			assertEquals("-syn", ace.getTcpFlags().get(4));
+			assertEquals("-urg", ace.getTcpFlags().get(5));
 			assertEquals("access-list", parser.getRuleName());
 		}
 	}

@@ -626,6 +626,14 @@ public class CiscoRouter extends GenericEquipment {
 		 }
 
 		/*
+		 * tcp flags.
+		 */
+		if (tpl.getTcpKeyword() != null) {
+			ace.setTcpKeyword(tpl.getTcpKeyword());
+			ace.getTcpFlags().addAll(tpl.getTcpFlags());
+		}
+
+		/*
 		 * Sanity checks.
 		 */
 

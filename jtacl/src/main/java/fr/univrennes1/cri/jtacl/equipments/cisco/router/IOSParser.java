@@ -845,7 +845,134 @@ public class IOSParser extends CommonRules<Object> {
 							}
 						}
 					)
+				),
+				SkipSpaces(),
+				Optional(
+					AceTcpFlags()
 				)
+			);
+	}
+
+	/**
+	 * Matches tcp flags in extended ACE.
+	 * @return a Rule
+	 */
+	public Rule AceTcpFlags() {
+		return
+			FirstOf(
+				AceTcpEstablished(),
+				AceTcpNewFormat(),
+				AceTcpOldFormat()
+			);
+	}
+
+	/**
+	 * Matches "established" in extended ACE.
+	 * @return a Rule
+	 */
+	public Rule AceTcpEstablished() {
+		return
+			Sequence(
+				String("established"),
+				new Action() {
+					public boolean run(Context context) {
+						_ace.setTcpKeyword("established");
+						return true;
+					}
+				}
+			);
+	}
+
+	/**
+	 * Matches new TCP flags format.
+	 * match-any | match-all tcpflags
+	 * @return a Rule
+	 */
+	public Rule AceTcpNewFormat() {
+		return
+			Sequence(
+				FirstOf(
+					String("match-any"),
+					String("match-all")
+				),
+				new Action() {
+					public boolean run(Context context) {
+						_ace.setTcpKeyword(context.getPrevText());
+						return true;
+					}
+				},
+				WhiteSpaces(),
+				OneOrMore(
+					AceTcpNewFlag()
+				)
+			);
+	}
+
+	/**
+	 * Matches new TCP flag format.
+	 * @return a Rule
+	 */
+	public Rule AceTcpNewFlag() {
+		return
+			Sequence(
+				FirstOf(
+					String("+ack"),
+					String("+fin"),
+					String("+psh"),
+					String("+rst"),
+					String("+syn"),
+					String("+urg"),
+					String("-ack"),
+					String("-fin"),
+					String("-psh"),
+					String("-rst"),
+					String("-syn"),
+					String("-urg")
+				),
+				new Action() {
+					public boolean run(Context context) {
+						_ace.getTcpFlags().add(context.getPrevText());
+						return true;
+					}
+				},
+				SkipSpaces()
+			);
+	}
+
+	/**
+	 * Matches old TCP flags format.
+	 * @return a Rule.
+	 */
+	public Rule AceTcpOldFormat() {
+		return
+			ZeroOrMore(
+				AceTcpOldFlag()
+			);
+	}
+
+	/**
+	 * Matches old TCP flags format.
+	 * @return a Rule.
+	 */
+	public Rule AceTcpOldFlag() {
+		return
+			Sequence(
+				FirstOf(
+					String("ack"),
+					String("fin"),
+					String("psh"),
+					String("rst"),
+					String("syn"),
+					String("urg")
+				),
+				new Action() {
+					public boolean run(Context context) {
+						_ace.getTcpFlags().add("+" + context.getPrevText());
+						_ace.setTcpKeyword("match-any");
+						return true;
+					}
+				},
+				SkipSpaces()
 			);
 	}
 

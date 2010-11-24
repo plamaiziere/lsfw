@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
+import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
+
 /**
  * Template to build ACE (access-list element). This class is used at parsing time
  * as an intermediate storage.
@@ -36,6 +38,8 @@ public class AceTemplate {
 	private String _subType;
 	private Integer _code;
 	private boolean _inactive;
+	private StringsList _tcpFlags = new StringsList();
+	private String _tcpKeyword;
 
 	public String getAction() {
 		return _action;
@@ -155,6 +159,18 @@ public class AceTemplate {
 
 	public void setSrcPortOperator(String srcPortOperator) {
 		_srcPortOperator = srcPortOperator;
+	}
+
+	public StringsList getTcpFlags() {
+		return _tcpFlags;
+	}
+
+	public String getTcpKeyword() {
+		return _tcpKeyword;
+	}
+
+	public void setTcpKeyword(String _tcpKeyword) {
+		this._tcpKeyword = _tcpKeyword;
 	}
 
 }
