@@ -60,4 +60,29 @@ public class TcpFlagsTest extends TestCase {
 		assertEquals(false, flags.hasURG());
 	}
 
+	/**
+	 * Test of String op
+	 */
+	public void testString() {
+		System.out.println("Test String");
+		TcpFlags flags = new TcpFlags("");
+		assertEquals(0, flags.getFlags());
+		assertEquals("", flags.toString());
+
+		flags = new TcpFlags("WEUAPRSF");
+		assertEquals("WEUAPRSF", flags.toString());
+	}
+
+	/**
+	 * Test contains()
+	 */
+	public void testContains() {
+		System.out.println("Test Contains");
+		TcpFlags flags = new TcpFlags("ASRU");
+
+		assertEquals(true, flags.contains(new TcpFlags("AS")));
+		assertEquals(false, flags.contains(new TcpFlags("PU")));
+	}
+
 }
+

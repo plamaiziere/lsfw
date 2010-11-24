@@ -32,6 +32,30 @@ public class TcpFlags {
 
 	protected int _flags;
 
+	public TcpFlags() {
+	}
+
+	public TcpFlags(int flags) {
+		_flags = flags;
+	}
+
+	public TcpFlags(TcpFlags flags) {
+		_flags = flags.getFlags();
+	}
+
+	public TcpFlags(String flags) {
+		String f = flags.toUpperCase();
+
+		setCWR(f.contains("W"));
+		setECE(f.contains("E"));
+		setURG(f.contains("U"));
+		setACK(f.contains("A"));
+		setPSH(f.contains("P"));
+		setRST(f.contains("R"));
+		setSYN(f.contains("S"));
+		setFIN(f.contains("F"));
+	}
+
 	public void clearAll() {
 		_flags = 0;
 	}
@@ -306,6 +330,69 @@ public class TcpFlags {
 			setFIN();
 		else
 			clearFIN();
+	}
+
+	/**
+	 * Returns true if all flags are unset.
+	 * @return true if all flags are unset.
+	 */
+	public boolean isEmpty() {
+		return _flags == 0;
+	}
+
+	/**
+	 * Returns true if this instance contains the flags in argument.
+	 * @param flags flags to check
+	 * @return true if this instance contains the flags in argument.
+	 */
+	public boolean contains(TcpFlags flags) {
+		return (_flags & flags.getFlags()) == flags.getFlags();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final TcpFlags other = (TcpFlags) obj;
+		if (this._flags != other._flags) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		hash = 29 * hash + this._flags;
+		return hash;
+	}
+
+	@Override
+	public String toString() {
+		String r = "";
+
+		if (hasCWR())
+			r += "W";
+		if (hasECE())
+			r += "E";
+		if (hasURG())
+			r += "U";
+		if (hasACK())
+			r += "A";
+		if (hasPSH())
+			r += "P";
+		if (hasRST())
+			r += "R";
+		if (hasSYN())
+			r += "S";
+		if (hasFIN())
+			r += "F";
+
+		return r;
 	}
 
 }
