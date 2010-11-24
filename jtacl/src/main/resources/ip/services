@@ -2002,8 +2002,8 @@ pptp		1723/tcp   #Point-to-point tunnelling protocol
 # IMPORTANT NOTE: See comments for ports 1645/1646 when using older equipment
 radius		1812/tcp   #RADIUS authentication protocol (IANA sanctioned)
 radius		1812/udp   #RADIUS authentication protocol (IANA sanctioned)
-radius-acct		1813/tcp   #RADIUS accounting protocol (IANA sanctioned)
-radius-acct		1813/udp  #RADIUS accounting protocol (IANA sanctioned)
+radius-acct		1813/tcp radacct  #RADIUS accounting protocol (IANA sanctioned)
+radius-acct		1813/udp radacct #RADIUS accounting protocol (IANA sanctioned)
 licensedaemon	1986/tcp   #cisco license management
 licensedaemon	1986/udp   #cisco license management
 tr-rsrb-p1	1987/tcp   #cisco RSRB Priority 1 port
