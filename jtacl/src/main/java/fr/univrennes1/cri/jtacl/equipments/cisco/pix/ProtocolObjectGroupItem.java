@@ -63,7 +63,7 @@ public class ProtocolObjectGroupItem extends ObjectGroupItem {
 	 * @return true if this item matches any of the protocols value in argument.
 	 */
 	public boolean matches(List<Integer> protocols) {
-		return protocols.contains(_protocol);
+		return ProtocolComparator.matches(protocols, _protocol);
 	}
 
 }

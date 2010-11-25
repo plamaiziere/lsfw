@@ -64,7 +64,7 @@ public class EnhancedServiceObjectGroupItem extends ObjectGroupItem {
 	 */
 	public boolean matches(List<Integer> protocols) {
 
-		return protocols.contains(_serviceObject.getProtocol());
+		return ProtocolComparator.matches(protocols, _serviceObject.getProtocol());
 	}
 
 	/**
@@ -77,8 +77,7 @@ public class EnhancedServiceObjectGroupItem extends ObjectGroupItem {
 	public boolean matches(List<Integer> protocols, int service) {
 		PortObject pobject = _serviceObject.getPortObject();
 
-
-		if (!protocols.contains(_serviceObject.getProtocol()))
+		if (!ProtocolComparator.matches(protocols, _serviceObject.getProtocol()))
 			return false;
 		if (pobject != null)
 			return (pobject.matches(service));

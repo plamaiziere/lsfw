@@ -955,7 +955,7 @@ public class CiscoRouter extends GenericEquipment {
 		/*
 		 * protocol
 		 */
-		if (aceProto != null && !reqProto.contains(aceProto))
+		if (aceProto != null && !ProtocolComparator.matches(reqProto, aceProto))
 			return MatchResult.NOT;
 	}
 

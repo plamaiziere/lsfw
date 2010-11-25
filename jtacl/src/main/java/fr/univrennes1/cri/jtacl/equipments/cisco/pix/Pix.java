@@ -1207,7 +1207,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 * protocol
 			 */
 			if (aclProto != null) {
-				if (!reqProto.contains(aclProto))
+				if (!ProtocolComparator.matches(reqProto, aclProto))
 					return MatchResult.NOT;
 			}
 			/*
