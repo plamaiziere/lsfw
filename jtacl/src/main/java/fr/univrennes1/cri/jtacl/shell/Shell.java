@@ -602,12 +602,14 @@ public class Shell {
 			}
 
 			/*
-			 * if ip we want to match tcp and udp too
+			 * if ip we want to match tcp, udp, icmp too
 			 */
 			if (sprotocol.equalsIgnoreCase("ip") ||
 					sprotocol.equalsIgnoreCase("ipv6")) {
 				protocols.add(ipProtocols.TCP());
 				protocols.add(ipProtocols.UDP());
+				protocols.add(ipProtocols.ICMP());
+				protocols.add(ipProtocols.ICMP6());
 			}
 			
 			/*
