@@ -21,6 +21,7 @@ import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.monitor.Probe;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeResults;
+import fr.univrennes1.cri.jtacl.core.monitor.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
@@ -906,6 +907,39 @@ public class CiscoRouter extends GenericEquipment {
 		return MatchResult.UNKNOWN;
 	}
 
+	protected String iosTcpFlagToFlag(String flag) {
+		if (flag.equals("ack"))
+			return "a";
+		if (flag.equals("fin"))
+			return "f";
+		if (flag.equals("psh"))
+			return "p";
+		if (flag.equals("rst"))
+			return "r";
+		if (flag.equals("syn"))
+			return "s";
+		if (flag.equals("urg"))
+			return "u";
+		return null;
+	}
+
+	protected boolean tcpFlagsFilter(ProbeTcpFlags reqFlags,
+			AccessListElement ace) {
+
+		String flags = "";
+		for (String f: ace.getTcpFlags()) {
+			String flag = iosTcpFlagToFlag(f.substring(1));
+			if (f.startsWith("+"))
+				flag = flag.toUpperCase();
+			flags += flag;
+		}
+		if (ace.getTcpKeyword().equals("match-any"))
+			return reqFlags.matchesAny(flags);
+		if (ace.getTcpKeyword().equals("match-all"))
+			return reqFlags.matchesAll(flags);
+		return false;
+	}
+
 	/**
 	 *
 	 */
@@ -1014,6 +1048,16 @@ public class CiscoRouter extends GenericEquipment {
 			}
 		}
 
+	}
+
+	/*
+	 * Check TCP flags
+	 */
+	ProbeTcpFlags reqTcpFlags = request.getTcpFlags();
+	StringsList aceFlags = ace.getTcpFlags();
+	if (reqTcpFlags != null && !aceFlags.isEmpty()) {
+		if (!tcpFlagsFilter(reqTcpFlags, ace))
+			return MatchResult.NOT;
 	}
 
 	if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL)

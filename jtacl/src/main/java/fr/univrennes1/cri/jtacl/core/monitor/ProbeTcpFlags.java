@@ -22,10 +22,19 @@ import java.util.ArrayList;
  */
 public class ProbeTcpFlags extends ArrayList<TcpFlags> {
 
-	public boolean matches(TcpFlags flags) {
+	public boolean matchesAll(String flags) {
 
 		for (TcpFlags f: this) {
-			if (f.contains(flags))
+			if (f.testFlagsAll(flags))
+				return true;
+		}
+		return false;
+	}
+
+	public boolean matchesAny(String flags) {
+
+		for (TcpFlags f: this) {
+			if (f.testFlagsAny(flags))
 				return true;
 		}
 		return false;

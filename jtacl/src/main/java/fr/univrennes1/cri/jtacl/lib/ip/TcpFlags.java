@@ -29,8 +29,41 @@ public class TcpFlags {
 	protected static final int FIN = 0x80;
 
 	protected static final int _msk = 0xFF;
+	protected static final String _lowerFlags = "weuaprsf";
+	protected static final String _upperFlags = "WEUAPRSF";
 
 	protected int _flags;
+
+	protected int getFlagByLetter(char f) {
+		switch (f) {
+			case 'w':
+			case 'W':
+				return CWR;
+			case 'e':
+			case 'E':
+				return ECE;
+			case 'u':
+			case 'U':
+				return URG;
+			case 'a':
+			case 'A':
+				return ACK;
+			case 'p':
+			case 'P':
+				return PSH;
+			case 'r':
+			case 'R':
+				return RST;
+			case 's':
+			case 'S':
+				return SYN;
+			case 'f':
+			case 'F':
+				return FIN;
+		}
+		throw new IllegalArgumentException("Invalid flag: " + f);
+	}
+
 
 	public TcpFlags() {
 	}
@@ -44,16 +77,7 @@ public class TcpFlags {
 	}
 
 	public TcpFlags(String flags) {
-		String f = flags.toUpperCase();
-
-		setCWR(f.contains("W"));
-		setECE(f.contains("E"));
-		setURG(f.contains("U"));
-		setACK(f.contains("A"));
-		setPSH(f.contains("P"));
-		setRST(f.contains("R"));
-		setSYN(f.contains("S"));
-		setFIN(f.contains("F"));
+		setFlags(flags);
 	}
 
 	public void clearAll() {
@@ -331,6 +355,59 @@ public class TcpFlags {
 		else
 			clearFIN();
 	}
+
+	public static boolean isLowerFlag(char f) {
+		return _lowerFlags.indexOf(f) >= 0;
+	}
+
+	public static boolean isUpperFlag(char f) {
+		return _upperFlags.indexOf(f) >= 0;
+	}
+	
+	public static boolean isFlag(char f) {
+		return isLowerFlag(f) || isUpperFlag(f);
+	}
+
+	public boolean getFlag(char f) {
+		return (getFlagByLetter(f) & _flags) != 0;
+	}
+
+	public void setFlag(char f) {
+		int bit = getFlagByLetter(f);
+		if (isLowerFlag(f))
+			_flags = ~bit & _flags & _msk;
+		else
+			_flags |= bit;
+	}
+
+	public void setFlags(String flags) {
+		for (int i = 0; i < flags.length(); i++)
+			setFlag(flags.charAt(i));
+	}
+
+	public boolean testFlag(char f) {
+		boolean r = getFlag(f);
+		if (isLowerFlag(f))
+			return !r;
+		else return r;
+	}
+
+	public boolean testFlagsAll(String flags) {
+		for (int i = 0; i < flags.length(); i++) {
+			if (!testFlag(flags.charAt(i)))
+				return false;
+		}
+		return true;
+	}
+
+	public boolean testFlagsAny(String flags) {
+		for (int i = 0; i < flags.length(); i++) {
+			if (testFlag(flags.charAt(i)))
+				return true;
+		}
+		return false;
+	}
+
 
 	/**
 	 * Returns true if all flags are unset.

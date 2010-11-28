@@ -176,10 +176,9 @@ public class Shell {
 	}
 
 	protected boolean checkTcpFlags(String flags) {
-		String allowed = "WEUAPRSF";
 
 		for (int i = 0; i < flags.length(); i++) {
-			if (allowed.indexOf(flags.charAt(i)) < 0)
+			if (!TcpFlags.isFlag(flags.charAt(i)))
 				return false;
 		}
 		return true;
@@ -636,6 +635,10 @@ public class Shell {
 						if (flag.equalsIgnoreCase("any")) {
 							probeTcpFlags = null;
 							break;
+						}
+						if (flag.equalsIgnoreCase("none")) {
+							probeTcpFlags.add(new TcpFlags());
+							continue;
 						}
 						if (!checkTcpFlags(flag)) {
 							System.out.println("invalid TCP flags: " + flag);
