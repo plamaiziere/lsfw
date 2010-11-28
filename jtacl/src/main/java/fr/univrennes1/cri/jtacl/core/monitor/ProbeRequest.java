@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.core.monitor;
 
+import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.List;
 
 /**
@@ -50,6 +51,11 @@ public class ProbeRequest {
 	 * (null = any)
 	 */
 	protected Integer _destPort;
+
+	/**
+	 * TCP flags we should match (null: any)
+	 */
+	protected ProbeTcpFlags _tcpFlags;
 
 	/**
 	 * Returns the internet protocols we should match.
@@ -109,7 +115,6 @@ public class ProbeRequest {
 	}
 
 
-
 	/**
 	 * Returns the source port.
 	 * (null = any)
@@ -146,6 +151,14 @@ public class ProbeRequest {
 		_destPort = port;
 	}
 
+	public ProbeTcpFlags getTcpFlags() {
+		return _tcpFlags;
+	}
+
+	public void setTcpFlags(ProbeTcpFlags tcpFlags) {
+		_tcpFlags = tcpFlags;
+	}
+
 	/**
 	 * Creates and returns a new copy of this instance.
 	 * @return a new copy of this instance.
@@ -157,6 +170,7 @@ public class ProbeRequest {
 		req._code = _code;
 		req._sourcePort = _sourcePort;
 		req._destPort = _destPort;
+		req._tcpFlags = _tcpFlags;
 		return req;
 	}
 

@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.shell;
 
 import fr.univrennes1.cri.jtacl.lib.misc.CommonRules;
+import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import org.parboiled.Action;
 import org.parboiled.Context;
 import org.parboiled.Rule;
@@ -39,6 +40,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _probeExpect;
 	protected boolean _probe6flag;
 	protected String _subCommand;
+	protected StringsList _tcpFlags;
 
 	public void clear() {
 		_command = "";
@@ -54,6 +56,7 @@ public class ShellParser extends CommonRules<Object> {
 		_topologyOption = null;
 		_probeExpect = null;
 		_subCommand = null;
+		_tcpFlags = null;
 	}
 
 	public String getCommand() {
@@ -106,6 +109,10 @@ public class ShellParser extends CommonRules<Object> {
 
 	public String getSubCommand() {
 		return _subCommand;
+	}
+
+	public StringsList getTcpFlags() {
+		return _tcpFlags;
 	}
 
 	Rule CommandLine() {
@@ -506,6 +513,12 @@ public class ShellParser extends CommonRules<Object> {
 							WhiteSpaces(),
 							TcpUdpSpecification()
 						)
+					),
+					Optional(
+						Sequence(
+							WhiteSpaces(),
+							TcpFlagsSpec()
+						)
 					)
 				),
 				Sequence(
@@ -536,6 +549,7 @@ public class ShellParser extends CommonRules<Object> {
 		return
 			FirstOf(
 				Sequence(
+					TestNot(StringIgnoreCase("flags")),
 					Identifier(),
 					new Action() {
 						public boolean run(Context context) {
@@ -558,6 +572,7 @@ public class ShellParser extends CommonRules<Object> {
 					)
 				),
 				Sequence(
+					TestNot(StringIgnoreCase("flags")),
 					Identifier(),
 					new Action() {
 						public boolean run(Context context) {
@@ -570,4 +585,36 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
+	Rule TcpFlagsSpec() {
+		return
+			Sequence(
+				StringIgnoreCase("flags"),
+				WhiteSpaces(),
+				new Action() {
+					public boolean run(Context context) {
+						_tcpFlags = new StringsList();
+						return true;
+					}
+				},
+				OneOrMore(
+					Sequence(
+						TcpFlagSpec(),
+						SkipSpaces()
+					)
+				)
+			);
+	}
+
+	Rule TcpFlagSpec() {
+		return
+			Sequence(
+				StringAtom(),
+				new Action() {
+					public boolean run(Context context) {
+						_tcpFlags.add(context.getPrevText());
+						return true;
+					}
+				}
+			);
+	}
 }

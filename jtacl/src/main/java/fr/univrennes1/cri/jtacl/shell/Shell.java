@@ -19,6 +19,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
 import fr.univrennes1.cri.jtacl.core.monitor.AclResult;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeRequest;
+import fr.univrennes1.cri.jtacl.core.monitor.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.monitor.Probing;
 import fr.univrennes1.cri.jtacl.core.monitor.RoutingResult;
@@ -38,6 +39,8 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
+import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -170,6 +173,16 @@ public class Shell {
 			}
 		}
 		return resLinks;
+	}
+
+	protected boolean checkTcpFlags(String flags) {
+		String allowed = "WEUAPRSF";
+
+		for (int i = 0; i < flags.length(); i++) {
+			if (allowed.indexOf(flags.charAt(i)) < 0)
+				return false;
+		}
+		return true;
 	}
 
 	public Shell() {
@@ -583,6 +596,10 @@ public class Shell {
 					protocols.add(ipProtocols.IP());
 				else
 					protocols.add(ipProtocols.IPV6());
+
+				/*
+				 * services lookup
+				 */
 				if (sprotoSource != null) {
 					protoSource = ipServices.serviceLookup(sprotoSource, sprotocol);
 					if (protoSource.intValue() == -1) {
@@ -598,6 +615,36 @@ public class Shell {
 						return false;
 					}
 					request.setDestinationPort(protoDest);
+				}
+
+				/*
+				 * tcp flags
+				 */
+				StringsList tcpFlags = command.getTcpFlags();
+				if (tcpFlags != null) {
+					if (sprotocol.equalsIgnoreCase("udp")) {
+						System.out.println("TCP flags not allowed for UDP!");
+						return false;
+					}
+
+					ProbeTcpFlags probeTcpFlags = new ProbeTcpFlags();
+
+					/*
+					 * check and add each flags spec
+					 */
+					for (String flag: tcpFlags) {
+						if (flag.equalsIgnoreCase("any")) {
+							probeTcpFlags = null;
+							break;
+						}
+						if (!checkTcpFlags(flag)) {
+							System.out.println("invalid TCP flags: " + flag);
+							return false;
+						}
+						TcpFlags tf = new TcpFlags(flag);
+						probeTcpFlags.add(tf);
+					}
+					request.setTcpFlags(probeTcpFlags);
 				}
 			}
 
