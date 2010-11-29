@@ -121,6 +121,6 @@ Examples:
   Probe with tcp flag SYN set.
   jtacl> probe 192.168.1.2/24 www.google.com tcp flags S
 
-  Probe with tcp flag SYN set or tcp flags SYN and ACK.
+  Probe with tcp flag SYN set or tcp flags SYN and ACK set.
   jtacl> probe 192.168.1.2/24 www.google.com tcp flags S SA
 
