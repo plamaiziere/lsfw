@@ -1,7 +1,7 @@
 --- probe ---
 
 probe|probe6 [on equipment-spec] source destination
-[tcp | udp [portsource:][portdest]] |
+[tcp | udp [portsource:][portdest] [flags tcpflags [tcpflags]]] |
 [icmp [icmptype]] |
 [icmp6 icmp6type]] |
 [protocol]
@@ -56,6 +56,25 @@ using the form [portsource:][portdest]
   Port can be a number or the name of a service. Services are resolved using
 an internal services database.
 
+tcp
+---
+  If the protocol is tcp, several tcp flags can be specified using the form
+flags tcpflags [tcpflags].
+
+tcpFlags can be a combinaison of flags or the keyword 'any' or 'none'.
+'none' designates a tcpflags with all flags unset.
+'any' matches all tcpflags, and is the default when flags are unspecified.
+
+A TCP flag is specified using a letter:
+ W: CWR
+ E: ECE
+ U: URG
+ A: ACK
+ P: PSH
+ R: RST
+ S: SYN
+ F: FIN
+
 icmp/icmp6
 -----------
   If the protocol is icmp or icmp6, the icmp-type or icmp message can be added.
@@ -98,3 +117,10 @@ Examples:
   equipment where the probe should be injected (instead using the network
   192.168.1.0/24).
   jtacl> probe =192.168.1.2/24 1.2.3.4
+
+  Probe with tcp flag SYN set.
+  jtacl> probe 192.168.1.2/24 www.google.com tcp flags S
+
+  Probe with tcp flag SYN set or tcp flags SYN and ACK.
+  jtacl> probe 192.168.1.2/24 www.google.com tcp flags S SA
+
