@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.core.monitor;
 
-import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.List;
 
 /**
