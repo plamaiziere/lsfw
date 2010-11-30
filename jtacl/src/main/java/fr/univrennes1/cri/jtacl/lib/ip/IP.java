@@ -70,7 +70,7 @@ public class IP {
 		int netlen = highest0Bits(netmask) + 1;
 		int masklen = highest1Bits(netmask) + 1;
 
-		if (!checkNetmask(netmask, masklen))
+		if ((masklen != 0 && masklen != 32) || !checkNetmask(netmask, masklen))
 			throw new UnknownHostException("Netmask can't be expressed as a prefix: " +
 				netmask.toString(16));
 		return (masklen - netlen);

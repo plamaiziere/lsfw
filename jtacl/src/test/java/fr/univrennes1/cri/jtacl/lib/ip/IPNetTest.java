@@ -283,6 +283,21 @@ public class IPNetTest extends TestCase {
 		}
 		assertTrue(f);
 
+		// invalid
+		f = false;
+		try {
+			testConstructorNetIP(
+				"0.0.0.255/0.0.0.255",
+				"0",
+				0,
+				IPversion.IPV4
+			);
+		} catch (UnknownHostException e) {
+			f = true;
+			System.out.println("check : " + e.getMessage());
+		}
+		assertTrue(f);
+
 		// test / ipv6
 		for (int i = 0; i <= 128; i++) {
 			testConstructorNetIP(
