@@ -402,7 +402,9 @@ public class IOSParserTest extends TestCase {
 			assertEquals("DESTMASK", ace.getDstIpMask());
 			assertEquals("eq", ace.getDstPortOperator());
 			assertEquals("PORT", ace.getDstFirstPort());
-			assertEquals("established", ace.getTcpKeyword());
+			assertEquals("match-any", ace.getTcpKeyword());
+			assertEquals("+ack", ace.getTcpFlags().get(0));
+			assertEquals("+rst", ace.getTcpFlags().get(1));
 			assertEquals("ace extended", parser.getRuleName());
 		}
 
@@ -454,7 +456,9 @@ public class IOSParserTest extends TestCase {
 			assertEquals(null, ace.getDstIpMask());
 			assertEquals("gt", ace.getDstPortOperator());
 			assertEquals("DESTPORT", ace.getDstFirstPort());
-			assertEquals("established", ace.getTcpKeyword());
+			assertEquals("match-any", ace.getTcpKeyword());
+			assertEquals("+ack", ace.getTcpFlags().get(0));
+			assertEquals("+rst", ace.getTcpFlags().get(1));
 			assertEquals("ace extended", parser.getRuleName());
 		}
 
@@ -492,7 +496,9 @@ public class IOSParserTest extends TestCase {
 			assertEquals(null, ace.getSrcIpMask());
 			assertEquals("any", ace.getDstIp());
 			assertEquals(null, ace.getDstIpMask());
-			assertEquals("established", ace.getTcpKeyword());
+			assertEquals("match-any", ace.getTcpKeyword());
+			assertEquals("+ack", ace.getTcpFlags().get(0));
+			assertEquals("+rst", ace.getTcpFlags().get(1));
 			assertEquals("access-list", parser.getRuleName());
 		}
 
