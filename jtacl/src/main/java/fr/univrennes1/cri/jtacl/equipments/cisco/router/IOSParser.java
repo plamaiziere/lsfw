@@ -876,7 +876,12 @@ public class IOSParser extends CommonRules<Object> {
 				String("established"),
 				new Action() {
 					public boolean run(Context context) {
-						_ace.setTcpKeyword("established");
+						/*
+						 * established : ack or rst
+						 */
+						_ace.setTcpKeyword("match-any");
+						_ace.getTcpFlags().add("+ack");
+						_ace.getTcpFlags().add("+rst");
 						return true;
 					}
 				}
