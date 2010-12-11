@@ -28,7 +28,8 @@ public class FilterOptsTemplate {
 	
 	private String _action;
 	private String _rcv;
-	private StringsList _flags = new StringsList();
+	private String _flags;
+	private String _flagset;
 	private List<IcmpItem> _icmpspec = new ArrayList<IcmpItem>();
 	private List<IcmpItem> _icmp6spec = new ArrayList<IcmpItem>();
 	private boolean _fragment;
@@ -108,8 +109,20 @@ public class FilterOptsTemplate {
 		_divertPacketPort = divertPacketPort;
 	}
 
-	public StringsList getFlags() {
+	public String getFlags() {
 		return _flags;
+	}
+
+	public void setFlags(String flags) {
+		_flags = flags;
+	}
+
+	public String getFlagset() {
+		return _flagset;
+	}
+
+	public void setFlagset(String flags) {
+		_flagset = flags;
 	}
 
 	public boolean isFragment() {

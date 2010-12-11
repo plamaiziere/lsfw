@@ -243,7 +243,8 @@ public class PfParserTest extends TestCase {
 		List<Xhost> hosts;
 		PortItemTemplate port;
 		List<PortItemTemplate> ports;
-		List<String> flags;
+		String flags;
+		String flagset;
 		List<IcmpItem> icmp;
 		IcmpItem icmpItem;
 		StringsList states;
@@ -1688,9 +1689,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertTrue(flags.size() == 2);
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			assertEquals("pfrule", parser.getRuleName());
 		}
 
@@ -1724,9 +1725,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertTrue(flags.size() == 2);
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmpspec();
 			assertTrue(icmp.size() == 1);
 			icmpItem = icmp.get(0);
@@ -1765,8 +1766,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmpspec();
 			assertTrue(icmp.size() == 1);
 			icmpItem = icmp.get(0);
@@ -1805,8 +1807,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmpspec();
 			icmpItem = icmp.get(0);
 			assertEquals("ICMP", icmpItem.getIcmpType());
@@ -1843,8 +1846,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmpspec();
 			icmpItem = icmp.get(0);
 			assertEquals("ICMP", icmpItem.getIcmpType());
@@ -1882,8 +1886,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmpspec();
 			assertTrue(icmp.size() == 2);
 			icmpItem = icmp.get(0);
@@ -1923,8 +1928,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmp6spec();
 			icmpItem = icmp.get(0);
 			assertEquals("ICMP", icmpItem.getIcmpType());
@@ -1961,8 +1967,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmp6spec();
 			icmpItem = icmp.get(0);
 			assertEquals("ICMP", icmpItem.getIcmpType());
@@ -1974,7 +1981,7 @@ public class PfParserTest extends TestCase {
 				"port {PORT1:PORT2, =PORT3} " +
 				"user { patrick, 20 } " +
 				"group { root, 0 } " +
-				"flags S/SA " +
+				"flags S/S " +
 				"icmp6-type {ICMP0, ICMP1 code ICMP1CODE}";
 
 		parser.clear();
@@ -1999,8 +2006,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("S", flags);
+			assertEquals("S", flagset);
 			icmp = rule.getFilterOpts().getIcmp6spec();
 			assertTrue(icmp.size() == 2);
 			icmpItem = icmp.get(0);
@@ -2016,7 +2024,7 @@ public class PfParserTest extends TestCase {
 				"port {PORT1:PORT2, =PORT3} " +
 				"user { patrick, 20 } " +
 				"group { root, 0 } " +
-				"flags S/SA " +
+				"flags /SA " +
 				"icmp6-type {ICMP0, ICMP1 code ICMP1CODE} " +
 				"tos TOS";
 
@@ -2042,8 +2050,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals(null, flags);
+			assertEquals("SA", flagset);
 			icmp = rule.getFilterOpts().getIcmp6spec();
 			icmpItem = icmp.get(0);
 			assertEquals("ICMP0", icmpItem.getIcmpType());
@@ -2059,7 +2068,7 @@ public class PfParserTest extends TestCase {
 				"port {PORT1:PORT2, =PORT3} " +
 				"user { patrick, 20 } " +
 				"group { root, 0 } " +
-				"flags S/SA " +
+				"flags any " +
 				"icmp6-type {ICMP0, ICMP1 code ICMP1CODE} " +
 				"tos TOS " +
 				"no state";
@@ -2086,8 +2095,9 @@ public class PfParserTest extends TestCase {
 			assertEquals(null, port.getLastPort());
 			assertEquals("=", port.getOperator());
 			flags = rule.getFilterOpts().getFlags();
-			assertEquals("S", flags.get(0));
-			assertEquals("SA", flags.get(1));
+			flagset = rule.getFilterOpts().getFlagset();
+			assertEquals("any", flags);
+			assertEquals(null, flagset);
 			icmp = rule.getFilterOpts().getIcmp6spec();
 			icmpItem = icmp.get(0);
 			assertEquals("ICMP0", icmpItem.getIcmpType());

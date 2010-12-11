@@ -50,7 +50,8 @@ public class PfParser extends PfBaseParser {
 	private PortItemTemplate _pfPortItem;
 	private IcmpItem _pfIcmpItem;
 	private String _pfStateOptItem;
-	private List<String> _flags = new ArrayList<String>();
+	private String _flags;
+	private String _flagset;
 	private List<Xhost> _ipspec = new ArrayList<Xhost>();
 	private List<PortItemTemplate> _portspec = new ArrayList<PortItemTemplate>();
 	private List<IcmpItem> _icmpspec = new ArrayList<IcmpItem>();
@@ -1247,7 +1248,8 @@ public class PfParser extends PfBaseParser {
 					public boolean run(Context context) {
 						_icmpspec.clear();
 						_icmp6spec.clear();
-						_flags.clear();
+						_flags = null;
+						_flagset = null;
 						_stateOptSpec.clear();
 						return true;
 					}
@@ -1255,7 +1257,8 @@ public class PfParser extends PfBaseParser {
 				PfFilterOptsl(),
 				new Action() {
 					public boolean run (Context context) {
-							_pfRule.getFilterOpts().getFlags().addAll(_flags);
+							_pfRule.getFilterOpts().setFlags(_flags);
+							_pfRule.getFilterOpts().setFlagset(_flagset);
 							_pfRule.getFilterOpts().getIcmpspec().addAll(_icmpspec);
 							_pfRule.getFilterOpts().getIcmp6spec().addAll(_icmp6spec);
 							return true;
@@ -3075,7 +3078,7 @@ public class PfParser extends PfBaseParser {
 					ANY(),
 					new Action() {
 						public boolean run(Context context) {
-							_flags.add("any");
+							_flags = "any";
 							return true;
 						}
 					}
@@ -3091,7 +3094,7 @@ public class PfParser extends PfBaseParser {
 					PfFlag(),
 					new Action() {
 						public boolean run(Context context) {
-							_flags.add(_pfString);
+							_flagset = _pfString;
 							return true;
 						}
 					}
@@ -3105,7 +3108,7 @@ public class PfParser extends PfBaseParser {
 					PfFlag(),
 					new Action() {
 						public boolean run(Context context) {
-							_flags.add(_pfString);
+							_flags = _pfString;
 							return true;
 						}
 					},
@@ -3115,7 +3118,7 @@ public class PfParser extends PfBaseParser {
 					PfFlag(),
 					new Action() {
 						public boolean run(Context context) {
-							_flags.add(_pfString);
+							_flagset = _pfString;
 							return true;
 						}
 					}
