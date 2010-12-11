@@ -34,8 +34,8 @@ public class TcpFlags {
 
 	protected int _flags;
 
-	protected int getFlagByLetter(char f) {
-		switch (f) {
+	protected int getFlagByLetter(char flag) {
+		switch (flag) {
 			case 'w':
 			case 'W':
 				return CWR;
@@ -61,33 +61,58 @@ public class TcpFlags {
 			case 'F':
 				return FIN;
 		}
-		throw new IllegalArgumentException("Invalid flag: " + f);
+		throw new IllegalArgumentException("Invalid tcp flag: " + flag);
 	}
 
-
+	/**
+	 * Constructs a new and empty instance.
+	 */
 	public TcpFlags() {
 	}
 
+	/**
+	 * Constructs a new instance with the flags in argument.
+	 * @param flags flags to set.
+	 */
 	public TcpFlags(int flags) {
 		_flags = flags;
 	}
 
+	/**
+	 * Constructs a new instance with the flags in argument.
+	 * @param flags to set
+	 */
 	public TcpFlags(TcpFlags flags) {
 		_flags = flags.getFlags();
 	}
 
+	/**
+	 * Contructs a new instance with flags in argument.
+	 * @param flags to set.
+	 */
 	public TcpFlags(String flags) {
 		setFlags(flags);
 	}
 
+	/**
+	 * Clears all the flags.
+	 */
 	public void clearAll() {
 		_flags = 0;
 	}
 
+	/**
+	 * Returns the flags as an integer.
+	 * @return the flags as an integer.
+	 */
 	public int getFlags() {
 		return _flags;
 	}
 
+	/**
+	 * Sets the flags from an integer.
+	 * @param flags flags to set.
+	 */
 	public void setFlags(int flags) {
 		_flags = flags;
 	}
@@ -356,42 +381,95 @@ public class TcpFlags {
 			clearFIN();
 	}
 
+	/**
+	 * Returns true if the flag in argument is a valid letter for a flag
+	 * in lowercase.
+	 * @param flag flag to check
+	 * @return true if the flag in argument is a valid letter for a flag in
+	 * lowercase.
+	 */
 	public static boolean isLowerFlag(char f) {
 		return _lowerFlags.indexOf(f) >= 0;
 	}
 
+	/**
+	 * Returns true if the flag in argument is a valid letter for a flag
+	 * in uppercase.
+	 * @param flag flag to check
+	 * @return true if the flag in argument is a valid letter for a flag in
+	 * uppercase.
+	 */
 	public static boolean isUpperFlag(char f) {
 		return _upperFlags.indexOf(f) >= 0;
 	}
-	
-	public static boolean isFlag(char f) {
-		return isLowerFlag(f) || isUpperFlag(f);
+
+	/**
+	 * Returns true if the flag in argument is a valid letter for a flag.
+	 * @param flag flag to check.
+	 * @return true if the flag in argument is a valid letter for a flag.
+	 */
+	public static boolean isFlag(char flag) {
+		return isLowerFlag(flag) || isUpperFlag(flag);
 	}
 
-	public boolean getFlag(char f) {
-		return (getFlagByLetter(f) & _flags) != 0;
+	/**
+	 * Returns the state of the flag specified in argument.
+	 * @param flag flag to check.
+	 * @return true if the flag is is set.
+	 */
+	public boolean getFlag(char flag) {
+		return (getFlagByLetter(flag) & _flags) != 0;
 	}
 
-	public void setFlag(char f) {
-		int bit = getFlagByLetter(f);
-		if (isLowerFlag(f))
+	/**
+	 * Sets or unsets a flag according to the flag in argument.
+	 * A flag specified in uppercase sets the flag, a flag specified in lowercase
+	 * unset the flag.
+	 * @param flag to set.
+	 */
+	public void setFlag(char flag) {
+		int bit = getFlagByLetter(flag);
+		if (isLowerFlag(flag))
 			_flags = ~bit & _flags & _msk;
 		else
 			_flags |= bit;
 	}
 
+	/**
+	 * Sets or unsets the flags according to the flags in argument.
+	 * A flag specified in uppercase sets the flag, a flag specified in lowercase
+	 * unset the flag.
+	 * @param flags to set.
+	 */
 	public void setFlags(String flags) {
 		for (int i = 0; i < flags.length(); i++)
 			setFlag(flags.charAt(i));
 	}
 
-	public boolean testFlag(char f) {
-		boolean r = getFlag(f);
-		if (isLowerFlag(f))
+	/**
+	 * Checks the state of the flag specified in argument.<br/>
+	 * If flag is an uppercase letter, the function checks that the flag is set.
+	 * <br/>
+	 * In lowercase, the function checks that the flag is unset.
+	 *
+	 * @param f flag to check
+	 * @return true if the flag is an uppercase flag and the flag is set.
+	 * Or true if the flag is a lowercase flag and the flag is unset.
+	 */
+	public boolean testFlag(char flag) {
+		boolean r = getFlag(flag);
+		if (isLowerFlag(flag))
 			return !r;
 		else return r;
 	}
 
+	/**
+	 * Returns true if this instance contains all the flags specified in the
+	 * flags in argument
+	 * @param flags flags to check.
+	 * @return true if this instance contains all the flags specified in the
+	 * flags in argument
+	 */
 	public boolean testFlagsAll(String flags) {
 		for (int i = 0; i < flags.length(); i++) {
 			if (!testFlag(flags.charAt(i)))
@@ -400,6 +478,13 @@ public class TcpFlags {
 		return true;
 	}
 
+	/**
+	 * Returns true if this instance contains any flags specified in the
+	 * flags in argument
+	 * @param flags flags to check.
+	 * @return true if this instance contains any flags specified in the
+	 * flags in argument
+	 */
 	public boolean testFlagsAny(String flags) {
 		for (int i = 0; i < flags.length(); i++) {
 			if (testFlag(flags.charAt(i)))
