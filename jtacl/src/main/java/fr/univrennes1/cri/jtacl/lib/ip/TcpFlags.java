@@ -479,6 +479,17 @@ public class TcpFlags {
 	}
 
 	/**
+	 * Returns true if this instance contains all the flags specified in the
+	 * flags in argument
+	 * @param flags flags to check.
+	 * @return true if this instance contains all the flags specified in the
+	 * flags in argument
+	 */
+	public boolean testFlagsAll(TcpFlags flags) {
+		return flags.isEmpty() || (_flags & flags.getFlags()) == flags.getFlags();
+	}
+
+	/**
 	 * Returns true if this instance contains any flags specified in the
 	 * flags in argument
 	 * @param flags flags to check.
@@ -486,6 +497,8 @@ public class TcpFlags {
 	 * flags in argument
 	 */
 	public boolean testFlagsAny(String flags) {
+		if (flags.isEmpty())
+			return true;
 		for (int i = 0; i < flags.length(); i++) {
 			if (testFlag(flags.charAt(i)))
 				return true;
@@ -493,6 +506,16 @@ public class TcpFlags {
 		return false;
 	}
 
+	/**
+	 * Returns true if this instance contains any flags specified in the
+	 * flags in argument
+	 * @param flags flags to check.
+	 * @return true if this instance contains any flags specified in the
+	 * flags in argument
+	 */
+	public boolean testFlagsAny(TcpFlags flags) {
+		return flags.isEmpty() || (_flags & flags.getFlags()) != 0;
+	}
 
 	/**
 	 * Returns true if all flags are unset.
@@ -500,15 +523,6 @@ public class TcpFlags {
 	 */
 	public boolean isEmpty() {
 		return _flags == 0;
-	}
-
-	/**
-	 * Returns true if this instance contains the flags in argument.
-	 * @param flags flags to check
-	 * @return true if this instance contains the flags in argument.
-	 */
-	public boolean contains(TcpFlags flags) {
-		return (_flags & flags.getFlags()) == flags.getFlags();
 	}
 
 	@Override

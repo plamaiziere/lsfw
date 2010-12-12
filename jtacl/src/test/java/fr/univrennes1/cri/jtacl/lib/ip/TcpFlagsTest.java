@@ -74,15 +74,36 @@ public class TcpFlagsTest extends TestCase {
 	}
 
 	/**
-	 * Test contains()
+	 * Test testFlagsAll()
 	 */
-	public void testContains() {
-		System.out.println("Test Contains");
+	public void testFlagsAll() {
+		System.out.println("Test flags all");
 		TcpFlags flags = new TcpFlags("ASRU");
 
-		assertEquals(true, flags.contains(new TcpFlags("AS")));
-		assertEquals(false, flags.contains(new TcpFlags("PU")));
+		assertEquals(true, flags.testFlagsAll(""));
+		assertEquals(true, flags.testFlagsAll("AS"));
+		assertEquals(true, flags.testFlagsAll("ASw"));
+		assertEquals(false, flags.testFlagsAll("PU"));
+
+		TcpFlags tflags = new TcpFlags("AU");
+		assertEquals(true, flags.testFlagsAll(tflags));
 	}
+
+	/**
+	 * Test testFlagsAny()
+	 */
+	public void testFlagsAny() {
+		System.out.println("Test flags any");
+		TcpFlags flags = new TcpFlags("ASRU");
+
+		assertEquals(true, flags.testFlagsAny("ASRUP"));
+		assertEquals(true, flags.testFlagsAny("ASwRUP"));
+		assertEquals(false, flags.testFlagsAny("P"));
+
+		TcpFlags tflags = new TcpFlags("A");
+		assertEquals(true, flags.testFlagsAny(tflags));
+	}
+
 
 }
 
