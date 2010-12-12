@@ -26,7 +26,7 @@ public abstract class PfGenericRule {
 	protected String _configurationLine;
 
 	/**
-	 * the text corresponding to this null.
+	 * the text corresponding to this rule.
 	 */
 	protected String _text;
 	
