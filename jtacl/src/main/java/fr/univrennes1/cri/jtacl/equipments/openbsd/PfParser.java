@@ -3372,7 +3372,7 @@ public class PfParser extends PfBaseParser {
 					STATE(),
 					new Action() {
 						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("no state");
+							_pfRule.getFilterOpts().setAction("no-state");
 							return true;
 						}
 					}
@@ -3392,7 +3392,7 @@ public class PfParser extends PfBaseParser {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("keep");
+							_pfRule.getFilterOpts().setAction("keep-state");
 							return true;
 						}
 					}
@@ -3412,7 +3412,7 @@ public class PfParser extends PfBaseParser {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("modulate");
+							_pfRule.getFilterOpts().setAction("modulate-state");
 							return true;
 						}
 					}
@@ -3432,7 +3432,7 @@ public class PfParser extends PfBaseParser {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("synproxy");
+							_pfRule.getFilterOpts().setAction("synproxy-state");
 							return true;
 						}
 					}

@@ -2106,7 +2106,7 @@ public class PfParserTest extends TestCase {
 			assertEquals("ICMP1", icmpItem.getIcmpType());
 			assertEquals("ICMP1CODE", icmpItem.getIcmpCode());
 			assertEquals("TOS", rule.getFilterOpts().getTos());
-			assertEquals("no state", rule.getFilterOpts().getAction());
+			assertEquals("no-state", rule.getFilterOpts().getAction());
 			assertEquals("pfrule", parser.getRuleName());
 		}
 
@@ -2125,7 +2125,7 @@ public class PfParserTest extends TestCase {
 			assertEquals("PROTO", rule.getProtoList().get(0));
 			assertTrue(rule.getSourceHostList().get(0).isAny());
 			assertTrue(rule.getDestHostList().get(0).isAny());
-			assertEquals("keep", rule.getFilterOpts().getAction());
+			assertEquals("keep-state", rule.getFilterOpts().getAction());
 			assertEquals("pfrule", parser.getRuleName());
 		}
 
@@ -2144,7 +2144,7 @@ public class PfParserTest extends TestCase {
 			assertEquals("PROTO", rule.getProtoList().get(0));
 			assertTrue(rule.getSourceHostList().get(0).isAny());
 			assertTrue(rule.getDestHostList().get(0).isAny());
-			assertEquals("modulate", rule.getFilterOpts().getAction());
+			assertEquals("modulate-state", rule.getFilterOpts().getAction());
 			assertEquals("pfrule", parser.getRuleName());
 		}
 
@@ -2163,7 +2163,7 @@ public class PfParserTest extends TestCase {
 			assertEquals("PROTO", rule.getProtoList().get(0));
 			assertTrue(rule.getSourceHostList().get(0).isAny());
 			assertTrue(rule.getDestHostList().get(0).isAny());
-			assertEquals("synproxy", rule.getFilterOpts().getAction());
+			assertEquals("synproxy-state", rule.getFilterOpts().getAction());
 			assertEquals("pfrule", parser.getRuleName());
 		}
 
@@ -2193,7 +2193,7 @@ public class PfParserTest extends TestCase {
 			assertEquals("pass", rule.getAction());
 			assertEquals("out", rule.getDir());
 			assertTrue(rule.isQuick());
-			assertEquals("synproxy", rule.getFilterOpts().getAction());
+			assertEquals("synproxy-state", rule.getFilterOpts().getAction());
 			states = rule.getFilterOpts().getOptions();
 			assertTrue(states.size() == 17);
 			assertEquals("MAXIMUM 00", states.get(0));

@@ -21,6 +21,7 @@ import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.monitor.Probe;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeResults;
+import fr.univrennes1.cri.jtacl.core.monitor.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLinksByIp;
@@ -29,6 +30,7 @@ import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.equipments.Generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
@@ -43,6 +45,7 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1275,6 +1278,76 @@ public class PacketFilter extends GenericEquipment {
 			}
 		}
 		rule.getIcmpspec().setAf(icmpAf);
+
+		/*
+		 * filtering action
+		 */
+		String filterAction = opts.getAction();
+		if (filterAction == null && rule.isPass()) {
+			/* default keep state for pass rule*/
+			filterAction = "keep-state";
+		}
+		if (filterAction != null && filterAction.equals("no-state"))
+			filterAction = null;
+
+		if (filterAction != null && !rule.isPass())
+			throwCfgException("state only allowed in pass rule: " + filterAction);
+
+		rule.setFilterAction(filterAction);
+
+		/*
+		 * tcp flags
+		 */
+
+		/*
+		 * flags are allowed for rule with empty protocol or containing TCP.
+		 */
+		boolean acceptflags = rule.getProtocols().isEmpty() ||
+				rule.getProtocols().contains(_ipProtocols.TCP());
+
+		String flags = opts.getFlags();
+		String flagset = opts.getFlagset();
+		if (flags == null && flagset == null && rule.isPass() &&
+				filterAction != null && acceptflags) {
+			/* default to S/SA for pass rules*/
+			flags = "S";
+			flagset = "SA";
+		}
+		
+		if ((flags != null || flagset != null) && !acceptflags)
+			throwCfgException("tcp flags not allowed here");
+
+		/*
+		 * if "any" do not assign any flags, else convert the flags and
+		 * store them in the rule.
+		 */
+		if (flags != null && flags.equals("any")) {
+			// nothing
+		} else {
+			TcpFlags tcpFlags = null;
+			TcpFlags tcpFlagsSet = null;
+			if (flags != null) {
+				try {
+					tcpFlags = new TcpFlags(flags);
+				} catch (InvalidParameterException ex) {
+					throwCfgException("invalid tcp flags: " + flags);
+				}
+			} else {
+				tcpFlags = new TcpFlags();
+			}
+			if (flagset != null) {
+				try {
+					tcpFlagsSet = new TcpFlags(flagset);
+				} catch (InvalidParameterException ex) {
+					throwCfgException("invalid tcp flagset: " + flagset);
+				}
+				if (tcpFlagsSet.equals(tcpFlags))
+					tcpFlagsSet = null;
+			}
+			rule.setFlags(tcpFlags);
+			rule.setFlagset(tcpFlagsSet);
+		}
+
 		if (Log.debug().isLoggable(Level.INFO)) {
 			String s = "pfrule: " +
 					rule.getAction() + " " + rule.getDirection() + " af=" +
@@ -1286,7 +1359,10 @@ public class PacketFilter extends GenericEquipment {
 					"\nfromport=" + rule.getFromPortSpec() +
 					"\nto=" + rule.getToIpSpec() +
 					"\ntoport " + rule.getToPortSpec() +
-					"\nicmp " + rule.getIcmpspec();
+					"\nicmp " + rule.getIcmpspec() +
+					"\nfAction " + rule.getFilterAction() +
+					"\nflags " + rule.getFlags() +
+					"\nflagset " + rule.getFlagset();
 			Log.debug().info(s);
 		}
 
@@ -2009,6 +2085,21 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	/**
+	 * tcp flags filter
+	 */
+	protected boolean tcpFlagsFilter(ProbeTcpFlags reqFlags, PfRule rule) {
+
+		TcpFlags flags = rule.getFlags();
+		TcpFlags flagset = rule.getFlagset();
+
+		if (flagset == null) {
+			return reqFlags.matchAll(flags);
+		} else {
+			return reqFlags.matchAllWithout(flags, flagset);
+		}
+	}
+
+	/**
 	 * pfrule fiter
 	 */
 	protected MatchResult ruleFilter(FilterContext context, PfRule rule,
@@ -2099,27 +2190,35 @@ public class PacketFilter extends GenericEquipment {
 				MatchResult match = portspecFilter(rule.getToPortSpec(), port);
 				if (match == MatchResult.NOT)
 					return MatchResult.NOT;
-			}
+			}			
+		}
 
-			/*
-			 * icmp spec
-			 */
-			Integer icmpType = request.getSubType();
-			Integer icmpCode = request.getCode();
-			if (reqProto != null && icmpType != null && icmpCode != null) {
-				IPIcmpEnt ent = new IPIcmpEnt("", icmpType, icmpCode);
-				AddressFamily icmpAf = AddressFamily.NONE;
-				if (reqProto.contains(_ipProtocols.ICMP()))
-					icmpAf = AddressFamily.INET;
-				if (reqProto.contains(_ipProtocols.ICMP6()))
-					icmpAf = AddressFamily.INET6;
-				if (icmpAf != AddressFamily.NONE) {
-					MatchResult match = icmpFilter(rule.getIcmpspec(), ent, icmpAf);
-					if (match == MatchResult.NOT)
-						return MatchResult.NOT;
-				}
+		/*
+		 * icmp spec
+		 */
+		Integer icmpType = request.getSubType();
+		Integer icmpCode = request.getCode();
+		if (reqProto != null && icmpType != null && icmpCode != null) {
+			IPIcmpEnt ent = new IPIcmpEnt("", icmpType, icmpCode);
+			AddressFamily icmpAf = AddressFamily.NONE;
+			if (reqProto.contains(_ipProtocols.ICMP()))
+				icmpAf = AddressFamily.INET;
+			if (reqProto.contains(_ipProtocols.ICMP6()))
+				icmpAf = AddressFamily.INET6;
+			if (icmpAf != AddressFamily.NONE) {
+				MatchResult match = icmpFilter(rule.getIcmpspec(), ent, icmpAf);
+				if (match == MatchResult.NOT)
+					return MatchResult.NOT;
 			}
-			
+		}
+
+		/*
+		 * check tcp flags
+		 */
+		ProbeTcpFlags pflags = request.getTcpFlags();
+		if (pflags != null && rule.getFlags() != null) {
+			if (!tcpFlagsFilter(pflags, rule))
+				return MatchResult.NOT;
 		}
 
 		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL)

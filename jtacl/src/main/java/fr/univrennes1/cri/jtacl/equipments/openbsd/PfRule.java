@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.ArrayList;
@@ -98,7 +99,22 @@ public class PfRule extends PfGenericRule {
 	/**
 	 * icmp specification
 	 */
-	 protected PfIcmpSpec _icmpspec = new PfIcmpSpec();
+	protected PfIcmpSpec _icmpspec = new PfIcmpSpec();
+
+	/**
+	 * tcp flags
+	 */
+	protected TcpFlags _flags;
+
+	/**
+	 * Out-of tcp flags set
+	 */
+	protected TcpFlags _flagset;
+
+	/**
+	 * filter action (no-state, keep-state...)
+	 */
+	protected String _filterAction;
 
 	/**
 	 * Returns the action of this rule (pass, match, block).
@@ -258,6 +274,54 @@ public class PfRule extends PfGenericRule {
 	 */
 	public PfIcmpSpec getIcmpspec() {
 		return _icmpspec;
+	}
+
+	/**
+	 * Returns the tcp flags of this rule (null = any).
+	 * @return the tcp flags of this rule.
+	 */
+	public TcpFlags getFlags() {
+		return _flags;
+	}
+
+	/**
+	 * Sets the tcp flags of this rule (null = any).
+	 * @param flags flags to set.
+	 */
+	public void setFlags(TcpFlags flags) {
+		 _flags = flags;
+	}
+
+	/**
+	 * Returns the out-of tcp flags of this rule (null = none).
+	 * @return the out-of tcp flags of this rule.
+	 */
+	public TcpFlags getFlagset() {
+		return _flagset;
+	}
+
+	/**
+	 * Sets the out-of tcp flags of this rule (null = none).
+	 * @param flags flags to set.
+	 */
+	public void setFlagset(TcpFlags flags) {
+		 _flagset = flags;
+	}
+
+	/**
+	 * Returns the filter action of this rule (ex: no-state).
+	 * @return the filter action of this rule.
+	 */
+	public String getFilterAction() {
+		return _filterAction;
+	}
+
+	/**
+	 * Sets the filter action of this rule.
+	 * @param action action to set.
+	 */
+	public void setFilterAction(String action) {
+		_filterAction = action;
 	}
 
 }
