@@ -31,6 +31,16 @@ public class IP {
 	}
 
 	/**
+	 * Array of prefixlen to netmaks (IPv4)
+	 */
+	private static final BigInteger [] _netmaskIpV4 = new BigInteger[33];
+
+	/**
+	 * Array of prefixlen to netmaks (IPv6)
+	 */
+	private static final BigInteger [] _netmaskIpV6 = new BigInteger[129];
+
+	/**
 	 * Largest value for an IPv6 address: 2^128 -1.
 	 */
 	public static final BigInteger MAX_IPV6_NUMBER =
@@ -57,6 +67,23 @@ public class IP {
 	 */
 	public static final BigInteger BIG_INT_0xFF = new BigInteger("FF", 16);
 
+	/**
+	 * Converts a prefix length to a netmask.
+	 * @param prefixLen the prefix to convert from.
+	 * @param ipVersion the {@link IPversion} version of IP.
+	 * @return the {@link BigInteger} netmask.
+	 */
+	private static BigInteger getNetmask(int prefixLen, IPversion ipVersion) {
+
+		BigInteger result = BigInteger.ZERO;
+		int numBit = maxPrefixLen(ipVersion) - 1;
+
+		for (int i = 0; i < prefixLen; i++) {
+			result = result.setBit(numBit);
+			numBit--;
+		}
+		return result;
+	}
 
 	/**
 	 * Converts a netmask (IPv4) to a prefix length.
@@ -84,14 +111,13 @@ public class IP {
 	 */
 	public static BigInteger prefixLenToNetmask(int prefixLen, IPversion ipVersion) {
 
-		BigInteger result = BigInteger.ZERO;
-		int numBit = maxPrefixLen(ipVersion) - 1;
-
-		for (int i = 0; i < prefixLen; i++) {
-			result = result.setBit(numBit);
-			numBit--;
+		switch (ipVersion) {
+			case IPV4:
+				return _netmaskIpV4[prefixLen];
+			case IPV6:
+				return _netmaskIpV6[prefixLen];
 		}
-		return result;
+		return null; 
 	}
 
 	/**
@@ -346,4 +372,16 @@ public class IP {
 		return result;
 	}
 
+	/*
+	 * Initialization of the netmask arrays
+	 */
+	static {
+
+		for (int i = 0; i <= maxPrefixLen(IPversion.IPV4); i++) {
+			_netmaskIpV4[i] = getNetmask(i, IPversion.IPV4);
+		}
+		for (int i = 0; i <= maxPrefixLen(IPversion.IPV6); i++) {
+			_netmaskIpV6[i] = getNetmask(i, IPversion.IPV6);
+		}
+	}
 }
