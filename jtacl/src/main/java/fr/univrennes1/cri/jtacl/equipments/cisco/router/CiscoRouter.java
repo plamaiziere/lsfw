@@ -934,9 +934,9 @@ public class CiscoRouter extends GenericEquipment {
 			flags += flag;
 		}
 		if (ace.getTcpKeyword().equals("match-any"))
-			return reqFlags.matchesAny(flags);
+			return reqFlags.matchAny(flags);
 		if (ace.getTcpKeyword().equals("match-all"))
-			return reqFlags.matchesAll(flags);
+			return reqFlags.matchAll(flags);
 		return false;
 	}
 

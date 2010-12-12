@@ -22,7 +22,14 @@ import java.util.ArrayList;
  */
 public class ProbeTcpFlags extends ArrayList<TcpFlags> {
 
-	public boolean matchesAll(String flags) {
+	/**
+	 * Returns true if at least one tcp flags in the probe matches all the flags
+	 * in argument
+	 * @param flags flags to check.
+	 * @return true if at least one tcp flags in the probe matches all the flags
+	 * in argument
+	 */
+	public boolean matchAll(String flags) {
 
 		for (TcpFlags f: this) {
 			if (f.testFlagsAll(flags))
@@ -31,7 +38,47 @@ public class ProbeTcpFlags extends ArrayList<TcpFlags> {
 		return false;
 	}
 
-	public boolean matchesAny(String flags) {
+	/**
+	 * Returns true if at least one tcp flags in the probe matches all the flags
+	 * in argument
+	 * @param flags flags to check.
+	 * @return true if at least one tcp flags in the probe matches all the flags
+	 * in argument
+	 */
+	public boolean matchAll(TcpFlags flags) {
+
+		for (TcpFlags f: this) {
+			if (f.testFlagsAll(flags))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns true if at least one tcp flags in the probe matches all the flags
+	 * in argument, without matching flagset.
+	 * @param flags flags to check.
+	 * @param flagset flagset to not match.
+	 * @return true true if at least one tcp flags in the probe matches all the flags
+	 * in argument, without matching flagset.
+	 */
+	public boolean matchAllWithout(TcpFlags flags, TcpFlags flagset) {
+
+		for (TcpFlags f: this) {
+			if (f.testFlagsAll(flags) && !f.testFlagsAll(flagset))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns true if at least one tcp flags in the probe matches any of the flags
+	 * in argument
+	 * @param flags flags to check.
+	 * @return true if at least one tcp flags in the probe matches any of the flags
+	 * in argument
+	 */
+	public boolean matchAny(String flags) {
 
 		for (TcpFlags f: this) {
 			if (f.testFlagsAny(flags))
