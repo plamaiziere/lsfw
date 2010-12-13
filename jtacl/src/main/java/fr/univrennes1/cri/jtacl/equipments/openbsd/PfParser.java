@@ -239,9 +239,6 @@ public class PfParser extends PfBaseParser {
 		ParsingResult<?> result;
 		int lindex = 0;
 		int blength = buffer.length();
-
-		StringBuilder ruleLine;
-		StringBuilder nextLine;
 		int lineRead = 0;
 		/*
 		 * begining of the rule
