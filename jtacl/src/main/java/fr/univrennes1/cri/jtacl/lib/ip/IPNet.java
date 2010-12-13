@@ -599,9 +599,9 @@ public class IPNet implements Comparable {
 	 */
 	public boolean networkContains(IPNet ipnet) throws UnknownHostException {
 		IPNet first = networkAddress();
-		IPNet last  = broadcastAddress();
+		IPNet last  = broadcastAddressOf(first);
 		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.broadcastAddress();
+		IPNet lastOther = broadcastAddressOf(firstOther);
 
 		return firstOther.isBetweenIP(first, last) && lastOther.isBetweenIP(first, last);
 	}
@@ -614,9 +614,9 @@ public class IPNet implements Comparable {
 	 */
 	public boolean overlaps(IPNet ipnet) throws UnknownHostException {
 		IPNet first = networkAddress();
-		IPNet last  = broadcastAddress();
+		IPNet last  = broadcastAddressOf(first);
 		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.broadcastAddress();
+		IPNet lastOther = broadcastAddressOf(firstOther);
 
 		return first.isBetweenIP(firstOther, lastOther) || 
 				last.isBetweenIP(firstOther, lastOther) || 
@@ -676,6 +676,21 @@ public class IPNet implements Comparable {
 		BigInteger bi = net.getIP().add(IP.networkLength(_prefixLen, _ipVersion));
 		bi = bi.subtract(BigInteger.ONE);
 		return new IPNet(bi, _ipVersion, _prefixLen);
+	}
+
+	/**
+	 * Returns the broadcast IP address of the network in argument.
+	 * @param network network to use to compute the broadcast address.
+	 * @return the {@link IPNet} broadcast IP address of the network in argument.
+	 * @throws UnknownHostException if the network in argument can not be
+	 * expressed as a network.
+	 */
+	public static IPNet broadcastAddressOf(IPNet network) throws UnknownHostException {
+		IPversion ipVersion = network.getIpVersion();
+		int prefixLen = network.getPrefixLen();
+		BigInteger bi = network.getIP().add(IP.networkLength(prefixLen, ipVersion));
+		bi = bi.subtract(BigInteger.ONE);
+		return new IPNet(bi, ipVersion, prefixLen);
 	}
 
 	/**
