@@ -51,8 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.parboiled.BasicParseRunner;
 import org.parboiled.Parboiled;
-import org.parboiled.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1131,7 +1131,7 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		PfParser parser = Parboiled.createParser(PfParser.class);
 		ParsingResult<?> result;
-		result = ReportingParseRunner.run(parser.Parse(), buf.toString());
+		result = BasicParseRunner.run(parser.Parse(), buf.toString());
 
 		if (!result.matched)
 			throwCfgException("cannot parse table's file:  " + fileName);
@@ -1562,7 +1562,7 @@ public class PacketFilter extends GenericEquipment {
 					": "+ lineCfg);
 
 			parser.clear();
-			result = ReportingParseRunner.run(parser.Parse(), lineCfg);
+			result = BasicParseRunner.run(parser.Parse(), lineCfg);
 			if (result.matched) {
 				String rule = parser.getRuleName();
 
@@ -1695,7 +1695,7 @@ public class PacketFilter extends GenericEquipment {
 				 * use a generic rule to known the number of lines taken by
 				 * the rule.
 				 */
-				result = ReportingParseRunner.run(parser.PfGenericRule(), lineCfg);
+				result = BasicParseRunner.run(parser.PfGenericRule(), lineCfg);
 				if (result.matched) {
 					nbLine = 0;
 					String matchedText = parser.getMatchedText();
