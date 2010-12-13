@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.parboiled.Action;
+import org.parboiled.BasicParseRunner;
 import org.parboiled.Context;
 import org.parboiled.ReportingParseRunner;
 import org.parboiled.Rule;
@@ -252,7 +253,7 @@ public class PfParser extends PfBaseParser {
 		/*
 		 * brace '}\n'
 		 */
-		result = ReportingParseRunner.run(IsClosingBrace(),
+		result = BasicParseRunner.run(IsClosingBrace(),
 				exRule.expandedToString());
 		if (!result.matched) {
 			/*
@@ -268,7 +269,7 @@ public class PfParser extends PfBaseParser {
 					nextFound = true;
 				}
 				if (!nextFound) {
-					result = ReportingParseRunner.run(IsNewRule(),
+					result = BasicParseRunner.run(IsNewRule(),
 						nextRule.expandedToString());
 						nextFound = result.matched;
 				}
