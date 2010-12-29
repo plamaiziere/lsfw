@@ -36,14 +36,16 @@
 		/>
 
 		<!-- Cisco Pix -->
-		<equipment classname="fr.univrennes1.cri.jtacl.equipments.cisco.pix.Pix"
+		<equipment
+			classname="fr.univrennes1.cri.jtacl.equipments.cisco.pix.Pix"
 			name="pix1"
 			comment="pix #1"
 			filename="./ciscopix.xml"
 		/>
 
 		<!-- OpenBSD PacketFilter -->
-		<equipment classname="fr.univrennes1.cri.jtacl.equipments.openbsd.PacketFilter"
+		<equipment
+			classname="fr.univrennes1.cri.jtacl.equipments.openbsd.PacketFilter"
 			name="pf1"
 			comment="PacketFilter #1"
 			filename="./packetfilter.xml"
