@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : simplerouter.xml
+	Created on : 16 octobre 2010, 12:32
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the SimpleRouter configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/simplerouter
+-->
+
+<equipment>
+
+	<!-- definitions of the interfaces -->
+	<iface name="if0" comment="interface 0" ip="10.0.2.1" network="10.0.2.0/24"/>
+
+	<iface name="if1" comment="interface 1" ip="192.168.10.254" network="192.168.10.0/24"/>
+	<iface name="if1" ip="192.168.11.254" network="192.168.11.0/24"/>
+	<iface name="if1" ip="192.168.12.254" network="192.168.12.0/24"/>
+
+	<!-- routing engine -->
+	<routing>
+		<!-- default route to R1 -->
+		<route prefix="0.0.0.0/0" nexthop="10.0.2.254" />
+	</routing>
+
+</equipment>
