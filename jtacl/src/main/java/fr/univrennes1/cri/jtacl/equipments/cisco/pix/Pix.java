@@ -1050,6 +1050,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			acl.setAction("deny");
 			acl.setConfigurationLine("access-list " + acg.getId() +
 				" *** implicit deny ***");
+			acl.setImplicit(true);
 			acg.add(acl);
 		}
 
