@@ -169,9 +169,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			new HashMap<String, AccessGroup>();
 
 	/**
-	 * Access list
+	 * access list groups
 	 */
-	protected ArrayList<AccessList> _accessLists = new ArrayList<AccessList>();
+	protected HashMap<String, AccessListGroup> _accessListGroups =
+			new HashMap<String, AccessListGroup>();
 
 	/**
 	 * parse context
@@ -206,7 +207,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			} catch (IOException ex) {
 				throw new JtaclConfigurationException("Cannot read file :" + filename);
 			}
-			parseInterfaces(cfg);
 			_configurations.add(cfg);
 		}
 	}
@@ -633,9 +633,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 */
 	private void ruleAcl(AclTemplate tpl) {
 
-		if (tpl.getInactive())
-			return;
-
 		/*
 		 * access-list
 		 */
@@ -651,11 +648,23 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				_parseContext.getLine());
 
 		/*
+		 * create a new ACL group if needed
+		 */
+		AccessListGroup acg = _accessListGroups.get(id);
+		if (acg == null) {
+			acg = new AccessListGroup(id);
+			_accessListGroups.put(id, acg);
+		}
+
+		if (tpl.getInactive())
+			return;
+
+		/*
 		 * remark
 		 */
 		if (tpl.getRemark() != null) {
 			acl.setRemark(tpl.getRemark());
-			_accessLists.add(acl);
+			acg.add(acl);
 			return;
 		}
 
@@ -855,7 +864,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				  acl.getDestServiceGroup() != null))
 			throwCfgException("conflict enhanced service group/destination");
 
-		_accessLists.add(acl);
+		acg.add(acl);
 		
 	}
 
@@ -1001,26 +1010,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			}
 		}
 	}
-
-	/**
-	 * link the acls to their access-group. We have to do this after parsing
-	 * because access-groups may not have been defined at this time.
-	 */
-	protected void aclLinkToAccessGroup() {
-		for (int i = 0; i < _accessLists.size(); /*no inc*/) {
-			AccessList acl = _accessLists.get(i);
-			AccessGroup group = _accessGroups.get(acl.getAccessListId());
-			if (group == null) {
-				Log.config().warning( "Equipment:" + _name +
-					" unknown access-group: " + acl.getAccessListId() +
-					" acl: " + acl.getConfigurationLine());
-				_accessLists.remove(i);
-			} else {
-				acl.setAccessGroup(group);
-				i++;
-			}
-		}
-	}
 	
 	@Override
 	public void configure() {
@@ -1034,17 +1023,41 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
 		loadConfiguration(doc);
+		/*
+		 * parse and add interfaces
+		 */
+		for (ConfigurationFile cfg: _configurations) {
+			parseInterfaces(cfg);
+		}
 		for (String n: _ciscoIfaces.keySet()) {
 			CiscoIface csIface = _ciscoIfaces.get(n);
 			if (!csIface.isShutdown())
 				addInterface(csIface);
 		}
+
+		/*
+		 * parse ACL
+		 */
 		for (ConfigurationFile cfg: _configurations) {
 			parse(cfg);
 		}
+
+		/*
+		 * add an implicit deny ACL in each ACL group
+		 */
+		for (AccessListGroup acg: _accessListGroups.values()) {
+			AccessList acl = new AccessList(acg.getId());
+			acl.setAction("deny");
+			acl.setConfigurationLine("access-list " + acg.getId() +
+				" *** implicit deny ***");
+			acg.add(acl);
+		}
+
+		/*
+		 * routing
+		 */
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
-		aclLinkToAccessGroup();
 	}
 
 	@Override
@@ -1322,53 +1335,61 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			}
 		}
 
-		/*
-		 * for each access list matching access groups associated.
-		 */
 		boolean first = true;
-		for (AccessList acl: _accessLists) {
-			AccessGroup aclAccessGroup = acl.getAccessGroup();
+		/*
+		 * for each access group.
+		 */
+		for (AccessGroup group: agroups) {
+			AccessListGroup acg = _accessListGroups.get(group.getName());
+			if (acg == null) {
+				/*
+				 * XXX: what we shoud do?
+				 */
+				continue;
+			}
+
 			/*
-			 * acl matches any access group?
+			 * each acl in the group.
 			 */
-			if (!acl.isRemark() && aclAccessGroup != null &&
-					agroups.contains(aclAccessGroup)) {
-				MatchResult match = MatchResult.NOT;
-				try {
-					match = probeFilter(probe, acl, direction);
-					if (match != MatchResult.NOT) {
-						/*
-						 * store the result in the probe
-						 */
-						AclResult aclResult = (acl.getAction().equals("permit")) ?
-							AclResult.ACCEPT : AclResult.DENY;
-						if (match != MatchResult.ALL)
-							aclResult = AclResult.MAY;
-						
-						results.addMatchingAcl(direction,
-							acl.getConfigurationLine(),
-							aclResult);
+			for (AccessList acl: acg) {
+				if (!acl.isRemark()) {
+					MatchResult match = MatchResult.NOT;
+					try {
+						match = probeFilter(probe, acl, direction);
+						if (match != MatchResult.NOT) {
+							/*
+							 * store the result in the probe
+							 */
+							AclResult aclResult = (acl.getAction().equals("permit")) ?
+								AclResult.ACCEPT : AclResult.DENY;
+							if (match != MatchResult.ALL)
+								aclResult = AclResult.MAY;
 
-						results.setInterface(direction,
-							ifaceName);
+							results.addMatchingAcl(direction,
+								acl.getConfigurationLine(),
+								aclResult);
 
-						/*
-						 * the active acl is the acl accepting or denying the packet.
-						 * On pix this is the first acl that match the packet.
-						 */
-						if (first) {
-							results.addActiveAcl(direction,
-									acl.getConfigurationLine(),
-									aclResult);
-							results.setAclResult(direction,
-									aclResult);
-							first = false;
+							results.setInterface(direction,
+								ifaceName);
+
+							/*
+							 * the active acl is the acl accepting or denying the packet.
+							 * On pix this is the first acl that match the packet.
+							 */
+							if (first) {
+								results.addActiveAcl(direction,
+										acl.getConfigurationLine(),
+										aclResult);
+								results.setAclResult(direction,
+										aclResult);
+								first = false;
+							}
 						}
+					} catch (UnknownHostException ex) {
+						// should not happen
+						throw new JtaclInternalException(("unexpected exception: " +
+							ex.getMessage()));
 					}
-				} catch (UnknownHostException ex) {
-					// should not happen
-					throw new JtaclInternalException(("unexpected exception: " +
-						ex.getMessage()));
 				}
 			}
 		}

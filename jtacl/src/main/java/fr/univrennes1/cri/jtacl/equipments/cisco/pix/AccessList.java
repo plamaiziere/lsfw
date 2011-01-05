@@ -33,11 +33,6 @@ public class AccessList {
 	protected String _accessListId;
 
 	/**
-	 * access group associated
-	 */
-	protected AccessGroup _accessGroup;
-
-	/**
 	 * action (permit, deny)
 	 */
 	protected String _action;
@@ -131,22 +126,6 @@ public class AccessList {
 	 */
 	public String getAccessListId() {
 		return _accessListId;
-	}
-
-	/**
-	 * Returns the access-group associated to this acl.
-	 * @return the access-group associated to this acl.
-	 */
-	public AccessGroup getAccessGroup() {
-		return _accessGroup;
-	}
-
-	/**
-	 * Sets the access-group associated to this acl.
-	 * @param group the access-group to associate.
-	 */
-	public void setAccessGroup(AccessGroup group) {
-		_accessGroup = group;
 	}
 
 	/**
