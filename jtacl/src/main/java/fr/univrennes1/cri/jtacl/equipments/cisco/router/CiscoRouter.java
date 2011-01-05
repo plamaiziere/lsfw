@@ -796,7 +796,8 @@ public class CiscoRouter extends GenericEquipment {
 			AccessListElement ace = new AccessListElement();
 			ace.setAction("deny");
 			ace.setConfigurationLine("[" + acl.getName() + "]" +
-				"*** implicit deny ***");
+				" *** implicit deny ***");
+			ace.setImplicit(true);
 			acl.add(ace);
 		}
 

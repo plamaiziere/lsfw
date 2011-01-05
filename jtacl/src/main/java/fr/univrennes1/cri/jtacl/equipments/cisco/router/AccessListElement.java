@@ -29,6 +29,11 @@ public class AccessListElement {
 	protected String _configurationLine;
 
 	/**
+	 * true if this ACE is an implicit rule
+	 */
+	 protected boolean _implicit;
+
+	/**
 	 * action (permit, deny)
 	 */
 	protected String _action;
@@ -99,6 +104,22 @@ public class AccessListElement {
 	 */
 	public AccessListElement() {
 		super();
+	}
+
+	/**
+	 * Returns true if this ACE is an implicit rule.
+	 * @return true if this ACE is an implicit rule.
+	 */
+	public boolean isImplicit() {
+		return _implicit;
+	}
+
+	/**
+	 * Sets the implicit flag of this ACE.
+	 * @param implicit flag to set
+	 */
+	public void setImplicit(boolean implicit) {
+		_implicit = implicit;
 	}
 
 	/**
