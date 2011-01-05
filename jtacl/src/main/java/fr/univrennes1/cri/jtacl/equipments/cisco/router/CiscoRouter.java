@@ -192,7 +192,6 @@ public class CiscoRouter extends GenericEquipment {
 			} catch (IOException ex) {
 				throw new JtaclConfigurationException("Cannot read file :" + filename);
 			}
-			parseInterfaces(cfg);
 			_configurations.add(cfg);
 		}
 	}
@@ -769,14 +768,41 @@ public class CiscoRouter extends GenericEquipment {
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
 		loadConfiguration(doc);
+		
+		/*
+		 * parse and add interfaces
+		 */
+		for (ConfigurationFile cfg: _configurations) {
+			parseInterfaces(cfg);
+		}
+
 		for (String n: _ciscoIfaces.keySet()) {
 			CiscoIface csIface = _ciscoIfaces.get(n);
 			if (!csIface.isShutdown())
 				addInterface(csIface);
 		}
+
+		/*
+		 * parse ACL
+		 */
 		for (ConfigurationFile cfg: _configurations) {
 			parse(cfg);
 		}
+
+		/*
+		 * add an implicit deny ACE in each ACL.
+		 */
+		for (AccessList acl: _accessLists) {
+			AccessListElement ace = new AccessListElement();
+			ace.setAction("deny");
+			ace.setConfigurationLine("[" + acl.getName() + "]" +
+				"*** implicit deny ***");
+			acl.add(ace);
+		}
+
+		/*
+		 * routing
+		 */
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
 	}
