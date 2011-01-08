@@ -9,7 +9,7 @@ interface FastEthernet1/1
  description INTERNAL
  ip address 10.0.1.254 255.255.255.0
  ip access-group INTERNAL_IN in
- ip access-group INTERBNAL_OUT out
+ ip access-group INTERNAL_OUT out
 !
 interface FastEthernet1/2
  description INTERCO R2
@@ -17,13 +17,84 @@ interface FastEthernet1/2
  ip access-group R2_IN in
  ip access-group R2_OUT out
 !
+! routes
+ip route 192.168.0.0 255.255.255.0 10.0.1.1
+ip route 192.168.1.0 255.255.255.0 10.0.1.1
+ip route 192.168.10.0 255.255.255.0 10.0.2.1
+ip route 192.168.11.0 255.255.255.0 10.0.2.1
+!
 ip access-list extended INTERNET_IN
- remark TODO
- permit icmp any any echo
- permit icmp any any echo-reply
- permit icmp any any traceroute
- permit icmp any any ttl-exceeded
- permit icmp any any unreachable
- permit icmp any any net-unreachable
- permit icmp any any host-unreachable
+  permit icmp any any echo
+  permit icmp any any echo-reply
+  permit icmp any any traceroute
+  permit icmp any any ttl-exceeded
+  permit icmp any any unreachable
+  permit icmp any any net-unreachable
+  permit icmp any any host-unreachable
+  deny icmp any any
+  deny udp any any range 135 139
+  deny tcp any any range 135 139
+  deny tcp any any eq 445
+  deny tcp any any eq 593
+  deny udp any range 135 139 any
+  deny tcp any range 135 139 any
+  deny tcp any eq 445 any
+  deny tcp any eq 593 any
+  permit ip any any
+!
+ip access-list extended INTERNET_OUT
+  permit icmp any any echo
+  permit icmp any any echo-reply
+  permit icmp any any traceroute
+  permit icmp any any ttl-exceeded
+  permit icmp any any unreachable
+  permit icmp any any net-unreachable
+  permit icmp any any host-unreachable
+  deny icmp any any
+  deny udp any any range 135 139
+  deny tcp any any range 135 139
+  deny tcp any any eq 445
+  deny tcp any any eq 593
+  deny udp any range 135 139 any
+  deny tcp any range 135 139 any
+  deny tcp any eq 445 any
+  deny tcp any eq 593 any
+  permit ip any any
+!
+ip access-list extended INTERNAL_IN
+  permit icmp any any echo
+  permit icmp any any echo-reply
+  permit icmp any any traceroute
+  permit icmp any any ttl-exceeded
+  permit icmp any any unreachable
+  permit icmp any any net-unreachable
+  permit icmp any any host-unreachable
+  deny icmp any any
+  deny udp any any range 135 139
+  deny tcp any any range 135 139
+  deny tcp any any eq 445
+  deny tcp any any eq 593
+  deny udp any range 135 139 any
+  deny tcp any range 135 139 any
+  deny tcp any eq 445 any
+  deny tcp any eq 593 any
+  permit ip any any
+ip access-list extended INTERNAL_OUT
+  permit icmp any any echo
+  permit icmp any any echo-reply
+  permit icmp any any traceroute
+  permit icmp any any ttl-exceeded
+  permit icmp any any unreachable
+  permit icmp any any net-unreachable
+  permit icmp any any host-unreachable
+  deny icmp any any
+  deny udp any any range 135 139
+  deny tcp any any range 135 139
+  deny tcp any any eq 445
+  deny tcp any any eq 593
+  deny udp any range 135 139 any
+  deny tcp any range 135 139 any
+  deny tcp any eq 445 any
+  deny tcp any eq 593 any
+  permit ip any any
 end
