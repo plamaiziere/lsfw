@@ -347,6 +347,9 @@ public class PfNodeHost {
 	public String toString() {
 
 		String s = _type.toString() + ":";
+		if (_not)
+			s = s + " ! ";
+
 		if (isAddrAny())
 			return s + "ANY";
 
