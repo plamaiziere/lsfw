@@ -978,6 +978,7 @@ public class PacketFilter extends GenericEquipment {
 		if (range)
 			host.addAddrRange(addrRange);
 
+		host.setNot(not);
 		return host;
 	}
 
