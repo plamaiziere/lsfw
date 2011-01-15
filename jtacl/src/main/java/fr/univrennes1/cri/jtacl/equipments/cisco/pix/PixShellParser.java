@@ -80,7 +80,7 @@ public class PixShellParser extends CommonRules<Object> {
 			StringIgnoreCase("show"),
 			WhiteSpaces(),
 			FirstOf(
-				StringIgnoreCase("names"),
+				StringIgnoreCase("name"),
 				StringIgnoreCase("enhanced-service"),
 				StringIgnoreCase("icmp-group"),
 				StringIgnoreCase("network-group"),

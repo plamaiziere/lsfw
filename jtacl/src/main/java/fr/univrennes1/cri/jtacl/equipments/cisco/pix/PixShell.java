@@ -114,7 +114,7 @@ public class PixShell implements GenericEquipmentShell {
 			return true;
 		}
 
-		if (shellCmd.equals("show-names")) {
+		if (shellCmd.equals("show-name")) {
 			commandShowNames(_shellParser);
 			return true;
 		}
