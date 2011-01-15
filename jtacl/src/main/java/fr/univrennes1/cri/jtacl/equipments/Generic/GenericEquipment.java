@@ -106,6 +106,12 @@ public class GenericEquipment extends NetworkEquipment {
 	protected Map<String, KeyValue> _options = new HashMap<String, KeyValue>();
 
 	/**
+	 * sub shell registered on this equipment.
+	 */
+	protected List<GenericEquipmentShell> _shells
+			= new ArrayList<GenericEquipmentShell>();
+
+	/**
 	 * option dump-configuration value = file name.<br/>
 	 * If set, the equipment module should dump the lines of configuration taken
 	 * in account to a file. It is useful for diagnostic and debugging purpose.
@@ -389,6 +395,37 @@ public class GenericEquipment extends NetworkEquipment {
 	@Override
 	public ShowableRoutes getShowableRoutes() {
 		return _routingEngine;
+	}
+
+	@Override
+	public void shellCommand(String command) {
+
+		if (command.equalsIgnoreCase("help")) {
+			for (GenericEquipmentShell shell: _shells) {
+				shell.shellHelp();
+			}
+			return;
+		}
+		
+		boolean cmdMatch = false;
+		for (GenericEquipmentShell shell: _shells) {
+			if (shell.shellCommand(command)) {
+				cmdMatch = true;
+ 				break;
+			}
+		}
+
+		if (!cmdMatch) {
+			super.shellCommand(command);
+		}
+	}
+
+	/**
+	 * Registers the specified shell in argument.
+	 * @param shell shell to register.
+	 */
+	public void registerShell(GenericEquipmentShell shell) {
+		_shells.add(shell);
 	}
 
 }

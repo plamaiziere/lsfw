@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.equipments.Generic.GenericEquipmentShell;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +28,7 @@ import org.parboiled.support.ParsingResult;
  * PIX Jtacl sub shell command
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PixShell {
+public class PixShell implements GenericEquipmentShell {
 
 	protected Pix _pix;
 	protected PixShellParser _shellParser;
@@ -51,7 +52,7 @@ public class PixShell {
 		}
 	}
 
-	public void commandHelp() {
+	public void shellHelp() {
 		try {
 			InputStream stream = null;
 			stream = this.getClass().getResourceAsStream("/help/pix");
@@ -109,7 +110,7 @@ public class PixShell {
 		String shellCmd = _shellParser.getCommand();
 
 		if (shellCmd.equals("help")) {
-			commandHelp();
+			shellHelp();
 			return true;
 		}
 

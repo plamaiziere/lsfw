@@ -229,6 +229,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 */
 	public Pix(Monitor monitor, String name, String comment, String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
+		PixShell shell = new PixShell(this);
+		registerShell(shell);
 	}
 
 	protected void loadConfiguration(Document doc) {
@@ -1447,14 +1449,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 					}
 				}
 			}
-		}
-	}
-
-	@Override
-	public void shellCommand(String command) {
-
-		if (!_shell.shellCommand(command)) {
-			super.shellCommand(command);
 		}
 	}
 	
