@@ -405,7 +405,7 @@ public class Shell {
 			return;
 		}
 
-		equipment.shellCommand(command.getSubCommand());
+		equipment.runShell(command.getSubCommand());
 	}
 
 	public void reloadCommand(ShellParser command) {

@@ -398,7 +398,7 @@ public class GenericEquipment extends NetworkEquipment {
 	}
 
 	@Override
-	public void shellCommand(String command) {
+	public void runShell(String command) {
 
 		if (command.equalsIgnoreCase("help")) {
 			for (GenericEquipmentShell shell: _shells) {
@@ -416,7 +416,7 @@ public class GenericEquipment extends NetworkEquipment {
 		}
 
 		if (!cmdMatch) {
-			super.shellCommand(command);
+			super.runShell(command);
 		}
 	}
 

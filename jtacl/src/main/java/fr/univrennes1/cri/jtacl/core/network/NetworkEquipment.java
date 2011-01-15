@@ -224,7 +224,7 @@ public class NetworkEquipment {
 	 * and could be overrided to implement commands specific to the equipment.
 	 * @param command the command to run.
 	 */
-	public void shellCommand(String command) {
+	public void runShell(String command) {
 		/*
 		 * do nothing by default
 		 */
