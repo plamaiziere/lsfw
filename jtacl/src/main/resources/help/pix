@@ -1,0 +1,15 @@
+--- Pix Help ---
+
+help: this help.
+
+show names | enhanced-service | icmp-group | network-group | protocol-group
+ | service-group  [(used | unused)] : Displays the specified items.
+
+If 'used' or 'unused' is specified, displays only the used or unused items.
+
+examples:
+---------
+
+show names unused
+
+show network-group

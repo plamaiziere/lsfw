@@ -99,6 +99,11 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	/**
+	 * internal sub shell
+	 */
+	 protected PixShell _shell = new PixShell(this);
+
+	/**
 	 * Configuration file, mapped into strings.
 	 */
 	protected class ConfigurationFile extends StringsList {
@@ -129,7 +134,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	/**
 	 * Names defined by the command name
 	 */
-	protected HashMap<String, String> _names = new HashMap<String, String>();
+	protected HashMap<String, PixName> _names = new HashMap<String, PixName>();
 
 	/**
 	 * network object group defined by the command object-group network
@@ -177,7 +182,43 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	/**
 	 * parse context
 	 */
-	 protected ParseContext _parseContext = new ParseContext();
+	protected ParseContext _parseContext = new ParseContext();
+
+	HashMap<String, AccessGroup> getAccessGroups() {
+		return _accessGroups;
+	}
+
+	HashMap<String, AccessListGroup> getAccessListGroups() {
+		return _accessListGroups;
+	}
+
+	ArrayList<ConfigurationFile> getConfigurations() {
+		return _configurations;
+	}
+
+	HashMap<String, ObjectGroup> getEnhancedGroups() {
+		return _enhancedGroups;
+	}
+
+	HashMap<String, ObjectGroup> getIcmpGroups() {
+		return _icmpGroups;
+	}
+
+	HashMap<String, PixName> getNames() {
+		return _names;
+	}
+
+	HashMap<String, ObjectGroup> getNetworkGroups() {
+		return _networkGroups;
+	}
+
+	HashMap<String, ObjectGroup> getProtocolGroups() {
+		return _protocolGroups;
+	}
+
+	HashMap<String, ObjectGroup> getServiceGroups() {
+		return _serviceGroups;
+	}
 
 	/**
 	 * Create a new {@link Pix} with this name and this comment.<br/>
@@ -212,9 +253,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	protected String nameLookup(String name) {
-		String result = _names.get(name);
-
-		return (result != null) ? result : name;
+		PixName result = _names.get(name);
+		if (result != null) {
+			result.incRefCount();
+			return result.getIpValue();
+		}
+		return name;
 	}
 
 	protected void throwCfgException(String msg) {
@@ -508,6 +552,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		if (_lastGroup.getGroupId().equals(groupId))
 			throwCfgException("group-id pointing to itself");
 
+		group.incRefCount();
+
 		String line = _parseContext.getLine();
 		ObjectGroupItem item = null;
 		switch (type) {
@@ -692,6 +738,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			if (protocolGroup == null)
 				throwCfgException("unknown protocol group: " + sprotocolGroup);
 			acl.setProtocolGroup(protocolGroup.expand());
+			protocolGroup.incRefCount();
 		}
 
 		/*
@@ -724,6 +771,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			if (group == null)
 				throwCfgException("unknown source network group:" + sNetworkGroup);
 			acl.setSourceNetworkGroup(group.expand());
+			group.incRefCount();
 		}
 
 		/*
@@ -752,6 +800,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			if (group == null)
 				throwCfgException("unknown source service group: " + sServiceGroup);
 			acl.setSourceServiceGroup(group.expand());
+			group.incRefCount();
 		}
 
 		/*
@@ -785,6 +834,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				throwCfgException("unknown destination network group: " +
 						sNetworkGroup);
 			acl.setDestNetworkGroup(group.expand());
+			group.incRefCount();
 		}
 
 		/*
@@ -814,6 +864,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				throwCfgException("unknown destination service group: " +
 						sServiceGroup);
 			acl.setDestServiceGroup(group.expand());
+			group.incRefCount();
 		}
 
 		/*
@@ -827,6 +878,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				throwCfgException("unknown enhanced destination service group: " +
 						sServiceGroup);
 			acl.setEnhancedDestServiceGroup(group.expand());
+			group.incRefCount();
 		}
 
 		/*
@@ -844,6 +896,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			if (group == null)
 				throwCfgException("unknown icmp group: " + sIcmpGroup);
 			acl.setIcmpGroup(group.expand());
+			group.incRefCount();
 		 }
 
 		/*
@@ -937,7 +990,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				if (rule.equals("name")) {
 					String name = parser.getName();
 					String IPvalue = parser.getIpAddress();
-					_names.put(name, IPvalue);
+					PixName pixName = new PixName(name, IPvalue);
+					_names.put(name, pixName);
 				}
 
 				/*
@@ -1396,4 +1450,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		}
 	}
 
+	@Override
+	public void shellCommand(String command) {
+
+		if (!_shell.shellCommand(command)) {
+			super.shellCommand(command);
+		}
+	}
+	
 }

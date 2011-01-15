@@ -25,6 +25,7 @@ public class ObjectGroup extends ArrayList<ObjectGroupItem> {
 	protected String _groupId;
 	protected String _description;
 	protected ObjectGroupType _type;
+	protected int _refCount;
 
 	/**
 	 * Constructs a new {@link ObjectGroup} group with the group Id
@@ -67,6 +68,18 @@ public class ObjectGroup extends ArrayList<ObjectGroupItem> {
 	 */
 	public void setDescription(String description) {
 		_description = description;
+	}
+
+	public void incRefCount() {
+		_refCount++;
+	}
+
+	public boolean isUsed() {
+		return _refCount > 0;
+	}
+
+	public int getRefCount() {
+		return _refCount;
 	}
 
 }
