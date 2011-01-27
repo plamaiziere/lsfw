@@ -16,7 +16,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import junit.framework.TestCase;
 import org.parboiled.Parboiled;
-import org.parboiled.ReportingParseRunner;
+import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**

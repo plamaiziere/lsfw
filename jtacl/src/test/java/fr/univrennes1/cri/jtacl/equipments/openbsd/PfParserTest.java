@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import junit.framework.TestCase;
 import org.parboiled.Parboiled;
-import org.parboiled.ReportingParseRunner;
+import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**

@@ -21,7 +21,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.TreeMap;
 import org.parboiled.Parboiled;
-import org.parboiled.ReportingParseRunner;
+import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**

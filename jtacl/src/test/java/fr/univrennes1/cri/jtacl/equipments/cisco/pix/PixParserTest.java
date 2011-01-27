@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import junit.framework.TestCase;
 import org.parboiled.Parboiled;
-import org.parboiled.ReportingParseRunner;
+import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**

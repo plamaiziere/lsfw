@@ -1169,7 +1169,7 @@ public class PfBaseParser extends CommonRules<Object> {
 		return OneOrMore(
 					Sequence(
 						TestNot(PfSeparators()),
-						Any()
+						ANY
 					)
 				);
 	}
@@ -1178,7 +1178,7 @@ public class PfBaseParser extends CommonRules<Object> {
 		return
 			FirstOf(
 				String("\\\n"),
-				CharSet(SPECIALS)
+				AnyOf(SPECIALS)
 			);
 	}
 
@@ -1198,7 +1198,7 @@ public class PfBaseParser extends CommonRules<Object> {
 	public Rule NextIsSeparator() {
 		return
 			FirstOf(
-				Test(Eoi()),
+				Test(EOI),
 				Test(PfSeparators())
 			);
 	}
@@ -1209,7 +1209,7 @@ public class PfBaseParser extends CommonRules<Object> {
 	 */
 	public Rule PfIdent() {
 		return OneOrMore(
-					CharSet(IDENT)
+					AnyOf(IDENT)
 				);
 	}
 

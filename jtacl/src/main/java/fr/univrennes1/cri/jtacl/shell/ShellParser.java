@@ -132,12 +132,12 @@ public class ShellParser extends CommonRules<Object> {
 	Rule CommandQuit() {
 		return Sequence(
 				FirstOf(
-					StringIgnoreCase("quit"),
-					StringIgnoreCase("exit"),
-					StringIgnoreCase("q"),
-					StringIgnoreCase("e")
+					IgnoreCase("quit"),
+					IgnoreCase("exit"),
+					IgnoreCase("q"),
+					IgnoreCase("e")
 				),
-				Eoi(),
+				EOI,
 				new Action() {
 					public boolean run(Context context) {
 						_command = "quit";
@@ -150,19 +150,19 @@ public class ShellParser extends CommonRules<Object> {
 	Rule CommandTopology() {
 		return Sequence(
 					FirstOf(
-						StringIgnoreCase("topology"),
-						StringIgnoreCase("t")
+						IgnoreCase("topology"),
+						IgnoreCase("t")
 					),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
 							FirstOf(
-								StringIgnoreCase("connected"),
-								StringIgnoreCase("!connected")
+								IgnoreCase("connected"),
+								IgnoreCase("!connected")
 							),
 							new Action() {
 								public boolean run(Context context) {
-									_topologyOption = context.getPrevText();
+									_topologyOption = context.getMatch();
 									return true;
 								}
 							}
@@ -174,13 +174,13 @@ public class ShellParser extends CommonRules<Object> {
 							StringAtom(),
 							new Action() {
 								public boolean run(Context context) {
-									_equipments = context.getPrevText();
+									_equipments = context.getMatch();
 									return true;
 								}
 							}
 						)
 					),
-					Eoi(),
+					EOI,
 					new Action() {
 						public boolean run(Context context) {
 							_command = "topology";
@@ -192,14 +192,14 @@ public class ShellParser extends CommonRules<Object> {
 
 	Rule CommandRoute() {
 		return Sequence(
-					StringIgnoreCase("route"),
+					IgnoreCase("route"),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
 							StringAtom(),
 							new Action() {
 								public boolean run(Context context) {
-									_equipments = context.getPrevText();
+									_equipments = context.getMatch();
 									return true;
 								}
 							}
@@ -217,8 +217,8 @@ public class ShellParser extends CommonRules<Object> {
 	Rule CommandOption() {
 		return Sequence(
 				FirstOf(
-					StringIgnoreCase("option"),
-					StringIgnoreCase("o")
+					IgnoreCase("option"),
+					IgnoreCase("o")
 				),
 				Optional(
 					Sequence(
@@ -226,19 +226,19 @@ public class ShellParser extends CommonRules<Object> {
 						Identifier(),
 						new Action() {
 							public boolean run(Context context) {
-								_setValueName = context.getPrevText();
+								_setValueName = context.getMatch();
 								return true;
 							}
 						},
 						Optional(
 							Sequence(
 								SkipSpaces(),
-								CharIgnoreCase('='),
+								IgnoreCase('='),
 								SkipSpaces(),
 								StringAtom(),
 								new Action() {
 									public boolean run(Context context) {
-										_setValueValue = context.getPrevText();
+										_setValueValue = context.getMatch();
 										return true;
 									}
 								}
@@ -246,7 +246,7 @@ public class ShellParser extends CommonRules<Object> {
 						)
 					)
 				),
-				Eoi(),
+				EOI,
 				new Action() {
 					public boolean run(Context context) {
 						_command = "option";
@@ -259,8 +259,8 @@ public class ShellParser extends CommonRules<Object> {
 	Rule CommandDefine() {
 		return Sequence(
 				FirstOf(
-					StringIgnoreCase("define"),
-					StringIgnoreCase("d")
+					IgnoreCase("define"),
+					IgnoreCase("d")
 				),
 				Optional(
 					Sequence(
@@ -268,19 +268,19 @@ public class ShellParser extends CommonRules<Object> {
 						Identifier(),
 						new Action() {
 							public boolean run(Context context) {
-								_setValueName = context.getPrevText();
+								_setValueName = context.getMatch();
 								return true;
 							}
 						},
 						Optional(
 							Sequence(
 								SkipSpaces(),
-								CharIgnoreCase('='),
+								IgnoreCase('='),
 								SkipSpaces(),
 								UntilEOI(),
 								new Action() {
 									public boolean run(Context context) {
-										_setValueValue = context.getPrevText();
+										_setValueValue = context.getMatch();
 										return true;
 									}
 								}
@@ -288,7 +288,7 @@ public class ShellParser extends CommonRules<Object> {
 						)
 					)
 				),
-				Eoi(),
+				EOI,
 				new Action() {
 					public boolean run(Context context) {
 						_command = "define";
@@ -301,20 +301,20 @@ public class ShellParser extends CommonRules<Object> {
 
 	Rule CommandHelp() {
 		return Sequence(
-					StringIgnoreCase("help"),
+					IgnoreCase("help"),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
 							StringAtom(),
 							new Action() {
 								public boolean run(Context context) {
-									_helpTopic = context.getPrevText();
+									_helpTopic = context.getMatch();
 									return true;
 								}
 							}
 						)
 					),
-					Eoi(),
+					EOI,
 					new Action() {
 						public boolean run(Context context) {
 							_command = "help";
@@ -329,26 +329,26 @@ public class ShellParser extends CommonRules<Object> {
 						Sequence(
 							TestNot(WhiteSpaces()),
 							TestNot(Special()),
-							Any()
+							ANY
 						)
 					);
 	}
 
 	Rule Special() {
-		return CharSet('=', ',', ':');
+		return AnyOf("=,:");
 	}
 
 	Rule CommandEquipment() {
 		return Sequence(
 			FirstOf(
-				StringIgnoreCase("equipment"),
-				StringIgnoreCase("eq")
+				IgnoreCase("equipment"),
+				IgnoreCase("eq")
 			),
 			WhiteSpaces(),
 			StringAtom(),
 			new Action() {
 				public boolean run(Context context) {
-					_equipments = context.getPrevText();
+					_equipments = context.getMatch();
 					return true;
 				}
 			},
@@ -356,7 +356,7 @@ public class ShellParser extends CommonRules<Object> {
 			UntilEOI(),
 			new Action() {
 				public boolean run(Context context) {
-					_subCommand = context.getPrevText();
+					_subCommand = context.getMatch();
 					_command = "equipment";
 					return true;
 				}
@@ -366,20 +366,20 @@ public class ShellParser extends CommonRules<Object> {
 
 	Rule CommandReload() {
 		return Sequence(
-			StringIgnoreCase("reload"),
+			IgnoreCase("reload"),
 			Optional(
 				Sequence(
 					WhiteSpaces(),
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_equipments = context.getPrevText();
+							_equipments = context.getMatch();
 							return true;
 						}
 					}
 				)
 			),
-			Eoi(),
+			EOI,
 			new Action() {
 				public boolean run(Context context) {
 					_command = "reload";
@@ -399,7 +399,7 @@ public class ShellParser extends CommonRules<Object> {
 				},
 				FirstOf(
 					Sequence(
-						StringIgnoreCase("probe6"),
+						IgnoreCase("probe6"),
 						new Action() {
 							public boolean run(Context context) {
 								_probe6flag = true;
@@ -408,7 +408,7 @@ public class ShellParser extends CommonRules<Object> {
 						}
 					),
 					Sequence(
-						StringIgnoreCase("p6"),
+						IgnoreCase("p6"),
 						new Action() {
 							public boolean run(Context context) {
 								_probe6flag = true;
@@ -416,8 +416,8 @@ public class ShellParser extends CommonRules<Object> {
 							}
 						}
 					),
-					StringIgnoreCase("probe"),
-					StringIgnoreCase("p")
+					IgnoreCase("probe"),
+					IgnoreCase("p")
 				),
 				WhiteSpaces(),
 				Optional(ProbeExpect()),
@@ -425,7 +425,7 @@ public class ShellParser extends CommonRules<Object> {
 				SourceSpecification(),
 				new Action() {
 					public boolean run(Context context) {
-						_srcAddress = context.getPrevText();
+						_srcAddress = context.getMatch();
 						return true;
 					}
 				},
@@ -433,7 +433,7 @@ public class ShellParser extends CommonRules<Object> {
 				DestinationSpecification(),
 				new Action() {
 					public boolean run(Context context) {
-						_destAddress = context.getPrevText();
+						_destAddress = context.getMatch();
 						return true;
 					}
 				},
@@ -443,7 +443,7 @@ public class ShellParser extends CommonRules<Object> {
 						ProtoSpecification()
 					)
 				),
-				Eoi(),
+				EOI,
 				new Action() {
 					public boolean run(Context context) {
 						if (_probe6flag)
@@ -458,12 +458,12 @@ public class ShellParser extends CommonRules<Object> {
 
 	Rule ProbeExpect() {
 		return Sequence(
-					StringIgnoreCase("expect"),
+					IgnoreCase("expect"),
 					WhiteSpaces(),
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_probeExpect = context.getPrevText();
+							_probeExpect = context.getMatch();
 							return true;
 						}
 					},
@@ -473,12 +473,12 @@ public class ShellParser extends CommonRules<Object> {
 
 	Rule OnEquipments() {
 		return Sequence(
-			StringIgnoreCase("on"),
+			IgnoreCase("on"),
 			WhiteSpaces(),
 			StringAtom(),
 			new Action() {
 				public boolean run(Context context) {
-					_equipments = context.getPrevText();
+					_equipments = context.getMatch();
 					return true;
 				}
 			},
@@ -504,7 +504,7 @@ public class ShellParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_protoSpecification = context.getPrevText();
+							_protoSpecification = context.getMatch();
 							return true;
 						}
 					},
@@ -525,7 +525,7 @@ public class ShellParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_protoSpecification = context.getPrevText();
+							_protoSpecification = context.getMatch();
 							return true;
 						}
 					},
@@ -535,7 +535,7 @@ public class ShellParser extends CommonRules<Object> {
 							Identifier(),
 							new Action() {
 								public boolean run(Context context) {
-									_protoSource = context.getPrevText();
+									_protoSource = context.getMatch();
 									return true;
 								}
 							}
@@ -549,11 +549,11 @@ public class ShellParser extends CommonRules<Object> {
 		return
 			FirstOf(
 				Sequence(
-					TestNot(StringIgnoreCase("flags")),
+					TestNot(IgnoreCase("flags")),
 					Identifier(),
 					new Action() {
 						public boolean run(Context context) {
-							_protoSource = context.getPrevText();
+							_protoSource = context.getMatch();
 							_protoDest = null;
 							return true;
 						}
@@ -564,7 +564,7 @@ public class ShellParser extends CommonRules<Object> {
 							Identifier(),
 							new Action() {
 								public boolean run(Context context) {
-									_protoDest = context.getPrevText();
+									_protoDest = context.getMatch();
 									return true;
 								}
 							}
@@ -572,12 +572,12 @@ public class ShellParser extends CommonRules<Object> {
 					)
 				),
 				Sequence(
-					TestNot(StringIgnoreCase("flags")),
+					TestNot(IgnoreCase("flags")),
 					Identifier(),
 					new Action() {
 						public boolean run(Context context) {
 							_protoSource = null;
-							_protoDest = context.getPrevText();
+							_protoDest = context.getMatch();
 							return true;
 						}
 					}
@@ -588,7 +588,7 @@ public class ShellParser extends CommonRules<Object> {
 	Rule TcpFlagsSpec() {
 		return
 			Sequence(
-				StringIgnoreCase("flags"),
+				IgnoreCase("flags"),
 				WhiteSpaces(),
 				new Action() {
 					public boolean run(Context context) {
@@ -611,7 +611,7 @@ public class ShellParser extends CommonRules<Object> {
 				StringAtom(),
 				new Action() {
 					public boolean run(Context context) {
-						_tcpFlags.add(context.getPrevText());
+						_tcpFlags.add(context.getMatch());
 						return true;
 					}
 				}

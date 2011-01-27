@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.parboiled.Action;
-import org.parboiled.BasicParseRunner;
 import org.parboiled.Context;
-import org.parboiled.ReportingParseRunner;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
+import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
@@ -360,7 +359,7 @@ public class PfParser extends PfBaseParser {
 				SkipSpaces(),
 				FirstOf(
 					Ch('\n'),
-					Eoi()
+					EOI
 				)
 			);
 	}
@@ -397,7 +396,7 @@ public class PfParser extends PfBaseParser {
 					),
 					SkipSpaces(),
 					FirstOf(
-						Eoi(),
+						EOI,
 						Eol()
 					)
 				),
@@ -406,7 +405,7 @@ public class PfParser extends PfBaseParser {
 				 */
 				new Action() {
 					public boolean run(Context context) {
-						_matchedText = context.getPrevText();
+						_matchedText = context.getMatch();
 						return true;
 					}
 				}
@@ -492,7 +491,7 @@ public class PfParser extends PfBaseParser {
 		return
 			FirstOf(
 				Eol(),
-				CharSet("{}")
+				AnyOf("{}")
 				);
 	}
 
@@ -505,7 +504,7 @@ public class PfParser extends PfBaseParser {
 						TestNot(
 							PfGenericSpecial()
 						),
-						Any()
+						ANY
 					)
 				);
 	}
@@ -531,7 +530,7 @@ public class PfParser extends PfBaseParser {
 						PfClosingBrace()
 					),
 					FirstOf(
-						Eoi(),
+						EOI,
 						Ch('\n')
 					)
 				),
@@ -540,7 +539,7 @@ public class PfParser extends PfBaseParser {
 				 */
 				new Action() {
 					public boolean run(Context context) {
-						_matchedText = context.getPrevText();
+						_matchedText = context.getMatch();
 						return true;
 					}
 				}
@@ -898,7 +897,7 @@ public class PfParser extends PfBaseParser {
 						PfDir(),
 						new Action() {
 							public boolean run(Context context) {
-								_pfRule.setDir(context.getPrevText());
+								_pfRule.setDir(context.getMatch());
 								return true;
 							}
 						}
@@ -1175,7 +1174,7 @@ public class PfParser extends PfBaseParser {
 						PfDir(),
 						new Action() {
 							public boolean run(Context context) {
-								_pfRule.setDir(context.getPrevText());
+								_pfRule.setDir(context.getMatch());
 								return true;
 							}
 						}
@@ -2151,7 +2150,7 @@ public class PfParser extends PfBaseParser {
 				),
 				new Action() {
 					public boolean run(Context context) {
-						_pfRule.setAf(context.getPrevText());
+						_pfRule.setAf(context.getMatch());
 						return true;
 					}
 				}
@@ -2791,7 +2790,7 @@ public class PfParser extends PfBaseParser {
 						new Action() {
 							public boolean run(Context context) {
 								_pfPortItem = new PortItemTemplate();
-								_pfPortItem.setOperator(context.getPrevText());
+								_pfPortItem.setOperator(context.getMatch());
 								return true;
 							}
 						},
@@ -2815,7 +2814,7 @@ public class PfParser extends PfBaseParser {
 							public boolean run(Context context) {
 								_pfPortItem = new PortItemTemplate();
 								_pfPortItem.setFirstPort(_pfString);
-								_pfPortItem.setOperator(context.getPrevText());
+								_pfPortItem.setOperator(context.getMatch());
 								return true;
 							}
 						},
@@ -3629,7 +3628,7 @@ public class PfParser extends PfBaseParser {
 								new Action() {
 									public boolean run(Context context) {
 										_pfStateOptItem = _pfStateOptItem +
-											" " + context.getPrevText();
+											" " + context.getMatch();
 										return true;
 									}
 								}
@@ -3668,7 +3667,7 @@ public class PfParser extends PfBaseParser {
 								new Action() {
 									public boolean run(Context context) {
 										_pfStateOptItem = _pfStateOptItem +
-											" " + context.getPrevText();
+											" " + context.getMatch();
 										return true;
 									}
 								}
@@ -3683,7 +3682,7 @@ public class PfParser extends PfBaseParser {
 						new Action() {
 							public boolean run(Context context) {
 								_pfStateOptItem = "STATELOCK " +
-									context.getPrevText();
+									context.getMatch();
 								return true;
 							}
 						}
@@ -4337,7 +4336,7 @@ public class PfParser extends PfBaseParser {
 				PfAtom(),
 				new Action() {
 					public boolean run(Context context) {
-						_pfString = context.getPrevText();
+						_pfString = context.getMatch();
 						return true;
 					}
 				}
@@ -4352,10 +4351,10 @@ public class PfParser extends PfBaseParser {
 	public Rule PfQuotedString() {
 		return
 		Sequence(
-			CharSet("'\""),
+			AnyOf("'\""),
 			new Action() {
 				public boolean run(Context context) {
-					_quotec = context.getPrevText().charAt(0);
+					_quotec = context.getMatch().charAt(0);
 					_lastString = "";
 					_previousChar = '\0';
 					_pfStringEnd = false;
@@ -4369,10 +4368,10 @@ public class PfParser extends PfBaseParser {
 							return !_pfStringEnd;
 						}
 					},
-					Any(),
+					ANY,
 					new Action() {
 						public boolean run(Context context) {
-							char c = context.getPrevText().charAt(0);
+							char c = context.getMatch().charAt(0);
 							/*
 							 * escaped character.
 							 */

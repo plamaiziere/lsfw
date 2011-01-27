@@ -183,7 +183,7 @@ public class IOSParser extends CommonRules<Object> {
 				UntilEOI(),
 				new Action() {
 					public boolean run(Context context) {
-						_name = context.getPrevText();
+						_name = context.getMatch();
 						_ruleName = "interface";
 						return true;
 					}
@@ -243,7 +243,7 @@ public class IOSParser extends CommonRules<Object> {
 				UntilEOI(),
 				new Action() {
 					public boolean run(Context context) {
-						_description = context.getPrevText();
+						_description = context.getMatch();
 						_ruleName = "description";
 						return true;
 					}
@@ -282,7 +282,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							return true;
 						}
 					},
@@ -290,7 +290,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipNetmask = context.getPrevText();
+							_ipNetmask = context.getMatch();
 							_ruleName = "ip address";
 							return true;
 						}
@@ -314,12 +314,12 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							_ruleName = "ipv6 address";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -338,7 +338,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_name = context.getPrevText();
+							_name = context.getMatch();
 							return true;
 						}
 					},
@@ -349,7 +349,7 @@ public class IOSParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_direction  = context.getPrevText();
+							_direction  = context.getMatch();
 							_ruleName = "ip access-group";
 							return true;
 						}
@@ -373,7 +373,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_name = context.getPrevText();
+							_name = context.getMatch();
 							return true;
 						}
 					},
@@ -384,7 +384,7 @@ public class IOSParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_direction  = context.getPrevText();
+							_direction  = context.getMatch();
 							_ruleName = "ipv6 traffic-filter";
 							return true;
 						}
@@ -497,7 +497,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							return true;
 						}
 					},
@@ -505,7 +505,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipNetmask = context.getPrevText();
+							_ipNetmask = context.getMatch();
 							return true;
 						}
 					},
@@ -513,12 +513,12 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_nexthop = context.getPrevText();
+							_nexthop = context.getMatch();
 							_ruleName = "ip route";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 			);		 
 	 }
 
@@ -545,7 +545,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							return true;
 						}
 					},
@@ -553,12 +553,12 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_nexthop = context.getPrevText();
+							_nexthop = context.getMatch();
 							_ruleName = "ipv6 route";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 			);
 	 }
 
@@ -573,7 +573,7 @@ public class IOSParser extends CommonRules<Object> {
 					ZeroOrMore(
 						Sequence(
 							TestNot(String("remark")),
-							Any()
+							ANY
 						)
 					),
 					String("remark"),
@@ -604,7 +604,7 @@ public class IOSParser extends CommonRules<Object> {
 				),
 				new Action() {
 					public boolean run(Context context) {
-						String type = context.getPrevText();
+						String type = context.getMatch();
 						_acl = new AclTemplate();
 						if (type.equals("standard"))
 							_acl.setAclType(AclType.IPSTD);
@@ -617,13 +617,13 @@ public class IOSParser extends CommonRules<Object> {
 				StringAtom(),
 				new Action() {
 					public boolean run(Context context) {
-						_acl.setName(context.getPrevText());
+						_acl.setName(context.getMatch());
 						_acl.setIpVersion(IPversion.IPV4);
 						_ruleName = "ip access-list named";
 						return true;
 					}
 				},
-				Eoi()
+				EOI
 			);
 	}
 
@@ -643,14 +643,14 @@ public class IOSParser extends CommonRules<Object> {
 				new Action() {
 					public boolean run(Context context) {
 						_acl = new AclTemplate();
-						_acl.setName(context.getPrevText());
+						_acl.setName(context.getMatch());
 						_acl.setIpVersion(IPversion.IPV6);
 						_acl.setAclType(AclType.IPEXT);
 						_ruleName = "ipv6 access-list named";
 						return true;
 					}
 				},
-				Eoi()
+				EOI
 			);
 	}
 
@@ -667,7 +667,7 @@ public class IOSParser extends CommonRules<Object> {
 				Number(),
 				new Action() {
 					public boolean run(Context context) {
-						int number = Integer.valueOf(context.getPrevText());
+						int number = Integer.valueOf(context.getMatch());
 						_acl = new AclTemplate();
 						_acl.setNumber(number);
 						_acl.setIpVersion(IPversion.IPV4);
@@ -731,7 +731,7 @@ public class IOSParser extends CommonRules<Object> {
 				),
 				new Action() {
 					public boolean run(Context context) {
-						_ace.setAction(context.getPrevText());
+						_ace.setAction(context.getMatch());
 						return true;
 					}
 				},
@@ -744,7 +744,7 @@ public class IOSParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_ace.setSrcIp(context.getPrevText());
+								_ace.setSrcIp(context.getMatch());
 								return true;
 							}
 						}
@@ -753,7 +753,7 @@ public class IOSParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_ace.setSrcIp(context.getPrevText());
+								_ace.setSrcIp(context.getMatch());
 								return true;
 							}
 						},
@@ -764,7 +764,7 @@ public class IOSParser extends CommonRules<Object> {
 								StringAtom(),
 								new Action() {
 									public boolean run(Context context) {
-										_ace.setSrcIpMask(context.getPrevText());
+										_ace.setSrcIpMask(context.getMatch());
 										return true;
 									}
 								}
@@ -902,7 +902,7 @@ public class IOSParser extends CommonRules<Object> {
 				),
 				new Action() {
 					public boolean run(Context context) {
-						_ace.setTcpKeyword(context.getPrevText());
+						_ace.setTcpKeyword(context.getMatch());
 						return true;
 					}
 				},
@@ -936,7 +936,7 @@ public class IOSParser extends CommonRules<Object> {
 				),
 				new Action() {
 					public boolean run(Context context) {
-						_ace.getTcpFlags().add(context.getPrevText());
+						_ace.getTcpFlags().add(context.getMatch());
 						return true;
 					}
 				},
@@ -972,7 +972,7 @@ public class IOSParser extends CommonRules<Object> {
 				),
 				new Action() {
 					public boolean run(Context context) {
-						_ace.getTcpFlags().add("+" + context.getPrevText());
+						_ace.getTcpFlags().add("+" + context.getMatch());
 						_ace.setTcpKeyword("match-any");
 						return true;
 					}
@@ -1051,7 +1051,7 @@ public class IOSParser extends CommonRules<Object> {
 						AclSubType(),
 						new Action() {
 							public boolean run(Context context) {
-								String icmp = context.getPrevText();
+								String icmp = context.getMatch();
 								IPIcmpEnt icmpEnt = 
 									IPIcmp4.getInstance().icmpLookup(icmp);
 								if (icmpEnt != null) {
@@ -1128,7 +1128,7 @@ public class IOSParser extends CommonRules<Object> {
 				),
 				new Action() {
 					public boolean run(Context context) {
-						_ace.setAction(context.getPrevText());
+						_ace.setAction(context.getMatch());
 						return true;
 					}
 				},
@@ -1142,7 +1142,7 @@ public class IOSParser extends CommonRules<Object> {
 						),
 						new Action() {
 							public boolean run(Context context) {
-								_ace.setProtocol(context.getPrevText());
+								_ace.setProtocol(context.getMatch());
 								return true;
 							}
 						},
@@ -1154,7 +1154,7 @@ public class IOSParser extends CommonRules<Object> {
 						String("icmp"),
 						new Action() {
 							public boolean run(Context context) {
-								_ace.setProtocol(context.getPrevText());
+								_ace.setProtocol(context.getMatch());
 								return true;
 							}
 						},
@@ -1166,7 +1166,7 @@ public class IOSParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_ace.setProtocol(context.getPrevText());
+								_ace.setProtocol(context.getMatch());
 								return true;
 							}
 						},
@@ -1208,7 +1208,7 @@ public class IOSParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_ipAddress = context.getPrevText();
+								_ipAddress = context.getMatch();
 								return true;
 							}
 						}
@@ -1218,7 +1218,7 @@ public class IOSParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_ipAddress = context.getPrevText();
+								_ipAddress = context.getMatch();
 								return true;
 							}
 						},
@@ -1235,7 +1235,7 @@ public class IOSParser extends CommonRules<Object> {
 								StringAtom(),
 								new Action() {
 									public boolean run(Context context) {
-										_ipNetmask = context.getPrevText();
+										_ipNetmask = context.getMatch();
 										return true;
 									}
 								}
@@ -1251,7 +1251,7 @@ public class IOSParser extends CommonRules<Object> {
 			StringAtom(),
 			new Action() {
 				public boolean run(Context context) {
-					_subType = context.getPrevText();
+					_subType = context.getMatch();
 					return true;
 				}
 			}
@@ -1295,7 +1295,7 @@ public class IOSParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_portOperator = context.getPrevText();
+							_portOperator = context.getMatch();
 							return true;
 						}
 					},
@@ -1303,7 +1303,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_firstPort = context.getPrevText();
+							_firstPort = context.getMatch();
 							return true;
 						}
 					}
@@ -1319,7 +1319,7 @@ public class IOSParser extends CommonRules<Object> {
 					String("range"),
 					new Action() {
 						public boolean run(Context context) {
-							_portOperator = context.getPrevText();
+							_portOperator = context.getMatch();
 							return true;
 						}
 					},
@@ -1327,7 +1327,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_firstPort = context.getPrevText();
+							_firstPort = context.getMatch();
 							return true;
 						}
 					},
@@ -1335,7 +1335,7 @@ public class IOSParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_lastPort = context.getPrevText();
+							_lastPort = context.getMatch();
 							return true;
 						}
 					}

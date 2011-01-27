@@ -13,6 +13,11 @@
 			<name>codehaus Project Repository</name>
 			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>
 		</repository>
+		<repository>
+			<id>scala-tools</id>
+			<name>scala repository</name>
+			<url>http://scala-tools.org/repo-releases/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -115,8 +120,8 @@
 				-Dversion=0.9.7.3 -DgeneratePom=true -Dpackaging=jar
 			-->
 			<groupId>org.parboiled</groupId>
-			<artifactId>parboiled</artifactId>
-			<version>0.9.7.3</version>
+			<artifactId>parboiled-java</artifactId>
+			<version>0.10.0</version>
 		</dependency>
 	</dependencies>
 </project>

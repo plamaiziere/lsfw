@@ -56,7 +56,7 @@ public class CommonRules<T> extends BaseParser<T> {
 		return OneOrMore(
 					Sequence(
 						TestNot(WhiteSpaces()),
-						Any()
+						ANY
 					)
 				);
 	}
@@ -66,7 +66,7 @@ public class CommonRules<T> extends BaseParser<T> {
 	 * @return a {@link Rule}
 	 */
 	public Rule WhiteSpace() {
-		return CharSet(' ', '\t');
+		return AnyOf(" \t");
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class CommonRules<T> extends BaseParser<T> {
 	 */
 	public Rule Number() {
 		return OneOrMore(
-					CharSet("0123456789")
+					AnyOf("0123456789")
 				);
 	}
 
@@ -100,7 +100,7 @@ public class CommonRules<T> extends BaseParser<T> {
 	 * @return a {@link Rule}
 	 */
 	public Rule UntilEOI() {
-		return ZeroOrMore(Any());
+		return ZeroOrMore(ANY);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class CommonRules<T> extends BaseParser<T> {
 						TestNot(
 							Eol()
 						),
-						Any()
+						ANY
 					)
 				);
 	}
@@ -138,7 +138,7 @@ public class CommonRules<T> extends BaseParser<T> {
 		return
 			FirstOf(
 				WhiteSpaces(),
-				Eoi()
+				EOI
 			);
 	}
 }

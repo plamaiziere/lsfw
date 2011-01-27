@@ -206,7 +206,7 @@ public class PixParser extends CommonRules<Object> {
 				UntilShutdown(),
 				new Action() {
 					public boolean run(Context context) {
-						_name = context.getPrevText().trim();
+						_name = context.getMatch().trim();
 						return true;
 					}
 				},
@@ -284,7 +284,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							return true;
 						}
 					},
@@ -292,7 +292,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipNetmask = context.getPrevText();
+							_ipNetmask = context.getMatch();
 							_ruleName = "ip address";
 							return true;
 						}
@@ -316,7 +316,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							_ruleName = "ipv6 address";
 							return true;
 						}
@@ -338,7 +338,7 @@ public class PixParser extends CommonRules<Object> {
 				UntilEOI(),
 				new Action() {
 					public boolean run(Context context) {
-						_name = context.getPrevText();
+						_name = context.getMatch();
 						_ruleName = "nameif";
 						return true;
 					}
@@ -387,7 +387,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							return true;
 						}
 					},
@@ -395,7 +395,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_name = context.getPrevText();
+							_name = context.getMatch();
 							_ruleName = "name";
 							return true;
 						}
@@ -418,7 +418,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_interface = context.getPrevText();
+							_interface = context.getMatch();
 							return true;
 						}
 					},
@@ -426,7 +426,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							return true;
 						}
 					},
@@ -434,7 +434,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipNetmask = context.getPrevText();
+							_ipNetmask = context.getMatch();
 							return true;
 						}
 					},
@@ -442,7 +442,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_nexthop = context.getPrevText();
+							_nexthop = context.getMatch();
 							_ruleName = "route";
 							return true;
 						}
@@ -472,7 +472,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_interface = context.getPrevText();
+							_interface = context.getMatch();
 							return true;
 						}
 					},
@@ -480,7 +480,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_ipAddress = context.getPrevText();
+							_ipAddress = context.getMatch();
 							return true;
 						}
 					},
@@ -488,7 +488,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_nexthop = context.getPrevText();
+							_nexthop = context.getMatch();
 							_ruleName = "ipv6 route";
 							return true;
 						}
@@ -512,12 +512,12 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_groupId = context.getPrevText();
+							_groupId = context.getMatch();
 							_ruleName = "object-group network";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -536,12 +536,12 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_groupId = context.getPrevText();
+							_groupId = context.getMatch();
 							_ruleName = "object-group protocol";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -558,7 +558,7 @@ public class PixParser extends CommonRules<Object> {
 					UntilEOI(),
 					new Action() {
 						public boolean run(Context context) {
-							_name = context.getPrevText();
+							_name = context.getMatch();
 							_ruleName = "description";
 							return true;
 						}
@@ -581,12 +581,12 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_groupId = context.getPrevText();
+							_groupId = context.getMatch();
 							_ruleName = "object-group icmp-type";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -612,11 +612,11 @@ public class PixParser extends CommonRules<Object> {
 							StringAtom(),
 							new Action() {
 								public boolean run(Context context) {
-									_ipAddress = context.getPrevText();
+									_ipAddress = context.getMatch();
 									return true;
 								}
 							},
-							Eoi()
+							EOI
 						),
 						/*
 						 * ip [netmask]
@@ -625,7 +625,7 @@ public class PixParser extends CommonRules<Object> {
 							StringAtom(),
 							new Action() {
 								public boolean run(Context context) {
-									_ipAddress = context.getPrevText();
+									_ipAddress = context.getMatch();
 									return true;
 								}
 							},
@@ -635,13 +635,13 @@ public class PixParser extends CommonRules<Object> {
 									StringAtom(),
 									new Action() {
 										public boolean run(Context context) {
-											_ipNetmask = context.getPrevText();
+											_ipNetmask = context.getMatch();
 											return true;
 										}
 									}
 								)
 							),
-							Eoi()
+							EOI
 						)
 					),
 					new Action() {
@@ -666,12 +666,12 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_protocol = context.getPrevText();
+							_protocol = context.getMatch();
 							_ruleName = "protocol-object";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -693,7 +693,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_groupId = context.getPrevText();
+							_groupId = context.getMatch();
 							return true;
 						}
 					},
@@ -707,7 +707,7 @@ public class PixParser extends CommonRules<Object> {
 							),
 							new Action() {
 								public boolean run(Context context) {
-									_protocol = context.getPrevText();
+									_protocol = context.getMatch();
 									return true;
 								}
 							}
@@ -719,7 +719,7 @@ public class PixParser extends CommonRules<Object> {
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -736,12 +736,12 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_groupId = context.getPrevText();
+							_groupId = context.getMatch();
 							_ruleName = "group-object";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -758,7 +758,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_protocol = context.getPrevText();
+							_protocol = context.getMatch();
 							return true;
 						}
 					},
@@ -774,7 +774,7 @@ public class PixParser extends CommonRules<Object> {
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 			);
 	}
 
@@ -799,7 +799,7 @@ public class PixParser extends CommonRules<Object> {
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	 }
 
@@ -816,12 +816,12 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_protocol = context.getPrevText();
+							_protocol = context.getMatch();
 							_ruleName = "icmp-object";
 							return true;
 						}
 					},
-					Eoi()
+					EOI
 				);
 	}
 
@@ -841,7 +841,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_name = context.getPrevText();
+							_name = context.getMatch();
 							return true;
 						}
 					},
@@ -852,7 +852,7 @@ public class PixParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_direction  = context.getPrevText();
+							_direction  = context.getMatch();
 							return true;
 						}
 					},
@@ -862,7 +862,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_interface = context.getPrevText();
+							_interface = context.getMatch();
 							_ruleName = "access-group";
 							return true;
 						}
@@ -895,7 +895,7 @@ public class PixParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_portOperator = context.getPrevText();
+							_portOperator = context.getMatch();
 							return true;
 						}
 					},
@@ -903,7 +903,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_firstPort = context.getPrevText();
+							_firstPort = context.getMatch();
 							return true;
 						}
 					}
@@ -919,7 +919,7 @@ public class PixParser extends CommonRules<Object> {
 					String("range"),
 					new Action() {
 						public boolean run(Context context) {
-							_portOperator = context.getPrevText();
+							_portOperator = context.getMatch();
 							return true;
 						}
 					},
@@ -927,7 +927,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_firstPort = context.getPrevText();
+							_firstPort = context.getMatch();
 							return true;
 						}
 					},
@@ -935,7 +935,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_lastPort = context.getPrevText();
+							_lastPort = context.getMatch();
 							return true;
 						}
 					}
@@ -958,7 +958,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_acl.setAccessListId(context.getPrevText());
+							_acl.setAccessListId(context.getMatch());
 							return true;
 						}
 					},
@@ -968,7 +968,7 @@ public class PixParser extends CommonRules<Object> {
 					UntilEOI(),
 					new Action() {
 						public boolean run(Context context) {
-							_acl.setRemark(context.getPrevText());
+							_acl.setRemark(context.getMatch());
 							_ruleName = "access-list remark";
 							return true;
 						}
@@ -988,7 +988,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtomNotGroup(),
 					new Action() {
 						public boolean run(Context context) {
-							_protocol = context.getPrevText();
+							_protocol = context.getMatch();
 							return true;
 					
 						}
@@ -1007,7 +1007,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							String id = context.getPrevText();
+							String id = context.getMatch();
 							ObjectGroupType type =
 									_groupTypeSearch.getGroupType(id);
 							if (type != null && type == ObjectGroupType.PROTOCOL) {
@@ -1031,7 +1031,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							String id = context.getPrevText();
+							String id = context.getMatch();
 							ObjectGroupType type =
 									_groupTypeSearch.getGroupType(id);
 							if (type != null && type == ObjectGroupType.SERVICE) {
@@ -1055,7 +1055,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							String id = context.getPrevText();
+							String id = context.getMatch();
 							ObjectGroupType type =
 									_groupTypeSearch.getGroupType(id);
 							if (type != null && type == ObjectGroupType.ENHANCED) {
@@ -1079,7 +1079,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							String id = context.getPrevText();
+							String id = context.getMatch();
 							ObjectGroupType type =
 									_groupTypeSearch.getGroupType(id);
 							if (type != null && type == ObjectGroupType.NETWORK) {
@@ -1103,7 +1103,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							String id = context.getPrevText();
+							String id = context.getMatch();
 							ObjectGroupType type =
 									_groupTypeSearch.getGroupType(id);
 							if (type != null && type == ObjectGroupType.ICMP) {
@@ -1137,7 +1137,7 @@ public class PixParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_ipAddress = context.getPrevText();
+								_ipAddress = context.getMatch();
 								return true;
 							}
 						}
@@ -1146,7 +1146,7 @@ public class PixParser extends CommonRules<Object> {
 						StringAtomNotGroup(),
 						new Action() {
 							public boolean run(Context context) {
-								_ipAddress = context.getPrevText();
+								_ipAddress = context.getMatch();
 								return true;
 							}
 						},
@@ -1154,7 +1154,7 @@ public class PixParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_ipNetmask = context.getPrevText();
+								_ipNetmask = context.getMatch();
 								return true;
 							}
 						}
@@ -1174,7 +1174,7 @@ public class PixParser extends CommonRules<Object> {
 						StringAtom(),
 						new Action() {
 							public boolean run(Context context) {
-								_name = context.getPrevText();
+								_name = context.getMatch();
 								return true;
 							}
 						}
@@ -1216,7 +1216,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtomNotGroup(),
 					new Action() {
 						public boolean run(Context context) {
-							String icmp = context.getPrevText();
+							String icmp = context.getMatch();
 							if (IPIcmp4.getInstance().icmpLookup(icmp) != null) {
 								_acl.setIcmp(icmp);
 								return true;
@@ -1255,7 +1255,7 @@ public class PixParser extends CommonRules<Object> {
 					StringAtom(),
 					new Action() {
 						public boolean run(Context context) {
-							_acl.setAccessListId(context.getPrevText());
+							_acl.setAccessListId(context.getMatch());
 							return true;
 						}
 					},
@@ -1280,7 +1280,7 @@ public class PixParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_acl.setAction(context.getPrevText());
+							_acl.setAction(context.getMatch());
 							return true;
 						}
 					},
@@ -1427,7 +1427,7 @@ public class PixParser extends CommonRules<Object> {
 		return ZeroOrMore(
 					Sequence(
 						TestNot(String("inactive")),
-						Any()
+						ANY
 					)
 				);
 	}
@@ -1440,7 +1440,7 @@ public class PixParser extends CommonRules<Object> {
 		return ZeroOrMore(
 					Sequence(
 						TestNot(String("shutdown")),
-						Any()
+						ANY
 					)
 				);
 	}

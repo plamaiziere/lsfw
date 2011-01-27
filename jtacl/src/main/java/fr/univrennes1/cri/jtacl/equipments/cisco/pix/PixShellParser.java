@@ -60,14 +60,14 @@ public class PixShellParser extends CommonRules<Object> {
 
 	Rule CommandHelp() {
 		return Sequence(
-			StringIgnoreCase("help"),
+			IgnoreCase("help"),
 			new Action() {
 				public boolean run(Context context) {
 					_command = "help";
 					return true;
 				}
 			},
-			Eoi()
+			EOI
 		);
 	}
 
@@ -77,19 +77,19 @@ public class PixShellParser extends CommonRules<Object> {
 	 */
 	Rule CommandShow() {
 		return Sequence(
-			StringIgnoreCase("show"),
+			IgnoreCase("show"),
 			WhiteSpaces(),
 			FirstOf(
-				StringIgnoreCase("name"),
-				StringIgnoreCase("enhanced-service"),
-				StringIgnoreCase("icmp-group"),
-				StringIgnoreCase("network-group"),
-				StringIgnoreCase("protocol-group"),
-				StringIgnoreCase("service-group")
+				IgnoreCase("name"),
+				IgnoreCase("enhanced-service"),
+				IgnoreCase("icmp-group"),
+				IgnoreCase("network-group"),
+				IgnoreCase("protocol-group"),
+				IgnoreCase("service-group")
 			),
 			new Action() {
 				public boolean run(Context context) {
-					_command = "show-" + context.getPrevText().toLowerCase();
+					_command = "show-" + context.getMatch().toLowerCase();
 					return true;
 				}
 			},
@@ -97,18 +97,18 @@ public class PixShellParser extends CommonRules<Object> {
 				Sequence(
 					WhiteSpace(),
 					FirstOf(
-						StringIgnoreCase("used"),
-						StringIgnoreCase("unused")
+						IgnoreCase("used"),
+						IgnoreCase("unused")
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_param.add(context.getPrevText().toLowerCase());
+							_param.add(context.getMatch().toLowerCase());
 							return true;
 						}
 					}
 				)
 			),
-			Eoi()
+			EOI
 		);
 	}
 

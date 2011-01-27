@@ -55,9 +55,9 @@ import java.util.List;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.parboiled.Parboiled;
-import org.parboiled.ReportingParseRunner;
+import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
-import org.parboiled.support.InputBuffer;
+import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
