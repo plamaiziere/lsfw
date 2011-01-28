@@ -2434,7 +2434,7 @@ public class PacketFilter extends GenericEquipment {
 		 * skipped interface
 		 */
 		if (_skippedIfaces.containsKey(link.getIface().getName())) {
-			probeResults.setAclResult(direction, AclResult.ACCEPT);
+			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
 			probeResults.setInterface(direction, interfaceDesc + " SKIPPED");
 			return;
 		}
@@ -2452,13 +2452,13 @@ public class PacketFilter extends GenericEquipment {
 		 * rule results
 		 */
 		for (RuleResult ruleResult: anchorResult.getRuleResults()) {
-			AclResult aclResult;
+			AclResult aclResult = new AclResult();
 			if (ruleResult.getAction().equals(PfRule.BLOCK))
-				aclResult = AclResult.DENY;
+				aclResult.addResult(AclResult.DENY);
 			else
-				aclResult = AclResult.ACCEPT;
+				aclResult.addResult(AclResult.ACCEPT);
 			if (ruleResult.getMatch() != MatchResult.ALL)
-				aclResult = AclResult.MAY;
+				aclResult.addResult(AclResult.MAY);
 			probeResults.addMatchingAcl(direction,
 				ruleResult.getText(),
 				aclResult);
@@ -2469,17 +2469,17 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		RuleResult lastResult = anchorResult.getLastResult();
 		if (lastResult != null) {
-			AclResult aclResult;
+			AclResult aclResult = new AclResult();
 			if (lastResult.getAction().equals(PfRule.BLOCK))
-				aclResult = AclResult.DENY;
+				aclResult.addResult(AclResult.DENY);
 			else
-				aclResult = AclResult.ACCEPT;
+				aclResult.addResult(AclResult.ACCEPT);
 			if (lastResult.getMatch() != MatchResult.ALL)
-				aclResult = AclResult.MAY;
+				aclResult.addResult(AclResult.MAY);
 			probeResults.addActiveAcl(direction, lastResult.getText(), aclResult);
 			probeResults.setAclResult(direction, aclResult);
 		} else {
-			probeResults.setAclResult(direction, AclResult.ACCEPT);
+			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
 		}
 
 		probeResults.setInterface(direction, interfaceDesc);

@@ -1157,10 +1157,11 @@ public class CiscoRouter extends GenericEquipment {
 						/*
 						 * store the result in the probe
 						 */
-						AclResult aclResult = (ace.getAction().equals("permit")) ?
-							AclResult.ACCEPT : AclResult.DENY;
+						AclResult aclResult = new AclResult();
+						aclResult.setResult(ace.getAction().equals("permit") ?
+							AclResult.ACCEPT : AclResult.DENY);
 						if (match != MatchResult.ALL)
-							aclResult = AclResult.MAY;
+							aclResult.addResult(AclResult.MAY);
 						
 						results.addMatchingAcl(direction,
 							ace.getConfigurationLine(),

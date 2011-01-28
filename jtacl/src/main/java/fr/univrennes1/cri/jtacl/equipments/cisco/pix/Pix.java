@@ -1417,10 +1417,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 							/*
 							 * store the result in the probe
 							 */
-							AclResult aclResult = (acl.getAction().equals("permit")) ?
-								AclResult.ACCEPT : AclResult.DENY;
+							AclResult aclResult = new AclResult();
+							aclResult.addResult(acl.getAction().equals("permit") ?
+								AclResult.ACCEPT : AclResult.DENY);
+
 							if (match != MatchResult.ALL)
-								aclResult = AclResult.MAY;
+								aclResult.addResult(AclResult.MAY);
 
 							results.addMatchingAcl(direction,
 								acl.getConfigurationLine(),

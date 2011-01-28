@@ -67,8 +67,8 @@ public class ProbeResults {
 		_interfaceIn = "";
 		_interfaceOut = "";
 
-		_resultIn = AclResult.ACCEPT;
-		_resultOut = AclResult.ACCEPT;
+		_resultIn = new AclResult(AclResult.ACCEPT);
+		_resultOut = new AclResult(AclResult.ACCEPT);
 		_routingResult = RoutingResult.UNKNOWN;
 		_routingMessage = "";
 	}
@@ -156,14 +156,41 @@ public class ProbeResults {
 	}
 
 	public AclResult getAclResult() {
-	
-		if (_resultIn == AclResult.ACCEPT && _resultOut == AclResult.ACCEPT)
-			return AclResult.ACCEPT;
 
-		if (_resultIn != AclResult.MAY && _resultOut != AclResult.MAY)
-			return AclResult.DENY;
+		AclResult result = new AclResult();
+		/*
+		 * may
+		 */
+		if (_resultIn.hasMay() || _resultOut.hasMay()) {
+			result.addResult(AclResult.MAY);
+		}
 
-		return AclResult.MAY;
+		/*
+		 * deny
+		 */
+		if (_resultIn.hasDeny() || _resultOut.hasDeny()) {
+			result.addResult(AclResult.DENY);
+			return result;
+		}
+
+		/*
+		 * accept
+		 */
+		if (_resultIn.hasAccept() && _resultOut.hasAccept()) {
+			result.addResult(AclResult.ACCEPT);
+			return result;
+		}
+
+		/*
+		 * match
+		 * XXX: can happen?
+		 */
+		if (_resultIn.hasMatch() || _resultOut.hasMatch()) {
+			result.addResult(AclResult.MATCH);
+			return result;
+		}
+		
+		return null;
 	}
 
 	public RoutingResult getRoutingResult() {

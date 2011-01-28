@@ -279,7 +279,8 @@ public class SimpleRouter extends GenericEquipment {
 				if (!toIP.networkContains(probe.getDestinationAddress())) {
 					continue;
 				}
-				AclResult aclResult = raction.equals("accept") ? AclResult.ACCEPT : AclResult.DENY;
+				AclResult aclResult = new AclResult(raction.equals("accept") ?
+					AclResult.ACCEPT : AclResult.DENY);
 
 				result.addMatchingAcl(input ? Direction.IN : Direction.OUT, acl, aclResult);
 				/*
@@ -293,7 +294,8 @@ public class SimpleRouter extends GenericEquipment {
 		}
 		if (lastAcl == null) {
 			// default policy is accept
-			result.setAclResult(input ? Direction.IN : Direction.OUT, AclResult.ACCEPT);
+			result.setAclResult(input ? Direction.IN : Direction.OUT,
+					new AclResult(AclResult.ACCEPT));
 			return;
 		}
 		/*

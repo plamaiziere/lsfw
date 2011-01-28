@@ -254,30 +254,41 @@ public class ProbesTracker {
 	 */
 	public AclResult getAclResult() {
 
-		if (getRoutingResult() != RoutingResult.ROUTED)
-			return AclResult.MAY;
+		AclResult result = new AclResult();
 
-		boolean deny = false;
+		if (getRoutingResult() != RoutingResult.ROUTED)
+			result.addResult(AclResult.MAY);
+
+		int accept = 0;
+		int deny = 0;
+		int match = 0;
+		int may = 0;
 
 		for (Probe finalProbe: _finalProbes.values()) {
 			ProbesList probes = finalProbe.getParentProbes();
 			probes.add(finalProbe);
 			for (Probe probe : probes) {
 				AclResult probeResult = probe.getResults().getAclResult();
-				switch (probeResult) {
-					case ACCEPT:
-							break;
-					case MAY:
-							return AclResult.MAY;
-					case DENY:
-							deny = true;
-							break;
-				}
+				if (probeResult.hasAccept())
+					accept++;
+				if (probeResult.hasDeny())
+					deny++;
+				if (probeResult.hasMatch())
+					match++;
+				if (probeResult.hasMay())
+					may++;
 			}
 		}
-		if (deny)
-			return AclResult.DENY;
-		return AclResult.ACCEPT;
+		if (may > 0)
+			result.addResult(AclResult.MAY);
+		if (match == 0 && accept > 0 && deny == 0)
+			result.addResult(AclResult.ACCEPT);
+		if (match == 0 && deny > 0)
+			result.addResult(AclResult.DENY);
+		if (match > 0) {
+			result.addResult(AclResult.MATCH);
+		}
+		return result;
 	}
 
 }

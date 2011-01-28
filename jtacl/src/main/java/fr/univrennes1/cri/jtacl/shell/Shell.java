@@ -702,6 +702,8 @@ public class Shell {
 		int accepted = 0;
 		int denied = 0;
 		int may = 0;
+		int match = 0;
+
 		/*
 		 * routing counters
 		 */
@@ -717,14 +719,16 @@ public class Shell {
 				ShellReport report = new ShellReport((tracker));
 				System.out.print(report.showResults(_verbose));
 			}
-			switch (tracker.getAclResult()) {
-				case ACCEPT:	accepted++;
-								break;
-				case DENY:		denied++;
-								break;
-				case MAY:		may++;
-								break;
-			}
+			AclResult aclResult = tracker.getAclResult();
+			if (aclResult.hasAccept())
+				accepted++;
+			if (aclResult.hasDeny())
+				denied++;
+			if (aclResult.hasMay())
+				may++;
+			if (aclResult.hasMatch())
+				match++;
+
 			switch (tracker.getRoutingResult()) {
 				case ROUTED:	routed++;
 								break;
@@ -734,35 +738,41 @@ public class Shell {
 								routeunknown++;
 			}
 		}
+
 		/*
 		 * Global ACL result
 		 */
-		AclResult aclResult = AclResult.MAY;
+		AclResult aclResult = new AclResult();
 		/*
 		 * one result was MAY
 		 */
-		if (may > 0) {
-			aclResult = AclResult.MAY;
-		} else {
-			/*
-			 * some probes were accepted and some were denied => MAY
-			 */
-			if (accepted > 0 && denied > 0) {
-				aclResult = AclResult.MAY;
-			} else {
-				/*
-				 * all probes were accepted => ACCEPT
-				 */
-				if (accepted > 0) {
-					aclResult = AclResult.ACCEPT;
-				}
-				/*
-				 * all probes were denied => DENY
-				 */
-				if (denied > 0) {
-					aclResult = AclResult.DENY;
-				}
-			}
+		if (may > 0 || match > 0)
+			aclResult.addResult(AclResult.MAY);
+
+		/*
+		 * some probes were accepted and some were denied => MAY
+		 */
+		if (match == 0 && accepted > 0 && denied > 0)
+			aclResult.addResult(AclResult.MAY);
+
+		/*
+		 * all probes were accepted => ACCEPT
+		 */
+		if (match == 0 && accepted > 0 && denied == 0)
+			aclResult.setResult(AclResult.ACCEPT);
+
+		/*
+		 * all probes were denied => DENY
+		 */
+		if (match == 0 && denied > 0 && accepted == 0) {
+			aclResult.setResult(AclResult.DENY);
+		}
+
+		/*
+		 * some probes were matching => MATCH
+		 */
+		if (match > 0) {
+			aclResult.setResult(AclResult.MATCH);
 		}
 
 		/*
@@ -802,6 +812,9 @@ public class Shell {
 			System.out.println();
 		}
 
+		/*
+		 * XXX we need a better logic here.
+		 */
 		boolean testExpect = false;
 		boolean notExpect = expect.startsWith("!");
 		if (notExpect && expect.length() > 1)
@@ -818,14 +831,14 @@ public class Shell {
 			testExpect = true;
 
 		if (expect.equalsIgnoreCase("ACCEPT") &&
-				aclResult == AclResult.ACCEPT)
+				aclResult.hasAccept() && !aclResult.hasMay())
 			testExpect = true;
 		if (expect.equalsIgnoreCase("DENY") &&
-				aclResult == AclResult.DENY)
+				aclResult.hasDeny() && !aclResult.hasMay())
 			testExpect = true;
 
 		if (expect.equalsIgnoreCase("MAY") &&
-				aclResult == AclResult.MAY)
+				aclResult.hasMay())
 				testExpect = true;
 
 		if (notExpect)
