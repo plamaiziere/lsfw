@@ -28,7 +28,7 @@ public class AccessListGroup extends ArrayList<AccessList> {
 
 	/**
 	 * Creates a new AccessListGroup with id set to id.
-	 * @param Id the id to set;
+	 * @param id the id to set;
 	 */
 	public AccessListGroup(String id) {
 		_id = id;

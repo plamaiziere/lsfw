@@ -240,7 +240,7 @@ public class TcpFlags {
 
 	/**
 	 * Sets the ACK flag according to the value in argument.
-	 * @param flag value to set.
+	 * @param value value to set.
 	 */
 	public void setACK(boolean value) {
 		if (value)
@@ -273,7 +273,7 @@ public class TcpFlags {
 
 	/**
 	 * Sets the PSH flag according to the value in argument.
-	 * @param flag value to set.
+	 * @param value value to set.
 	 */
 	public void setPSH(boolean value) {
 		if (value)
@@ -306,7 +306,7 @@ public class TcpFlags {
 
 	/**
 	 * Sets the RST flag according to the value in argument.
-	 * @param flag value to set.
+	 * @param value value to set.
 	 */
 	public void setRST(boolean value) {
 		if (value)
@@ -339,7 +339,7 @@ public class TcpFlags {
 
 	/**
 	 * Sets the SYN flag according to the value in argument.
-	 * @param flag value to set.
+	 * @param value value to set.
 	 */
 	public void setSYN(boolean value) {
 		if (value)
@@ -372,7 +372,7 @@ public class TcpFlags {
 
 	/**
 	 * Sets the FIN flag according to the value in argument.
-	 * @param flag value to set.
+	 * @param value value to set.
 	 */
 	public void setFIN(boolean value) {
 		if (value)
@@ -388,8 +388,8 @@ public class TcpFlags {
 	 * @return true if the flag in argument is a valid letter for a flag in
 	 * lowercase.
 	 */
-	public static boolean isLowerFlag(char f) {
-		return _lowerFlags.indexOf(f) >= 0;
+	public static boolean isLowerFlag(char flag) {
+		return _lowerFlags.indexOf(flag) >= 0;
 	}
 
 	/**
@@ -399,8 +399,8 @@ public class TcpFlags {
 	 * @return true if the flag in argument is a valid letter for a flag in
 	 * uppercase.
 	 */
-	public static boolean isUpperFlag(char f) {
-		return _upperFlags.indexOf(f) >= 0;
+	public static boolean isUpperFlag(char flag) {
+		return _upperFlags.indexOf(flag) >= 0;
 	}
 
 	/**
@@ -425,7 +425,7 @@ public class TcpFlags {
 	 * Sets or unsets a flag according to the flag in argument.
 	 * A flag specified in uppercase sets the flag, a flag specified in lowercase
 	 * unset the flag.
-	 * @param flag to set.
+	 * @param flag flag to set.
 	 */
 	public void setFlag(char flag) {
 		int bit = getFlagByLetter(flag);
@@ -439,7 +439,7 @@ public class TcpFlags {
 	 * Sets or unsets the flags according to the flags in argument.
 	 * A flag specified in uppercase sets the flag, a flag specified in lowercase
 	 * unset the flag.
-	 * @param flags to set.
+	 * @param flags flags to set.
 	 */
 	public void setFlags(String flags) {
 		for (int i = 0; i < flags.length(); i++)
@@ -452,7 +452,7 @@ public class TcpFlags {
 	 * <br/>
 	 * In lowercase, the function checks that the flag is unset.
 	 *
-	 * @param f flag to check
+	 * @param flag flag to check
 	 * @return true if the flag is an uppercase flag and the flag is set.
 	 * Or true if the flag is a lowercase flag and the flag is unset.
 	 */
