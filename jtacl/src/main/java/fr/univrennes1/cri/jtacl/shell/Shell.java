@@ -759,13 +759,13 @@ public class Shell {
 		 * all probes were accepted => ACCEPT
 		 */
 		if (match == 0 && accepted > 0 && denied == 0)
-			aclResult.setResult(AclResult.ACCEPT);
+			aclResult.addResult(AclResult.ACCEPT);
 
 		/*
 		 * all probes were denied => DENY
 		 */
 		if (match == 0 && denied > 0 && accepted == 0) {
-			aclResult.setResult(AclResult.DENY);
+			aclResult.addResult(AclResult.DENY);
 		}
 
 		/*
