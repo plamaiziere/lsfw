@@ -14,7 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.lib.misc.MatchResult;
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
 
 /**
  * Describes a network object group.
