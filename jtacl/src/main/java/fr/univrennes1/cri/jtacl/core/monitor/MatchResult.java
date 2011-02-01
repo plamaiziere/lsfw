@@ -19,7 +19,7 @@ package fr.univrennes1.cri.jtacl.core.monitor;
  */
 public enum MatchResult {
 	/**
-	 * Match totaly.
+	 * Match totally.
 	 */
 	ALL,
 	/**
@@ -27,7 +27,7 @@ public enum MatchResult {
 	 */
 	NOT,
 	/**
-	 * Match partialy.
+	 * Match partially.
 	 */
 	MATCH,
 	/**
