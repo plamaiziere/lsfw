@@ -1044,7 +1044,7 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	PortSpec reqDestPort = request.getDestinationPort();
 	PortObject aceDestPort = ace.getDestPortObject();
-	MatchResult mDestPort = MatchResult.NOT;
+	MatchResult mDestPort = MatchResult.ALL;
 
 	if (reqDestPort != null) {
 		/*
