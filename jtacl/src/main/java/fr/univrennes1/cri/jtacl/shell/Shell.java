@@ -602,21 +602,27 @@ public class Shell {
 				 * services lookup
 				 */
 				if (sprotoSource != null) {
-					protoSource = ipServices.serviceLookup(sprotoSource, sprotocol);
-					if (protoSource.intValue() == -1) {
-						System.out.println("unknown service: " + sprotoSource);
-						return false;
-					}
-					request.setSourcePort(new PortSpec(PortOperator.EQ, protoSource));
+					if (!sprotoSource.equalsIgnoreCase("none")) {
+						protoSource = ipServices.serviceLookup(sprotoSource, sprotocol);
+						if (protoSource.intValue() == -1) {
+							System.out.println("unknown service: " + sprotoSource);
+							return false;
+						}
+						request.setSourcePort(new PortSpec(PortOperator.EQ, protoSource));
+					} else
+						request.setSourcePort(new PortSpec(PortOperator.NONE));
 				}
 
 				if (sprotoDest != null) {
-					protoDest = ipServices.serviceLookup(sprotoDest, sprotocol);
-					if (protoDest.intValue() == -1) {
-						System.out.println("unknown service: " + sprotoDest);
-						return false;
-					}
-					request.setDestinationPort(new PortSpec(PortOperator.EQ, protoDest));
+					if (!sprotoDest.equalsIgnoreCase("none")) {
+						protoDest = ipServices.serviceLookup(sprotoDest, sprotocol);
+						if (protoDest.intValue() == -1) {
+							System.out.println("unknown service: " + sprotoDest);
+							return false;
+						}
+						request.setDestinationPort(new PortSpec(PortOperator.EQ, protoDest));
+					} else
+						request.setDestinationPort(new PortSpec(PortOperator.NONE));
 				}
 
 				/*
