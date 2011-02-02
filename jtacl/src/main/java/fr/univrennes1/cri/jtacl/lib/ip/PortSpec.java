@@ -11,9 +11,12 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.core.monitor;
+package fr.univrennes1.cri.jtacl.lib.ip;
 
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +25,12 @@ import java.util.List;
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class ProbePortSpec {
+public class PortSpec {
 
 	/**
 	 * Current operator
 	 */
-	protected ProbePortOperator _operator;
+	protected PortOperator _operator;
 
 	/**
 	 * Range(s) of ports.
@@ -39,7 +42,7 @@ public class ProbePortSpec {
 	 * (ANY or NONE)
 	 * @param operator operator to apply.
 	 */
-	public ProbePortSpec(ProbePortOperator operator) {
+	public PortSpec(PortOperator operator) {
 		_operator = operator;
 		switch (operator) {
 			case NONE:
@@ -59,7 +62,7 @@ public class ProbePortSpec {
 	 * @param operator operator to apply.
 	 * @param port port operand.
 	 */
-	public ProbePortSpec(ProbePortOperator operator, int port) {
+	public PortSpec(PortOperator operator, int port) {
 		_operator = operator;
 		switch (operator) {
 			case EQ:
@@ -105,7 +108,7 @@ public class ProbePortSpec {
 	 * @param firstPort first port operand.
 	 * @param lastPort last port operand.
 	 */
-	public ProbePortSpec(ProbePortOperator operator, int firstPort, int lastPort) {
+	public PortSpec(PortOperator operator, int firstPort, int lastPort) {
 		_operator = operator;
 		switch (operator) {
 			case RANGE:
@@ -143,12 +146,12 @@ public class ProbePortSpec {
 	 * @param port port spec to check.
 	 * @return true if this instance matches the port in argument.
 	 */
-	public MatchResult matches(ProbePortSpec portSpec) {
+	public MatchResult matches(PortSpec portSpec) {
 
-		if (_operator == ProbePortOperator.NONE)
+		if (_operator == PortOperator.NONE)
 			return MatchResult.NOT;
 
-		if (_operator == ProbePortOperator.ANY)
+		if (_operator == PortOperator.ANY)
 			return MatchResult.ALL;
 
 		int match = 0;

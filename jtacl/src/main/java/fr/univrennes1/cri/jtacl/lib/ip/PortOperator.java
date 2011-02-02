@@ -11,13 +11,13 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.core.monitor;
+package fr.univrennes1.cri.jtacl.lib.ip;
 
 /**
  * Port operators.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public enum ProbePortOperator {
+public enum PortOperator {
 	/**
 	 * Operator "ANY"
 	 */
