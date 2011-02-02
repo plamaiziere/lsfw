@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import java.util.List;
 
 /**
@@ -50,23 +52,34 @@ public class EnhancedServiceObjectGroup extends ObjectGroup {
 	}
 
 	/**
-	 * Checks if at least one item of this group matches the protocols and the
-	 * service value in argument.
+	 * Checks if at least one item of this group matches the service
+	 *  in argument and if this group matches the protocols in argument.
 	 * @param protocols protocols value to check.
-	 * @param service service value to check.
-	 * @return true if at least one item matches the protocols
-	 * and the service value in argument.
+	 * @param port {@link PortSpec} port spec value to check.
+	 * @return a {@link MatchResult} between this group and the port spec in
+	 * argument.
 	 */
-	public boolean matches(List<Integer> protocols, int service) {
+	public MatchResult matches(List<Integer> protocols, PortSpec port) {
+		int match = 0;
+		int all = 0;
+
 		for (ObjectGroupItem item: this) {
 			EnhancedServiceObjectGroupItem sitem =
 					(EnhancedServiceObjectGroupItem) item;
 			if (sitem.isGroup())
 				continue;
-			if (sitem.matches(protocols, service))
-				return true;
+			MatchResult res = sitem.matches(protocols, port);
+			if (res == MatchResult.ALL)
+				all++;
+			if (res == MatchResult.MATCH)
+				match++;
 		}
-		return false;
+		if (all > 0)
+			return MatchResult.ALL;
+		if (match > 0)
+			return MatchResult.MATCH;
+
+		return MatchResult.NOT;
 	}
 
 	/**

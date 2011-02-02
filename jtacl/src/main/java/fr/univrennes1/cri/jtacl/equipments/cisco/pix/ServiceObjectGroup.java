@@ -14,8 +14,10 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtoEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 
 /**
  * Describes a service object group.
@@ -51,11 +53,11 @@ public class ServiceObjectGroup extends ObjectGroup {
 	 * Checks if at least one item of this group matches the service
 	 *  in argument and if this group matches the protocol in argument.
 	 * @param protocol protocol value to check.
-	 * @param service service value to check.
-	 * @return true if an item of this group matches the protocol and the service
-	 * in argument.
+	 * @param port {@link PortSpec} port spec value to check.
+	 * @return a {@link MatchResult} between this group and the port spec in
+	 * argument.
 	 */
-	 public boolean matches(int protocol, int service) {
+	 public MatchResult matches(int protocol, PortSpec port) {
 		IPProtoEnt ent = IPProtocols.getInstance().getProtoByNumber(protocol);
 		if (ent == null)
 			throw new JtaclInternalException("unknown protocol number: " +
@@ -63,16 +65,26 @@ public class ServiceObjectGroup extends ObjectGroup {
 
 		// _protocol is tcp-udp or udp or tcp
 		if (!_protocol.contains(ent.getName()))
-			return false;
+			return MatchResult.NOT;
 
+		int match = 0;
+		int all = 0;
 		for (ObjectGroupItem item: this) {
 			ServiceObjectGroupItem sitem = (ServiceObjectGroupItem) item;
 			if (sitem.isGroup())
 				continue;
-			if (sitem.matches(service))
-				return true;
+			MatchResult res = sitem.matches(port);
+			if (res == MatchResult.ALL)
+				all++;
+			if (res == MatchResult.MATCH)
+				match++;
 		}
-		return false;
+		if (all > 0)
+			return MatchResult.ALL;
+		if (match > 0)
+			return MatchResult.MATCH;
+
+		return MatchResult.NOT;
 	}
 
 	/**

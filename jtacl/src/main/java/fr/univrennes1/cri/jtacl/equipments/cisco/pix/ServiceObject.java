@@ -13,6 +13,9 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+
 /**
  * Describes a service object.
  *
@@ -43,12 +46,12 @@ public class ServiceObject {
 		return _protocol;
 	}
 
-	public boolean matches(int protocol, int port) {
+	public MatchResult matches(int protocol, PortSpec port) {
 		if (protocol == _protocol) {
 			if (_portObject != null)
 				return _portObject.matches(port);
 		}
-		return false;
+		return MatchResult.NOT;
 	}
 
 }

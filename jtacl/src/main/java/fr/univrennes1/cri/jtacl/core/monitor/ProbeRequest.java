@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.core.monitor;
 
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import java.util.List;
 
 /**
@@ -40,16 +41,16 @@ public class ProbeRequest {
 	protected Integer _code;
 
 	/**
-	 * The source port.
-	 * (null = any)
+	 * The source port specification.
+	 * 
 	 */
-	protected Integer _sourcePort;
+	protected PortSpec _sourcePort;
 
 	/**
-	 * The destination port..
-	 * (null = any)
+	 * The destination port specification
+	 * 
 	 */
-	protected Integer _destPort;
+	protected PortSpec _destPort;
 
 	/**
 	 * TCP flags we should match (null: any)
@@ -115,38 +116,38 @@ public class ProbeRequest {
 
 
 	/**
-	 * Returns the source port.
-	 * (null = any)
-	 * @return the source port.
-	 * (null = any)
+	 * Returns the source port specification
+	 * 
+	 * @return the source port specification.
+	 * 
 	 */
-	public Integer getSourcePort() {
+	public PortSpec getSourcePort() {
 		return _sourcePort;
 	}
 
 	/**
-	 * Sets the source port.
-	 * @param port port value to set. Null designates any port.
+	 * Sets the source port specification.
+	 * @param port port value to set.
 	 */
-	public void setSourcePort(Integer port) {
+	public void setSourcePort(PortSpec port) {
 		_sourcePort = port;
 	}
 
 	/**
-	 * Returns the destination port.
-	 * (null = any)
-	 * @return the destination port.
-	 * (null = any)
+	 * Returns the destination port specification.
+	 * 
+	 * @return the destination port specification.
+	 * 
 	 */
-	public Integer getDestinationPort() {
+	public PortSpec getDestinationPort() {
 		return _destPort;
 	}
 
 	/**
-	 * Sets the destination port.
-	 * @param port port value to set. Null designates any port.
+	 * Sets the destination port specification.
+	 * @param port port value to set..
 	 */
-	public void setDestinationPort(Integer port) {
+	public void setDestinationPort(PortSpec port) {
 		_destPort = port;
 	}
 

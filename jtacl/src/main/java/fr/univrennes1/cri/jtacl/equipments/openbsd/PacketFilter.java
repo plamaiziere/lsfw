@@ -33,6 +33,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -2016,12 +2017,11 @@ public class PacketFilter extends GenericEquipment {
 	/**
 	 * port filter
 	 */
-	protected MatchResult portspecFilter(PfPortSpec portspec, int port) {
+	protected MatchResult portspecFilter(PfPortSpec portspec, PortSpec port) {
 
 		if (portspec.isEmpty())
 			return MatchResult.ALL;
-		boolean match = portspec.matches(port);
-		return match ? MatchResult.ALL : MatchResult.NOT;
+		return portspec.matches(port);
 	}
 
 	/**
@@ -2153,6 +2153,8 @@ public class PacketFilter extends GenericEquipment {
 
 		MatchResult mIpSource = MatchResult.ALL;
 		MatchResult mIpDest = MatchResult.ALL;
+		MatchResult mSourcePort = MatchResult.ALL;
+		MatchResult mDestPort = MatchResult.ALL;
 
 		if (!rule.isAll()) {
 			/*
@@ -2167,10 +2169,10 @@ public class PacketFilter extends GenericEquipment {
 			/*
 			 * from port spec
 			 */
-			Integer port = request.getSourcePort();
+			PortSpec port = request.getSourcePort();
 			if (port != null) {
-				MatchResult match = portspecFilter(rule.getFromPortSpec(), port);
-				if (match == MatchResult.NOT)
+				mSourcePort = portspecFilter(rule.getFromPortSpec(), port);
+				if (mSourcePort == MatchResult.NOT)
 					return MatchResult.NOT;
 			}
 
@@ -2188,8 +2190,8 @@ public class PacketFilter extends GenericEquipment {
 			 */
 			port = request.getDestinationPort();
 			if (port != null) {
-				MatchResult match = portspecFilter(rule.getToPortSpec(), port);
-				if (match == MatchResult.NOT)
+				mDestPort = portspecFilter(rule.getToPortSpec(), port);
+				if (mDestPort == MatchResult.NOT)
 					return MatchResult.NOT;
 			}			
 		}
@@ -2222,7 +2224,8 @@ public class PacketFilter extends GenericEquipment {
 				return MatchResult.NOT;
 		}
 
-		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL)
+		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
+				mSourcePort == MatchResult.ALL && mDestPort == MatchResult.ALL)
 			return MatchResult.ALL;
 
 		return MatchResult.MATCH;

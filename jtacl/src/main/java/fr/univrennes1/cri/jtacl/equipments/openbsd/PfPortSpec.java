@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import java.util.ArrayList;
 
 /**
@@ -27,12 +29,22 @@ public class PfPortSpec extends ArrayList<PfPortItem> {
 	 * @param port port to check.
 	 * @return true if this {@link PfPortSpec} matches the port in argument.
 	 */
-	public boolean matches(int port) {
+	public MatchResult matches(PortSpec port) {
+		int match = 0;
+		int all = 0;
 		for (PfPortItem item: this) {
-			if (item.matches(port))
-				return true;
+			MatchResult res = item.matches(port);
+			if (res == MatchResult.ALL)
+				all++;
+			if (res == MatchResult.MATCH)
+				match++;
 		}
-		return false;
+		if (all > 0)
+			return MatchResult.ALL;
+		if (match > 0)
+			return MatchResult.MATCH;
+
+		return MatchResult.NOT;
 	}
 
 }

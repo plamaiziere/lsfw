@@ -13,6 +13,11 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+
 /**
  * Describes a port object.
  *
@@ -51,14 +56,9 @@ public class PortObject {
 	protected String _operator;
 
 	/**
-	 * first port
+	 * port spec corresponding to this Port Object
 	 */
-	protected int _firstPort;
-
-	/**
-	 * last port (operator range)
-	 */
-	protected int _lastPort;
+	protected PortSpec _portSpec;
 
 	/**
 	 * Constructs a new {@link PortObject} instance using an operator
@@ -68,8 +68,23 @@ public class PortObject {
 	 */
 	public PortObject(String operator, int port) {
 		_operator = operator;
-		_firstPort = port;
-		_lastPort = -1;
+
+		if (_operator.equals(EQ)) {
+			_portSpec = new PortSpec(PortOperator.EQ, port);
+		}
+		if (_operator.equals(GT)) {
+			_portSpec = new PortSpec(PortOperator.GT, port);
+		}
+		if (_operator.equals(LT)) {
+			_portSpec = new PortSpec(PortOperator.LT, port);
+		}
+		if (_operator.equals(NEQ)) {
+			_portSpec = new PortSpec(PortOperator.NEQ, port);
+		}
+
+		if (_portSpec == null)
+			throw new JtaclInternalException("Invalid port operator" +
+					_operator);
 	}
 
 	/**
@@ -81,49 +96,25 @@ public class PortObject {
 	 */
 	public PortObject(String operator, int firstPort, int lastPort) {
 		_operator = operator;
-		_firstPort = firstPort;
-		_lastPort = lastPort;
+
+		if (_operator.equals(RANGE))
+			_portSpec = new PortSpec(PortOperator.RANGE, firstPort,
+					lastPort);
+
+		if (_portSpec == null)
+			throw new JtaclInternalException("Invalid port operator" +
+					_operator);
+
 	}
 
 	/**
-	 * Checks if this {@link PortObject} matches the port in argument.
-	 * @param port port to check.
-	 * @return true if this {@link PortObject} matches the port in argument.
+	 * Checks if this {@link PortObject} matches the {@link PortSpec} in argument.
+	 * @param port port spec to check.
+	 * @return the {@link MatchResult} between the portSpec in argument and
+	 * this port object.
 	 */
-	public boolean matches(int port) {
-		if (_operator.equals(EQ)) {
-			return port == _firstPort;
-		}
-		if (_operator.equals(NEQ)) {
-			return port != _firstPort;
-		}
-		if (_operator.equals(LT)) {
-			return port < _firstPort;
-		}
-		if (_operator.equals(GT)) {
-			return port > _firstPort;
-		}
-		if (_operator.equals(RANGE)) {
-			return port >= _firstPort && port <= _lastPort;
-		}
-		return false;
-	}
-
-	/**
-	 * Returns the first port of this port object.
-	 * @return the first port of this port object.
-	 */
-	public int getFirstPort() {
-		return _firstPort;
-	}
-
-	/**
-	 * Returns the last port of this port object.
-	 * Valid if operator == RANGE
-	 * @return the last port of this port object.
-	 */
-	public int getLastPort() {
-		return _lastPort;
+	public MatchResult matches(PortSpec port) {
+		return port.matches(_portSpec);
 	}
 
 	/**
@@ -132,6 +123,14 @@ public class PortObject {
 	 */
 	public String getOperator() {
 		return _operator;
+	}
+
+	/**
+	 * Returns the {@link PortSpec} associated to this port object
+	 * @return
+	 */
+	public PortSpec getPortSpec() {
+		return _portSpec;
 	}
 
 }

@@ -13,7 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import java.util.List;
 
 /**
@@ -67,21 +68,23 @@ public class EnhancedServiceObjectGroupItem extends ObjectGroupItem {
 		return ProtocolComparator.matches(protocols, _serviceObject.getProtocol());
 	}
 
+
 	/**
-	 * Checks if this item matches the protocols and the service value in argument.
+	 * Checks if at least one item of this group matches the service
+	 *  in argument and if this group matches the protocol sin argument.
 	 * @param protocols protocols value to check.
-	 * @param service service value to check.
-	 * @return true if this item matches any of the protocols and the service
-	 * value in argument.
+	 * @param port {@link PortSpec} port spec value to check.
+	 * @return a {@link MatchResult} between this group and the port spec in
+	 * argument.
 	 */
-	public boolean matches(List<Integer> protocols, int service) {
+	public MatchResult matches(List<Integer> protocols, PortSpec port) {
 		PortObject pobject = _serviceObject.getPortObject();
 
 		if (!ProtocolComparator.matches(protocols, _serviceObject.getProtocol()))
-			return false;
+			return MatchResult.NOT;
 		if (pobject != null)
-			return (pobject.matches(service));
-		return false;
+			return (pobject.matches(port));
+		return MatchResult.NOT;
 	}
 
 }

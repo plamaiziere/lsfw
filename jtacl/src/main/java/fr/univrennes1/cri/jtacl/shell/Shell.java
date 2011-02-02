@@ -39,6 +39,8 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.io.BufferedReader;
@@ -605,15 +607,16 @@ public class Shell {
 						System.out.println("unknown service: " + sprotoSource);
 						return false;
 					}
-					request.setSourcePort(protoSource);
+					request.setSourcePort(new PortSpec(PortOperator.EQ, protoSource));
 				}
+
 				if (sprotoDest != null) {
 					protoDest = ipServices.serviceLookup(sprotoDest, sprotocol);
 					if (protoDest.intValue() == -1) {
 						System.out.println("unknown service: " + sprotoDest);
 						return false;
 					}
-					request.setDestinationPort(protoDest);
+					request.setDestinationPort(new PortSpec(PortOperator.EQ, protoDest));
 				}
 
 				/*

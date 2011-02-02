@@ -13,6 +13,9 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+
 /**
  * An item of a service object group.
  *
@@ -56,12 +59,12 @@ public class ServiceObjectGroupItem extends ObjectGroupItem {
 	}
 
 	/**
-	 * Checks if this item matches the service in argument.
-	 * @param service service value to check.
-	 * @return true if this item matches the service value in argument.
+	 * Checks if this item matches the port spec in argument.
+	 * @param port {@link PortSpec} value to check.
+	 * @return the {@link MatchResult} between this instance and the port spec.
 	 */
-	public boolean matches(int service) {
-		return _portObject.matches(service);
+	public MatchResult matches(PortSpec port) {
+		return _portObject.matches(port);
 	}	
 
 

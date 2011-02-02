@@ -32,6 +32,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -1023,29 +1024,37 @@ public class CiscoRouter extends GenericEquipment {
 	/*
 	 * check source service
 	 */
-	Integer reqSourcePort = request.getSourcePort();
+	PortSpec reqSourcePort = request.getSourcePort();
 	PortObject aceSrcPort = ace.getSourcePortObject();
+	MatchResult mSourcePort = MatchResult.ALL;
 
 	if (reqSourcePort != null) {
 		/*
 		 * port object
 		 */
-		if (aceSrcPort != null && !aceSrcPort.matches(reqSourcePort))
-			return MatchResult.NOT;
+		if (aceSrcPort != null) {
+			mSourcePort = aceSrcPort.matches(reqSourcePort);
+			if (mSourcePort == MatchResult.NOT)
+				return MatchResult.NOT;
+		}
 	}
 
 	/*
 	 * check destination service
 	 */
-	Integer reqDestPort = request.getDestinationPort();
+	PortSpec reqDestPort = request.getDestinationPort();
 	PortObject aceDestPort = ace.getDestPortObject();
+	MatchResult mDestPort = MatchResult.NOT;
 
 	if (reqDestPort != null) {
 		/*
 		 * port object
 		 */
-		if (aceDestPort != null && !aceDestPort.matches(reqDestPort))
-			return MatchResult.NOT;
+		if (aceDestPort != null) {
+			mDestPort = aceDestPort.matches(reqDestPort);
+			if (mDestPort == MatchResult.NOT)
+				return MatchResult.NOT;
+		}
 	}
 
 	/*
@@ -1087,7 +1096,8 @@ public class CiscoRouter extends GenericEquipment {
 			return MatchResult.NOT;
 	}
 
-	if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL)
+	if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
+			mSourcePort == MatchResult.ALL && mDestPort == MatchResult.ALL)
 		return MatchResult.ALL;
 
 	return MatchResult.MATCH;

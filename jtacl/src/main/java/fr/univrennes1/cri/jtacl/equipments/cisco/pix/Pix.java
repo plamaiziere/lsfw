@@ -30,6 +30,7 @@ import fr.univrennes1.cri.jtacl.equipments.Generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -1291,43 +1292,57 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * check source service
 		 */
-		Integer reqSourcePort = request.getSourcePort();
+		PortSpec reqSourcePort = request.getSourcePort();
 		PortObject aclSrcPort = acl.getSourcePortObject();
 		ServiceObjectGroup aclSrcServiceGroup = acl.getSourceServiceGroup();
+		MatchResult mSourcePort = MatchResult.ALL;
 
 		if (reqSourcePort != null) {
 			/*
 			 * port object
 			 */
-			if (aclSrcPort != null && !aclSrcPort.matches(reqSourcePort))
-				return MatchResult.NOT;
+			if (aclSrcPort != null) {
+				mSourcePort = aclSrcPort.matches(reqSourcePort);
+				if (mSourcePort == MatchResult.NOT)
+					return MatchResult.NOT;
+			}
+
 			/*
 			 * service group
 			 */
-			if (aclSrcServiceGroup != null &&
-					!aclSrcServiceGroup.matches(aclProto, reqSourcePort))
-				return MatchResult.NOT;
+			if (aclSrcServiceGroup != null) {
+				mSourcePort = aclSrcServiceGroup.matches(aclProto, reqSourcePort);
+				if (mSourcePort == MatchResult.NOT)
+					return MatchResult.NOT;
+			}
 		}
 
 		/*
 		 * check destination service
 		 */
-		Integer reqDestPort = request.getDestinationPort();
+		PortSpec reqDestPort = request.getDestinationPort();
 		PortObject aclDestPort = acl.getDestPortObject();
 		ServiceObjectGroup aclDestServiceGroup = acl.getDestServiceGroup();
+		MatchResult mDestPort = MatchResult.ALL;
 
 		if (reqDestPort != null) {
 			/*
 			 * port object
 			 */
-			if (aclDestPort != null && !aclDestPort.matches(reqDestPort))
-				return MatchResult.NOT;
+			if (aclDestPort != null) {
+				mDestPort = aclDestPort.matches(reqDestPort);
+				if (mDestPort == MatchResult.NOT)
+					return MatchResult.NOT;
+			}
+
 			/*
 			 * service group
 			 */
-			if (aclDestServiceGroup != null &&
-					!aclDestServiceGroup.matches(aclProto, reqDestPort))
-				return MatchResult.NOT;
+			if (aclDestServiceGroup != null) {
+				mDestPort = aclDestServiceGroup.matches(aclProto, reqDestPort);
+				if (mDestPort == MatchResult.NOT)
+					return MatchResult.NOT;
+			}
 		}
 
 		/*
@@ -1358,16 +1373,23 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 * enhanced service group.
 		 */
 		EnhancedServiceObjectGroup egroup = acl.getEnhancedDestServiceGroup();
+		MatchResult mEnhancedService = MatchResult.ALL;
+
 		if (egroup != null) {
-			if (reqProto != null &&
-					reqDestPort != null &&
-					!egroup.matches(reqProto, reqDestPort))
-				return MatchResult.NOT;
+			if (reqProto != null && reqDestPort != null) {
+				mEnhancedService = egroup.matches(reqProto, reqDestPort);
+				if (mEnhancedService == MatchResult.NOT)
+					return MatchResult.NOT;
+			}
 			if (reqProto != null && !egroup.matches(reqProto))
 					return MatchResult.NOT;
 		}
 
-		if (mIpSource == MatchResult.MATCH || mIpDest == MatchResult.MATCH)
+		if (mIpSource == MatchResult.MATCH ||
+				mIpDest == MatchResult.MATCH ||
+				mSourcePort == MatchResult.MATCH ||
+				mDestPort == MatchResult.MATCH ||
+				mEnhancedService == MatchResult.MATCH)
 			return MatchResult.MATCH;
 
 		return MatchResult.ALL;

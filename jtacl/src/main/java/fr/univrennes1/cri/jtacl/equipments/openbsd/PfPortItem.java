@@ -13,6 +13,11 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
+import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+
 /**
  * Describes a Port Item.
  *
@@ -71,14 +76,9 @@ public class PfPortItem {
 	protected String _operator;
 
 	/**
-	 * first port
+	 * port spec associated to this item
 	 */
-	protected int _firstPort;
-
-	/**
-	 * last port (operator range)
-	 */
-	protected int _lastPort;
+	protected PortSpec _portSpec;
 
 	/**
 	 * Constructs a new {@link PfPortItem} instance using an operator
@@ -88,8 +88,28 @@ public class PfPortItem {
 	 */
 	public PfPortItem(String operator, int port) {
 		_operator = operator;
-		_firstPort = port;
-		_lastPort = -1;
+
+		if (_operator.equals(EQ))
+			_portSpec = new PortSpec(PortOperator.EQ, port);
+
+		if (_operator.equals(NEQ))
+			_portSpec = new PortSpec(PortOperator.NEQ, port);
+
+		if (_operator.equals(LT))
+			_portSpec = new PortSpec(PortOperator.LT, port);
+
+		if (_operator.equals(LTE))
+			_portSpec = new PortSpec(PortOperator.LTE, port);
+
+		if (_operator.equals(GT))
+			_portSpec = new PortSpec(PortOperator.GT, port);
+
+		if (_operator.equals(GTE))
+			_portSpec = new PortSpec(PortOperator.GTE, port);
+
+		if (_portSpec == null)
+			throw new JtaclInternalException("Invalid port operator" +
+					_operator);
 	}
 
 	/**
@@ -101,49 +121,34 @@ public class PfPortItem {
 	 */
 	public PfPortItem(String operator, int firstPort, int lastPort) {
 		_operator = operator;
-		_firstPort = firstPort;
-		_lastPort = lastPort;
+
+		if (_operator.equals(RANGE))
+			_portSpec = new PortSpec(PortOperator.RANGE, firstPort, lastPort);
+
+		if (_operator.equals(RANGEEX))
+			_portSpec = new PortSpec(PortOperator.RANGEEX, firstPort, lastPort);
+
+		if (_operator.equals(EXCEPT))
+			_portSpec = new PortSpec(PortOperator.EXCLUDE, firstPort, lastPort);
+
+		if (_portSpec == null)
+			throw new JtaclInternalException("Invalid port operator" +
+					_operator);
 	}
 
 	/**
 	 * Checks if this {@link PfPortItem} matches the port in argument.
 	 * @param port port to check.
-	 * @return true if this {@link PfPortItem} matches the port in argument.
+	 * @return a {@link MatchResult} between the port spec in argument and this
+	 * item.
 	 */
-	public boolean matches(int port) {
-		if (_operator.equals(EQ)) {
-			return port == _firstPort;
-		}
-		if (_operator.equals(NEQ)) {
-			return port != _firstPort;
-		}
-		if (_operator.equals(LT)) {
-			return port < _firstPort;
-		}
-		if (_operator.equals(LTE)) {
-			return port <= _firstPort;
-		}
-		if (_operator.equals(GT)) {
-			return port > _firstPort;
-		}
-		if (_operator.equals(GTE)) {
-			return port >= _firstPort;
-		}
-		if (_operator.equals(RANGE)) {
-			return port >= _firstPort && port <= _lastPort;
-		}
-		if (_operator.equals(RANGEEX)) {
-			return port > _firstPort && port < _lastPort;
-		}
-		if (_operator.equals(EXCEPT)) {
-			return !(port >= _firstPort && port <= _lastPort);
-		}
-		return false;
+	public MatchResult matches(PortSpec port) {
+		return port.matches(_portSpec);
 	}
 
 	@Override
 	public String toString() {
-		return _firstPort + _operator + _lastPort;
+		return _portSpec.toString();
 	}
 
 
