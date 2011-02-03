@@ -147,6 +147,10 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
+	/*
+	 * (topology | t) [connected | !connected] [atom]
+	 *
+	 */
 	Rule CommandTopology() {
 		return Sequence(
 					FirstOf(
@@ -190,6 +194,9 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
+	/*
+	 * route [atom]
+	 */
 	Rule CommandRoute() {
 		return Sequence(
 					IgnoreCase("route"),
@@ -214,6 +221,9 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
+	/*
+	 * (option | o) [identifier [= atom]]
+	 */
 	Rule CommandOption() {
 		return Sequence(
 				FirstOf(
@@ -256,6 +266,10 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
+	/*
+	 * (define | d) [identifier [ = string]]
+	 *
+	 */
 	Rule CommandDefine() {
 		return Sequence(
 				FirstOf(
@@ -298,7 +312,9 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
-
+	/*
+	 * help [atom]
+	 */
 	Rule CommandHelp() {
 		return Sequence(
 					IgnoreCase("help"),
@@ -338,6 +354,9 @@ public class ShellParser extends CommonRules<Object> {
 		return AnyOf("=,:");
 	}
 
+	/*
+	 * (equipment | eq) atom string
+	 */
 	Rule CommandEquipment() {
 		return Sequence(
 			FirstOf(
@@ -364,6 +383,9 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
+	/*
+	 * reload [atom]
+	 */
 	Rule CommandReload() {
 		return Sequence(
 			IgnoreCase("reload"),
@@ -389,6 +411,10 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
+	/*
+	 * (probe | p | probe6 | p6) [ProbeExpect] [OnEquipment]
+	 *		SourceSpec DestSpec [ProtoSpec]
+	 */
 	Rule CommandProbe() {
 		return Sequence(
 				new Action() {
@@ -456,6 +482,9 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
+	/*
+	 * expect atom
+	 */
 	Rule ProbeExpect() {
 		return Sequence(
 					IgnoreCase("expect"),
@@ -471,6 +500,9 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
+	/*
+	 * on atom
+	 */
 	Rule OnEquipments() {
 		return Sequence(
 			IgnoreCase("on"),
@@ -494,6 +526,10 @@ public class ShellParser extends CommonRules<Object> {
 		return StringAtom();
 	}
 
+	/*
+	 * ( (udp | tcp) [TcpUdpSpec] [TcpFlagsSpec] )
+	 *   | (atom [Identifier])
+	 */
 	Rule ProtoSpecification() {
 		return
 			FirstOf(
@@ -545,6 +581,9 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
+	/*
+	 * ([Identifier]:[Identifier]) | Identifier
+	 */
 	Rule TcpUdpSpecification() {
 		return
 			FirstOf(
@@ -585,6 +624,9 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
+	/*
+	 * flags TcpFlagsSpec+
+	 */
 	Rule TcpFlagsSpec() {
 		return
 			Sequence(
@@ -605,6 +647,9 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
+	/*
+	 * atom
+	 */
 	Rule TcpFlagSpec() {
 		return
 			Sequence(

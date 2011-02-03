@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import static java.util.Arrays.* ;
 import java.util.Collections;
 import java.util.List;
@@ -81,6 +82,9 @@ public class Shell {
 	static public final int EXIT_SUCCESS = 0;
 	static public final int EXIT_FAILURE = 1;
 	static public final int EXIT_ERROR = 255;
+
+	static protected final List<String> _specialPorts = Arrays.asList(
+		"none", "any", "dyn", "priv");
 
 	/**
 	 * Returns all the {@link IfaceLink} links matching an 'equipment specification'
@@ -230,6 +234,22 @@ public class Shell {
 			r = r.replace("$" + s, _monitor.getDefines().get(s));
 		}
 		return r;
+	}
+
+	protected PortSpec portToPortSpec(String port) {
+		if (port.equalsIgnoreCase("none"))
+			return new PortSpec(PortOperator.NONE);
+
+		if (port.equalsIgnoreCase("any"))
+			return new PortSpec(PortOperator.ANY);
+
+		if (port.equalsIgnoreCase("dyn"))
+			return new PortSpec(PortOperator.GTE, 1024);
+
+		if (port.equalsIgnoreCase("priv"))
+			return new PortSpec(PortOperator.LT, 1024);
+
+		return null;
 	}
 
 
@@ -602,27 +622,33 @@ public class Shell {
 				 * services lookup
 				 */
 				if (sprotoSource != null) {
-					if (!sprotoSource.equalsIgnoreCase("none")) {
+					String port = sprotoSource.toLowerCase();
+					if (!_specialPorts.contains(port)) {
 						protoSource = ipServices.serviceLookup(sprotoSource, sprotocol);
 						if (protoSource.intValue() == -1) {
 							System.out.println("unknown service: " + sprotoSource);
 							return false;
 						}
 						request.setSourcePort(new PortSpec(PortOperator.EQ, protoSource));
-					} else
-						request.setSourcePort(new PortSpec(PortOperator.NONE));
+					} else {
+						PortSpec pSpec = portToPortSpec(port);
+						request.setSourcePort(pSpec);
+					}
 				}
 
 				if (sprotoDest != null) {
-					if (!sprotoDest.equalsIgnoreCase("none")) {
+					String port = sprotoDest.toLowerCase();
+					if (!_specialPorts.contains(port)) {
 						protoDest = ipServices.serviceLookup(sprotoDest, sprotocol);
 						if (protoDest.intValue() == -1) {
 							System.out.println("unknown service: " + sprotoDest);
 							return false;
 						}
 						request.setDestinationPort(new PortSpec(PortOperator.EQ, protoDest));
-					} else
-						request.setDestinationPort(new PortSpec(PortOperator.NONE));
+					} else {
+						PortSpec pSpec = portToPortSpec(port);
+						request.setDestinationPort(pSpec);
+					}
 				}
 
 				/*
