@@ -72,12 +72,12 @@ public class PortSpec {
 					_ranges.add(new PortRange(0, port - 1));
 
 				if (port < PortRange.MAX)
-					_ranges.add(new PortRange(port - 1, PortRange.MAX));
+					_ranges.add(new PortRange(port + 1, PortRange.MAX));
 				break;
 
 			case LT:
 				if (port > 0)
-					_ranges.add(new PortRange(0, port -1));
+					_ranges.add(new PortRange(0, port - 1));
 
 				break;
 
@@ -141,8 +141,15 @@ public class PortSpec {
 
 	/**
 	 * Checks if this instance matches the port spec in argument.
+	 * <ul>
+	 * <li>Returns MatchResult.ALL if at least one range of this PortSpec includes
+	 * one range of the PortSpec in argument.</li>
+	 * <li>Returns MatchResult.MATCH if at least one range of this PortSpec overlaps
+	 * one range of the PortSpec in argument.</li>
+	 * <li>Returns MachResult.NOT otherwise.</li>
+	 * </ul>
 	 * @param port port spec to check.
-	 * @return true if this instance matches the port in argument.
+	 * @return The match result between this instance and the PortSpec in argument.
 	 */
 	public MatchResult matches(PortSpec portSpec) {
 
@@ -152,31 +159,44 @@ public class PortSpec {
 		if (_operator == PortOperator.ANY)
 			return MatchResult.ALL;
 
+		int all = 0;
 		int match = 0;
-		int overlaps = 0;
 		for (PortRange rangeSelf: _ranges) {
 				int firstSelf = rangeSelf.getFirstPort();
 				int lastSelf = rangeSelf.getLastPort();
+				int lastAll = 0;
+				int lastMatch = 0;
+
 			for (PortRange range: portSpec.getRanges()) {
 				int first = range.getFirstPort();
 				int last = range.getLastPort();
 
-				if (firstSelf >= first && firstSelf <= last &&
-						lastSelf >= first && lastSelf <= last) {
-					match++;
+				/*
+				 * all: this PortSpec include the other PortSpec:
+				 */
+				if (firstSelf <= first && lastSelf >= last) {
+					lastAll++;
 				} else {
+					/*
+					 * else matches if there is an overlap.
+					 */
 					if ((firstSelf >= first && firstSelf <= last) ||
-							(lastSelf >= first && lastSelf <= last)) {
-						overlaps++;
+							(lastSelf >= first && lastSelf <= last) ||
+							(first >= firstSelf && first <= lastSelf) ||
+							(last >= firstSelf && last <= lastSelf)) {
+						lastMatch++;
 					}
 				}
 			}
+			if (lastAll > 0)
+				all++;
+			match += lastMatch;
 		}
 
-		if (match == _ranges.size())
+		if (all == _ranges.size())
 			return MatchResult.ALL;
 
-		if (overlaps > 0)
+		if (match > 0)
 			return MatchResult.MATCH;
 
 		return MatchResult.NOT;

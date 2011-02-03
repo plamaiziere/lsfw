@@ -67,11 +67,11 @@ public class PortSpecTest extends TestCase {
 
 		p1 = new PortSpec(PortOperator.NEQ, 1000);
 		p2 = new PortSpec(PortOperator.RANGE, 1000, 1001);
-		assertEquals(p1.matches(p2), MatchResult.NOT);
+		assertEquals(p1.matches(p2), MatchResult.MATCH);
 
 		p1 = new PortSpec(PortOperator.NEQ, 1000);
 		p2 = new PortSpec(PortOperator.EXCLUDE, 500, 1001);
-		assertEquals(p1.matches(p2), MatchResult.MATCH);
+		assertEquals(p1.matches(p2), MatchResult.ALL);
 
 		p1 = new PortSpec(PortOperator.RANGE, 500, 1001);
 		p2 = new PortSpec(PortOperator.RANGE, 500, 1001);
@@ -79,11 +79,11 @@ public class PortSpecTest extends TestCase {
 
 		p1 = new PortSpec(PortOperator.RANGE, 500, 1001);
 		p2 = new PortSpec(PortOperator.RANGE, 600, 1001);
-		assertEquals(p1.matches(p2), MatchResult.MATCH);
+		assertEquals(p1.matches(p2), MatchResult.ALL);
 
 		p1 = new PortSpec(PortOperator.RANGE, 500, 1001);
 		p2 = new PortSpec(PortOperator.RANGE, 500, 700);
-		assertEquals(p1.matches(p2), MatchResult.MATCH);
+		assertEquals(p1.matches(p2), MatchResult.ALL);
 
 		p1 = new PortSpec(PortOperator.RANGE, 500, 1001);
 		p2 = new PortSpec(PortOperator.RANGE, 1, 499);
@@ -111,11 +111,11 @@ public class PortSpecTest extends TestCase {
 
 		p1 = new PortSpec(PortOperator.EXCLUDE, 400, 1001);
 		p2 = new PortSpec(PortOperator.EXCLUDE, 500, 900);
-		assertEquals(p1.matches(p2), MatchResult.ALL);
+		assertEquals(p1.matches(p2), MatchResult.MATCH);
 
 		p1 = new PortSpec(PortOperator.EXCLUDE, 400, 1001);
 		p2 = new PortSpec(PortOperator.EXCLUDE, 300, 1001);
-		assertEquals(p1.matches(p2), MatchResult.MATCH);
+		assertEquals(p1.matches(p2), MatchResult.ALL);
 
 		p1 = new PortSpec(PortOperator.EXCLUDE, 400, 1001);
 		p2 = new PortSpec(PortOperator.RANGE, 400, 1001);
