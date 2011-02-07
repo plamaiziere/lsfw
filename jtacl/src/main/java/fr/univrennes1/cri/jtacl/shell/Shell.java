@@ -40,6 +40,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
@@ -84,7 +85,7 @@ public class Shell {
 	static public final int EXIT_ERROR = 255;
 
 	static protected final List<String> _specialPorts = Arrays.asList(
-		"none", "any", "dyn", "priv");
+		"none", "any", "known", "reg", "dyn");
 
 	/**
 	 * Returns all the {@link IfaceLink} links matching an 'equipment specification'
@@ -243,10 +244,13 @@ public class Shell {
 		if (port.equalsIgnoreCase("any"))
 			return new PortSpec(PortOperator.ANY);
 
-		if (port.equalsIgnoreCase("dyn"))
-			return new PortSpec(PortOperator.GTE, 1024);
+		if (port.equalsIgnoreCase("reg"))
+			return new PortSpec(PortOperator.RANGE, 1024, 49151);
 
-		if (port.equalsIgnoreCase("priv"))
+		if (port.equalsIgnoreCase("dyn"))
+			return new PortSpec(PortOperator.RANGE, 49152, PortRange.MAX);
+
+		if (port.equalsIgnoreCase("known"))
 			return new PortSpec(PortOperator.LT, 1024);
 
 		return null;

@@ -53,14 +53,15 @@ udp/tcp
   If the protocol is udp or tcp, port source and port destination can be specified
 using the form [portsource:][portdest]
 
-  Port can be a number, the name of a service or one of the keyworkds "any,
-  none, dyn, priv". Services are resolved using an internal services database.
+  Port can be a number, the name of a service or one of the keywords "any,
+  none, known, reg, dyn". Services are resolved using an internal services database.
 
   The following keywords can be used instead of a service name:
     none : a "none" port witch never match.
     any  : a "any" port witch always match. This is the default.
-    priv : a priviledgied port between 0..1023.
-    dyn  : a dynamic port between 1024..65535.
+    known: a "well known" port between 0..1023.
+	reg  : a "registered" port between 1024..49151.
+    dyn  : a "dynamic" port between 49152..65535.
 
 tcp
 ---
