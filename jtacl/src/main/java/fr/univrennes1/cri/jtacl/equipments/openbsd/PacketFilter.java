@@ -2017,11 +2017,11 @@ public class PacketFilter extends GenericEquipment {
 	/**
 	 * port filter
 	 */
-	protected MatchResult portspecFilter(PfPortSpec portspec, PortSpec port) {
+	protected MatchResult portspecFilter(PfPortSpec portspec, PortSpec portRequest) {
 
 		if (portspec.isEmpty())
 			return MatchResult.ALL;
-		return portspec.matches(port);
+		return portspec.matches(portRequest);
 	}
 
 	/**

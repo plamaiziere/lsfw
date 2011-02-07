@@ -114,7 +114,7 @@ public class PortObject {
 	 * this port object.
 	 */
 	public MatchResult matches(PortSpec port) {
-		return port.matches(_portSpec);
+		return _portSpec.matches(port);
 	}
 
 	/**
@@ -131,6 +131,11 @@ public class PortObject {
 	 */
 	public PortSpec getPortSpec() {
 		return _portSpec;
+	}
+
+	@Override
+	public String toString() {
+		return _portSpec.toString();
 	}
 
 }

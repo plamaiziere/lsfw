@@ -138,12 +138,12 @@ public class PfPortItem {
 
 	/**
 	 * Checks if this {@link PfPortItem} matches the port in argument.
-	 * @param port port to check.
+	 * @param portRequest port to check.
 	 * @return a {@link MatchResult} between the port spec in argument and this
 	 * item.
 	 */
-	public MatchResult matches(PortSpec port) {
-		return port.matches(_portSpec);
+	public MatchResult matches(PortSpec portRequest) {
+		return _portSpec.matches(portRequest);
 	}
 
 	@Override

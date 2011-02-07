@@ -1209,6 +1209,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		}
 	}
 
+	/*
+	 * Port Filter
+	 */
+	protected MatchResult portFilter(PortObject port, PortSpec portRequest) {
+		return port.matches(portRequest);
+	}
+
 	/**
 	 *
 	 */
@@ -1302,7 +1309,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 * port object
 			 */
 			if (aclSrcPort != null) {
-				mSourcePort = aclSrcPort.matches(reqSourcePort);
+				mSourcePort = portFilter(aclSrcPort, reqSourcePort);
 				if (mSourcePort == MatchResult.NOT)
 					return MatchResult.NOT;
 			}
@@ -1330,7 +1337,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 * port object
 			 */
 			if (aclDestPort != null) {
-				mDestPort = aclDestPort.matches(reqDestPort);
+				mDestPort = portFilter(aclDestPort, reqDestPort);
 				if (mDestPort == MatchResult.NOT)
 					return MatchResult.NOT;
 			}
