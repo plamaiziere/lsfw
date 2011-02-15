@@ -553,6 +553,8 @@ public class Monitor {
 		 */
 		NetworkLink nlink = link.getNetworkLink();
 
+		IfaceLink hostLink = null;
+
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info("network link: " + nlink.toString());
 
@@ -561,15 +563,18 @@ public class Monitor {
 		 * its destination
 		 */
 		if (nextHop.equals(nlink.getNetwork())) {
-			probe.destinationReached("destination reached");
-			return;
+			hostLink = nlink.getIfaceLink(probe.getDestinationAddress());
+			if (hostLink == null) {
+				probe.destinationReached("destination reached");
+				return;
+			}
 		}
 
 		/*
 		 * The "null" network designates all IP address
 		 *
 		 */
-		if (nlink.getNetwork().isNullNetwork()) {
+		if (hostLink == null && nlink.getNetwork().isNullNetwork()) {
 			probe.destinationReached("destination reached");
 			return;
 		}
@@ -578,7 +583,7 @@ public class Monitor {
 		 * Search the next interface link
 		 */
 		IfaceLink nextHopLink = nlink.getIfaceLink(nextHop);
-		if (nextHopLink == null) {
+		if (hostLink == null && nextHopLink == null) {
 			/*
 			 * If the network link is a border, we always accept the probe
 			 * regardeless of the next hop.
@@ -596,7 +601,10 @@ public class Monitor {
 		 * the probe.
 		 */
 		Probe nextProbe = probe.newChild();
-		sendProbe(nextHopLink, nextProbe);
+		if (hostLink == null)
+			sendProbe(nextHopLink, nextProbe);
+		else
+			sendProbe(hostLink, nextProbe);
 	}
 
 	/**
