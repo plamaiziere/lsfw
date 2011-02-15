@@ -60,7 +60,7 @@ using the form [portsource:][portdest]
     none : a "none" port witch never match.
     any  : a "any" port witch always match. This is the default.
     known: a "well known" port between 0..1023.
-	reg  : a "registered" port between 1024..49151.
+    reg  : a "registered" port between 1024..49151.
     dyn  : a "dynamic" port between 49152..65535.
 
 tcp
