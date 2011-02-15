@@ -57,8 +57,8 @@ using the form [portsource:][portdest]
   none, known, reg, dyn". Services are resolved using an internal services database.
 
   The following keywords can be used instead of a service name:
-    none : a "none" port witch never match.
-    any  : a "any" port witch always match. This is the default.
+    none : a "none" port which never match.
+    any  : a "any" port which always match. This is the default.
     known: a "well known" port between 0..1023.
     reg  : a "registered" port between 1024..49151.
     dyn  : a "dynamic" port between 49152..65535.
