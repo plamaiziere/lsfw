@@ -2438,9 +2438,11 @@ public class PfParser extends PfBaseParser {
 				Sequence(
 					SkipSpaces(),
 					Optional(
-						Sequence(
-							Ch('\n'),
-							SkipSpaces()
+						OneOrMore(
+							Sequence(
+								Ch('\n'),
+								SkipSpaces()
+							)
 						)
 					)
 				)
