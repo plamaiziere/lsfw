@@ -2999,6 +2999,23 @@ public class PfParserTest extends TestCase {
 			assertEquals("tabledef", parser.getRuleName());
 		}
 
+		line = "table < TABLE > const counter persist { \n  \n   HOST1\n\n HOST2 \n\n}" ;
+
+		parser.clear();
+		result = ReportingParseRunner.run(parser.Parse(), line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			table = parser.getPfTable();
+			hosts = table.getHosts();
+			assertEquals("TABLE", table.getName());
+			assertEquals("const", table.getOptions().get(0));
+			assertEquals("counter", table.getOptions().get(1));
+			assertEquals("persist", table.getOptions().get(2));
+			assertEquals("HOST1", hosts.get(0).getFirstAddress());
+			assertEquals("HOST2", hosts.get(1).getFirstAddress());
+			assertEquals("tabledef", parser.getRuleName());
+		}
+
 	}
 
 	/**
