@@ -13,6 +13,9 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.SimplifiedRule;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.AclResult;
@@ -225,6 +228,22 @@ public class PacketFilter extends GenericEquipment {
 	 * Current anchor at parsing time
 	 */
 	protected PfAnchor _curAnchor;
+
+	/**
+	 * refence of all tables
+	 */
+	protected List<PfTable> _refTables = new ArrayList<PfTable>();
+
+	/**
+	 * reference of all rules
+	 */
+	protected List<PfRule> _refRules = new ArrayList<PfRule>();
+
+	/**
+	 * IPNet cross references
+	 */
+	protected Map<IPNet, IPNetCrossRef> _netCrossRef =
+			new HashMap<IPNet, IPNetCrossRef>();
 
 	/**
 	 * the next anchor uid that will be generated.
@@ -1155,6 +1174,7 @@ public class PacketFilter extends GenericEquipment {
 		rule.setConfigurationLine(_parseContext.getFileName() + " #" +
 			_parseContext.getLineNumber() + ": ");
 		rule.setText(text);
+		rule.setParseContext(_parseContext);
 		
 		/*
 		 * action
@@ -1384,6 +1404,7 @@ public class PacketFilter extends GenericEquipment {
 		table.setConfigurationLine(_parseContext.getFileName() + " #" +
 			_parseContext.getLineNumber() + ": ");
 		table.setText(text);
+		table.setParseContext(_parseContext);
 
 		/*
 		 * name
@@ -1441,6 +1462,7 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		PfRule pfRule = rulePfRule(anchorTpl.getRule(), true);
 		rule.setPfRule(pfRule);
+		_refRules.add(pfRule);
 
 		/*
 		 * inlined
@@ -1667,6 +1689,7 @@ public class PacketFilter extends GenericEquipment {
 					if (rule.equals("pfrule")) {
 						PfRule pfrule = rulePfRule(parser.getPfRule(), false);
 						_curAnchor.addRule(pfrule);
+						_refRules.add(pfrule);
 					}
 
 					/*
@@ -1690,6 +1713,7 @@ public class PacketFilter extends GenericEquipment {
 							warnConfig("table name <" + name
 								+ "> conflicts with root table");
 						_curAnchor.addTable(pfTable);
+						_refTables.add(pfTable);
 					}
 				}
 			} else {
@@ -1762,6 +1786,54 @@ public class PacketFilter extends GenericEquipment {
 		if (_routesFile != null)
 			loadRoutesFromFile(_routesFile);
 		loadRoutesFromXML(doc);
+	}
+
+
+	protected List<SimplifiedRule> expandPfRule(PfRule rule) {
+
+		ArrayList<SimplifiedRule> srules = new ArrayList<SimplifiedRule>();
+
+		/*
+		 * expand from
+		 */
+		
+
+		return srules;
+	}
+
+	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
+		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+		if (ref == null)
+			ref = new IPNetCrossRef(ipnet);
+		return ref;
+	}
+
+	/**
+	 * Compute IPNet cross references
+	 */
+	protected void IPNetCrossReference() {
+		/*
+		 * tables
+		 */
+		for (PfTable table: _refTables) {
+			for (PfNodeHost nhost : table.getIpspec()) {
+				if (nhost.isAddrMask()) {
+					for (IPNet ip: nhost.getAddr()) {
+						IPNetCrossRef ref = getIPNetCrossRef(ip);
+						CrossRefContext ctx =
+								new CrossRefContext(table.getParseContext(), "table");
+						ref.getContexts().add(ctx);
+					}
+				}
+			}
+		}
+
+		/*
+		 * rules
+		 */
+		for (PfRule rule: _refRules) {
+
+		}
 	}
 
 	@Override

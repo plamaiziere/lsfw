@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
+
 /**
  * Generic rule type.
  * 
@@ -29,6 +31,11 @@ public abstract class PfGenericRule {
 	 * the text corresponding to this rule.
 	 */
 	protected String _text;
+
+	/**
+	 * parse context of this rule.
+	 */
+	protected ParseContext _parseContext;
 	
 	/**
 	 * Returns the line of configuration corresponding to this rule.
@@ -60,6 +67,22 @@ public abstract class PfGenericRule {
 	 */
 	public void setConfigurationLine(String configurationLine) {
 		_configurationLine = configurationLine;
+	}
+
+	/**
+	 * Returns the parse context of this rule.
+	 * @return the parse context of this rule. May be null.
+	 */
+	public ParseContext getParseContext() {
+		return _parseContext;
+	}
+
+	/**
+	 * Sets the parse context of this rule.
+	 * @param parseContext parse context to set. May be null.
+	 */
+	public void setParseContext(ParseContext parseContext) {
+		_parseContext = parseContext;
 	}
 
 }
