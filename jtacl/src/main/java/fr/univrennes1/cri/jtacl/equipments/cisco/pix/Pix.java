@@ -100,11 +100,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	/**
-	 * internal sub shell
-	 */
-	 protected PixShell _shell = new PixShell(this);
-
-	/**
 	 * Configuration file, mapped into strings.
 	 */
 	protected class ConfigurationFile extends StringsList {
