@@ -22,13 +22,19 @@ import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 public class CrossRefContext {
 	protected ParseContext _parseContext;
 	protected String _contextName;
-	protected SimplifiedRule _rule;
+	protected String _comment;
 
-	public CrossRefContext(ParseContext parseContext, String contextName) {
+	public CrossRefContext(ParseContext parseContext, String contextName,
+			String comment) {
 		_parseContext = parseContext;
 		_contextName = contextName;
+		_comment = comment;
 	}
 
+	public String getComment() {
+		return _comment;
+	}
+	
 	public String getContextName() {
 		return _contextName;
 	}
@@ -36,17 +42,5 @@ public class CrossRefContext {
 	public ParseContext getParseContext() {
 		return _parseContext;
 	}
-
-	public SimplifiedRule getRule() {
-		return _rule;
-	}
-
-	public void setRule(SimplifiedRule rule) {
-		_rule = rule;
-	}
-
-
-
-
 
 }
