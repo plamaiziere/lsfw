@@ -185,11 +185,24 @@ public class PfAnchor {
 
 	/**
 	 * Retrieves a table by its name in this anchor
-	 * @param name of the table to retrieve.
+	 * @param name name of the table to retrieve.
 	 * @return the table named 'name'. Null if the table does not no exist.
 	 */
 	public PfTable getTable(String name) {
 		return _tables.get(name);
+	}
+	
+	/**
+	 * Searches the table in argument in this anchor and if not found in the root
+	 * anchor.
+	 * @param name name of the table to retrieve.
+	 * @return the table named 'name'. Null if the table does not no exist.
+	 */
+	public PfTable findTable(String name) {
+		PfTable table = getTable(name);
+		if (table == null && !isRoot())
+			table = _root.getTable(name);
+		return table;
 	}
 
 	/**
