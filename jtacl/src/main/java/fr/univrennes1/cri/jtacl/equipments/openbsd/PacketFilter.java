@@ -15,7 +15,6 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
-import fr.univrennes1.cri.jtacl.analysis.SimplifiedRule;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.AclResult;
@@ -1159,7 +1158,7 @@ public class PacketFilter extends GenericEquipment {
 
 		return parseIpSpec(parser.getPfTable().getHosts());
 	}
-
+	
 	/*
 	 * PF filtering rule
 	 */
@@ -1369,7 +1368,7 @@ public class PacketFilter extends GenericEquipment {
 			rule.setFlags(tcpFlags);
 			rule.setFlagset(tcpFlagsSet);
 		}
-
+		
 		if (Log.debug().isLoggable(Level.INFO)) {
 			String s = "pfrule: " +
 					rule.getAction() + " " + rule.getDirection() + " af=" +
@@ -1634,6 +1633,7 @@ public class PacketFilter extends GenericEquipment {
 				 */
 				if (rule.equals("anchorrule")) {
 					PfAnchorRule anchorRule = ruleAnchor(parser.getPfAnchor());
+					anchorRule.setOwnerAnchor(_curAnchor);
 					_curAnchor.addRule(anchorRule);
 					/*
 					 * find or create the anchor
@@ -1689,6 +1689,7 @@ public class PacketFilter extends GenericEquipment {
 					if (rule.equals("pfrule")) {
 						PfRule pfrule = rulePfRule(parser.getPfRule(), false);
 						_curAnchor.addRule(pfrule);
+						pfrule.setOwnerAnchor(_curAnchor);
 						_refRules.add(pfrule);
 					}
 
@@ -1786,53 +1787,74 @@ public class PacketFilter extends GenericEquipment {
 		if (_routesFile != null)
 			loadRoutesFromFile(_routesFile);
 		loadRoutesFromXML(doc);
-	}
-
-
-	protected List<SimplifiedRule> expandPfRule(PfRule rule) {
-
-		ArrayList<SimplifiedRule> srules = new ArrayList<SimplifiedRule>();
-
 		/*
-		 * expand from
+		 * compute cross reference
 		 */
-		
-
-		return srules;
+		ipNetCrossReference();
 	}
+
 
 	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
 		IPNetCrossRef ref = _netCrossRef.get(ipnet);
-		if (ref == null)
+		if (ref == null) {
 			ref = new IPNetCrossRef(ipnet);
+			_netCrossRef.put(ipnet, ref);
+		}
 		return ref;
+	}
+	
+	/*
+	 * Cross reference for ipspec
+	 */
+	protected void crossRefIpSpec(PfAnchor anchor, PfIpSpec ipspec, CrossRefContext refContext) {		
+		for (PfNodeHost nodeHost: ipspec) {
+			if (nodeHost.isAddrMask()) {
+				for (IPNet ip: nodeHost.getAddr()) {
+					IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+					ipNetRef.getContexts().add(refContext);
+				}
+			}
+			if (nodeHost.isAddrTable()) {
+				PfTable table = anchor.findTable(nodeHost.getTblName());
+				if (table != null)
+					crossRefIpSpec(anchor, table.getIpspec(), refContext);
+			}
+		}
+	}
+	
+	/*
+	 * Cross reference for a rule
+	 */
+	protected void crossRefRule(PfRule rule) {
+		CrossRefContext refContext = new CrossRefContext(_parseContext, "rule",
+				rule.getAction());
+
+		if (rule.getFromIpSpec() != null)
+			crossRefIpSpec(rule.getOwnerAnchor(), rule.getFromIpSpec(), refContext);
+		
+		if (rule.getToIpSpec() != null)
+			crossRefIpSpec(rule.getOwnerAnchor(), rule.getToIpSpec(), refContext);
+
 	}
 
 	/**
 	 * Compute IPNet cross references
 	 */
-	protected void IPNetCrossReference() {
+	protected void ipNetCrossReference() {
 		/*
 		 * tables
 		 */
 		for (PfTable table: _refTables) {
-			for (PfNodeHost nhost : table.getIpspec()) {
-				if (nhost.isAddrMask()) {
-					for (IPNet ip: nhost.getAddr()) {
-						IPNetCrossRef ref = getIPNetCrossRef(ip);
-						CrossRefContext ctx =
-								new CrossRefContext(table.getParseContext(), "table");
-						ref.getContexts().add(ctx);
-					}
-				}
-			}
+			CrossRefContext refContext = new CrossRefContext(table.getParseContext(),
+				"table", table.getName());
+			crossRefIpSpec(table.getOwnerAnchor(), table.getIpspec(), refContext);
 		}
 
 		/*
 		 * rules
 		 */
 		for (PfRule rule: _refRules) {
-
+			crossRefRule(rule);
 		}
 	}
 
@@ -2017,14 +2039,8 @@ public class PacketFilter extends GenericEquipment {
 		 * table
 		 */
 		if (host.isAddrTable()) {
-			/*
-			 * use the current anchor first, then default to the root anchor.
-			 */
 			String name = host.getTblName();
-			PfTable table = context.getAnchor().getTable(name);
-			if (table == null) {
-				table = _rootAnchor.getTable(name);
-			}
+			PfTable table = context.getAnchor().findTable(name);
 			/*
 			 * table not found.
 			 */
