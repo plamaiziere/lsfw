@@ -316,6 +316,10 @@ public class PacketFilter extends GenericEquipment {
 		return icmp;
 	}
 
+	public Map<IPNet, IPNetCrossRef> getNetCrossRef() {
+		return _netCrossRef;
+	}
+
 	/**
 	 * Create a new {@link PacketFilter} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -327,6 +331,8 @@ public class PacketFilter extends GenericEquipment {
 			String configurationFileName) {
 
 		super(monitor, name, comment, configurationFileName);
+		PacketFilterShell shell = new PacketFilterShell(this);
+		registerShell(shell);
 		_rootAnchor = PfAnchor.newRootAnchor();
 	}
 
@@ -1558,10 +1564,10 @@ public class PacketFilter extends GenericEquipment {
 		int inlinedAnchor = 0;
 
 		while (buffer.length() > 0) {
-
 			/*
 			 * get the rule.
 			 */
+			_parseContext = new ParseContext();
 			ExpandedRule exRule = null;
 			try {
 				exRule = parser.getRule(buffer, macros);
