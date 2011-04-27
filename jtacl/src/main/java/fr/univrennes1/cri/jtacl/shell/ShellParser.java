@@ -148,7 +148,7 @@ public class ShellParser extends CommonRules<Object> {
 	}
 
 	/*
-	 * (topology | t) [connected | !connected] [atom]
+	 * (topology | t) [connected | !connected] [atom]
 	 *
 	 */
 	Rule CommandTopology() {

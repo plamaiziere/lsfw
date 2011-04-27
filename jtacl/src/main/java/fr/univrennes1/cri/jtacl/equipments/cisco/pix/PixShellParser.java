@@ -72,7 +72,7 @@ public class PixShellParser extends CommonRules<Object> {
 	}
 
 	/**
-	 * show (names ¡ enhanced-service | icmp-group | network-group | protocol-group
+	 * show (names | enhanced-service | icmp-group | network-group | protocol-group
 	 * | service-group) | (used | unused)
 	 */
 	Rule CommandShow() {
