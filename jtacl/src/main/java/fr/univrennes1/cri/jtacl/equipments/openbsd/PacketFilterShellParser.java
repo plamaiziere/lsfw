@@ -28,10 +28,16 @@ public class PacketFilterShellParser extends CommonRules<Object> {
 
 	protected String _command = "";
 	protected List<String> _param = null;
+	protected String _xrefObject = null;
+	protected String _xrefFormat = null;
+	protected String _xrefIp = null;
 
 	public void clear() {
 		_command = "";
 		_param = new ArrayList<String>();
+		_xrefObject = null;
+		_xrefFormat = null;
+		_xrefIp = null;
 	}
 
 	public String getCommand() {
@@ -40,6 +46,18 @@ public class PacketFilterShellParser extends CommonRules<Object> {
 
 	public List<String> getParam() {
 		return _param;
+	}
+
+	public String getXrefObject() {
+		return _xrefObject;
+	}
+
+	public String getXrefFormat() {
+		return _xrefFormat;
+	}
+
+	public String getXrefIp() {
+		return _xrefIp;
 	}
 
 	Rule CommandLine() {
@@ -72,7 +90,7 @@ public class PacketFilterShellParser extends CommonRules<Object> {
 	}
 
 	/**
-	 * xref [ip]
+	 * xref [ip] [long|short] [addresse]
 	 */
 	Rule CommandXref() {
 		return Sequence(
@@ -83,17 +101,32 @@ public class PacketFilterShellParser extends CommonRules<Object> {
 					IgnoreCase("ip"),
 					new Action() {
 						public boolean run(Context context) {
-							_param.add(context.getMatch().toLowerCase());
+							_xrefObject = "ip";
 							return true;
 						}
 					},
 					Optional(
 						Sequence(
 							WhiteSpaces(),
+							FirstOf(
+								IgnoreCase("long"),
+								IgnoreCase("short")
+							),
+							new Action() {
+								public boolean run(Context context) {
+								_xrefFormat = context.getMatch().toLowerCase();
+								return true;
+								}
+							}
+						)
+					),
+					Optional(
+						Sequence(
+							WhiteSpaces(),
 							StringAtom(),
 							new Action() {
 								public boolean run(Context context) {
-									_param.add(context.getMatch());
+									_xrefIp = context.getMatch();
 									return true;
 								}
 							}

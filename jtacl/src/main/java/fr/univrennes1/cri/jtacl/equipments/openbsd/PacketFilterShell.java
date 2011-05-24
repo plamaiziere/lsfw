@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
@@ -61,10 +62,28 @@ public class PacketFilterShell implements GenericEquipmentShell {
 
 		for (IPNet ip: _pf.getNetCrossRef().keySet()) {
 			IPNetCrossRef crossref = _pf.getNetCrossRef().get(ip);
-			System.out.println(ip);
 			for (CrossRefContext ctx: crossref.getContexts()) {
-				System.out.println(ctx.getContextName());
-				System.out.println(ctx.getParseContext().getLine());
+				System.out.print(ip);
+				System.out.print("; " + ctx.getContextName());
+				System.out.print("; " + ctx.getComment());
+				String format = parser.getXrefFormat();
+				if (format != null) {
+					System.out.print("; ");
+					if (format.equals("short")) {
+						String line = ctx.getParseContext().getLine();
+						Scanner sc = new Scanner(line);
+						if (sc.hasNextLine())
+							System.out.println(sc.nextLine());
+						else
+							System.out.println(line);
+					}
+					if (format.equals("long")) {
+						String line = ctx.getParseContext().getLine();
+						System.out.println(line);
+					}
+				} else {
+					System.out.println();
+				}
 			}
 		}
 	}
