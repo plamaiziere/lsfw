@@ -58,4 +58,8 @@ public class ParseContext {
 		return "File: " + _fileName + " line#: " + _lineNumber +
 			" "  + _line.trim() + " : ";
 	}
+
+	public String getFileNameAndLine() {
+		return _fileName + " #" + _lineNumber;
+	}
 }
