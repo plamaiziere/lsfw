@@ -129,6 +129,8 @@ public class IPNetTest extends TestCase {
 		{"1",				"16777216",		"32", "4"},
 		{"255",				"4278190080",	"32", "4"},
 		{"256",				"256",			"32", "4"},
+		// we assume localhost resolves to 127.0.0.1
+		{"@localhost",		"2130706433",	"32", "4"},
 		};
 		testDataNetipOk(dtaddrv4);
 
@@ -166,6 +168,8 @@ public class IPNetTest extends TestCase {
 		{"1:2:3:4:5:6::", "5192455318486707404433266432802816", "128", "6"},
 		{"0:0:0:0:0:0:13.1.68.3", "218186755", "128", "6"},
 		{"::13.1.68.3",	"218186755", "128", "6"},
+		// we assume localhost resolves to ::1
+		{"@@localhost",	"1",	"128", "6"},
 		};
 		testDataNetipOk(dtaddrv6);
 

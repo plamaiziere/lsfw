@@ -439,12 +439,40 @@ public class IPNet implements Comparable {
 	 * is used as the address of the {@link IPNet} ip and the second is used
 	 * to compute the prefixlen. This is only supported for IPv4.<br/>
 	 *			ex: IPNet("0.0.0.0-255.255.255.255)
-	 * </li></ul>
+	 * </li>
+	 * <li>
+	 * Name resolution<br/>
+	 *   A data string starting with '@' or '@@' specifies a host name to
+	 *   resolve using dns. The number of '@' characters specifies the address
+	 *   family to use (IPv4 or IPv6). <br/>
+	 *		ex : @localhost/34 (returns 127.0.0.1/24). <br/>
+	 *		ex : @@localhost (returns ::1/128). <br/>
+	 * </ul>
 	 * @param data The {@link String} string to parse.
 	 * @throws UnknownHostException if some parameters are invalid or if we
 	 * can't parse the string.
 	 */
 	public IPNet(String data) throws UnknownHostException {
+
+		// resolve IPV6
+		if (data.startsWith("@@")) {
+			String host = data.substring(2);
+			IPNet ip = getByName(host, IPversion.IPV6);
+			_ip = ip.getIP();
+			_prefixLen = ip.getPrefixLen();
+			_ipVersion = ip.getIpVersion();
+			return;
+		}
+
+		// resolve IPV4
+		if (data.startsWith("@")) {
+			String host = data.substring(1);
+			IPNet ip = getByName(host, IPversion.IPV4);
+			_ip = ip.getIP();
+			_prefixLen = ip.getPrefixLen();
+			_ipVersion = ip.getIpVersion();
+			return;
+		}
 
 		// splitting of a string into IP and prefixlen et. al.
 		String[] split = data.split("-");
