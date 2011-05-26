@@ -7,4 +7,6 @@ equipment | eq equipment-name command : Runs a command on the specified equipmen
 Example:
 --------
 
-(Equipment commands are not yet implemented)
+Example with a PacketFilter equipment named "PF".
+  jtacl> equipment PF xref ip short
+  jtacl> equipment PF help
