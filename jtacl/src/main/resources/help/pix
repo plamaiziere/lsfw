@@ -1,4 +1,4 @@
---- Pix Help ---
+--- Pix Shell Help ---
 
 help: this help.
 
@@ -13,3 +13,11 @@ examples:
 show name unused
 
 show network-group
+
+Note:
+-----
+This command is only available on equipments of type Pix via the
+"equipment" command of Jtacl.
+
+Example with a Pix equipment named "PIX":
+jtacl> equipment PIX show name
