@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -60,10 +61,30 @@ public class PacketFilterShell implements GenericEquipmentShell {
 
 	protected void commandXrefIp(PacketFilterShellParser parser) {
 
+		IPNet ipreq = null;
+		if (parser.getXrefIp() != null) {
+			try {
+				ipreq = new IPNet(parser.getXrefIp());
+			} catch (UnknownHostException ex) {
+				System.out.println("Error: " + ex.getMessage());
+				return;
+			}
+		}
+
 		for (IPNet ip: _pf.getNetCrossRef().keySet()) {
 			IPNetCrossRef crossref = _pf.getNetCrossRef().get(ip);
+			if (ipreq != null) {
+				try {
+					if (!ipreq.overlaps(ip))
+						continue;
+				}
+				catch (UnknownHostException ex) {
+					System.out.println("Error " + ex.getMessage());
+					return;
+				}
+			}
 			for (CrossRefContext ctx: crossref.getContexts()) {
-				System.out.print(ip);
+				System.out.print(ip.toString("::i"));
 				System.out.print("; " + ctx.getContextName());
 				System.out.print("; " + ctx.getComment());
 				String format = parser.getXrefFormat();
