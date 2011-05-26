@@ -90,7 +90,7 @@ public class PacketFilterShellParser extends CommonRules<Object> {
 	}
 
 	/**
-	 * xref [ip] [long|short] [addresse]
+	 * xref [ip [long|short] [IPaddress]]
 	 */
 	Rule CommandXref() {
 		return Sequence(
