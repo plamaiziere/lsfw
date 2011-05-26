@@ -20,4 +20,4 @@ This command is only available on equipments of type Pix via the
 "equipment" command of Jtacl.
 
 Example with a Pix equipment named "PIX":
-jtacl> equipment PIX show name
+  jtacl> equipment PIX show name
