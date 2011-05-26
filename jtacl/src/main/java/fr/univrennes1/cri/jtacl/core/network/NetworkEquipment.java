@@ -231,4 +231,15 @@ public class NetworkEquipment {
 		System.out.println("Unknown equipment command");
 	}
 
+	/**
+	 * Returns true if the configuration of this equipment has changed.
+	 * This is used by the monitor to auto reload the equipment on change.
+	 * <br/> This method could be overrided to signal a change in the
+	 * configuration to the monitor.
+	 * @return true if the configuration of this equipment has changed.
+	 */
+	public boolean hasChanged() {
+		return false;
+	}
+
 }
