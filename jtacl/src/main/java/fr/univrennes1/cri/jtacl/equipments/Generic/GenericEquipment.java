@@ -30,6 +30,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
+import fr.univrennes1.cri.jtacl.lib.misc.FilesMonitor;
 import fr.univrennes1.cri.jtacl.lib.misc.KeyValue;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -110,6 +111,11 @@ public class GenericEquipment extends NetworkEquipment {
 	 */
 	protected List<GenericEquipmentShell> _shells
 			= new ArrayList<GenericEquipmentShell>();
+
+	/**
+	 * File alteration monitor for this equipment
+	 */
+	protected FilesMonitor _fam = new FilesMonitor();
 
 	/**
 	 * option dump-configuration value = file name.<br/>
@@ -375,6 +381,15 @@ public class GenericEquipment extends NetworkEquipment {
 	}
 
 	/**
+	 * Adds the filename in argument to the file alteration monitor of
+	 * this equipment.
+	 * @param fileName Filename to add
+	 */
+	protected void famAdd(String fileName) {
+		_fam.addFile(fileName);
+	}
+
+	/**
 	 * Create a new {@link GenericEquipment} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
 	 * @param name the name of the equipment.
@@ -428,4 +443,9 @@ public class GenericEquipment extends NetworkEquipment {
 		_shells.add(shell);
 	}
 
+	@Override
+	public boolean hasChanged() {
+		List<String> files = _fam.checkFiles();
+		return !files.isEmpty();
+	}
 }
