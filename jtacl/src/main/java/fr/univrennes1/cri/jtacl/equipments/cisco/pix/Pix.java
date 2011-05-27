@@ -246,6 +246,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			} catch (IOException ex) {
 				throw new JtaclConfigurationException("Cannot read file :" + filename);
 			}
+			famAdd(filename);
 			_configurations.add(cfg);
 		}
 	}

@@ -17,6 +17,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
 import fr.univrennes1.cri.jtacl.core.monitor.AclResult;
+import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.monitor.ProbeTcpFlags;
@@ -254,6 +255,23 @@ public class Shell {
 			return new PortSpec(PortOperator.LT, 1024);
 
 		return null;
+	}
+
+	protected void autoReload() {
+
+		for (String eqName: _monitor.getEquipments().keySet()) {
+		
+			NetworkEquipment equipment =
+					_monitor.getEquipments().get(eqName);
+			if (equipment.hasChanged()) {
+				Log.debug().info("reloading " + eqName);
+				try {
+					_monitor.reloadEquipment(equipment);
+				} catch (JtaclRuntimeException ex) {
+					System.err.println("Error: " + ex.getMessage());
+				}
+			}
+		}
 	}
 
 
@@ -1021,6 +1039,9 @@ public class Shell {
 			}
 			if (commandLine == null) {
 				break;
+			}
+			if (_interactiveMode && !_testMode) {
+				autoReload();
 			}
 			commandLine = commandLine.trim();
 			parseShellCommand(commandLine);
