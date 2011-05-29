@@ -30,6 +30,11 @@ public class Options {
 	private int _maxHop = -1;
 
 	/**
+	 * Auto-reload option
+	 */
+	private boolean _autoReload = false;
+
+	/**
 	 * Returns the max number of hop while probing.
 	 * @return the max number of hop while probing.
 	 */
@@ -94,6 +99,22 @@ public class Options {
 	}
 
 	/**
+	 * Gets the autoreload option
+	 * @return the state of autoreload.
+	 */
+	public boolean getAutoReload() {
+		return _autoReload;
+	}
+
+	/**
+	 * Sets the autoreload option
+	 * @param flag state of autoreload.
+	 */
+	public void setAutoReload(boolean flag) {
+		_autoReload = flag;
+	}
+
+	/**
 	 * Sets the option with the specified value.
 	 * @param optionName the name of the option to set.
 	 * @param value value to set.
@@ -104,6 +125,11 @@ public class Options {
 		try {
 			if (optionName.equalsIgnoreCase("maxhop")) {
 				setMaxHop(Integer.valueOf(value));
+				return;
+			}
+
+			if (optionName.equalsIgnoreCase("autoreload")) {
+				setAutoReload(Boolean.valueOf(value));
 				return;
 			}
 
@@ -136,8 +162,8 @@ public class Options {
 		return "debug.level=" + getDebugLevel() + "\n" +
 				"notify.level=" + getNotifyLevel() + "\n" +
 				"config.level=" + getConfigLevel() + "\n" +
-				"maxhop=" + getMaxHop();
-
+				"maxhop=" + getMaxHop() + "\n" +
+				"autoreload=" + getAutoReload();
 	}
 
 }

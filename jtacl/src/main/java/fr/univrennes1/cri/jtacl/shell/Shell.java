@@ -1040,7 +1040,8 @@ public class Shell {
 			if (commandLine == null) {
 				break;
 			}
-			if (_interactiveMode && !_testMode) {
+			if (_interactiveMode && !_testMode &&
+					_monitor.getOptions().getAutoReload()) {
 				autoReload();
 			}
 			commandLine = commandLine.trim();
