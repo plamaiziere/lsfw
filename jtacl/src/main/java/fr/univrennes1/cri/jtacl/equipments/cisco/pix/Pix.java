@@ -1072,6 +1072,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * Read the XML configuration file
 		 */
+		famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);

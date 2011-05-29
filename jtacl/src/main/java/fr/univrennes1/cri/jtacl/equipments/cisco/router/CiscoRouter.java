@@ -193,6 +193,7 @@ public class CiscoRouter extends GenericEquipment {
 			} catch (IOException ex) {
 				throw new JtaclConfigurationException("Cannot read file :" + filename);
 			}
+			famAdd(filename);
 			_configurations.add(cfg);
 		}
 	}
@@ -765,6 +766,7 @@ public class CiscoRouter extends GenericEquipment {
 		/*
 		 * Read the XML configuration file
 		 */
+		famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
