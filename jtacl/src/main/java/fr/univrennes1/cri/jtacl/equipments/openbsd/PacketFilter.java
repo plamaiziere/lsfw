@@ -1162,6 +1162,7 @@ public class PacketFilter extends GenericEquipment {
 		if (!result.matched)
 			throwCfgException("cannot parse table's file:  " + fileName);
 
+		famAdd(fileName);
 		return parseIpSpec(parser.getPfTable().getHosts());
 	}
 	
@@ -1431,6 +1432,7 @@ public class PacketFilter extends GenericEquipment {
 		for (String n: fileNames) {
 			ipspec.addAll(loadTable(n));
 			table.getFileNames().add(n);
+			famAdd(n);
 		}
 		/*
 		 * use rule's ip 
@@ -1557,6 +1559,8 @@ public class PacketFilter extends GenericEquipment {
 		ParsingResult<?> result;
 		PfParser parser = Parboiled.createParser(PfParser.class);
 		Map<String, String> macros = new HashMap<String, String>();
+
+		famAdd(cfg.getFileName());
 
 		StringBuilder buffer = cfg.getBuffer();
 		int lineNumber = 1;
@@ -1780,6 +1784,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * Read the XML configuration file
 		 */
+		famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
@@ -1790,8 +1795,10 @@ public class PacketFilter extends GenericEquipment {
 		loadAnchors();
 		loadTables();
 		routeDirectlyConnectedNetworks();
-		if (_routesFile != null)
+		if (_routesFile != null) {
 			loadRoutesFromFile(_routesFile);
+			famAdd(_routesFile);
+		}
 		loadRoutesFromXML(doc);
 		/*
 		 * compute cross reference
