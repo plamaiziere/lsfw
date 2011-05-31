@@ -127,6 +127,7 @@ public class SimpleRouter extends GenericEquipment {
 		if (_configurationFileName.isEmpty())
 			return;
 
+                famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 
 		loadIfaces(doc);
