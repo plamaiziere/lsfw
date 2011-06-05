@@ -445,4 +445,12 @@ public class AccessList {
 		return _parseContext;
 	}
 
+	/**
+	 * Sets the parse context of this acl.
+	 * @param parseContext parse context to set.
+	 */
+	public void setParseContext(ParseContext parseContext) {
+		_parseContext = parseContext;
+	}
+
 }
