@@ -24,7 +24,7 @@ import org.parboiled.Rule;
  * Generic Equipment sub shell rules
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class GenericEquipmentShellParser<T> extends CommonRules<T> {
+public class GenericEquipmentShellParser extends CommonRules<Object> {
 
 	protected String _command = "";
 	protected List<String> _param = null;
