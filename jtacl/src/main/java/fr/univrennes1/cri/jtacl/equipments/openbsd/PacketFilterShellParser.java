@@ -14,8 +14,6 @@
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
-import java.util.ArrayList;
-import java.util.List;
 import org.parboiled.Action;
 import org.parboiled.Context;
 import org.parboiled.Rule;
@@ -24,14 +22,14 @@ import org.parboiled.Rule;
  * PacketFilter Jtacl sub shell parser
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PacketFilterShellParser extends GenericEquipmentShellParser<Object> {
+public class PacketFilterShellParser extends GenericEquipmentShellParser {
 
 	public void clear() {
 		super.clear();
 	}
 
-	Rule CommandLine() {
-		return (Rule) Sequence(
+	public Rule CommandLine() {
+		return Sequence(
 			new Action() {
 				public boolean run(Context context) {
 					clear();
