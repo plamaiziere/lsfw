@@ -1824,7 +1824,7 @@ public class PacketFilter extends GenericEquipment {
 			if (nodeHost.isAddrMask()) {
 				for (IPNet ip: nodeHost.getAddr()) {
 					IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
-					ipNetRef.getContexts().add(refContext);
+					ipNetRef.addContext(refContext);
 				}
 			}
 			if (nodeHost.isAddrTable()) {
