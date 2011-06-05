@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.equipments.Generic;
+package fr.univrennes1.cri.jtacl.equipments.generic;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
