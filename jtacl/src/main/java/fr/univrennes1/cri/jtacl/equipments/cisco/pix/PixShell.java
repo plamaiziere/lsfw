@@ -13,12 +13,17 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.TreeMap;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -93,6 +98,56 @@ public class PixShell implements GenericEquipmentShell {
 		}
 	}
 
+	protected void commandXrefIp(PixShellParser parser) {
+
+		IPNet ipreq = null;
+		if (parser.getXrefIp() != null) {
+			try {
+				ipreq = new IPNet(parser.getXrefIp());
+			} catch (UnknownHostException ex) {
+				System.out.println("Error: " + ex.getMessage());
+				return;
+			}
+		}
+
+		for (IPNet ip: _pix.getNetCrossRef().keySet()) {
+			IPNetCrossRef crossref = _pix.getNetCrossRef().get(ip);
+			if (ipreq != null) {
+				try {
+					if (!ipreq.overlaps(ip))
+						continue;
+				}
+				catch (UnknownHostException ex) {
+					System.out.println("Error " + ex.getMessage());
+					return;
+				}
+			}
+			for (CrossRefContext ctx: crossref.getContexts()) {
+				System.out.print(ip.toString("::i"));
+				System.out.print("; " + ctx.getContextName());
+				System.out.print("; " + ctx.getComment());
+				String format = parser.getXrefFormat();
+				if (format != null) {
+					System.out.print("; ");
+					if (format.equals("short")) {
+						String line = ctx.getParseContext().getLine();
+						Scanner sc = new Scanner(line);
+						if (sc.hasNextLine())
+							System.out.println(sc.nextLine());
+						else
+							System.out.println(line);
+					}
+					if (format.equals("long")) {
+						String line = ctx.getParseContext().getLine();
+						System.out.println(line);
+					}
+				} else {
+					System.out.println();
+				}
+			}
+		}
+	}
+
 	public PixShell(Pix pix) {
 		_pix = pix;
 		_shellParser = Parboiled.createParser(PixShellParser.class);
@@ -150,6 +205,11 @@ public class PixShell implements GenericEquipmentShell {
 		if (shellCmd.equals("show-service-group")) {
 			HashMap<String, ObjectGroup> groups = _pix.getServiceGroups();
 			outputGroups(groups, using);
+			return true;
+		}
+
+		if (shellCmd.equals("xref")) {
+			commandXrefIp(_shellParser);
 			return true;
 		}
 

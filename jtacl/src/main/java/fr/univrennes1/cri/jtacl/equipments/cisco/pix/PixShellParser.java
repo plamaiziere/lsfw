@@ -14,8 +14,6 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
-import java.util.ArrayList;
-import java.util.List;
 import org.parboiled.Action;
 import org.parboiled.Context;
 import org.parboiled.Rule;
@@ -24,13 +22,13 @@ import org.parboiled.Rule;
  * PIX Jtacl sub shell parser
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PixShellParser extends GenericEquipmentShellParser<Object> {
+public class PixShellParser extends GenericEquipmentShellParser {
 
 	public void clear() {
 		super.clear();
 	}
 
-	Rule CommandLine() {
+	public Rule CommandLine() {
 		return Sequence(
 			new Action() {
 				public boolean run(Context context) {
@@ -41,6 +39,7 @@ public class PixShellParser extends GenericEquipmentShellParser<Object> {
 			FirstOf(
 				CommandHelp(),
 				CommandShow(),
+				CommandXref(),
 				String("PLACE-HOLDER")
 			)
 		);

@@ -225,6 +225,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		return _serviceGroups;
 	}
 
+	Map<IPNet, IPNetCrossRef> getNetCrossRef() {
+		return _netCrossRef;
+	}
+
 	/**
 	 * Create a new {@link Pix} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -267,15 +271,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			return result.getIpValue();
 		}
 		return name;
-	}
-
-	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
-		IPNetCrossRef ref = _netCrossRef.get(ipnet);
-		if (ref == null) {
-			ref = new IPNetCrossRef(ipnet);
-			_netCrossRef.put(ipnet, ref);
-		}
-		return ref;
 	}
 
 	protected void throwCfgException(String msg) {
@@ -625,6 +620,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				CrossRefContext refctx =
 						new CrossRefContext(_parseContext,
 						"network-object-group", _lastGroup.getGroupId() );
+				ixref.addContext(refctx);
 				break;
 
 			/*
@@ -716,6 +712,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		acl.setConfigurationLine(fileName + " #" +
 				_parseContext.getLineNumber() + " " +
 				_parseContext.getLine());
+
+		acl.setParseContext(_parseContext);
 
 		/*
 		 * create a new ACL group if needed
@@ -1138,6 +1136,79 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 */
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
+		/*
+		 * compute cross reference
+		 */
+		ipNetCrossReference();
+	}
+
+
+	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
+		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+		if (ref == null) {
+			ref = new IPNetCrossRef(ipnet);
+			_netCrossRef.put(ipnet, ref);
+		}
+		return ref;
+	}
+
+	/*
+	 * Cross reference for used network-group
+	 */
+	protected void crossRefNetworkGroup(NetworkObjectGroup networkGroup, CrossRefContext refContext) {
+
+		for (ObjectGroupItem groupItem: networkGroup.expand()) {
+			NetworkObjectGroupItem networkGroupItem =
+				(NetworkObjectGroupItem) groupItem;
+			IPNet ip = networkGroupItem.getIpAddress();
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			ipNetRef.addContext(refContext);
+		}
+	}
+
+	/*
+	 * Cross reference for an access list
+	 */
+	protected void crossRefAccessList(AccessList acl) {
+		ParseContext context = acl.getParseContext();
+		CrossRefContext refContext = new CrossRefContext(context, "acl",
+				"[" + acl.getAction() + "] " + context.getFileNameAndLine());
+
+		NetworkObjectGroup networkGroup = acl.getSourceNetworkGroup();
+		if (networkGroup != null)
+			crossRefNetworkGroup(networkGroup, refContext);
+
+		networkGroup = acl.getDestNetworkGroup();
+		if (networkGroup != null)
+			crossRefNetworkGroup(networkGroup, refContext);
+
+		IPNet ip = acl.getSourceIp();
+		if (ip != null) {
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			ipNetRef.addContext(refContext);
+		}
+
+		ip = acl.getDestIp();
+		if (ip != null) {
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			ipNetRef.addContext(refContext);
+		}
+
+	}
+
+	/**
+	 * Compute IPNet cross references
+	 */
+	protected void ipNetCrossReference() {
+		/*
+		 * acl
+		 */
+		for (AccessListGroup aclGroup: _accessListGroups.values()) {
+			for (AccessList acl: aclGroup) {
+				if (!acl.isImplicit())
+					crossRefAccessList(acl);
+			}
+		}
 	}
 
 	@Override
