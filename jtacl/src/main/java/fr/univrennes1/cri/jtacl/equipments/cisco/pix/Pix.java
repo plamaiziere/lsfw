@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
@@ -41,6 +43,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -176,6 +179,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			new HashMap<String, AccessListGroup>();
 
 	/**
+	 * IPNet cross references
+	 */
+	protected Map<IPNet, IPNetCrossRef> _netCrossRef =
+			new HashMap<IPNet, IPNetCrossRef>();
+
+	/**
 	 * parse context
 	 */
 	protected ParseContext _parseContext = new ParseContext();
@@ -258,6 +267,15 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			return result.getIpValue();
 		}
 		return name;
+	}
+
+	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
+		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+		if (ref == null) {
+			ref = new IPNetCrossRef(ipnet);
+			_netCrossRef.put(ipnet, ref);
+		}
+		return ref;
 	}
 
 	protected void throwCfgException(String msg) {
@@ -600,6 +618,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				NetworkObjectGroupItem nobject =
 						new NetworkObjectGroupItem(_lastGroup, line, ip);
 				_lastGroup.add(nobject);
+				/*
+				 * cross reference
+				 */
+				IPNetCrossRef ixref = getIPNetCrossRef(ip);
+				CrossRefContext refctx =
+						new CrossRefContext(_parseContext,
+						"network-object-group", _lastGroup.getGroupId() );
 				break;
 
 			/*

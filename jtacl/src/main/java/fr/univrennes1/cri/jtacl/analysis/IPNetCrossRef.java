@@ -35,6 +35,10 @@ public class IPNetCrossRef {
 		return _contexts;
 	}
 
+	public void addContext(CrossRefContext context) {
+		_contexts.add(context);
+	}
+
 	@Override
 	public String toString() {
 		return "IPNetCrossRef [_ip=" + _ip + ", _contexts=" + _contexts + "]";
