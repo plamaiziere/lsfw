@@ -127,7 +127,7 @@ public class PortObject {
 
 	/**
 	 * Returns the {@link PortSpec} associated to this port object
-	 * @return
+	 * @return the {@link PortSpec} associated to this port object
 	 */
 	public PortSpec getPortSpec() {
 		return _portSpec;
