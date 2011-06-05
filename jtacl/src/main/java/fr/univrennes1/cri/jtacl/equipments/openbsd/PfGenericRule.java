@@ -84,7 +84,7 @@ public abstract class PfGenericRule {
 
 	/**
 	 * Sets the parse context of this rule.
-	 * @param parseContext parse context to set. May be null.
+	 * @param parseContext parse context to set.
 	 */
 	public void setParseContext(ParseContext parseContext) {
 		_parseContext = parseContext;
