@@ -13,7 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import fr.univrennes1.cri.jtacl.lib.misc.CommonRules;
+import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
 import java.util.ArrayList;
 import java.util.List;
 import org.parboiled.Action;
@@ -24,22 +24,10 @@ import org.parboiled.Rule;
  * PIX Jtacl sub shell parser
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PixShellParser extends CommonRules<Object> {
-
-	protected String _command = "";
-	protected List<String> _param = null;
+public class PixShellParser extends GenericEquipmentShellParser<Object> {
 
 	public void clear() {
-		_command = "";
-		_param = new ArrayList<String>();
-	}
-
-	public String getCommand() {
-		return _command;
-	}
-
-	public List<String> getParam() {
-		return _param;
+		super.clear();
 	}
 
 	Rule CommandLine() {
@@ -55,19 +43,6 @@ public class PixShellParser extends CommonRules<Object> {
 				CommandShow(),
 				String("PLACE-HOLDER")
 			)
-		);
-	}
-
-	Rule CommandHelp() {
-		return Sequence(
-			IgnoreCase("help"),
-			new Action() {
-				public boolean run(Context context) {
-					_command = "help";
-					return true;
-				}
-			},
-			EOI
 		);
 	}
 
