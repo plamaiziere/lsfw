@@ -148,7 +148,7 @@ public class PortSpec {
 	 * one range of the PortSpec in argument.</li>
 	 * <li>Returns MachResult.NOT otherwise.</li>
 	 * </ul>
-	 * @param port port spec to check.
+	 * @param portSpec port spec to check.
 	 * @return The match result between this instance and the PortSpec in argument.
 	 */
 	public MatchResult matches(PortSpec portSpec) {
