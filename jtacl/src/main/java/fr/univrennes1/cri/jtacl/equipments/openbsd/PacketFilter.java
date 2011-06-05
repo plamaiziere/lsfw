@@ -29,7 +29,7 @@ import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLinksByIp;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
-import fr.univrennes1.cri.jtacl.equipments.Generic.GenericEquipment;
+import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;

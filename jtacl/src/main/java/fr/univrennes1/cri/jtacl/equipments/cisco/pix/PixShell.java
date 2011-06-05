@@ -13,7 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import fr.univrennes1.cri.jtacl.equipments.Generic.GenericEquipmentShell;
+import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

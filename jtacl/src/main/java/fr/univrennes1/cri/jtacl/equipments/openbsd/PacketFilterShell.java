@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
-import fr.univrennes1.cri.jtacl.equipments.Generic.GenericEquipmentShell;
+import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.io.BufferedReader;
 import java.io.IOException;
