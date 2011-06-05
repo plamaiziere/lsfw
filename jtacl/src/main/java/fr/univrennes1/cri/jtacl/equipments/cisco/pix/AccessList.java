@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 
 /**
  * Describes an access list.
@@ -26,6 +27,11 @@ public class AccessList {
 	 * the line of configuration corresponding to this acl (may be null)
 	 */
 	protected String _configurationLine;
+
+	/**
+	 * parse context of this acl.
+	 */
+	protected ParseContext _parseContext;
 
 	/**
 	 * access list id
@@ -429,6 +435,14 @@ public class AccessList {
 	 */
 	public void setRemark(String remark) {
 		_remark = remark;
+	}
+
+	/**
+	 * Returns the parse context of this acl.
+	 * @return the parse context of this acl.
+	 */
+	public ParseContext getParseContext() {
+		return _parseContext;
 	}
 
 }
