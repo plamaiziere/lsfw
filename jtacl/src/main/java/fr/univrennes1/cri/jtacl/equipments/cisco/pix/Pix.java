@@ -327,6 +327,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		for (int i = 0; i < cfg.size(); i++) {
 			String line = cfg.get(i);
 			line = parser.stripWhiteSpaces(line);
+			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
 			String lineCfg = parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
@@ -984,6 +985,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			line = parser.stripWhiteSpaces(line);
 			String lineCfg = parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
+			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
 
 			/*
