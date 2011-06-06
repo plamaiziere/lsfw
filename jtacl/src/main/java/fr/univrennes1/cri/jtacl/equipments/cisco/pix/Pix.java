@@ -945,6 +945,25 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	/*
+	 * name
+	 */
+	private void ruleName(PixParser parser) {
+		String name = parser.getName();
+		String IPvalue = parser.getIpAddress();
+		PixName pixName = new PixName(name, IPvalue);
+		_names.put(name, pixName);
+
+		/*
+		 * cross reference
+		 */
+		IPNet ip = parseIp(IPvalue);
+		IPNetCrossRef ixref = getIPNetCrossRef(ip);
+		CrossRefContext refctx =
+				new CrossRefContext(_parseContext, "name", name);
+		ixref.addContext(refctx);
+	}
+
+	/*
 	 * we need to provide the group's type to the parser because it depends
 	 * of the type of the object-group.
 	 * For example:
@@ -1012,10 +1031,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				 * name
 				 */
 				if (rule.equals("name")) {
-					String name = parser.getName();
-					String IPvalue = parser.getIpAddress();
-					PixName pixName = new PixName(name, IPvalue);
-					_names.put(name, pixName);
+					ruleName(parser);
 				}
 
 				/*
