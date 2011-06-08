@@ -23,36 +23,10 @@ import org.parboiled.Rule;
  * PIX Jtacl sub shell parser
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PixShellParser extends CommonRules<Object> {
-
-	protected GenericEquipmentShellParser _genericShell;
-
-	public PixShellParser() {
-		_genericShell = Parboiled.createParser(GenericEquipmentShellParser.class);
-	}
+public class PixShellParser extends GenericEquipmentShellParser {
 
 	public void clear() {
-		_genericShell.clear();
-	}
-
-	public String getCommand() {
-		return _genericShell.getCommand();
-	}
-
-	public List<String> getParam() {
-		return _genericShell.getParam();
-	}
-
-	public String getXrefIp() {
-		return _genericShell.getXrefIp();
-	}
-
-	public String getXrefFormat() {
-		return _genericShell.getXrefFormat();
-	}
-
-	public String getXrefObject() {
-		return _genericShell.getXrefObject();
+		super.clear();
 	}
 
 	public Rule CommandLine() {
@@ -64,8 +38,8 @@ public class PixShellParser extends CommonRules<Object> {
 				}
 			},
 			FirstOf(
-				_genericShell.CommandHelp(),
-				_genericShell.CommandXref(),
+				CommandHelp(),
+				CommandXref(),
 				CommandShow()
 			)
 		);
@@ -89,7 +63,7 @@ public class PixShellParser extends CommonRules<Object> {
 			),
 			new Action() {
 				public boolean run(Context context) {
-					_genericShell.setCommand("show-" + context.getMatch().toLowerCase());
+					setCommand("show-" + context.getMatch().toLowerCase());
 					return true;
 				}
 			},
@@ -102,7 +76,7 @@ public class PixShellParser extends CommonRules<Object> {
 					),
 					new Action() {
 						public boolean run(Context context) {
-							_genericShell.getParam().add(context.getMatch().toLowerCase());
+							getParam().add(context.getMatch().toLowerCase());
 							return true;
 						}
 					}
