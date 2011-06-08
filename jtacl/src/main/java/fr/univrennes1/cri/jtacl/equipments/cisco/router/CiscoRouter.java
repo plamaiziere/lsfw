@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
+import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.parsers.IOSParser;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
@@ -45,6 +47,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -157,6 +160,12 @@ public class CiscoRouter extends GenericEquipment {
 	protected HashMap<String, CiscoIface> _ciscoIfaces = new HashMap<String, CiscoIface>();
 
 	/**
+	 * IPNet cross references
+	 */
+	protected Map<IPNet, IPNetCrossRef> _netCrossRef =
+			new HashMap<IPNet, IPNetCrossRef>();
+
+	/**
 	 * parse context
 	 */
 	 protected ParseContext _parseContext = new ParseContext();
@@ -167,6 +176,13 @@ public class CiscoRouter extends GenericEquipment {
 	protected ArrayList<AccessList> _accessLists = new ArrayList<AccessList>();
 
 	/**
+	 * IPNet cross references
+	 */
+	Map<IPNet, IPNetCrossRef> getNetCrossRef() {
+		return _netCrossRef;
+	}
+
+	/**
 	 * Create a new {@link CiscoRouter} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
 	 * @param name the name of the equipment.
@@ -175,6 +191,8 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	public CiscoRouter(Monitor monitor, String name, String comment, String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
+		IOSShell shell = new IOSShell(this);
+		registerShell(shell);
 	}
 
 	protected void loadConfiguration(Document doc) {
@@ -475,6 +493,7 @@ public class CiscoRouter extends GenericEquipment {
 		ace.setConfigurationLine(fileName + " #" +
 			_parseContext.getLineNumber() + ": [" +
 			acl.getName() + "] " + _parseContext.getLine().trim());
+		ace.setParseContext(_parseContext);
 
 		/*
 		 * action (permit, deny)
@@ -694,6 +713,7 @@ public class CiscoRouter extends GenericEquipment {
 			String lineCfg = parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
 
+			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
 
 			/*
@@ -810,6 +830,59 @@ public class CiscoRouter extends GenericEquipment {
 		 */
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
+		/*
+		 * compute cross reference
+		 */
+		ipNetCrossReference();
+	}
+
+	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
+		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+		if (ref == null) {
+			ref = new IPNetCrossRef(ipnet);
+			_netCrossRef.put(ipnet, ref);
+		}
+		return ref;
+	}
+
+	/*
+	 * Cross reference for an access list element
+	 */
+	protected void crossRefAccessList(AccessListElement ace) {
+		ParseContext context = ace.getParseContext();
+		CrossRefContext refContext = new CrossRefContext(context, "ace",
+				"[" + ace.getAction() + "]; " + context.getFileNameAndLine());
+
+		IPNet ip = ace.getSourceIp();
+		if (ip != null) {
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			ipNetRef.addContext(refContext);
+		}
+
+		ip = ace.getDestIp();
+		if (ip != null) {
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			ipNetRef.addContext(refContext);
+		}
+
+	}
+
+	/**
+	 * Compute IPNet cross references
+	 */
+	protected void ipNetCrossReference() {
+		/*
+		 * access list
+		 */
+		for (AccessList acl: _accessLists) {
+			/*
+			 * access list element
+			 */
+			for (AccessListElement ace: acl) {
+				if (!ace.isImplicit())
+					crossRefAccessList(ace);
+			}
+		}
 	}
 
 	@Override

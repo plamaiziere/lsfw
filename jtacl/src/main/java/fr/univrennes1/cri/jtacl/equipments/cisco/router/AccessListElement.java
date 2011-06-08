@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 
 /**
@@ -27,6 +28,11 @@ public class AccessListElement {
 	 * the line of configuration corresponding to this ace (may be null)
 	 */
 	protected String _configurationLine;
+
+	/**
+	 * parse context of this acl.
+	 */
+	protected ParseContext _parseContext;
 
 	/**
 	 * true if this ACE is an implicit rule
@@ -343,6 +349,22 @@ public class AccessListElement {
 	 */
 	public void setTcpKeyword(String tcpKeyword) {
 		_tcpKeyword = tcpKeyword;
+	}
+
+	/**
+	 * Returns the parse context of this acl.
+	 * @return the parse context of this acl.
+	 */
+	public ParseContext getParseContext() {
+		return _parseContext;
+	}
+
+	/**
+	 * Sets the parse context of this acl.
+	 * @param parseContext parse context to set.
+	 */
+	public void setParseContext(ParseContext parseContext) {
+		_parseContext = parseContext;
 	}
 
 }
