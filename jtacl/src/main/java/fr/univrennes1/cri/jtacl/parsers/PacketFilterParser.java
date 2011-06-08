@@ -13,7 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.parsers;
 
-import fr.univrennes1.cri.jtacl.parsers.PfBaseParser;
+import fr.univrennes1.cri.jtacl.parsers.PacketFilterBaseParser;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.AnchorTemplate;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.ExpandedRule;
@@ -47,7 +47,7 @@ import org.parboiled.support.ParsingResult;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
-public class PfParser extends PfBaseParser {
+public class PacketFilterParser extends PacketFilterBaseParser {
 
 	private String _ruleName;
 	private String _name;

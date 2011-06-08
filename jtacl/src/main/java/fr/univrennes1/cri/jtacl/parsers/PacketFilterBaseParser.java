@@ -21,7 +21,7 @@ import org.parboiled.Rule;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
-public class PfBaseParser extends CommonRules<Object> {
+public class PacketFilterBaseParser extends CommonRules<Object> {
 
 	/*
 	 * Special characters.

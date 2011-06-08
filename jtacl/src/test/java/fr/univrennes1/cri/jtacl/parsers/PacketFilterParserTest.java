@@ -25,7 +25,7 @@ import fr.univrennes1.cri.jtacl.equipments.openbsd.RuleTemplate;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.ScrubOptsTemplate;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.TableTemplate;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.Xhost;
-import fr.univrennes1.cri.jtacl.parsers.PfParser;
+import fr.univrennes1.cri.jtacl.parsers.PacketFilterParser;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,12 +39,12 @@ import org.parboiled.support.ParsingResult;
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PfParserTest extends TestCase {
+public class PacketFilterParserTest extends TestCase {
 
-	PfParser parser = Parboiled.createParser(PfParser.class);
+	PacketFilterParser parser = Parboiled.createParser(PacketFilterParser.class);
 	ParsingResult<?> result;
 
-    public PfParserTest(String testName) {
+    public PacketFilterParserTest(String testName) {
         super(testName);
     }
 
