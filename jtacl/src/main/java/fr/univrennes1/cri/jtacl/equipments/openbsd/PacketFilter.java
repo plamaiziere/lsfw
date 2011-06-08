@@ -317,6 +317,9 @@ public class PacketFilter extends GenericEquipment {
 		return icmp;
 	}
 
+	/*
+	 * IPNet cross reference
+	 */
 	public Map<IPNet, IPNetCrossRef> getNetCrossRef() {
 		return _netCrossRef;
 	}
