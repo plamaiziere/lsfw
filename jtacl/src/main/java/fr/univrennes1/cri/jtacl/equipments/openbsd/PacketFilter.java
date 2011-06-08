@@ -13,7 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
-import fr.univrennes1.cri.jtacl.parsers.PfParser;
+import fr.univrennes1.cri.jtacl.parsers.PacketFilterParser;
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
@@ -1156,7 +1156,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * use the parser to retrieve the values
 		 */
-		PfParser parser = Parboiled.createParser(PfParser.class);
+		PacketFilterParser parser = Parboiled.createParser(PacketFilterParser.class);
 		ParsingResult<?> result;
 		result = BasicParseRunner.run(parser.Parse(), buf.toString());
 
@@ -1558,7 +1558,7 @@ public class PacketFilter extends GenericEquipment {
 
 	protected void parse(ConfigurationFile cfg) {
 		ParsingResult<?> result;
-		PfParser parser = Parboiled.createParser(PfParser.class);
+		PacketFilterParser parser = Parboiled.createParser(PacketFilterParser.class);
 		Map<String, String> macros = new HashMap<String, String>();
 
 		famAdd(cfg.getFileName());
