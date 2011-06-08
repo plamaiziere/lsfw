@@ -14,18 +14,47 @@
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
+import fr.univrennes1.cri.jtacl.lib.misc.CommonRules;
+import java.util.List;
 import org.parboiled.Action;
 import org.parboiled.Context;
+import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 
 /**
  * PacketFilter Jtacl sub shell parser
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PacketFilterShellParser extends GenericEquipmentShellParser {
+public class PacketFilterShellParser extends CommonRules<Object> {
+
+	protected GenericEquipmentShellParser _genericShell;
+
+	public PacketFilterShellParser() {
+		_genericShell = Parboiled.createParser(GenericEquipmentShellParser.class);
+	}
 
 	public void clear() {
-		super.clear();
+		_genericShell.clear();
+	}
+
+	public String getCommand() {
+		return _genericShell.getCommand();
+	}
+
+	public List<String> getParam() {
+		return _genericShell.getParam();
+	}
+
+	public String getXrefIp() {
+		return _genericShell.getXrefIp();
+	}
+
+	public String getXrefFormat() {
+		return _genericShell.getXrefFormat();
+	}
+
+	public String getXrefObject() {
+		return _genericShell.getXrefObject();
 	}
 
 	public Rule CommandLine() {
@@ -37,9 +66,8 @@ public class PacketFilterShellParser extends GenericEquipmentShellParser {
 				}
 			},
 			FirstOf(
-				CommandHelp(),
-				CommandXref(),
-				String("PLACE-HOLDER")
+				_genericShell.CommandHelp(),
+				_genericShell.CommandXref()
 			)
 		);
 	}

@@ -44,6 +44,10 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		return _command;
 	}
 
+	public void setCommand(String command) {
+		_command = command;
+	}
+
 	public List<String> getParam() {
 		return _param;
 	}
@@ -51,13 +55,24 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	public String getXrefObject() {
 		return _xrefObject;
 	}
+	public void setXrefObject(String xrefObject) {
+		_xrefObject = xrefObject;
+	}
 
 	public String getXrefFormat() {
 		return _xrefFormat;
 	}
 
+	public void setXrefFormat(String xrefFormat) {
+		_xrefFormat = xrefFormat;
+	}
+
 	public String getXrefIp() {
 		return _xrefIp;
+	}
+
+	public void setXrefIp(String xrefIp) {
+		_xrefIp = xrefIp;
 	}
 
 	public Rule CommandHelp() {
@@ -65,7 +80,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 			IgnoreCase("help"),
 			new Action() {
 				public boolean run(Context context) {
-					_command = "help";
+					setCommand("help");
 					return true;
 				}
 			},
@@ -85,7 +100,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 					IgnoreCase("ip"),
 					new Action() {
 						public boolean run(Context context) {
-							_xrefObject = "ip";
+							setXrefObject("ip");
 							return true;
 						}
 					},
@@ -98,7 +113,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 							),
 							new Action() {
 								public boolean run(Context context) {
-								_xrefFormat = context.getMatch().toLowerCase();
+								setXrefFormat(context.getMatch().toLowerCase());
 								return true;
 								}
 							}
@@ -110,7 +125,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 							StringAtom(),
 							new Action() {
 								public boolean run(Context context) {
-									_xrefIp = context.getMatch();
+									setXrefIp(context.getMatch());
 									return true;
 								}
 							}
@@ -120,7 +135,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 			),
 			new Action() {
 				public boolean run(Context context) {
-					_command = "xref";
+					setCommand("xref");
 					return true;
 				}
 			},
