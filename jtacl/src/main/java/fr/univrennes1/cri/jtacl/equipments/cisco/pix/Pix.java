@@ -226,6 +226,9 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		return _serviceGroups;
 	}
 
+	/*
+	 * IPNet cross reference
+	 */
 	Map<IPNet, IPNetCrossRef> getNetCrossRef() {
 		return _netCrossRef;
 	}
