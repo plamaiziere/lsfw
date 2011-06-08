@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
+import fr.univrennes1.cri.jtacl.parsers.IOSParser;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.AclResult;

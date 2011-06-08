@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.lib.misc;
+package fr.univrennes1.cri.jtacl.parsers;
 
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;

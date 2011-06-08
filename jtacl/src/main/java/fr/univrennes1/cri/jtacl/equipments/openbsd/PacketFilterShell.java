@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.parsers.PacketFilterShellParser;
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;

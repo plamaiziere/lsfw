@@ -11,10 +11,9 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.equipments.openbsd;
+package fr.univrennes1.cri.jtacl.parsers;
 
-import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
-import fr.univrennes1.cri.jtacl.lib.misc.CommonRules;
+import fr.univrennes1.cri.jtacl.parsers.GenericEquipmentShellParser;
 import java.util.List;
 import org.parboiled.Action;
 import org.parboiled.Context;

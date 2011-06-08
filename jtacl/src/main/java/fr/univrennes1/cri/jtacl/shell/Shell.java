@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.shell;
 
+import fr.univrennes1.cri.jtacl.parsers.ShellParser;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;

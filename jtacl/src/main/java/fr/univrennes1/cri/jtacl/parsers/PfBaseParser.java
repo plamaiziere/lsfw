@@ -11,9 +11,8 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.equipments.openbsd;
+package fr.univrennes1.cri.jtacl.parsers;
 
-import fr.univrennes1.cri.jtacl.lib.misc.CommonRules;
 import org.parboiled.Rule;
 
 /**

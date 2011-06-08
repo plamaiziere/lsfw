@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.parsers.PfParser;
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;

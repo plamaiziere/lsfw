@@ -11,9 +11,8 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.shell;
+package fr.univrennes1.cri.jtacl.parsers;
 
-import fr.univrennes1.cri.jtacl.lib.misc.CommonRules;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import org.parboiled.Action;
 import org.parboiled.Context;
@@ -115,7 +114,7 @@ public class ShellParser extends CommonRules<Object> {
 		return _tcpFlags;
 	}
 
-	Rule CommandLine() {
+	public Rule CommandLine() {
 		return FirstOf(
 				CommandProbe(),
 				CommandQuit(),
@@ -129,7 +128,7 @@ public class ShellParser extends CommonRules<Object> {
 			);
 	}
 
-	Rule CommandQuit() {
+	public Rule CommandQuit() {
 		return Sequence(
 				FirstOf(
 					IgnoreCase("quit"),
@@ -151,7 +150,7 @@ public class ShellParser extends CommonRules<Object> {
 	 * (topology | t) [connected | !connected] [atom]
 	 *
 	 */
-	Rule CommandTopology() {
+	public Rule CommandTopology() {
 		return Sequence(
 					FirstOf(
 						IgnoreCase("topology"),
@@ -197,7 +196,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * route [atom]
 	 */
-	Rule CommandRoute() {
+	public Rule CommandRoute() {
 		return Sequence(
 					IgnoreCase("route"),
 					Optional(
@@ -224,7 +223,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * (option | o) [identifier [= atom]]
 	 */
-	Rule CommandOption() {
+	public Rule CommandOption() {
 		return Sequence(
 				FirstOf(
 					IgnoreCase("option"),
@@ -270,7 +269,7 @@ public class ShellParser extends CommonRules<Object> {
 	 * (define | d) [identifier [ = string]]
 	 *
 	 */
-	Rule CommandDefine() {
+	public Rule CommandDefine() {
 		return Sequence(
 				FirstOf(
 					IgnoreCase("define"),
@@ -315,7 +314,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * help [atom]
 	 */
-	Rule CommandHelp() {
+	public Rule CommandHelp() {
 		return Sequence(
 					IgnoreCase("help"),
 					Optional(
@@ -340,7 +339,7 @@ public class ShellParser extends CommonRules<Object> {
 				);
 	}
 
-	Rule Identifier() {
+	public Rule Identifier() {
 			return OneOrMore(
 						Sequence(
 							TestNot(WhiteSpaces()),
@@ -350,14 +349,14 @@ public class ShellParser extends CommonRules<Object> {
 					);
 	}
 
-	Rule Special() {
+	public Rule Special() {
 		return AnyOf("=,:");
 	}
 
 	/*
 	 * (equipment | eq) atom string
 	 */
-	Rule CommandEquipment() {
+	public Rule CommandEquipment() {
 		return Sequence(
 			FirstOf(
 				IgnoreCase("equipment"),
@@ -386,7 +385,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * reload [atom]
 	 */
-	Rule CommandReload() {
+	public Rule CommandReload() {
 		return Sequence(
 			IgnoreCase("reload"),
 			Optional(
@@ -415,7 +414,7 @@ public class ShellParser extends CommonRules<Object> {
 	 * (probe | p | probe6 | p6) [ProbeExpect] [OnEquipment]
 	 *		SourceSpec DestSpec [ProtoSpec]
 	 */
-	Rule CommandProbe() {
+	public Rule CommandProbe() {
 		return Sequence(
 				new Action() {
 					public boolean run(Context context) {
@@ -485,7 +484,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * expect atom
 	 */
-	Rule ProbeExpect() {
+	public Rule ProbeExpect() {
 		return Sequence(
 					IgnoreCase("expect"),
 					WhiteSpaces(),
@@ -503,7 +502,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * on atom
 	 */
-	Rule OnEquipments() {
+	public Rule OnEquipments() {
 		return Sequence(
 			IgnoreCase("on"),
 			WhiteSpaces(),
@@ -518,11 +517,11 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
-	Rule SourceSpecification() {
+	public Rule SourceSpecification() {
 		return StringAtom();
 	}
 
-	Rule DestinationSpecification() {
+	public Rule DestinationSpecification() {
 		return StringAtom();
 	}
 
@@ -530,7 +529,7 @@ public class ShellParser extends CommonRules<Object> {
 	 * ( (udp | tcp) [TcpUdpSpec] [TcpFlagsSpec] )
 	 *   | (atom [Identifier])
 	 */
-	Rule ProtoSpecification() {
+	public Rule ProtoSpecification() {
 		return
 			FirstOf(
 				Sequence(
@@ -584,7 +583,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * ([Identifier]:[Identifier]) | Identifier
 	 */
-	Rule TcpUdpSpecification() {
+	public Rule TcpUdpSpecification() {
 		return
 			FirstOf(
 				Sequence(
@@ -627,7 +626,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * flags TcpFlagsSpec+
 	 */
-	Rule TcpFlagsSpec() {
+	public Rule TcpFlagsSpec() {
 		return
 			Sequence(
 				IgnoreCase("flags"),
@@ -650,7 +649,7 @@ public class ShellParser extends CommonRules<Object> {
 	/*
 	 * atom
 	 */
-	Rule TcpFlagSpec() {
+	public Rule TcpFlagSpec() {
 		return
 			Sequence(
 				StringAtom(),
