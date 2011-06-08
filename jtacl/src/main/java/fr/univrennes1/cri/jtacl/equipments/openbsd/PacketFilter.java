@@ -1841,7 +1841,7 @@ public class PacketFilter extends GenericEquipment {
 	protected void crossRefRule(PfRule rule) {
 		ParseContext context = rule.getParseContext();
 		CrossRefContext refContext = new CrossRefContext(context, "rule",
-				"[" + rule.getAction() + "] " + context.getFileNameAndLine());
+				"[" + rule.getAction() + "]; " + context.getFileNameAndLine());
 
 		if (rule.getFromIpSpec() != null)
 			crossRefIpSpec(rule.getOwnerAnchor(), rule.getFromIpSpec(), refContext);
@@ -1860,7 +1860,7 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		for (PfTable table: _refTables) {
 			CrossRefContext refContext = new CrossRefContext(table.getParseContext(),
-				"table", "<" + table.getName() + "> " +
+				"table", "<" + table.getName() + ">; " +
 				table.getParseContext().getFileNameAndLine());
 			crossRefIpSpec(table.getOwnerAnchor(), table.getIpspec(), refContext);
 		}
