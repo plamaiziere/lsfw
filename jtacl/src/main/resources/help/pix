@@ -14,10 +14,30 @@ show name unused
 
 show network-group
 
+---------
+
+xref ip [short|long] [IpAddress]: Outputs the cross reference of IP addresses.
+
+The "short" and "long" options allow to specify the output format.
+  short: outputs only the first line of configuration.
+  long: ouptuts all the lines of configuration.
+  if short and long are missing, do not output the configuration line.
+
+IPAddress specifies the IP to output. Any IP overlapping this IPAddress are
+displayed.
+
+examples:
+---------
+
+xref ip
+xref ip short
+xref ip long 192.168.1.0/24
+
 Note:
 -----
-This command is only available on equipments of type Pix via the
+This command are only available on equipments of type Pix via the
 "equipment" command of Jtacl.
 
 Example with a Pix equipment named "PIX":
   jtacl> equipment PIX show name
+  jtacl> equipment PIX xref ip 192.168.1.1/24
