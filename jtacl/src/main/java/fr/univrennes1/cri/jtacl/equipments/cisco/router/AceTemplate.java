@@ -45,120 +45,135 @@ public class AceTemplate {
 		return _action;
 	}
 
-	public void setAction(String action) {
+	public boolean setAction(String action) {
 		_action = action;
+		return true;
 	}
 
 	public String getDstFirstPort() {
 		return _dstFirstPort;
 	}
 
-	public void setDstFirstPort(String dstFirstPort) {
+	public boolean setDstFirstPort(String dstFirstPort) {
 		_dstFirstPort = dstFirstPort;
+		return true;
 	}
 
 	public String getDstIp() {
 		return _dstIp;
 	}
 
-	public void setDstIp(String dstIp) {
+	public boolean setDstIp(String dstIp) {
 		_dstIp = dstIp;
+		return true;
 	}
 
 	public String getDstIpMask() {
 		return _dstIpMask;
 	}
 
-	public void setDstIpMask(String dstIpMask) {
+	public boolean setDstIpMask(String dstIpMask) {
 		_dstIpMask = dstIpMask;
+		return true;
 	}
 
 	public String getDstLastPort() {
 		return _dstLastPort;
 	}
 
-	public void setDstLastPort(String dstLastPort) {
+	public boolean setDstLastPort(String dstLastPort) {
 		_dstLastPort = dstLastPort;
+		return true;
 	}
 
 	public String getDstPortOperator() {
 		return _dstPortOperator;
 	}
 
-	public void setDstPortOperator(String dstPortOperator) {
+	public boolean setDstPortOperator(String dstPortOperator) {
 		_dstPortOperator = dstPortOperator;
+		return true;
 	}
 
 	public String getSubType() {
 		return _subType;
 	}
 
-	public void setSubType(String subType) {
-		this._subType = subType;
+	public boolean setSubType(String subType) {
+		_subType = subType;
+		return true;
 	}
 
 	public Integer getCode() {
 		return _code;
 	}
 
-	public void setCode(Integer code) {
+	public boolean setCode(Integer code) {
 		_code = code;
+		return true;
 	}
 
 	public boolean getInactive() {
 		return _inactive;
 	}
 	
-	public void setInactive(boolean inactive) {
+	public boolean setInactive(boolean inactive) {
 		_inactive = inactive;
+		return true;
 	}
 
 	public String getProtocol() {
 		return _protocol;
 	}
 
-	public void setProtocol(String protocol) {
+	public boolean setProtocol(String protocol) {
 		_protocol = protocol;
+		return true;
 	}
 
 	public String getSrcFirstPort() {
 		return _srcFirstPort;
 	}
 
-	public void setSrcFirstPort(String srcFirstPort) {
+	public boolean setSrcFirstPort(String srcFirstPort) {
 		_srcFirstPort = srcFirstPort;
+		return true;
 	}
 
 	public String getSrcIp() {
 		return _srcIp;
 	}
 
-	public void setSrcIp(String srcIp) {
+	public boolean setSrcIp(String srcIp) {
 		_srcIp = srcIp;
+		return true;
 	}
 
 	public String getSrcIpMask() {
 		return _srcIpMask;
 	}
 
-	public void setSrcIpMask(String srcIpMask) {
+	public boolean setSrcIpMask(String srcIpMask) {
 		_srcIpMask = srcIpMask;
+		return true;
 	}
 
 	public String getSrcLastPort() {
 		return _srcLastPort;
 	}
 
-	public void setSrcLastPort(String srcLastPort) {
+	public boolean setSrcLastPort(String srcLastPort) {
 		_srcLastPort = srcLastPort;
+		return true;
 	}
 
 	public String getSrcPortOperator() {
 		return _srcPortOperator;
 	}
 
-	public void setSrcPortOperator(String srcPortOperator) {
+	public boolean setSrcPortOperator(String srcPortOperator) {
 		_srcPortOperator = srcPortOperator;
+		return true;
 	}
 
 	public StringsList getTcpFlags() {
@@ -169,8 +184,9 @@ public class AceTemplate {
 		return _tcpKeyword;
 	}
 
-	public void setTcpKeyword(String _tcpKeyword) {
-		this._tcpKeyword = _tcpKeyword;
+	public boolean setTcpKeyword(String tcpKeyword) {
+		_tcpKeyword = tcpKeyword;
+		return true;
 	}
 
 }

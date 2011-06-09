@@ -32,20 +32,23 @@ public class AclTemplate {
 		return _number;
 	}
 
-	public void setNumber(Integer number) {
-		this._number = number;
+	public boolean setNumber(Integer number) {
+		_number = number;
+		return true;
 	}
 
 	public String getName() {
 		return _name;
 	}
 
-	public void setName(String _name) {
-		this._name = _name;
+	public boolean setName(String name) {
+		_name = name;
+		return true;
 	}
 
-	public void setAclType(AclType type) {
+	public boolean setAclType(AclType type) {
 		_type = type;
+		return true;
 	}
 
 	public AclType getAclType() {
@@ -56,8 +59,9 @@ public class AclTemplate {
 		return _ipVersion;
 	}
 
-	public void setIpVersion(IPversion _ipVersion) {
-		this._ipVersion = _ipVersion;
+	public boolean setIpVersion(IPversion ipVersion) {
+		_ipVersion = ipVersion;
+		return true;
 	}
 
 }
