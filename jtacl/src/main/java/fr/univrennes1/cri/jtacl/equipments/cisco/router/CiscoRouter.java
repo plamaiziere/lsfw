@@ -280,7 +280,6 @@ public class CiscoRouter extends GenericEquipment {
 					inInterface = false;
 					curCsIface = null;
 				} else {
-					parser.clear();
 					result = ReportingParseRunner.run(parser.InInterface(), lineCfg);
 					if (result.matched) {
 						dumpConfiguration(line);
@@ -374,7 +373,6 @@ public class CiscoRouter extends GenericEquipment {
 				}
 			}
 			if (lineCfg.startsWith("interface")) {
-				parser.clear();
 				result = ReportingParseRunner.run(parser.Interface(), lineCfg);
 				if (result.matched) {
 					inInterface = true;
@@ -728,7 +726,6 @@ public class CiscoRouter extends GenericEquipment {
 			/*
 			 * parse the line
 			 */
-			parser.clear();
 			parser.setAclContext(_lastAcl);
 
 			result = ReportingParseRunner.run(parser.Parse(), lineCfg);

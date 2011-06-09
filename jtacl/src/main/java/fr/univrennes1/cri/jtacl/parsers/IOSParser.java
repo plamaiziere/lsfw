@@ -21,8 +21,6 @@ import fr.univrennes1.cri.jtacl.equipments.cisco.router.AclType;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
-import org.parboiled.Action;
-import org.parboiled.Context;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
 
@@ -32,47 +30,124 @@ import org.parboiled.annotations.SuppressSubnodes;
  */
 public class IOSParser extends CommonRules<Object> {
 
-	private String _name;
-	private String _direction;
-	private String _ipAddress;
-	private String _ipNetmask;
-	private String 	_nexthop;
-	private String _description;
-	private String _portOperator;
-	private String _firstPort;
-	private String _lastPort;
-	private String _subType;
-	private String _ruleName;
-	private AclTemplate _acl;
-	private AceTemplate _ace;
-	private AccessList _aclContext;
+	protected String _name;
+	protected String _direction;
+	protected String _ipAddress;
+	protected String _ipNetmask;
+	protected String 	_nexthop;
+	protected String _description;
+	protected String _portOperator;
+	protected String _firstPort;
+	protected String _lastPort;
+	protected String _subType;
+	protected String _ruleName;
+	protected AclTemplate _acl;
+	protected AceTemplate _ace;
+	protected AccessList _aclContext;
+
+	protected boolean checkAclContext(AclType type) {
+		return _aclContext != null && _aclContext.getAclType() == type;
+	}
+
+	protected boolean checkAclType(AclType type) {
+		return _acl != null && _acl.getAclType() == type;
+	}
+
+	protected boolean newAclTemplate(String type) {
+		_acl = new AclTemplate();
+		if (type.equals("standard"))
+			_acl.setAclType(AclType.IPSTD);
+		else
+			_acl.setAclType(AclType.IPEXT);
+		return true;
+	}
+
+	protected boolean newAclTemplateNumber(String number) {
+		int n = Integer.valueOf(number);
+		_acl = new AclTemplate();
+		_acl.setNumber(n);
+		_acl.setIpVersion(IPversion.IPV4);
+		_acl.setAclType(AclType.getType(n));
+		return true;
+	}
+
+	protected boolean newAceTemplate() {
+		_ace = new AceTemplate();
+		return true;
+	}
+
+	protected boolean setAceIcmp4(String icmp) {
+		IPIcmpEnt icmpEnt = IPIcmp4.getInstance().icmpLookup(icmp);
+		if (icmpEnt != null) {
+			_ace.setSubType(icmp);
+			_ace.setCode(icmpEnt.getCode());
+			return true;
+		}
+		throw new JtaclConfigurationException("unknown icmp type or message: "
+				+ icmp);
+	}
 
 	public String getDirection() {
 		return _direction;
+	}
+
+	public boolean setDirection(String direction) {
+		_direction = direction;
+		return true;
 	}
 
 	public String getName() {
 		return _name;
 	}
 
+	public boolean setName(String name) {
+		_name = name;
+		return true;
+	}
+
 	public String getDescription() {
 		return _description;
+	}
+
+	public boolean setDescription(String description) {
+		_description = description;
+		return true;
 	}
 
 	public String getIpAddress() {
 		return _ipAddress;
 	}
 
+	public boolean setIpAddress(String ipAddress) {
+		_ipAddress = ipAddress;
+		return true;
+	}
+	
 	public String getIpNetmask() {
 		return _ipNetmask;
+	}
+
+	public boolean setIpNetmask(String ipNetmask) {
+		_ipNetmask = ipNetmask;
+		return true;
 	}
 
 	public String getNexthop() {
 		return _nexthop;
 	}
 
+	public boolean setNexthop(String nexthop) {
+		_nexthop = nexthop;
+		return true;
+	}
+
 	public String getRuleName() {
 		return _ruleName;
+	}
+
+	public boolean setRuleName(String ruleName) {
+		_ruleName = ruleName;
+		return true;
 	}
 
 	public AclTemplate getAclTemplate() {
@@ -86,11 +161,47 @@ public class IOSParser extends CommonRules<Object> {
 	public void setAclContext(AccessList acl) {
 		_aclContext = acl;
 	}
-	
+
+	public String getFirstPort() {
+		return _firstPort;
+	}
+
+	public boolean setFirstPort(String firstPort) {
+		_firstPort = firstPort;
+		return true;
+	}
+
+	public String getLastPort() {
+		return _lastPort;
+	}
+
+	public boolean setLastPort(String lastPort) {
+		_lastPort = lastPort;
+		return true;
+	}
+
+	public String getPortOperator() {
+		return _portOperator;
+	}
+
+	public boolean setPortOperator(String portOperator) {
+		_portOperator = portOperator;
+		return true;
+	}
+
+	public String getSubType() {
+		return _subType;
+	}
+
+	public boolean setSubType(String subType) {
+		_subType = subType;
+		return true;
+	}
+
 	/**
 	 * Resets the resulting values of the parsing to null.
 	 */
-	public void clear() {
+	protected boolean clear() {
 		_name = null;
 		_direction = null;
 		_description = null;
@@ -104,6 +215,7 @@ public class IOSParser extends CommonRules<Object> {
 		_lastPort = null;
 		_subType = null;
 		_ruleName = null;
+		return true;
 	}
 
 	/**
@@ -181,16 +293,12 @@ public class IOSParser extends CommonRules<Object> {
 	@SuppressSubnodes
 	public Rule Interface() {
 		return Sequence(
+				clear(),
 				String("interface"),
 				WhiteSpaces(),
 				UntilEOI(),
-				new Action() {
-					public boolean run(Context context) {
-						_name = context.getMatch();
-						_ruleName = "interface";
-						return true;
-					}
-				}
+				setName(match()),
+				setRuleName("interface")
 			);
 	}
 
@@ -202,6 +310,7 @@ public class IOSParser extends CommonRules<Object> {
 	@SuppressSubnodes
 	public Rule ExitInterface() {
 		return Sequence (
+					clear(),
 					FirstOf(
 						String("interface"),
 						String("router"),
@@ -225,13 +334,16 @@ public class IOSParser extends CommonRules<Object> {
 	 */
 	@SuppressSubnodes
 	public Rule InInterface() {
-		return FirstOf(
-					IfDescription(),
-					IfIpv6Address(),
-					IfIpAddress(),
-					IfIpAccessGroup(),
-					IfIpv6TrafficFilter(),
-					IfShutdown()
+		return Sequence(
+					clear(),
+					FirstOf(
+						IfDescription(),
+						IfIpv6Address(),
+						IfIpAddress(),
+						IfIpAccessGroup(),
+						IfIpv6TrafficFilter(),
+						IfShutdown()
+					)
 			);
 	}
 
@@ -244,14 +356,9 @@ public class IOSParser extends CommonRules<Object> {
 				String("description"),
 				WhiteSpaces(),
 				UntilEOI(),
-				new Action() {
-					public boolean run(Context context) {
-						_description = context.getMatch();
-						_ruleName = "description";
-						return true;
-					}
-				}
-			);
+				setDescription(match()),
+				setRuleName("description")
+		);
 	}
 
 	/**
@@ -262,12 +369,7 @@ public class IOSParser extends CommonRules<Object> {
 		return Sequence(
 				String("shutdown"),
 				UntilEOI(),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "shutdown";
-						return true;
-					}
-				}
+				setRuleName("shutdown")
 			);
 	}
 
@@ -283,21 +385,11 @@ public class IOSParser extends CommonRules<Object> {
 					String("address"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							return true;
-						}
-					},
+					setIpAddress(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipNetmask = context.getMatch();
-							_ruleName = "ip address";
-							return true;
-						}
-					},
+					setIpNetmask(match()),
+					setRuleName("ip address"),
 					// we don't care about the rest if any.
 					UntilEOI()
 				);
@@ -315,13 +407,8 @@ public class IOSParser extends CommonRules<Object> {
 					String("address"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							_ruleName = "ipv6 address";
-							return true;
-						}
-					},
+					setIpAddress(match()),
+					setRuleName("ipv6 address"),
 					EOI
 				);
 	}
@@ -339,24 +426,14 @@ public class IOSParser extends CommonRules<Object> {
 					String("access-group"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_name = context.getMatch();
-							return true;
-						}
-					},
+					setName(match()),
 					WhiteSpaces(),
 					FirstOf(
 						String("in"),
 						String("out")
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_direction  = context.getMatch();
-							_ruleName = "ip access-group";
-							return true;
-						}
-					},
+					setDirection(match()),
+					setRuleName("ip access-group"),
 					UntilEOI()
 				);
 	}
@@ -374,24 +451,14 @@ public class IOSParser extends CommonRules<Object> {
 					String("traffic-filter"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_name = context.getMatch();
-							return true;
-						}
-					},
+					setName(match()),
 					WhiteSpaces(),
 					FirstOf(
 						String("in"),
 						String("out")
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_direction  = context.getMatch();
-							_ruleName = "ipv6 traffic-filter";
-							return true;
-						}
-					},
+					setDirection(match()),
+					setRuleName("ipv6 traffic-filter"),
 					UntilEOI()
 				);
 	}
@@ -402,35 +469,28 @@ public class IOSParser extends CommonRules<Object> {
 	 */
 	@SuppressSubnodes
 	public Rule Parse() {
-		return FirstOf(
-				Ignore(),
-				IpRoute(),
-				Ipv6Route(),
-				IpAccessList(),
-				Ipv6AccessList(),
-				AccessListRemark(),
-				AccessList(),
-				/*
-				 * parsing of ACE depends on the acl context
-				 */
+		return Sequence(
+				clear(),
 				FirstOf(
-					Sequence(
-						new Action() {
-							public boolean run(Context context) {
-								return _aclContext != null &&
-										_aclContext.getAclType() == AclType.IPSTD;
-							}
-						},
-						AceStandard()
-					),
-					Sequence(
-						new Action() {
-							public boolean run(Context context) {
-								return _aclContext != null &&
-										_aclContext.getAclType() == AclType.IPEXT;
-							}
-						},
-						AceExtended()
+					Ignore(),
+					IpRoute(),
+					Ipv6Route(),
+					IpAccessList(),
+					Ipv6AccessList(),
+					AccessListRemark(),
+					AccessList(),
+					/*
+					 * parsing of ACE depends on the acl context
+					 */
+					FirstOf(
+						Sequence(
+							checkAclContext(AclType.IPSTD),
+							AceStandard()
+						),
+						Sequence(
+							checkAclContext(AclType.IPEXT),
+							AceExtended()
+						)
 					)
 				)
 			);
@@ -470,12 +530,7 @@ public class IOSParser extends CommonRules<Object> {
 				// place holder for new rules
 				String("###### PLACE HOLDER #######")
 			),
-			new Action() {
-				public boolean run(Context context) {
-					_ruleName = "Ignore";
-					return true;
-				}
-			}
+			setRuleName("Ignore")
 		);
 	}
 
@@ -498,29 +553,14 @@ public class IOSParser extends CommonRules<Object> {
 					String("route"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							return true;
-						}
-					},
+					setIpAddress(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipNetmask = context.getMatch();
-							return true;
-						}
-					},
+					setIpNetmask(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_nexthop = context.getMatch();
-							_ruleName = "ip route";
-							return true;
-						}
-					},
+					setNexthop(match()),
+					setRuleName("ip route"),
 					EOI
 			);		 
 	 }
@@ -546,21 +586,11 @@ public class IOSParser extends CommonRules<Object> {
 					String("route"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							return true;
-						}
-					},
+					setIpAddress(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_nexthop = context.getMatch();
-							_ruleName = "ipv6 route";
-							return true;
-						}
-					},
+					setNexthop(match()),
+					setRuleName("ipv6 route"),
 					EOI
 			);
 	 }
@@ -580,12 +610,7 @@ public class IOSParser extends CommonRules<Object> {
 						)
 					),
 					String("remark"),
-					new Action() {
-						public boolean run(Context context) {
-							_ruleName = "access-list remark";
-							return true;
-						}
-					}
+					setRuleName("access-list remark")
 				);
 	}
 
@@ -605,27 +630,12 @@ public class IOSParser extends CommonRules<Object> {
 					String("standard"),
 					String("extended")
 				),
-				new Action() {
-					public boolean run(Context context) {
-						String type = context.getMatch();
-						_acl = new AclTemplate();
-						if (type.equals("standard"))
-							_acl.setAclType(AclType.IPSTD);
-						else
-							_acl.setAclType(AclType.IPEXT);
-						return true;
-					}
-				},
+				newAclTemplate(match()),
 				WhiteSpaces(),
 				StringAtom(),
-				new Action() {
-					public boolean run(Context context) {
-						_acl.setName(context.getMatch());
-						_acl.setIpVersion(IPversion.IPV4);
-						_ruleName = "ip access-list named";
-						return true;
-					}
-				},
+				_acl.setName(match()),
+				_acl.setIpVersion(IPversion.IPV4),
+				setRuleName("ip access-list named"),
 				EOI
 			);
 	}
@@ -641,18 +651,12 @@ public class IOSParser extends CommonRules<Object> {
 				String("ipv6"),
 				WhiteSpaces(),
 				String("access-list"),
+				newAclTemplate("extended"),
 				WhiteSpaces(),
 				StringAtom(),
-				new Action() {
-					public boolean run(Context context) {
-						_acl = new AclTemplate();
-						_acl.setName(context.getMatch());
-						_acl.setIpVersion(IPversion.IPV6);
-						_acl.setAclType(AclType.IPEXT);
-						_ruleName = "ipv6 access-list named";
-						return true;
-					}
-				},
+				_acl.setName(match()),
+				_acl.setIpVersion(IPversion.IPV6),
+				setRuleName("ipv6 access-list named"),
 				EOI
 			);
 	}
@@ -668,16 +672,7 @@ public class IOSParser extends CommonRules<Object> {
 				String("access-list"),
 				WhiteSpaces(),
 				Number(),
-				new Action() {
-					public boolean run(Context context) {
-						int number = Integer.valueOf(context.getMatch());
-						_acl = new AclTemplate();
-						_acl.setNumber(number);
-						_acl.setIpVersion(IPversion.IPV4);
-						_acl.setAclType(AclType.getType(number));
-						return true;
-					}
-				},
+				newAclTemplateNumber(match()),
 				WhiteSpaces(),
 				/*
 				 * Test the acl type to get the rule.
@@ -685,30 +680,15 @@ public class IOSParser extends CommonRules<Object> {
 				FirstOf(
 					/* standard */
 					Sequence(
-						new Action() {
-							public boolean run(Context context) {
-								AclType type = _acl.getAclType();
-								return type == AclType.IPSTD;
-							}
-						},
+						checkAclType(AclType.IPSTD),
 						AceStandard()
 					),
 					Sequence(
-						new Action() {
-							public boolean run(Context context) {
-								AclType type = _acl.getAclType();
-								return type == AclType.IPEXT;
-							}
-						},
+						checkAclType(AclType.IPEXT),
 						AceExtended()
 					)
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "access-list";
-						return true;
-					}
-				}
+				setRuleName("access-list")
 			);
 	 }
 
@@ -722,22 +702,12 @@ public class IOSParser extends CommonRules<Object> {
 	public Rule AceStandard() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_ace = new AceTemplate();
-						return true;
-					}
-				},
+				newAceTemplate(),
 				FirstOf(
 					String("permit"),
 					String("deny")
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setAction(context.getMatch());
-						return true;
-					}
-				},
+				_ace.setAction(match()),
 				WhiteSpaces(),
 				FirstOf(
 					String("any"),
@@ -745,42 +715,22 @@ public class IOSParser extends CommonRules<Object> {
 						String("host"),
 						WhiteSpaces(),
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_ace.setSrcIp(context.getMatch());
-								return true;
-							}
-						}
+						_ace.setSrcIp(match())
 					),
 					Sequence(
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_ace.setSrcIp(context.getMatch());
-								return true;
-							}
-						},
+						_ace.setSrcIp(match()),
 						Optional(
 							Sequence(
 								WhiteSpaces(),
 								TestNot(String("log")),
 								StringAtom(),
-								new Action() {
-									public boolean run(Context context) {
-										_ace.setSrcIpMask(context.getMatch());
-										return true;
-									}
-								}
+								_ace.setSrcIpMask(match())
 							)
 						)
 					)
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "ace standard";
-						return true;
-					}
-				},
+				setRuleName("ace standard"),
 				UntilEOI()
 			);
 	}
@@ -794,59 +744,39 @@ public class IOSParser extends CommonRules<Object> {
 			Sequence(
 				// source
 				AclIpAddress(),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setSrcIp(_ipAddress);
-						_ace.setSrcIpMask(_ipNetmask);
-						_ipAddress = null;
-						_ipNetmask = null;
-						return true;
-					}
-				},
+				_ace.setSrcIp(_ipAddress),
+				_ace.setSrcIpMask(_ipNetmask),
+				setIpAddress(null),
+				setIpNetmask(null),
 				WhiteSpaces(),
 				Optional(
 					Sequence(
 						PortOperatorOrRange(),
-						new Action() {
-							public boolean run(Context context) {
-								_ace.setSrcPortOperator(_portOperator);
-								_ace.setSrcFirstPort(_firstPort);
-								_ace.setSrcLastPort(_lastPort);
-								_portOperator = null;
-								_firstPort = null;
-								_lastPort = null;
-								return true;
-							}
-						},
+						_ace.setSrcPortOperator(_portOperator),
+						_ace.setSrcFirstPort(_firstPort),
+						_ace.setSrcLastPort(_lastPort),
+						setPortOperator(null),
+						setFirstPort(null),
+						setLastPort(null),
 						WhiteSpaces()
 					)
 				),
 				// destination
 				AclIpAddress(),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setDstIp(_ipAddress);
-						_ace.setDstIpMask(_ipNetmask);
-						_ipAddress = null;
-						_ipNetmask = null;
-						return true;
-					}
-				},
+				_ace.setDstIp(_ipAddress),
+				_ace.setDstIpMask(_ipNetmask),
+				setIpAddress(null),
+				setIpNetmask(null),
 				WhiteSpacesOrEoi(),
 				Optional(
 					Sequence(
 						PortOperatorOrRange(),
-						new Action() {
-							public boolean run(Context context) {
-								_ace.setDstPortOperator(_portOperator);
-								_ace.setDstFirstPort(_firstPort);
-								_ace.setDstLastPort(_lastPort);
-								_portOperator = null;
-								_firstPort = null;
-								_lastPort = null;
-								return true;
-							}
-						}
+						_ace.setDstPortOperator(_portOperator),
+						_ace.setDstFirstPort(_firstPort),
+						_ace.setDstLastPort(_lastPort),
+						setPortOperator(null),
+						setFirstPort(null),
+						setLastPort(null)
 					)
 				),
 				SkipSpaces(),
@@ -877,17 +807,12 @@ public class IOSParser extends CommonRules<Object> {
 		return
 			Sequence(
 				String("established"),
-				new Action() {
-					public boolean run(Context context) {
-						/*
-						 * established : ack or rst
-						 */
-						_ace.setTcpKeyword("match-any");
-						_ace.getTcpFlags().add("+ack");
-						_ace.getTcpFlags().add("+rst");
-						return true;
-					}
-				}
+				/*
+				 * established : ack or rst
+				 */
+				_ace.setTcpKeyword("match-any"),
+				_ace.getTcpFlags().add("+ack"),
+				_ace.getTcpFlags().add("+rst")
 			);
 	}
 
@@ -903,12 +828,7 @@ public class IOSParser extends CommonRules<Object> {
 					String("match-any"),
 					String("match-all")
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setTcpKeyword(context.getMatch());
-						return true;
-					}
-				},
+				_ace.setTcpKeyword(match()),
 				WhiteSpaces(),
 				OneOrMore(
 					AceTcpNewFlag()
@@ -937,12 +857,7 @@ public class IOSParser extends CommonRules<Object> {
 					String("-syn"),
 					String("-urg")
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.getTcpFlags().add(context.getMatch());
-						return true;
-					}
-				},
+				_ace.getTcpFlags().add(match()),
 				SkipSpaces()
 			);
 	}
@@ -973,13 +888,8 @@ public class IOSParser extends CommonRules<Object> {
 					String("syn"),
 					String("urg")
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.getTcpFlags().add("+" + context.getMatch());
-						_ace.setTcpKeyword("match-any");
-						return true;
-					}
-				},
+				_ace.getTcpFlags().add("+" + match()),
+				_ace.setTcpKeyword("match-any"),
 				SkipSpaces()
 			);
 	}
@@ -993,27 +903,17 @@ public class IOSParser extends CommonRules<Object> {
 			Sequence(
 				// source
 				AclIpAddress(),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setSrcIp(_ipAddress);
-						_ace.setSrcIpMask(_ipNetmask);
-						_ipAddress = null;
-						_ipNetmask = null;
-						return true;
-					}
-				},
+				_ace.setSrcIp(_ipAddress),
+				_ace.setSrcIpMask(_ipNetmask),
+				setIpAddress(null),
+				setIpNetmask(null),
 				WhiteSpaces(),
 				// destination
 				AclIpAddress(),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setDstIp(_ipAddress);
-						_ace.setDstIpMask(_ipNetmask);
-						_ipAddress = null;
-						_ipNetmask = null;
-						return true;
-					}
-				}
+				_ace.setDstIp(_ipAddress),
+				_ace.setDstIpMask(_ipNetmask),
+				setIpAddress(null),
+				setIpNetmask(null)
 			);
 	}
 
@@ -1027,45 +927,22 @@ public class IOSParser extends CommonRules<Object> {
 			Sequence(
 				// source
 				AclIpAddress(),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setSrcIp(_ipAddress);
-						_ace.setSrcIpMask(_ipNetmask);
-						_ipAddress = null;
-						_ipNetmask = null;
-						return true;
-					}
-				},
+				_ace.setSrcIp(_ipAddress),
+				_ace.setSrcIpMask(_ipNetmask),
+				setIpAddress(null),
+				setIpNetmask(null),
 				WhiteSpaces(),
 				// destination
 				AclIpAddress(),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setDstIp(_ipAddress);
-						_ace.setDstIpMask(_ipNetmask);
-						_ipAddress = null;
-						_ipNetmask = null;
-						return true;
-					}
-				},
+				_ace.setDstIp(_ipAddress),
+				_ace.setDstIpMask(_ipNetmask),
+				setIpAddress(null),
+				setIpNetmask(null),
 				Optional(
 					Sequence(
 						WhiteSpaces(),
 						AclSubType(),
-						new Action() {
-							public boolean run(Context context) {
-								String icmp = context.getMatch();
-								IPIcmpEnt icmpEnt = 
-									IPIcmp4.getInstance().icmpLookup(icmp);
-								if (icmpEnt != null) {
-									_ace.setSubType(icmp);
-									_ace.setCode(icmpEnt.getCode());
-									return true;
-								}
-								throw new JtaclConfigurationException(
-										"unknown icmp type or message: " + icmp);
-							}
-						}
+						setAceIcmp4(match())
 					)
 				)
 			);
@@ -1118,23 +995,13 @@ public class IOSParser extends CommonRules<Object> {
 	public Rule AceExtended() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_ace = new AceTemplate();
-						return true;
-					}
-				},
+				newAceTemplate(),
 				// permit | deny
 				FirstOf(
 					String("permit"),
 					String("deny")
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ace.setAction(context.getMatch());
-						return true;
-					}
-				},
+				_ace.setAction(match()),
 				WhiteSpaces(),
 				FirstOf(
 					// tcp | udp
@@ -1143,46 +1010,26 @@ public class IOSParser extends CommonRules<Object> {
 							String("tcp"),
 							String("udp")
 						),
-						new Action() {
-							public boolean run(Context context) {
-								_ace.setProtocol(context.getMatch());
-								return true;
-							}
-						},
+						_ace.setProtocol(match()),
 						WhiteSpaces(),
 						AceExtendedTcpUdp()
 					),
 					// icmp
 					Sequence(
 						String("icmp"),
-						new Action() {
-							public boolean run(Context context) {
-								_ace.setProtocol(context.getMatch());
-								return true;
-							}
-						},
+						_ace.setProtocol(match()),
 						WhiteSpaces(),
 						AceExtendedIcmp()
 					),
 					// other protocol
 					Sequence(
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_ace.setProtocol(context.getMatch());
-								return true;
-							}
-						},
+						_ace.setProtocol(match()),
 						WhiteSpaces(),
 						AceExtendedOtherProtocol()
 					)
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "ace extended";
-						return true;
-					}
-				},
+				setRuleName("ace extended"),
 				UntilEOI()
 			);
 	}
@@ -1197,51 +1044,26 @@ public class IOSParser extends CommonRules<Object> {
 					// any
 					Sequence(
 						String("any"),
-						new Action() {
-							public boolean run(Context context) {
-								_ipAddress = "any";
-								return true;
-							}
-						}
+						setIpAddress("any")
 					),
 					// host ip
 					Sequence(
 						String("host"),
 						WhiteSpaces(),
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_ipAddress = context.getMatch();
-								return true;
-							}
-						}
+						setIpAddress(match())
 					),
 					// ip [netmask] (no netmask if ipv6)
 					Sequence(
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_ipAddress = context.getMatch();
-								return true;
-							}
-						},
+						setIpAddress(match()),
 						// netmask | nothing (ipv6)
 						FirstOf(
-							new Action() {
-								public boolean run(Context context) {
-									// no mask if ipv6 address
-									return _ipAddress.contains(":");
-								}
-							},
+							_ipAddress.contains(":"),
 							Sequence(
 								WhiteSpaces(),
 								StringAtom(),
-								new Action() {
-									public boolean run(Context context) {
-										_ipNetmask = context.getMatch();
-										return true;
-									}
-								}
+								setIpNetmask(match())
 							)
 						)
 					)
@@ -1252,12 +1074,7 @@ public class IOSParser extends CommonRules<Object> {
 		return Sequence(
 			TestNot(AclKeyword()),
 			StringAtom(),
-			new Action() {
-				public boolean run(Context context) {
-					_subType = context.getMatch();
-					return true;
-				}
-			}
+			setSubType(match())
 		);
 	}
 
@@ -1296,20 +1113,10 @@ public class IOSParser extends CommonRules<Object> {
 						String("lt"),
 						String("gt")
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_portOperator = context.getMatch();
-							return true;
-						}
-					},
+					setPortOperator(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_firstPort = context.getMatch();
-							return true;
-						}
-					}
+					setFirstPort(match())
 			);
 	}
 
@@ -1320,28 +1127,13 @@ public class IOSParser extends CommonRules<Object> {
 	public Rule PortOperatorRange() {
 		return Sequence(
 					String("range"),
-					new Action() {
-						public boolean run(Context context) {
-							_portOperator = context.getMatch();
-							return true;
-						}
-					},
+					setPortOperator(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_firstPort = context.getMatch();
-							return true;
-						}
-					},
+					setFirstPort(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_lastPort = context.getMatch();
-							return true;
-						}
-					}
+					setLastPort(match())
 			);
 		}
 
