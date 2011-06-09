@@ -13,10 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.parsers;
 
-import java.util.List;
-import org.parboiled.Action;
-import org.parboiled.Context;
-import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 
 /**
@@ -25,24 +21,20 @@ import org.parboiled.Rule;
  */
 public class PixShellParser extends GenericEquipmentShellParser {
 
-	public void clear() {
-		super.clear();
+	protected boolean clear() {
+		return super.clear();
 	}
 
 	public Rule CommandLine() {
-		return Sequence(
-			new Action() {
-				public boolean run(Context context) {
-					clear();
-					return true;
-				}
-			},
-			FirstOf(
-				CommandHelp(),
-				CommandXref(),
-				CommandShow()
-			)
-		);
+		return
+			Sequence(
+				clear(),
+				FirstOf(
+					CommandHelp(),
+					CommandXref(),
+					CommandShow()
+				)
+			);
 	}
 
 	/**
@@ -61,12 +53,7 @@ public class PixShellParser extends GenericEquipmentShellParser {
 				IgnoreCase("protocol-group"),
 				IgnoreCase("service-group")
 			),
-			new Action() {
-				public boolean run(Context context) {
-					setCommand("show-" + context.getMatch().toLowerCase());
-					return true;
-				}
-			},
+			setCommand("show-" + match().toLowerCase()),
 			Optional(
 				Sequence(
 					WhiteSpace(),
@@ -74,12 +61,7 @@ public class PixShellParser extends GenericEquipmentShellParser {
 						IgnoreCase("used"),
 						IgnoreCase("unused")
 					),
-					new Action() {
-						public boolean run(Context context) {
-							getParam().add(context.getMatch().toLowerCase());
-							return true;
-						}
-					}
+					getParam().add(match().toLowerCase())
 				)
 			),
 			EOI

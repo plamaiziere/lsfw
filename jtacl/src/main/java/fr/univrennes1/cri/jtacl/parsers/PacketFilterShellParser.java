@@ -13,8 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.parsers;
 
-import org.parboiled.Action;
-import org.parboiled.Context;
 import org.parboiled.Rule;
 
 /**
@@ -23,23 +21,19 @@ import org.parboiled.Rule;
  */
 public class PacketFilterShellParser extends GenericEquipmentShellParser {
 
-	public void clear() {
-		super.clear();
+	protected boolean clear() {
+		return super.clear();
 	}
 
 	public Rule CommandLine() {
-		return Sequence(
-			new Action() {
-				public boolean run(Context context) {
-					clear();
-					return true;
-				}
-			},
-			FirstOf(
-				CommandHelp(),
-				CommandXref()
-			)
-		);
+		return
+			Sequence(
+				clear(),
+				FirstOf(
+					CommandHelp(),
+					CommandXref()
+				)
+			);
 	}
 
 }

@@ -15,8 +15,6 @@ package fr.univrennes1.cri.jtacl.parsers;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.parboiled.Action;
-import org.parboiled.Context;
 import org.parboiled.Rule;
 
 /**
@@ -31,20 +29,22 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	protected String _xrefFormat = null;
 	protected String _xrefIp = null;
 
-	public void clear() {
+	protected boolean clear() {
 		_command = "";
 		_param = new ArrayList<String>();
 		_xrefObject = null;
 		_xrefFormat = null;
 		_xrefIp = null;
+		return true;
 	}
 
 	public String getCommand() {
 		return _command;
 	}
 
-	public void setCommand(String command) {
+	public boolean setCommand(String command) {
 		_command = command;
+		return true;
 	}
 
 	public List<String> getParam() {
@@ -54,35 +54,34 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	public String getXrefObject() {
 		return _xrefObject;
 	}
-	public void setXrefObject(String xrefObject) {
+
+	public boolean setXrefObject(String xrefObject) {
 		_xrefObject = xrefObject;
+		return true;
 	}
 
 	public String getXrefFormat() {
 		return _xrefFormat;
 	}
 
-	public void setXrefFormat(String xrefFormat) {
+	public boolean setXrefFormat(String xrefFormat) {
 		_xrefFormat = xrefFormat;
+		return true;
 	}
 
 	public String getXrefIp() {
 		return _xrefIp;
 	}
 
-	public void setXrefIp(String xrefIp) {
+	public boolean setXrefIp(String xrefIp) {
 		_xrefIp = xrefIp;
+		return true;
 	}
 
 	public Rule CommandHelp() {
 		return Sequence(
 			IgnoreCase("help"),
-			new Action() {
-				public boolean run(Context context) {
-					setCommand("help");
-					return true;
-				}
-			},
+			setCommand("help"),
 			EOI
 		);
 	}
@@ -97,12 +96,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 			Optional(
 				Sequence(
 					IgnoreCase("ip"),
-					new Action() {
-						public boolean run(Context context) {
-							setXrefObject("ip");
-							return true;
-						}
-					},
+					setXrefObject("ip"),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
@@ -110,34 +104,19 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 								IgnoreCase("long"),
 								IgnoreCase("short")
 							),
-							new Action() {
-								public boolean run(Context context) {
-								setXrefFormat(context.getMatch().toLowerCase());
-								return true;
-								}
-							}
+							setXrefFormat(match().toLowerCase())
 						)
 					),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
 							StringAtom(),
-							new Action() {
-								public boolean run(Context context) {
-									setXrefIp(context.getMatch());
-									return true;
-								}
-							}
+							setXrefIp(match())
 						)
 					)
 				)
 			),
-			new Action() {
-				public boolean run(Context context) {
-					setCommand("xref");
-					return true;
-				}
-			},
+			setCommand("xref"),
 			EOI
 		);
 	}
