@@ -16,7 +16,6 @@ package fr.univrennes1.cri.jtacl.parsers;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.AclTemplate;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.GroupTypeSearchable;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.ObjectGroupType;
-import fr.univrennes1.cri.jtacl.parsers.PixParser;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
 import java.io.IOException;
@@ -91,9 +90,8 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testInterface() {
 		System.out.println("Interface");
 		String line = "interface foo bar";
-		parser.clear();
-		 result = ReportingParseRunner.run(parser.Interface(), line);
-		 assertTrue(result.matched);
+		result = ReportingParseRunner.run(parser.Interface(), line);
+		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("foo bar", parser.getName());
 			assertEquals(null, parser.getShutdown());
@@ -101,9 +99,8 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "interface foo bar shutdown blabla";
-		parser.clear();
-		 result = ReportingParseRunner.run(parser.Interface(), line);
-		 assertTrue(result.matched);
+		result = ReportingParseRunner.run(parser.Interface(), line);
+		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("foo bar", parser.getName());
 			assertEquals("shutdown", parser.getShutdown());
@@ -128,10 +125,9 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			"access-list"
 		};
 		for (String s: dt) {
-			parser.clear();
-			 result = ReportingParseRunner.run(parser.ExitInterface(), s);
-			 System.out.println("test: " + s);
-			 assertTrue(result.matched);
+			result = ReportingParseRunner.run(parser.ExitInterface(), s);
+			System.out.println("test: " + s);
+			assertTrue(result.matched);
 		}
 	}
 
@@ -141,7 +137,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testIfAddress() {
 		System.out.println("IfAddress");
 		String line = "ip  address    IPADDRESS    NETMASK   secondary or something else";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.InInterface(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -158,7 +153,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		System.out.println("IfIpv6Address");
 
 		String line = "ipv6     address      IPADDRESS";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.InInterface(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -167,7 +161,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "ipv6     address      IPADDRESS something";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.InInterface(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -182,7 +175,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testIfName() {
 		System.out.println("IfName");
 		String line = "nameif       outside";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.InInterface(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -197,7 +189,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testPixName() {
 		System.out.println("PixName");
 		String line = "name     IPADDRESS     NAME    A DESCRIPTION ";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -214,7 +205,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testPixRoute() {
 		System.out.println("PixRoute");
 		String line = "route    INTERFACE    IPADDRESS   NETMASK    NEXTHOP some option";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -232,7 +222,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testIpv6Route() {
 		System.out.println("Ipv6Route");
 		String line = "ipv6 route   INTERFACE  IPADDRESS   NEXTHOP something";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -249,7 +238,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testObjectGroupNetwork() {
 		System.out.println("ObjectGroupNetwork");
 		String line = "object-group      network      GROUPID";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -264,7 +252,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testObjectGroupService() {
 		System.out.println("ObjectGroupService");
 		String line = "object-group      service      GROUPID tcp";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -274,7 +261,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "object-group      service      GROUPID udp";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -284,7 +270,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "object-group      service      GROUPID tcp-udp";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -294,7 +279,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "object-group      service      GROUPID";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -311,7 +295,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testObjectGroupProtocol() {
 		System.out.println("ObjectGroupProtocol");
 		String line = "object-group      protocol      GROUPID";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -326,7 +309,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testObjectGroupIcmp() {
 		System.out.println("ObjectGroupIcmp");
 		String line = "object-group      icmp-type      GROUPID";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -341,7 +323,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testNetworkObject() {
 		System.out.println("NetworkObject");
 		String line = "network-object     host       IPADDRESS";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -350,7 +331,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "network-object     IPADDRESS     NETMASK";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -360,7 +340,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "network-object     IPADDRESS";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -376,7 +355,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testProtocolObject() {
 		System.out.println("ProtocolObject");
 		String line = "protocol-object     PROTO";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -391,7 +369,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void tesIcmpObject() {
 		System.out.println("IcmpObject");
 		String line = "icmp-object     PROTO";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -406,7 +383,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testGroupObject() {
 		System.out.println("GroupObject");
 		String line = "group-object     GROUPID";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -415,7 +391,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "network-object     IPADDRESS     NETMASK";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -425,7 +400,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "network-object     IPADDRESS";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -441,7 +415,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testServiceObject() {
 		System.out.println("service-object");
 		String line = "service-object PROTO  eq   PORT";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -452,7 +425,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "service-object PROTO  range   PORT1 PORT2";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -464,7 +436,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "service-object PROTO";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -481,7 +452,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testPortObject() {
 		System.out.println("port-object");
 		String line = "port-object  eq   PORT";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -490,7 +460,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			assertEquals("port-object", parser.getRuleName());
 		}
 		line = "port-object  neq   PORT";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -499,7 +468,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			assertEquals("port-object", parser.getRuleName());
 		}
 		line = "port-object  lt   PORT";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -508,7 +476,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			assertEquals("port-object", parser.getRuleName());
 		}
 		line = "port-object  gt   PORT";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -517,7 +484,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			assertEquals("port-object", parser.getRuleName());
 		}
 		line = "port-object  range   PORT1 PORT2";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -534,7 +500,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testAccessGroup() {
 		System.out.println("AccessGroup");
 		String line = "access-group GROUP    in   interface    INTERFACE  something";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -545,7 +510,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "access-group GROUP    out  interface    INTERFACE  something";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -562,7 +526,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testAccessListRemark() {
 		System.out.println("AccessListRemark");
 		String line = "access-list ID remark something something";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -570,7 +533,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		}
 
 		line = "access-list ID remark something something something something";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -585,7 +547,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	public void testDescription() {
 		System.out.println("Description");
 		String line = "description something something";
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -615,7 +576,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any eq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -636,7 +596,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any eq SERVSRC" +
 				" host  IP   eq   SERVDST inactive";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -657,7 +616,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		line = "access-list ID  line 40  extended  permit" +
 				" PROTO any any";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -673,7 +631,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		line = "access-list ID  line 40  extended  permit" +
 				" PROTO any any inactive";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -692,7 +649,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any eq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -713,7 +669,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any eq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -734,7 +689,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" object-group GPROTO  any eq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -755,7 +709,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  IPSRC MASKSRC eq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -777,7 +730,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  host IPSRC  eq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -798,7 +750,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  object-group GSRCNETWORK  eq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -819,7 +770,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any lt SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -836,7 +786,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			assertEquals("SERVDST", acl.getDstFirstPort());
 		}
 
-		parser.clear();
 		line = "access-list ID deny" +
 				" PROTO  any gt SERVSRC" +
 				" host  IP   eq   SERVDST";
@@ -861,7 +810,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any neq SERVSRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -882,7 +830,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any range SERV1SRC SERV2SRC" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -904,7 +851,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any object-group GSRCSERV" +
 				" host  IP   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -924,7 +870,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any object-group GSRCSERV" +
 				" IPDST MASKDST   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -945,7 +890,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any object-group GSRCSERV" +
 				" object-group GDSTNETWORK   eq   SERVDST";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -965,7 +909,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  any object-group GSRCSERV" +
 				" object-group GDSTNETWORK";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -985,7 +928,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" PROTO  interface SRCIFACE" +
 				" interface DSTIFACE";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -1004,7 +946,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" interface DSTIFACE" +
 				" something something inactive something";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -1021,7 +962,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		line = "access-list inside_access_in " +
 				"extended deny tcp any object-group GDSTNETWORK";
 		
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -1038,7 +978,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 		line = "access-list ID " +
 				"extended deny object-group GENHANCED any object-group GDSTNETWORK";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -1059,7 +998,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				"extended deny ICMP any object-group GDSTNETWORK" +
 				" object-group GICMP";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -1078,7 +1016,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				"extended deny ICMP object-group GSRCNETWORK object-group GDSTNETWORK" +
 				" object-group GICMP inactive";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -1103,7 +1040,6 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 				" object-group GDSTNETWORK" +
 				" echo";
 
-		parser.clear();
 		result = ReportingParseRunner.run(parser.Parse(), line);
 		assertTrue(result.matched);
 		if (result.matched) {

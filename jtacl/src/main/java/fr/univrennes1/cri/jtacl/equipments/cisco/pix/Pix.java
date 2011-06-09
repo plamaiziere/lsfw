@@ -341,7 +341,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 					inInterface = false;
 					curCsIface = null;
 				} else {
-					parser.clear();
 					result = ReportingParseRunner.run(parser.InInterface(), lineCfg);
 					if (result.matched) {
 						String rule = parser.getRuleName();
@@ -383,7 +382,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				}
 			}
 			if (lineCfg.startsWith("interface")) {
-				parser.clear();
 				result = ReportingParseRunner.run(parser.Interface(), lineCfg);
 				if (result.matched) {
 					inInterface = true;
@@ -1016,7 +1014,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			/*
 			 * parse the line
 			 */
-			parser.clear();
 			result = ReportingParseRunner.run(parser.Parse(), lineCfg);
 			if (result.matched) {
 				String rule = parser.getRuleName();

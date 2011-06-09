@@ -17,8 +17,6 @@ import fr.univrennes1.cri.jtacl.equipments.cisco.pix.AclTemplate;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.GroupTypeSearchable;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.ObjectGroupType;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
-import org.parboiled.Action;
-import org.parboiled.Context;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
 
@@ -28,77 +26,169 @@ import org.parboiled.annotations.SuppressSubnodes;
  */
 public class PixParser extends CommonRules<Object> {
 
-	private String _name;
-	private String _ipAddress;
-	private String _ipNetmask;
-	private String _nexthop;
-	private String _interface;
-	private String _shutdown;
-	private String _ruleName;
-	private String _groupId;
-	private String _protocol;
-	private String _portOperator;
-	private String _firstPort;
-	private String _lastPort;
-	private String _direction;
+	protected String _name;
+	protected String _ipAddress;
+	protected String _ipNetmask;
+	protected String _nexthop;
+	protected String _interface;
+	protected String _shutdown;
+	protected String _ruleName;
+	protected String _groupId;
+	protected String _protocol;
+	protected String _portOperator;
+	protected String _firstPort;
+	protected String _lastPort;
+	protected String _direction;
 
-	private AclTemplate _acl;
-	private GroupTypeSearchable _groupTypeSearch;
+	protected AclTemplate _acl;
+	protected GroupTypeSearchable _groupTypeSearch;
 
-	public String getName() {
-		return _name;
+	protected boolean newAclTemplate() {
+		_acl = new AclTemplate();
+		return true;
 	}
 
-	public String getIpAddress() {
-		return _ipAddress;
+	protected boolean checkObjectGroupType(String id, ObjectGroupType type) {
+		ObjectGroupType t =	_groupTypeSearch.getGroupType(id);
+		if (t != null && t == type)
+			return true;
+		return false;
 	}
 
-	public String getIpNetmask() {
-		return _ipNetmask;
+	protected boolean aclSetIcmp(String icmp) {
+		if (IPIcmp4.getInstance().icmpLookup(icmp) != null) {
+			_acl.setIcmp(icmp);
+			return true;
+		}
+		return false;
 	}
 
-	public String getNexthop() {
-		return _nexthop;
+
+	public AclTemplate getAcl() {
+		return _acl;
 	}
 
-	public String getInterface() {
-		return _interface;
-	}
-
-	public String getRuleName() {
-		return _ruleName;
-	}
-
-	public String getGroupId() {
-		return _groupId;
-	}
-
-	public String getProtocol() {
-		return _protocol;
-	}
-
-	public String getPortOperator() {
-		return _portOperator;
-	}
-
-	public String getFirstPort() {
-		return _firstPort;
-	}
-
-	public String getLastPort() {
-		return _lastPort;
+	public boolean setAcl(AclTemplate acl) {
+		_acl = acl;
+		return true;
 	}
 
 	public String getDirection() {
 		return _direction;
 	}
 
-	public AclTemplate getAcl() {
-		return _acl;
+	public boolean setDirection(String direction) {
+		_direction = direction;
+		return true;
+
+	}
+
+	public String getFirstPort() {
+		return _firstPort;
+	}
+
+	public boolean setFirstPort(String firstPort) {
+		_firstPort = firstPort;
+		return true;
+	}
+
+	public String getGroupId() {
+		return _groupId;
+	}
+
+	public boolean setGroupId(String groupId) {
+		_groupId = groupId;
+		return true;
+	}
+
+	public String getInterface() {
+		return _interface;
+	}
+
+	public boolean setInterface(String iface) {
+		_interface = iface;
+		return true;
+	}
+
+	public String getIpAddress() {
+		return _ipAddress;
+	}
+
+	public boolean setIpAddress(String ipAddress) {
+		_ipAddress = ipAddress;
+		return true;
+	}
+
+	public String getIpNetmask() {
+		return _ipNetmask;
+	}
+
+	public boolean setIpNetmask(String ipNetmask) {
+		_ipNetmask = ipNetmask;
+		return true;
+	}
+
+	public String getLastPort() {
+		return _lastPort;
+	}
+
+	public boolean setLastPort(String lastPort) {
+		_lastPort = lastPort;
+		return true;
+	}
+
+	public String getName() {
+		return _name;
+	}
+
+	public boolean setName(String name) {
+		_name = name;
+		return true;
+	}
+
+	public String getNexthop() {
+		return _nexthop;
+	}
+
+	public boolean setNexthop(String nexthop) {
+		_nexthop = nexthop;
+		return true;
+	}
+
+	public String getPortOperator() {
+		return _portOperator;
+	}
+
+	public boolean setPortOperator(String portOperator) {
+		_portOperator = portOperator;
+		return true;
+	}
+
+	public String getProtocol() {
+		return _protocol;
+	}
+
+	public boolean setProtocol(String protocol) {
+		_protocol = protocol;
+		return true;
+	}
+
+	public String getRuleName() {
+		return _ruleName;
+	}
+
+	public boolean setRuleName(String ruleName) {
+		_ruleName = ruleName;
+		return true;
 	}
 
 	public String getShutdown() {
 		return _shutdown;
+	}
+
+	public boolean setShutdown(String shutdown) {
+		_shutdown = shutdown;
+		return true;
 	}
 
 	public void setGroupTypeSearch(GroupTypeSearchable groupType) {
@@ -108,7 +198,7 @@ public class PixParser extends CommonRules<Object> {
 	/**
 	 * Resets the resulting values of the parsing to null.
 	 */
-	public void clear() {
+	protected boolean clear() {
 		_name = null;
 		_ipAddress = null;
 		_ipNetmask = null;
@@ -123,6 +213,7 @@ public class PixParser extends CommonRules<Object> {
 		_direction = null;
 		_acl = null;
 		_shutdown = null;
+		return true;
 	}
 
 	/**
@@ -203,33 +294,19 @@ public class PixParser extends CommonRules<Object> {
 	@SuppressSubnodes
 	public Rule Interface() {
 		return Sequence(
+				clear(),
 				String("interface"),
 				WhiteSpaces(),
 				UntilShutdown(),
-				new Action() {
-					public boolean run(Context context) {
-						_name = context.getMatch().trim();
-						return true;
-					}
-				},
+				setName(match().trim()),
 				Optional(
 					Sequence(
 						String("shutdown"),
-						new Action() {
-							public boolean run(Context context) {
-								_shutdown = "shutdown";
-								return true;
-							}
-						}
+						setShutdown("shutdown")
 					)
 				),
 				UntilEOI(),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "interface";
-						return true;
-					}
-				}
+				setRuleName("interface")
 			);
 	}
 
@@ -241,6 +318,7 @@ public class PixParser extends CommonRules<Object> {
 	@SuppressSubnodes
 	public Rule ExitInterface() {
 		return Sequence (
+					clear(),
 					FirstOf(
 						String("interface"),
 						String("router"),
@@ -264,10 +342,14 @@ public class PixParser extends CommonRules<Object> {
 	 */
 	@SuppressSubnodes
 	public Rule InInterface() {
-		return FirstOf(
+		return
+			Sequence(
+				clear(),
+				FirstOf(
 					IfName(),
 					IfIpv6Address(),
 					IfIpAddress()
+				)
 			);
 	}
 
@@ -284,21 +366,11 @@ public class PixParser extends CommonRules<Object> {
 					String("address"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							return true;
-						}
-					},
+					setIpAddress(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipNetmask = context.getMatch();
-							_ruleName = "ip address";
-							return true;
-						}
-					},
+					setIpNetmask(match()),
+					setRuleName("ip address"),
 					// we don't care about the rest if any.
 					UntilEOI()
 				);
@@ -316,13 +388,8 @@ public class PixParser extends CommonRules<Object> {
 					String("address"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							_ruleName = "ipv6 address";
-							return true;
-						}
-					},
+					setIpAddress(match()),
+					setRuleName("ipv6 address"),
 					UntilEOI()
 				);
 	}
@@ -338,13 +405,8 @@ public class PixParser extends CommonRules<Object> {
 				String("nameif"),
 				WhiteSpaces(),
 				UntilEOI(),
-				new Action() {
-					public boolean run(Context context) {
-						_name = context.getMatch();
-						_ruleName = "nameif";
-						return true;
-					}
-				}
+				setName(match()),
+				setRuleName("nameif")
 			);
 	}
 
@@ -354,24 +416,28 @@ public class PixParser extends CommonRules<Object> {
 	 */
 	@SuppressSubnodes
 	public Rule Parse() {
-		return FirstOf(
-				Name(),
-				Route(),
-				Ipv6Route(),
-				ObjectGroupNetwork(),
-				ObjectGroupService(),
-				ObjectGroupProtocol(),
-				ObjectGroupIcmp(),
-				NetworkObject(),
-				ProtocolObject(),
-				ServiceObject(),
-				PortObject(),
-				GroupObject(),
-				IcmpObject(),
-				AccessGroup(),
-				AccessListRemark(),
-				AccessListAcl(),
-				Description()
+		return
+			Sequence(
+				clear(),
+				FirstOf(
+					Name(),
+					Route(),
+					Ipv6Route(),
+					ObjectGroupNetwork(),
+					ObjectGroupService(),
+					ObjectGroupProtocol(),
+					ObjectGroupIcmp(),
+					NetworkObject(),
+					ProtocolObject(),
+					ServiceObject(),
+					PortObject(),
+					GroupObject(),
+					IcmpObject(),
+					AccessGroup(),
+					AccessListRemark(),
+					AccessListAcl(),
+					Description()
+				)
 			);
 	}
 
@@ -387,21 +453,11 @@ public class PixParser extends CommonRules<Object> {
 					String("name"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							return true;
-						}
-					},
+					setIpAddress(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_name = context.getMatch();
-							_ruleName = "name";
-							return true;
-						}
-					},
+					setName(match()),
+					setRuleName("name"),
 					UntilEOI()
 				);
 	}
@@ -418,37 +474,17 @@ public class PixParser extends CommonRules<Object> {
 					String("route"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_interface = context.getMatch();
-							return true;
-						}
-					},
+					setInterface(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							return true;
-						}
-					},
+					setIpAddress(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipNetmask = context.getMatch();
-							return true;
-						}
-					},
+					setIpNetmask(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_nexthop = context.getMatch();
-							_ruleName = "route";
-							return true;
-						}
-					},
+					setNexthop(match()),
+					setRuleName("route"),
 					UntilEOI()
 			);
 	}
@@ -472,29 +508,14 @@ public class PixParser extends CommonRules<Object> {
 					String("route"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_interface = context.getMatch();
-							return true;
-						}
-					},
+					setInterface(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_ipAddress = context.getMatch();
-							return true;
-						}
-					},
+					setIpAddress(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_nexthop = context.getMatch();
-							_ruleName = "ipv6 route";
-							return true;
-						}
-					},
+					setNexthop(match()),
+					setRuleName("ipv6 route"),
 					UntilEOI()
 			);
 	}
@@ -512,13 +533,8 @@ public class PixParser extends CommonRules<Object> {
 					String("network"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_groupId = context.getMatch();
-							_ruleName = "object-group network";
-							return true;
-						}
-					},
+					setGroupId(match()),
+					setRuleName("object-group network"),
 					EOI
 				);
 	}
@@ -536,13 +552,8 @@ public class PixParser extends CommonRules<Object> {
 					String("protocol"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_groupId = context.getMatch();
-							_ruleName = "object-group protocol";
-							return true;
-						}
-					},
+					setGroupId(match()),
+					setRuleName("object-group protocol"),
 					EOI
 				);
 	}
@@ -558,13 +569,8 @@ public class PixParser extends CommonRules<Object> {
 					String("description"),
 					WhiteSpaces(),
 					UntilEOI(),
-					new Action() {
-						public boolean run(Context context) {
-							_name = context.getMatch();
-							_ruleName = "description";
-							return true;
-						}
-					}
+					setName(match()),
+					setRuleName("description")
 				);
 	}
 
@@ -581,13 +587,8 @@ public class PixParser extends CommonRules<Object> {
 					String("icmp-type"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_groupId = context.getMatch();
-							_ruleName = "object-group icmp-type";
-							return true;
-						}
-					},
+					setGroupId(match()),
+					setRuleName("object-group icmp-type"),
 					EOI
 				);
 	}
@@ -612,12 +613,7 @@ public class PixParser extends CommonRules<Object> {
 							String("host"),
 							WhiteSpaces(),
 							StringAtom(),
-							new Action() {
-								public boolean run(Context context) {
-									_ipAddress = context.getMatch();
-									return true;
-								}
-							},
+							setIpAddress(match()),
 							EOI
 						),
 						/*
@@ -625,33 +621,18 @@ public class PixParser extends CommonRules<Object> {
 						 */
 						Sequence(
 							StringAtom(),
-							new Action() {
-								public boolean run(Context context) {
-									_ipAddress = context.getMatch();
-									return true;
-								}
-							},
+							setIpAddress(match()),
 							Optional(
 								Sequence(
 									WhiteSpaces(),
 									StringAtom(),
-									new Action() {
-										public boolean run(Context context) {
-											_ipNetmask = context.getMatch();
-											return true;
-										}
-									}
+									setIpNetmask(match())
 								)
 							),
 							EOI
 						)
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_ruleName = "network-object";
-							return true;
-						}
-					}
+					setRuleName("network-object")
 				);
 	}
 
@@ -666,13 +647,8 @@ public class PixParser extends CommonRules<Object> {
 					String("protocol-object"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_protocol = context.getMatch();
-							_ruleName = "protocol-object";
-							return true;
-						}
-					},
+					setProtocol(match()),
+					setRuleName("protocol-object"),
 					EOI
 				);
 	}
@@ -693,12 +669,7 @@ public class PixParser extends CommonRules<Object> {
 					String("service"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_groupId = context.getMatch();
-							return true;
-						}
-					},
+					setGroupId(match()),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
@@ -707,20 +678,10 @@ public class PixParser extends CommonRules<Object> {
 									String("tcp"),
 									String("udp")
 							),
-							new Action() {
-								public boolean run(Context context) {
-									_protocol = context.getMatch();
-									return true;
-								}
-							}
+							setProtocol(match())
 						)
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_ruleName = "object-group service";
-							return true;
-						}
-					},
+					setRuleName("object-group service"),
 					EOI
 				);
 	}
@@ -736,13 +697,8 @@ public class PixParser extends CommonRules<Object> {
 					String("group-object"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_groupId = context.getMatch();
-							_ruleName = "group-object";
-							return true;
-						}
-					},
+					setGroupId(match()),
+					setRuleName("group-object"),
 					EOI
 				);
 	}
@@ -758,24 +714,14 @@ public class PixParser extends CommonRules<Object> {
 					String("service-object"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_protocol = context.getMatch();
-							return true;
-						}
-					},
+					setProtocol(match()),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
 							PortOperatorOrRange()
 						)
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_ruleName = "service-object";
-							return true;
-						}
-					},
+					setRuleName("service-object"),
 					EOI
 			);
 	}
@@ -795,12 +741,7 @@ public class PixParser extends CommonRules<Object> {
 					String("port-object"),
 					WhiteSpaces(),
 					PortOperatorOrRange(),
-					new Action() {
-						public boolean run(Context context) {
-							_ruleName = "port-object";
-							return true;
-						}
-					},
+					setRuleName("port-object"),
 					EOI
 				);
 	 }
@@ -816,18 +757,11 @@ public class PixParser extends CommonRules<Object> {
 					String("icmp-object"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_protocol = context.getMatch();
-							_ruleName = "icmp-object";
-							return true;
-						}
-					},
+					setProtocol(match()),
+					setRuleName("icmp-object"),
 					EOI
 				);
 	}
-
-
 
 	/**
 	 * Match command access-group. <br/>
@@ -841,34 +775,19 @@ public class PixParser extends CommonRules<Object> {
 					String("access-group"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_name = context.getMatch();
-							return true;
-						}
-					},
+					setName(match()),
 					WhiteSpaces(),
 					FirstOf(
 						String("in"),
 						String("out")
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_direction  = context.getMatch();
-							return true;
-						}
-					},
+					setDirection(match()),
 					WhiteSpaces(),
 					String("interface"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_interface = context.getMatch();
-							_ruleName = "access-group";
-							return true;
-						}
-					},
+					setInterface(match()),
+					setRuleName("access-group"),
 					UntilEOI()
 				);
 	}
@@ -895,20 +814,10 @@ public class PixParser extends CommonRules<Object> {
 						String("lt"),
 						String("gt")
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_portOperator = context.getMatch();
-							return true;
-						}
-					},
+					setPortOperator(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_firstPort = context.getMatch();
-							return true;
-						}
-					}
+					setFirstPort(match())
 			);
 	}
 
@@ -919,28 +828,13 @@ public class PixParser extends CommonRules<Object> {
 	public Rule PortOperatorRange() {
 		return Sequence(
 					String("range"),
-					new Action() {
-						public boolean run(Context context) {
-							_portOperator = context.getMatch();
-							return true;
-						}
-					},
+					setPortOperator(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_firstPort = context.getMatch();
-							return true;
-						}
-					},
+					setFirstPort(match()),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_lastPort = context.getMatch();
-							return true;
-						}
-					}
+					setLastPort(match())
 			);
 		}
 
@@ -949,32 +843,17 @@ public class PixParser extends CommonRules<Object> {
 	 */
 	public Rule AccessListRemark() {
 		return Sequence(
-					new Action() {
-						public boolean run(Context context) {
-							_acl = new AclTemplate();
-							return true;
-						}
-					},
+					newAclTemplate(),
 					String("access-list"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_acl.setAccessListId(context.getMatch());
-							return true;
-						}
-					},
+					_acl.setAccessListId(match()),
 					WhiteSpaces(),
 					String("remark"),
 					SkipSpaces(),
 					UntilEOI(),
-					new Action() {
-						public boolean run(Context context) {
-							_acl.setRemark(context.getMatch());
-							_ruleName = "access-list remark";
-							return true;
-						}
-					}
+					_acl.setRemark(match()),
+					setRuleName("access-list remark")
 				);
 	}
 
@@ -988,13 +867,7 @@ public class PixParser extends CommonRules<Object> {
 	public Rule Protocol() {
 		return Sequence(
 					StringAtomNotGroup(),
-					new Action() {
-						public boolean run(Context context) {
-							_protocol = context.getMatch();
-							return true;
-					
-						}
-					}
+					setProtocol(match())
 			);
 	}
 
@@ -1007,18 +880,8 @@ public class PixParser extends CommonRules<Object> {
 					String("object-group"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							String id = context.getMatch();
-							ObjectGroupType type =
-									_groupTypeSearch.getGroupType(id);
-							if (type != null && type == ObjectGroupType.PROTOCOL) {
-								_groupId = id;
-								return true;
-							}
-							return false;
-						}
-					}
+					setGroupId(match()),
+					checkObjectGroupType(_groupId, ObjectGroupType.PROTOCOL)
 				);
 	}
 
@@ -1031,18 +894,8 @@ public class PixParser extends CommonRules<Object> {
 					String("object-group"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							String id = context.getMatch();
-							ObjectGroupType type =
-									_groupTypeSearch.getGroupType(id);
-							if (type != null && type == ObjectGroupType.SERVICE) {
-								_groupId = id;
-								return true;
-							}
-							return false;
-						}
-					}
+					setGroupId(match()),
+					checkObjectGroupType(_groupId, ObjectGroupType.SERVICE)
 				);
 	}
 
@@ -1055,18 +908,8 @@ public class PixParser extends CommonRules<Object> {
 					String("object-group"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							String id = context.getMatch();
-							ObjectGroupType type =
-									_groupTypeSearch.getGroupType(id);
-							if (type != null && type == ObjectGroupType.ENHANCED) {
-								_groupId = id;
-								return true;
-							}
-							return false;
-						}
-					}
+					setGroupId(match()),
+					checkObjectGroupType(_groupId, ObjectGroupType.ENHANCED)
 				);
 	}
 
@@ -1079,18 +922,8 @@ public class PixParser extends CommonRules<Object> {
 					String("object-group"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							String id = context.getMatch();
-							ObjectGroupType type =
-									_groupTypeSearch.getGroupType(id);
-							if (type != null && type == ObjectGroupType.NETWORK) {
-								_groupId = id;
-								return true;
-							}
-							return false;
-						}
-					}
+					setGroupId(match()),
+					checkObjectGroupType(_groupId, ObjectGroupType.NETWORK)
 				);
 	}
 
@@ -1103,18 +936,8 @@ public class PixParser extends CommonRules<Object> {
 					String("object-group"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							String id = context.getMatch();
-							ObjectGroupType type =
-									_groupTypeSearch.getGroupType(id);
-							if (type != null && type == ObjectGroupType.ICMP) {
-								_groupId = id;
-								return true;
-							}
-							return false;
-						}
-					}
+					setGroupId(match()),
+					checkObjectGroupType(_groupId, ObjectGroupType.ICMP)
 				);
 	}
 	
@@ -1126,40 +949,20 @@ public class PixParser extends CommonRules<Object> {
 		return FirstOf(
 					Sequence(
 						String("any"),
-						new Action() {
-							public boolean run(Context context) {
-								_ipAddress = "any";
-								return true;
-							}
-						}
+						setIpAddress("any")
 					),
 					Sequence(
 						String("host"),
 						WhiteSpaces(),
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_ipAddress = context.getMatch();
-								return true;
-							}
-						}
+						setIpAddress(match())
 					),
 					Sequence(
 						StringAtomNotGroup(),
-						new Action() {
-							public boolean run(Context context) {
-								_ipAddress = context.getMatch();
-								return true;
-							}
-						},
+						setIpAddress(match()),
 						WhiteSpaces(),
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_ipNetmask = context.getMatch();
-								return true;
-							}
-						}
+						setIpNetmask(match())
 					)
 				);
 	}
@@ -1174,12 +977,7 @@ public class PixParser extends CommonRules<Object> {
 						String("interface"),
 						WhiteSpaces(),
 						StringAtom(),
-						new Action() {
-							public boolean run(Context context) {
-								_name = context.getMatch();
-								return true;
-							}
-						}
+						setName(match())
 					),
 					ObjectGroupTypeNetwork(),
 					AclIpAddress()
@@ -1206,26 +1004,12 @@ public class PixParser extends CommonRules<Object> {
 		return FirstOf(
 				Sequence(
 					ObjectGroupTypeIcmp(),
-					new Action() {
-						public boolean run(Context context) {
-							_acl.setIcmpGroup(_groupId);
-							_groupId = null;
-							return true;
-						}
-					}
+					_acl.setIcmpGroup(_groupId),
+					setGroupId(null)
 				),
 				Sequence(
 					StringAtomNotGroup(),
-					new Action() {
-						public boolean run(Context context) {
-							String icmp = context.getMatch();
-							if (IPIcmp4.getInstance().icmpLookup(icmp) != null) {
-								_acl.setIcmp(icmp);
-								return true;
-							}
-							return false;
-						}
-					}
+					aclSetIcmp(match())
 				)
 			);
 	}
@@ -1246,21 +1030,11 @@ public class PixParser extends CommonRules<Object> {
 	 */
 	public Rule AccessListAcl() {
 		return Sequence(
-					new Action() {
-						public boolean run(Context context) {
-							_acl = new AclTemplate();
-							return true;
-						}
-					},
+					newAclTemplate(),
 					String("access-list"),
 					WhiteSpaces(),
 					StringAtom(),
-					new Action() {
-						public boolean run(Context context) {
-							_acl.setAccessListId(context.getMatch());
-							return true;
-						}
-					},
+					_acl.setAccessListId(match()),
 					WhiteSpaces(),
 					Optional(
 						Sequence(
@@ -1280,95 +1054,60 @@ public class PixParser extends CommonRules<Object> {
 						String("permit"),
 						String("deny")
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_acl.setAction(context.getMatch());
-							return true;
-						}
-					},
+					_acl.setAction(match()),
 					WhiteSpaces(),
-					new Action() {
-						public boolean run(Context context) {
-							_protocol = null;
-							_groupId = null;
-							return true;
-						}
-					},
+					setProtocol(null),
+					setGroupId(null),
 					FirstOf(
 						Sequence(
 							ProtocolOrGroup(),
-							new Action() {
-								public boolean run(Context context) {
-									_acl.setProtocol(_protocol);
-									_acl.setProtocolGroupId(_groupId);
-									_groupId = null;
-									return true;
-								}
-							},
+							_acl.setProtocol(_protocol),
+							_acl.setProtocolGroupId(_groupId),
+							setGroupId(null),
 							WhiteSpaces()
 						),
 						Sequence(
 							ObjectGroupTypeEnhanced(),
-							new Action() {
-								public boolean run(Context context) {
-									_acl.setDstEnhancedServiceGroup(_groupId);
-									_groupId = null;
-									return true;
-								}
-							},
+							_acl.setDstEnhancedServiceGroup(_groupId),
+							setGroupId(null),
 							WhiteSpaces()
 						)
 					),
 					// source
 					AclNetwork(),
-					new Action() {
-						public boolean run(Context context) {
-							_acl.setSrcIfName(_name);
-							_acl.setSrcIp(_ipAddress);
-							_acl.setSrcIpMask(_ipNetmask);
-							_acl.setSrcNetworkGroup(_groupId);
-							_name = null;
-							_ipAddress = null;
-							_ipNetmask = null;
-							_groupId = null;
-							return true;
-						}
-					},
+					_acl.setSrcIfName(_name),
+					_acl.setSrcIp(_ipAddress),
+					_acl.setSrcIpMask(_ipNetmask),
+					_acl.setSrcNetworkGroup(_groupId),
+					setName(null),
+					setIpAddress(null),
+					setIpNetmask(null),
+					setGroupId(null),
 					WhiteSpaces(),
 					Optional(
 						Sequence(
 							AclPort(),
-							new Action() {
-								public boolean run(Context context) {
-									_acl.setSrcPortOperator(_portOperator);
-									_acl.setSrcFirstPort(_firstPort);
-									_acl.setSrcLastPort(_lastPort);
-									_acl.setSrcServiceGroup(_groupId);
-									_portOperator = null;
-									_firstPort = null;
-									_lastPort = null;
-									_groupId = null;
-									return true;
-								}
-							},
+							_acl.setSrcPortOperator(_portOperator),
+							_acl.setSrcFirstPort(_firstPort),
+							_acl.setSrcLastPort(_lastPort),
+							_acl.setSrcServiceGroup(_groupId),
+							setPortOperator(null),
+							setFirstPort(null),
+							setLastPort(null),
+							setGroupId(null),
 							WhiteSpaces()
 						)
 					),
 					// destination
 					AclNetwork(),
-					new Action() {
-						public boolean run(Context context) {
-							_acl.setDstIfName(_name);
-							_acl.setDstIp(_ipAddress);
-							_acl.setDstIpMask(_ipNetmask);
-							_acl.setDstNetworkGroup(_groupId);
-							_name = null;
-							_ipAddress = null;
-							_ipNetmask = null;
-							_groupId = null;
-							return true;
-						}
-					},
+					_acl.setDstIfName(_name),
+					_acl.setDstIp(_ipAddress),
+					_acl.setDstIpMask(_ipNetmask),
+					_acl.setDstNetworkGroup(_groupId),
+					setName(null),
+					setIpAddress(null),
+					setIpNetmask(null),
+					setGroupId(null),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
@@ -1376,19 +1115,14 @@ public class PixParser extends CommonRules<Object> {
 								FirstOf(
 									Sequence(
 										AclPort(),
-										new Action() {
-											public boolean run(Context context) {
-												_acl.setDstPortOperator(_portOperator);
-												_acl.setDstFirstPort(_firstPort);
-												_acl.setDstLastPort(_lastPort);
-												_acl.setDstServiceGroup(_groupId);
-												_portOperator = null;
-												_firstPort = null;
-												_lastPort = null;
-												_groupId = null;
-												return true;
-											}
-										}
+										_acl.setDstPortOperator(_portOperator),
+										_acl.setDstFirstPort(_firstPort),
+										_acl.setDstLastPort(_lastPort),
+										_acl.setDstServiceGroup(_groupId),
+										setPortOperator(null),
+										setFirstPort(null),
+										setLastPort(null),
+										setGroupId(null)
 									),
 									AclIcmp()
 								)
@@ -1402,22 +1136,11 @@ public class PixParser extends CommonRules<Object> {
 					Optional(
 						Sequence(
 							Test(String("inactive")),
-							new Action() {
-								public boolean run(Context context) {
-									_acl.setInactive(true);
-									return true;
-								}
-							}
+							_acl.setInactive(true)
 						)
 					),
 					UntilEOI(),
-					new Action() {
-						public boolean run(Context context) {
-							_ruleName = "access-list acl";
-							return true;
-						}
-					}
-
+					setRuleName("access-list acl")
 				);
 	}
 
