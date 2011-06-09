@@ -51,200 +51,225 @@ public class AclTemplate {
 		return _accessListId;
 	}
 
-	public void setAccessListId(String accessListId) {
+	public boolean setAccessListId(String accessListId) {
 		_accessListId = accessListId;
+		return true;
 	}
 
 	public String getAction() {
 		return _action;
 	}
 
-	public void setAction(String action) {
+	public boolean setAction(String action) {
 		_action = action;
+		return true;
 	}
 
 	public String getDstFirstPort() {
 		return _dstFirstPort;
 	}
 
-	public void setDstFirstPort(String dstFirstPort) {
+	public boolean setDstFirstPort(String dstFirstPort) {
 		_dstFirstPort = dstFirstPort;
+		return true;
 	}
 
 	public String getDstIfName() {
 		return _dstIfName;
 	}
 
-	public void setDstIfName(String dstIfName) {
+	public boolean setDstIfName(String dstIfName) {
 		_dstIfName = dstIfName;
+		return true;
 	}
 
 	public String getDstIp() {
 		return _dstIp;
 	}
 
-	public void setDstIp(String dstIp) {
+	public boolean setDstIp(String dstIp) {
 		_dstIp = dstIp;
+		return true;
 	}
 
 	public String getDstIpMask() {
 		return _dstIpMask;
 	}
 
-	public void setDstIpMask(String dstIpMask) {
+	public boolean setDstIpMask(String dstIpMask) {
 		_dstIpMask = dstIpMask;
+		return true;
 	}
 
 	public String getDstLastPort() {
 		return _dstLastPort;
 	}
 
-	public void setDstLastPort(String dstLastPort) {
+	public boolean setDstLastPort(String dstLastPort) {
 		_dstLastPort = dstLastPort;
+		return true;
 	}
 
 	public String getDstNetworkGroup() {
 		return _dstNetworkGroup;
 	}
 
-	public void setDstNetworkGroup(String dstNetworkGroup) {
+	public boolean setDstNetworkGroup(String dstNetworkGroup) {
 		_dstNetworkGroup = dstNetworkGroup;
+		return true;
 	}
 
 	public String getDstPortOperator() {
 		return _dstPortOperator;
 	}
 
-	public void setDstPortOperator(String dstPortOperator) {
+	public boolean setDstPortOperator(String dstPortOperator) {
 		_dstPortOperator = dstPortOperator;
+		return true;
 	}
 
 	public String getDstServiceGroup() {
 		return _dstServiceGroup;
 	}
 
-	public void setDstServiceGroup(String dstServiceGroup) {
+	public boolean setDstServiceGroup(String dstServiceGroup) {
 		_dstServiceGroup = dstServiceGroup;
+		return true;
 	}
 
 	public String getDstEnhancedServiceGroup() {
 		return _dstEnhancedServiceGroup;
 	}
 
-	public void setDstEnhancedServiceGroup(String dstEnhancedServiceGroup) {
+	public boolean setDstEnhancedServiceGroup(String dstEnhancedServiceGroup) {
 		_dstEnhancedServiceGroup = dstEnhancedServiceGroup;
+		return true;
 	}
 
 	public String getIcmp() {
 		return _icmp;
 	}
 
-	public void setIcmp(String _icmp) {
-		this._icmp = _icmp;
+	public boolean setIcmp(String icmp) {
+		_icmp = icmp;
+		return true;
 	}
 
 	public String getIcmpGroup() {
 		return _icmpGroup;
 	}
 
-	public void setIcmpGroup(String icmpGroup) {
+	public boolean setIcmpGroup(String icmpGroup) {
 		_icmpGroup = icmpGroup;
+		return true;
 	}
 
 	public boolean getInactive() {
 		return _inactive;
 	}
 	
-	public void setInactive(boolean inactive) {
+	public boolean setInactive(boolean inactive) {
 		_inactive = inactive;
+		return true;
 	}
 
 	public String getProtocol() {
 		return _protocol;
 	}
 
-	public void setProtocol(String protocol) {
+	public boolean setProtocol(String protocol) {
 		_protocol = protocol;
+		return true;
 	}
 
 	public String getProtocolGroupId() {
 		return _protocolGroupId;
 	}
 
-	public void setProtocolGroupId(String protocolGroupId) {
+	public boolean setProtocolGroupId(String protocolGroupId) {
 		_protocolGroupId = protocolGroupId;
+		return true;
 	}
 
 	public String getSrcFirstPort() {
 		return _srcFirstPort;
 	}
 
-	public void setSrcFirstPort(String srcFirstPort) {
+	public boolean setSrcFirstPort(String srcFirstPort) {
 		_srcFirstPort = srcFirstPort;
+		return true;
 	}
 
 	public String getSrcIfName() {
 		return _srcIfName;
 	}
 
-	public void setSrcIfName(String srcIfName) {
+	public boolean setSrcIfName(String srcIfName) {
 		_srcIfName = srcIfName;
+		return true;
 	}
 
 	public String getSrcIp() {
 		return _srcIp;
 	}
 
-	public void setSrcIp(String srcIp) {
+	public boolean setSrcIp(String srcIp) {
 		_srcIp = srcIp;
+		return true;
 	}
 
 	public String getSrcIpMask() {
 		return _srcIpMask;
 	}
 
-	public void setSrcIpMask(String srcIpMask) {
+	public boolean setSrcIpMask(String srcIpMask) {
 		_srcIpMask = srcIpMask;
+		return true;
 	}
 
 	public String getSrcLastPort() {
 		return _srcLastPort;
 	}
 
-	public void setSrcLastPort(String srcLastPort) {
+	public boolean setSrcLastPort(String srcLastPort) {
 		_srcLastPort = srcLastPort;
+		return true;
 	}
 
 	public String getSrcNetworkGroup() {
 		return _srcNetworkGroup;
 	}
 
-	public void setSrcNetworkGroup(String srcNetworkGroup) {
+	public boolean setSrcNetworkGroup(String srcNetworkGroup) {
 		_srcNetworkGroup = srcNetworkGroup;
+		return true;
 	}
 
 	public String getSrcPortOperator() {
 		return _srcPortOperator;
 	}
 
-	public void setSrcPortOperator(String srcPortOperator) {
+	public boolean setSrcPortOperator(String srcPortOperator) {
 		_srcPortOperator = srcPortOperator;
+		return true;
 	}
 
 	public String getSrcServiceGroup() {
 		return _srcServiceGroup;
 	}
 
-	public void setSrcServiceGroup(String srcServiceGroup) {
+	public boolean setSrcServiceGroup(String srcServiceGroup) {
 		_srcServiceGroup = srcServiceGroup;
+		return true;
 	}
 
 	public String getRemark() {
 		return _remark;
 	}
 
-	public void setRemark(String remark) {
+	public boolean setRemark(String remark) {
 		_remark = remark;
+		return true;
 	}
 
 }
