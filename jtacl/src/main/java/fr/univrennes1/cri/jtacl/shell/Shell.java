@@ -905,7 +905,6 @@ public class Shell {
 	}
 
 	public void parseShellCommand(String commandLine) {
-		_parser.clear();
 		// comment
 		if (commandLine.startsWith("#"))
 			return;
