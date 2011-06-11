@@ -35,16 +35,18 @@ public class RouteOptsTemplate {
 		return _poolOpts;
 	}
 
-	public void setPoolOpts(PoolOptsTemplate poolOpts) {
+	public boolean setPoolOpts(PoolOptsTemplate poolOpts) {
 		_poolOpts = poolOpts;
+		return true;
 	}
 
 	public int getRt() {
 		return _rt;
 	}
 
-	public void setRt(int rt) {
+	public boolean setRt(int rt) {
 		_rt = rt;
+		return true;
 	}
 
 }

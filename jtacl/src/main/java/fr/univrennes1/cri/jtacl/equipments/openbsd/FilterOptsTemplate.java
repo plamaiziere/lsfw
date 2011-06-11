@@ -65,72 +65,81 @@ public class FilterOptsTemplate {
 		return _action;
 	}
 
-	public void setAction(String action) {
+	public boolean setAction(String action) {
 		_action = action;
+		return true;
 	}
 
 	public boolean isAllowopts() {
 		return _allowopts;
 	}
 
-	public void setAllowopts(boolean allowopts) {
+	public boolean setAllowopts(boolean allowopts) {
 		_allowopts = allowopts;
+		return true;
 	}
 
 	public boolean isBinat() {
 		return _binat;
 	}
 
-	public void setBinat(boolean binat) {
+	public boolean setBinat(boolean binat) {
 		_binat = binat;
+		return true;
 	}
 
 	public String getDivertAddr() {
 		return _divertAddr;
 	}
 
-	public void setDivertAddr(String divertAddr) {
+	public boolean setDivertAddr(String divertAddr) {
 		_divertAddr = divertAddr;
+		return true;
 	}
 
 	public String getDivertPort() {
 		return _divertPort;
 	}
 
-	public void setDivertPort(String divertPort) {
+	public boolean setDivertPort(String divertPort) {
 		_divertPort = divertPort;
+		return true;
 	}
 
 	public String getDivertPacketPort() {
 		return _divertPacketPort;
 	}
 
-	public void setDivertPacketPort(String divertPacketPort) {
+	public boolean setDivertPacketPort(String divertPacketPort) {
 		_divertPacketPort = divertPacketPort;
+		return true;
 	}
 
 	public String getFlags() {
 		return _flags;
 	}
 
-	public void setFlags(String flags) {
+	public boolean setFlags(String flags) {
 		_flags = flags;
+		return true;
 	}
 
 	public String getFlagset() {
 		return _flagset;
 	}
 
-	public void setFlagset(String flags) {
+	public boolean setFlagset(String flags) {
 		_flagset = flags;
+		return true;
 	}
 
 	public boolean isFragment() {
 		return _fragment;
 	}
 
-	public void setFragment(boolean fragment) {
+	public boolean setFragment(boolean fragment) {
 		_fragment = fragment;
+		return true;
 	}
 
 	public List<IcmpItem> getIcmp6spec() {
@@ -145,48 +154,54 @@ public class FilterOptsTemplate {
 		return _label;
 	}
 
-	public void setLabel(String label) {
+	public boolean setLabel(String label) {
 		_label = label;
+		return true;
 	}
 
 	public String getMatchTag() {
 		return _matchTag;
 	}
 
-	public void setMatchTag(String matchTag) {
+	public boolean setMatchTag(String matchTag) {
 		_matchTag = matchTag;
+		return true;
 	}
 
 	public boolean isMatchTagNot() {
 		return _matchTagNot;
 	}
 
-	public void setMatchTagNot(boolean matchTagNot) {
+	public boolean setMatchTagNot(boolean matchTagNot) {
 		_matchTagNot = matchTagNot;
+		return true;
 	}
 
 	public int getMax_mss() {
 		return _max_mss;
 	}
 
-	public void setMax_mss(int max_mss) {
+	public boolean setMax_mss(int max_mss) {
 		_max_mss = max_mss;
+		return true;
 	}
 
 	public int getMinttl() {
 		return _minttl;
 	}
 
-	public void setMinttl(int minttl) {
+	public boolean setMinttl(int minttl) {
 		_minttl = minttl;
+		return true;
 	}
 
 	public int getNodf() {
 		return _nodf;
 	}
 
-	public void setNodf(int nodf) {
+	public boolean setNodf(int nodf) {
 		_nodf = nodf;
+		return true;
 	}
 
 	public StringsList getOptions() {
@@ -197,112 +212,126 @@ public class FilterOptsTemplate {
 		return _pqname;
 	}
 
-	public void setPQname(String PQname) {
+	public boolean setPQname(String PQname) {
 		_pqname = PQname;
+		return true;
 	}
 
 	public String getProbability() {
 		return _probability;
 	}
 
-	public void setProbability(String probability) {
+	public boolean setProbability(String probability) {
 		_probability = probability;
+		return true;
 	}
 
 	public String getQname() {
 		return _qname;
 	}
 
-	public void setQname(String qname) {
+	public boolean setQname(String qname) {
 		_qname = qname;
+		return true;
 	}
 
 	public int getRandomid() {
 		return _randomid;
 	}
 
-	public void setRandomid(int randomid) {
+	public boolean setRandomid(int randomid) {
 		_randomid = randomid;
+		return true;
 	}
 
 	public String getRcv() {
 		return _rcv;
 	}
 
-	public void setRcv(String rcv) {
+	public boolean setRcv(String rcv) {
 		_rcv = rcv;
+		return true;
 	}
 
 	public RouteOptsTemplate getRouteOpts() {
 		return _routeOpts;
 	}
 
-	public void setRouteOpts(RouteOptsTemplate routeOpts) {
+	public boolean setRouteOpts(RouteOptsTemplate routeOpts) {
 		_routeOpts = routeOpts;
+		return true;
 	}
 
 	public String getRtableId() {
 		return _rtableId;
 	}
 
-	public void setRtableId(String rtableId) {
+	public boolean setRtableId(String rtableId) {
 		_rtableId = rtableId;
+		return true;
 	}
 
 	public ScrubOptsTemplate getScrubOpts() {
 		return _scrubOpts;
 	}
 
-	public void setScrubOpts(ScrubOptsTemplate scrubOpts) {
+	public boolean setScrubOpts(ScrubOptsTemplate scrubOpts) {
 		_scrubOpts = scrubOpts;
+		return true;
 	}
 
 	public int getSettos() {
 		return _settos;
 	}
 
-	public void setSettos(int settos) {
+	public boolean setSettos(int settos) {
 		_settos = settos;
+		return true;
 	}
 
 	public String getTag() {
 		return _tag;
 	}
 
-	public void setTag(String tag) {
+	public boolean setTag(String tag) {
 		_tag = tag;
+		return true;
 	}
 
 	public String getTos() {
 		return _tos;
 	}
 
-	public void setTos(String tos) {
+	public boolean setTos(String tos) {
 		_tos = tos;
+		return true;
 	}
 
 	public RedirSpecTemplate getNat() {
 		return _nat;
 	}
 
-	public void setNat(RedirSpecTemplate nat) {
+	public boolean setNat(RedirSpecTemplate nat) {
 		_nat = nat;
+		return true;
 	}
 
 	public RedirSpecTemplate getRdr() {
 		return _rdr;
 	}
 
-	public void setRdr(RedirSpecTemplate rdr) {
+	public boolean setRdr(RedirSpecTemplate rdr) {
 		_rdr = rdr;
+		return true;
 	}
 
 	public RedirSpecTemplate getRroute() {
 		return _rroute;
 	}
 
-	public void setRroute(RedirSpecTemplate rroute) {
+	public boolean setRroute(RedirSpecTemplate rroute) {
 		_rroute = rroute;
+		return true;
 	}
 
 }

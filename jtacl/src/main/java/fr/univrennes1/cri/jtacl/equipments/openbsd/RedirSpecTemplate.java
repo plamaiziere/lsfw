@@ -38,20 +38,27 @@ public class RedirSpecTemplate {
 		return _hosts;
 	}
 
+	public boolean addHost(List<Xhost> host) {
+		_hosts.addAll(host);
+		return true;
+	}
+
 	public PoolOptsTemplate getPoolOpts() {
 		return _poolOpts;
 	}
 
-	public void setPoolOpts(PoolOptsTemplate poolOpts) {
+	public boolean setPoolOpts(PoolOptsTemplate poolOpts) {
 		_poolOpts = poolOpts;
+		return true;
 	}
 
 	public String getPortstar() {
 		return _portstar;
 	}
 
-	public void setPortstar(String _portstar) {
-		this._portstar = _portstar;
+	public boolean setPortstar(String portstar) {
+		_portstar = portstar;
+		return true;
 	}
 
 }

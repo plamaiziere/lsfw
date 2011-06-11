@@ -29,32 +29,36 @@ public class PoolOptsTemplate {
 		return _key;
 	}
 
-	public void setKey(String key) {
+	public boolean setKey(String key) {
 		_key = key;
+		return true;
 	}
 
 	public int getOpts() {
 		return _opts;
 	}
 
-	public void setOpts(int opts) {
+	public boolean setOpts(int opts) {
 		_opts = opts;
+		return true;
 	}
 
 	public boolean isStaticPort() {
 		return _staticPort;
 	}
 
-	public void setStaticPort(boolean staticPort) {
+	public boolean setStaticPort(boolean staticPort) {
 		_staticPort = staticPort;
+		return true;
 	}
 
 	public int getType() {
 		return _type;
 	}
 
-	public void setType(int type) {
+	public boolean setType(int type) {
 		_type = type;
+		return true;
 	}
 
 

@@ -36,88 +36,99 @@ public class Xhost {
 		return _dynaddr;
 	}
 
-	public void setDynaddr(String dynaddr) {
+	public boolean setDynaddr(String dynaddr) {
 		_dynaddr = dynaddr;
+		return true;
 	}
 
 	public String getDynaddrMask() {
 		return _dynaddrMask;
 	}
 
-	public void setDynaddrMask(String dynaddrMask) {
+	public boolean setDynaddrMask(String dynaddrMask) {
 		_dynaddrMask = dynaddrMask;
+		return true;
 	}
 
 	public String getIfName() {
 		return _ifName;
 	}
 
-	public void setIfName(String ifName) {
+	public boolean setIfName(String ifName) {
 		_ifName = ifName;
+		return true;
 	}
 
 	public String getFirstAddress() {
 		return _firstAddress;
 	}
 
-	public void setFirstAddress(String firstAddress) {
+	public boolean setFirstAddress(String firstAddress) {
 		_firstAddress = firstAddress;
+		return true;
 	}
 
 	public String getLastAddress() {
 		return _lastAddress;
 	}
 
-	public void setLastAddress(String lastAddress) {
+	public boolean setLastAddress(String lastAddress) {
 		_lastAddress = lastAddress;
+		return true;
 	}
 
 	public boolean isNoroute() {
 		return _noroute;
 	}
 
-	public void setNoroute(boolean noroute) {
+	public boolean setNoroute(boolean noroute) {
 		_noroute = noroute;
+		return true;
 	}
 
 	public boolean isNot() {
 		return _not;
 	}
 
-	public void setNot(boolean not) {
+	public boolean setNot(boolean not) {
 		_not = not;
+		return true;
 	}
 
 	public String getRoute() {
 		return _route;
 	}
 
-	public void setRoute(String route) {
+	public boolean setRoute(String route) {
 		_route = route;
+		return true;
 	}
 
 	public boolean isUrpffailed() {
 		return _urpffailed;
 	}
 
-	public void setUrpffailed(boolean urpffailed) {
+	public boolean setUrpffailed(boolean urpffailed) {
 		_urpffailed = urpffailed;
+		return true;
 	}
 
 	public boolean isAny() {
 		return _any;
 	}
 
-	public void setAny(boolean any) {
+	public boolean setAny(boolean any) {
 		_any = any;
+		return true;
 	}
 
 	public String getTable() {
 		return _table;
 	}
 
-	public void setTable(String table) {
+	public boolean setTable(String table) {
 		_table = table;
+		return true;
 	}
 
 }

@@ -30,24 +30,27 @@ public class PortItemTemplate {
 		return _firstPort;
 	}
 
-	public void setFirstPort(String firstPort) {
+	public boolean setFirstPort(String firstPort) {
 		_firstPort = firstPort;
+		return true;
 	}
 
 	public String getLastPort() {
 		return _lastPort;
 	}
 
-	public void setLastPort(String lastPort) {
+	public boolean setLastPort(String lastPort) {
 		_lastPort = lastPort;
+		return true;
 	}
 
 	public String getOperator() {
 		return _operator;
 	}
 
-	public void setOperator(String operator) {
+	public boolean setOperator(String operator) {
 		_operator = operator;
+		return true;
 	}
 
 }

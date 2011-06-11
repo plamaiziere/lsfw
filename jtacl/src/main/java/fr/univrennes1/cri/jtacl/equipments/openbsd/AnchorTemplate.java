@@ -30,24 +30,27 @@ public class AnchorTemplate {
 		return _inlined;
 	}
 
-	public void setInlined(boolean inlined) {
+	public boolean setInlined(boolean inlined) {
 		_inlined = inlined;
+		return true;
 	}
 
 	public String getName() {
 		return _name;
 	}
 
-	public void setName(String name) {
+	public boolean setName(String name) {
 		_name = name;
+		return true;
 	}
 
 	public RuleTemplate getRule() {
 		return _rule;
 	}
 
-	public void setRule(RuleTemplate rule) {
+	public boolean setRule(RuleTemplate rule) {
 		_rule = rule;
+		return true;
 	}
 
 

@@ -27,16 +27,18 @@ public class IcmpItem {
 		return _icmpCode;
 	}
 
-	public void setIcmpCode(String icmpCode) {
+	public boolean setIcmpCode(String icmpCode) {
 		_icmpCode = icmpCode;
+		return true;
 	}
 
 	public String getIcmpType() {
 		return _icmpType;
 	}
 
-	public void setIcmpType(String icmpType) {
+	public boolean setIcmpType(String icmpType) {
 		_icmpType = icmpType;
+		return true;
 	}
 
 }

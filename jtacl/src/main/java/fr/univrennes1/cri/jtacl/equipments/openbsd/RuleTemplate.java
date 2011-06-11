@@ -45,24 +45,27 @@ public class RuleTemplate {
 		return _action;
 	}
 
-	public void setAction(String action) {
+	public boolean setAction(String action) {
 		_action = action;
+		return true;
 	}
 
 	public String getDir() {
 		return _dir;
 	}
 
-	public void setDir(String dir) {
+	public boolean setDir(String dir) {
 		_dir = dir;
+		return true;
 	}
 
 	public boolean isQuick() {
 		return _quick;
 	}
 
-	public void setQuick(boolean quick) {
+	public boolean setQuick(boolean quick) {
 		_quick = quick;
+		return true;
 	}
 
 	public StringsList getIfList() {
@@ -73,8 +76,9 @@ public class RuleTemplate {
 		return _af;
 	}
 
-	public void setAf(String af) {
+	public boolean setAf(String af) {
 		_af = af;
+		return true;
 	}
 
 	public StringsList getProtoList() {
@@ -105,12 +109,33 @@ public class RuleTemplate {
 		return _all;
 	}
 
-	public void setAll(boolean all) {
+	public boolean setAll(boolean all) {
 		_all = all;
+		return true;
 	}
 
 	public FilterOptsTemplate getFilterOpts() {
 		return _filterOpts;
+	}
+
+	public boolean addSourceHost(List<Xhost> hosts) {
+		_sourceHostList.addAll(hosts);
+		return true;
+	}
+
+	public boolean addDestinationHost(List<Xhost> hosts) {
+		_destHostList.addAll(hosts);
+		return true;
+	}
+
+	public boolean addSourcePort(List<PortItemTemplate> ports) {
+		_sourcePortList.addAll(ports);
+		return true;
+	}
+
+	public boolean addDestinationPort(List<PortItemTemplate> ports) {
+		_destPortList.addAll(ports);
+		return true;
 	}
 
 }

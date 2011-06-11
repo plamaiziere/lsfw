@@ -31,47 +31,53 @@ public class ScrubOptsTemplate {
 		return _maxmss;
 	}
 
-	public void setMaxmss(String maxmss) {
+	public boolean setMaxmss(String maxmss) {
 		_maxmss = maxmss;
+		return true;
 	}
 
 	public String getMinttl() {
 		return _minttl;
 	}
 
-	public void setMinttl(String minttl) {
+	public boolean setMinttl(String minttl) {
 		_minttl = minttl;
+		return true;
 	}
 
 	public boolean isNodf() {
 		return _nodf;
 	}
 
-	public void setNodf(boolean nodf) {
+	public boolean setNodf(boolean nodf) {
 		_nodf = nodf;
+		return true;
 	}
 
 	public boolean isRandomid() {
 		return _randomid;
 	}
 
-	public void setRandomid(boolean randomid) {
+	public boolean setRandomid(boolean randomid) {
 		_randomid = randomid;
+		return true;
 	}
 
 	public boolean isReassemble_tcp() {
 		return _reassemble_tcp;
 	}
 
-	public void setReassemble_tcp(boolean reassemble_tcp) {
+	public boolean setReassemble_tcp(boolean reassemble_tcp) {
 		_reassemble_tcp = reassemble_tcp;
+		return true;
 	}
 
 	public String getSettos() {
 		return _settos;
 	}
 
-	public void setSettos(String settos) {
+	public boolean setSettos(String settos) {
 		_settos = settos;
+		return true;
 	}
 }

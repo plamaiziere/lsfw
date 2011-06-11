@@ -43,16 +43,18 @@ public class TableTemplate {
 		return _name;
 	}
 
-	public void setName(String name) {
+	public boolean setName(String name) {
 		_name = name;
+		return true;
 	}
 
 	public StringsList getOptions() {
 		return _options;
 	}
 
-	public void setOptions(StringsList options) {
+	public boolean setOptions(StringsList options) {
 		_options = options;
+		return true;
 	}
 
 }
