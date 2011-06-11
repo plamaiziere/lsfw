@@ -11,15 +11,16 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.parsers;
+package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
 import org.parboiled.Rule;
 
 /**
- * IOS Router Jtacl sub shell parser
+ * PacketFilter Jtacl sub shell parser
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class IOSShellParser extends GenericEquipmentShellParser {
+public class PacketFilterShellParser extends GenericEquipmentShellParser {
 
 	protected boolean clear() {
 		return super.clear();

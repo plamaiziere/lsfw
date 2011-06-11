@@ -17,7 +17,6 @@ import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.parsers.IOSShellParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

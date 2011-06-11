@@ -11,9 +11,10 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.parsers;
+package fr.univrennes1.cri.jtacl.shell;
 
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
+import fr.univrennes1.cri.jtacl.parsers.CommonRules;
 import org.parboiled.Rule;
 
 /**

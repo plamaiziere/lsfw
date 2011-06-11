@@ -11,8 +11,9 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.parsers;
+package fr.univrennes1.cri.jtacl.equipments.generic;
 
+import fr.univrennes1.cri.jtacl.parsers.CommonRules;
 import java.util.ArrayList;
 import java.util.List;
 import org.parboiled.Rule;

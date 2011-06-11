@@ -11,8 +11,9 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.parsers;
+package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
 import org.parboiled.Rule;
 
 /**

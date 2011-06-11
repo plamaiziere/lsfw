@@ -11,12 +11,13 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.parsers;
+package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.AclTemplate;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.GroupTypeSearchable;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.ObjectGroupType;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
+import fr.univrennes1.cri.jtacl.parsers.CommonRules;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
 
