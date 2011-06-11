@@ -11,8 +11,9 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.parsers;
+package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.equipments.cisco.pix.PixParser;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.AclTemplate;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.GroupTypeSearchable;
 import fr.univrennes1.cri.jtacl.equipments.cisco.pix.ObjectGroupType;

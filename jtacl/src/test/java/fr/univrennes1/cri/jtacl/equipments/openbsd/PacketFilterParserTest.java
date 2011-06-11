@@ -11,8 +11,9 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.parsers;
+package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.equipments.openbsd.PacketFilterParser;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.AnchorTemplate;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.ExpandedRule;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.IcmpItem;
