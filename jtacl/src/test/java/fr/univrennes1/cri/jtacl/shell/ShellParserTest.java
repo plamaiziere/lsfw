@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.shell;
 
-import fr.univrennes1.cri.jtacl.shell.ShellParser;
 import junit.framework.TestCase;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;

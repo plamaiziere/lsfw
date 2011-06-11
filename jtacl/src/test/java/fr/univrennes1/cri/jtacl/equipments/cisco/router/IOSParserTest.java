@@ -13,11 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
-import fr.univrennes1.cri.jtacl.equipments.cisco.router.IOSParser;
-import fr.univrennes1.cri.jtacl.equipments.cisco.router.AccessList;
-import fr.univrennes1.cri.jtacl.equipments.cisco.router.AceTemplate;
-import fr.univrennes1.cri.jtacl.equipments.cisco.router.AclTemplate;
-import fr.univrennes1.cri.jtacl.equipments.cisco.router.AclType;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import junit.framework.TestCase;
 import org.parboiled.Parboiled;

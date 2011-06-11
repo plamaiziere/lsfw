@@ -13,21 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
-import fr.univrennes1.cri.jtacl.equipments.openbsd.PacketFilterBaseParser;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.AnchorTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.ExpandedRule;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.ExpandedRuleLine;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.IcmpItem;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.PfConst;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.PoolOptsTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.PortItemTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.RedirSpecTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.RouteOptsTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.RuleTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.ScrubOptsTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.TableTemplate;
-import fr.univrennes1.cri.jtacl.equipments.openbsd.Xhost;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.ArrayList;
 import java.util.List;
