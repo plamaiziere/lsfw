@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.parsers;
 
-import fr.univrennes1.cri.jtacl.parsers.PacketFilterBaseParser;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.AnchorTemplate;
 import fr.univrennes1.cri.jtacl.equipments.openbsd.ExpandedRule;
@@ -32,8 +31,6 @@ import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.parboiled.Action;
-import org.parboiled.Context;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.parserunners.BasicParseRunner;
@@ -49,78 +46,365 @@ import org.parboiled.support.ParsingResult;
 
 public class PacketFilterParser extends PacketFilterBaseParser {
 
-	private String _ruleName;
-	private String _name;
-	private String _value;
-	private char _quotec;
-	private boolean _quoted;
-	private char _previousChar;
-	private String _lastString;
-	private String _pfString;
-	private boolean _pfStringEnd;
-	private String _ifItem;
-	private boolean _pfnot;
-	private Xhost _pfXhost;
-	private PortItemTemplate _pfPortItem;
-	private IcmpItem _pfIcmpItem;
-	private String _pfStateOptItem;
-	private String _flags;
-	private String _flagset;
-	private List<Xhost> _ipspec = new ArrayList<Xhost>();
-	private List<PortItemTemplate> _portspec = new ArrayList<PortItemTemplate>();
-	private List<IcmpItem> _icmpspec = new ArrayList<IcmpItem>();
-	private List<IcmpItem> _icmp6spec = new ArrayList<IcmpItem>();
-	private StringsList _stateOptSpec = new StringsList();
-	private ScrubOptsTemplate _scrubOpts;
-	private PoolOptsTemplate _poolOpts;
-	private String _pfQname;
-	private String _pfPQname;
-	private List<Xhost> _redirHosts = new ArrayList<Xhost>();
-	private RedirSpecTemplate _redirSpec;
-	private RouteOptsTemplate _routeOpts;
-	private String _ifname;
-	private StringsList _macroValues = new StringsList();
-	private String _matchedText;
-	private StringBuilder _curExpandedContext;
+	protected String _ruleName;
+	protected String _name;
+	protected String _value;
+	protected char _quotec;
+	protected boolean _quoted;
+	protected char _previousChar;
+	protected String _lastString;
+	protected String _pfString;
+	protected boolean _pfStringEnd;
+	protected String _ifItem;
+	protected boolean _pfnot;
+	protected Xhost _pfXhost;
+	protected PortItemTemplate _pfPortItem;
+	protected IcmpItem _pfIcmpItem;
+	protected String _pfStateOptItem;
+	protected String _flags;
+	protected String _flagset;
+	protected List<Xhost> _ipspec = new ArrayList<Xhost>();
+	protected List<PortItemTemplate> _portspec = new ArrayList<PortItemTemplate>();
+	protected List<IcmpItem> _icmpspec = new ArrayList<IcmpItem>();
+	protected List<IcmpItem> _icmp6spec = new ArrayList<IcmpItem>();
+	protected StringsList _stateOptSpec = new StringsList();
+	protected ScrubOptsTemplate _scrubOpts;
+	protected PoolOptsTemplate _poolOpts;
+	protected String _pfQname;
+	protected String _pfPQname;
+	protected List<Xhost> _redirHosts = new ArrayList<Xhost>();
+	protected RedirSpecTemplate _redirSpec;
+	protected RouteOptsTemplate _routeOpts;
+	protected String _ifname;
+	protected StringsList _macroValues = new StringsList();
+	protected String _matchedText;
+	protected StringBuilder _curExpandedContext;
 
-	private RuleTemplate _pfRule;
-	private TableTemplate _pfTable;
-	private AnchorTemplate _pfAnchor;
+	protected RuleTemplate _pfRule;
+	protected TableTemplate _pfTable;
+	protected AnchorTemplate _pfAnchor;
+
+	protected boolean macroValuesClear() {
+		_macroValues.clear();
+		return true;
+	}
+
+	protected boolean macroValuesToValue() {
+		_value = "";
+		for (String s: _macroValues)
+			_value = _value + s + " ";
+		_value = _value.trim();
+		return true;
+	}
+
+	protected boolean newTableTemplate() {
+		_pfTable = new TableTemplate();
+		return true;
+	}
+
+	protected boolean ipSpecClear() {
+		_ipspec.clear();
+		return true;
+	}
+
+	protected boolean newRuleTemplate() {
+		_pfRule = new RuleTemplate();
+		return true;
+	}
+
+	protected boolean newAnchorTemplate() {
+		_pfAnchor = new AnchorTemplate();
+		return true;
+	}
+
+	protected boolean newScrubOptsTemplate() {
+		_scrubOpts = new ScrubOptsTemplate();
+		return true;
+	}
+
+	protected boolean icmpSpecClear() {
+		_icmpspec.clear();
+		return true;
+	}
+
+	protected boolean icmp6SpecClear() {
+		_icmp6spec.clear();
+		return true;
+	}
+
+	protected boolean stateOptSpecClear() {
+		_stateOptSpec.clear();
+		return true;
+	}
+
+	protected boolean pfRuleSetFilterOpts() {
+		_pfRule.getFilterOpts().setFlags(_flags);
+		_pfRule.getFilterOpts().setFlagset(_flagset);
+		_pfRule.getFilterOpts().getIcmpspec().addAll(_icmpspec);
+		_pfRule.getFilterOpts().getIcmp6spec().addAll(_icmp6spec);
+		return true;
+	}
+
+	protected boolean pfRuleSetIfItem(boolean pfnot, String ifName) {
+		if (pfnot)
+			ifName = "!" + ifName;
+		_pfRule.getIfList().add(ifName);
+		return true;
+	}
+	
+	protected boolean newRouteOpts() {
+		_routeOpts = new RouteOptsTemplate();
+		return true;
+	}
+
+	protected boolean portSpecClear() {
+		_portspec.clear();
+		return true;
+	}
+
+	protected boolean newPfXhost() {
+		_pfXhost = new Xhost();
+		return true;
+	}
+
+	protected boolean newPfPortItem() {
+		_pfPortItem = new PortItemTemplate();
+		return true;
+	}
+
+	protected boolean pfPortItemFromRange(String portRange) {
+		/*
+		 * XXX: why ':' is not in PORTBINARY?
+		 */
+		int p = portRange.indexOf(':');
+		if (p > 0 && p < (portRange.length() -1)) {
+			_pfPortItem.setOperator(":");
+			String first = portRange.substring(0, p);
+			String last = portRange.substring(p + 1);
+			_pfPortItem.setFirstPort(first);
+			_pfPortItem.setLastPort(last);
+		} else
+			_pfPortItem.setFirstPort(portRange);
+		return true;
+	}
+
+	protected boolean newPfIcmpItem() {
+		_pfIcmpItem = new IcmpItem();
+		return true;
+	}
+
+	protected boolean redirHostsClear() {
+		_redirHosts.clear();
+		return true;
+	}
+
+	protected boolean newRedirSpec() {
+		_redirSpec = new RedirSpecTemplate();
+		return true;
+	}
+
+	protected boolean newPoolOpts() {
+		_poolOpts = new PoolOptsTemplate();
+		return true;
+	}
+
+	protected boolean quotedStringStart(String string) {
+		_quotec = string.charAt(0);
+		_lastString = "";
+		_previousChar = '\0';
+		_pfStringEnd = false;
+		return true;
+	}
+
+	protected boolean quotedStringContinue() {
+		return !_pfStringEnd;
+	}
+
+	protected boolean quotedString(String string) {
+		char c = string.charAt(0);
+		/*
+		 * escaped character.
+		 */
+		if (_previousChar == '\\') {
+			if (c != '\n')
+				_lastString += c;
+			_previousChar = '\0';
+			return true;
+		} else {
+			if (c == '\\') {
+				_previousChar = c;
+				return true;
+			}
+			if (c != _quotec && c != '\n') {
+				_previousChar = c;
+				_lastString += c;
+			}
+			if (c == _quotec)
+				_pfStringEnd = true;
+			return true;
+		}
+	}
+
+	public String getFlags() {
+		return _flags;
+	}
+
+	public boolean setFlags(String flags) {
+		_flags = flags;
+		return true;
+	}
+
+	public String getFlagset() {
+		return _flagset;
+	}
+
+	public boolean setFlagset(String flagset) {
+		_flagset = flagset;
+		return true;
+	}
 
 	public String getName() {
 		return _name;
+	}
+
+	public boolean setName(String name) {
+		_name = name;
+		return true;
 	}
 
 	public String getRuleName() {
 		return _ruleName;
 	}
 
-	public java.lang.String getMatchedText() {
+	public boolean setRuleName(String ruleName) {
+		_ruleName = ruleName;
+		return true;
+	}
+
+	public String getMatchedText() {
 		return _matchedText;
+	}
+
+	public boolean setMatchedText(String matchedText) {
+		_matchedText = matchedText;
+		return true;
 	}
 
 	public String getValue() {
 		return _value;
 	}
 
+	public boolean setValue(String value) {
+		_value = value;
+		return true;
+	}
+
 	public String getLastString() {
 		return _lastString;
+	}
+
+	public boolean setLastString(String lastString) {
+		_lastString = lastString;
+		return true;
 	}
 
 	public RuleTemplate getPfRule() {
 		return _pfRule;
 	}
 
+	public boolean setPfRule(RuleTemplate pfRule) {
+		_pfRule = pfRule;
+		return true;
+	}
+
 	public TableTemplate getPfTable() {
 		return _pfTable;
+	}
+
+	public boolean setPfTable(TableTemplate pfTable) {
+		_pfTable = pfTable;
+		return true;
 	}
 
 	public AnchorTemplate getPfAnchor() {
 		return _pfAnchor;
 	}
 
+	public boolean setPfAnchor(AnchorTemplate pfAnchor) {
+		_pfAnchor = pfAnchor;
+		return true;
+	}
+
 	public StringBuilder getCurExpandedContext() {
 		return _curExpandedContext;
+	}
+
+	public boolean setCurExpandedContext(StringBuilder curExpandedContext) {
+		_curExpandedContext = curExpandedContext;
+		return true;
+	}
+
+	public boolean getPfnot() {
+		return _pfnot;
+	}
+
+	public boolean setPfnot(boolean pfnot) {
+		_pfnot = pfnot;
+		return true;
+	}
+
+	public String getIfItem() {
+		return _ifItem;
+	}
+
+	public boolean setIfItem(String ifItem) {
+		_ifItem = ifItem;
+		return true;
+	}
+
+	public String getPfStateOptItem() {
+		return _pfStateOptItem;
+	}
+
+	public boolean setPfStateOptItem(String state) {
+		_pfStateOptItem = state;
+		return true;
+	}
+
+	public String getPfPQname() {
+		return _pfPQname;
+	}
+
+	public boolean setPfPQname(String pfPQname) {
+		_pfPQname = pfPQname;
+		return true;
+	}
+
+	public String getPfQname() {
+		return _pfQname;
+	}
+
+	public boolean setPfQname(String pfQname) {
+		_pfQname = pfQname;
+		return true;
+	}
+
+	public String getIfname() {
+		return _ifname;
+	}
+
+	public boolean setIfname(String ifname) {
+		_ifname = ifname;
+		return true;
+	}
+
+	public String getPfString() {
+		return _pfString;
+	}
+
+	public boolean setPfString(String pfString) {
+		_pfString = pfString;
+		return true;
 	}
 
 	private List<StringBuilder> expandLine(StringBuilder line, Map<String, String> symbols) {
@@ -299,7 +583,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	/**
 	 * Resets the resulting values of the parsing to null.
 	 */
-	public void clear() {
+	protected boolean clear() {
 		_ruleName = null;
 		_name = null;
 		_value = null;
@@ -308,6 +592,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		_pfRule = null;
 		_pfTable = null;
 		_pfAnchor = null;
+		return true;
 	}
 
 	/**
@@ -392,20 +677,10 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					ZeroOrMore(
 						Sequence(
 							SkipSpaces(),
-							new Action() {
-								public boolean run(Context context) {
-									return true;
-								}
-							},
 							FirstOf(
 								PfGenericList(),
 								PfGenericRuleItem()
-							),
-							new Action() {
-								public boolean run(Context context) {
-									return true;
-								}
-							}
+							)
 						)
 					),
 					SkipSpaces(),
@@ -417,40 +692,20 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				/*
 				 * text matched
 				 */
-				new Action() {
-					public boolean run(Context context) {
-						_matchedText = context.getMatch();
-						return true;
-					}
-				}
+				setMatchedText(match())
 			);
 	}
 
 	public Rule PfGenericRuleItem() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						return true;
-					}
-				},
 				TestNot(
 					PfGenericSpecial()
 				),
-				new Action() {
-					public boolean run(Context context) {
-						return true;
-					}
-				},
 				FirstOf(
 					PfQuotedString(),
 					PfGenericAtom()
-				),
-				new Action() {
-					public boolean run(Context context) {
-						return true;
-					}
-				}
+				)
 			);
 	}
 
@@ -458,21 +713,11 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			FirstOf(
 				Sequence(
-					new Action() {
-						public boolean run(Context context) {
-							return true;
-						}
-					},
 					Ch('{'),
 					PfOptnl(),
 					Ch('}')
 				),
 				Sequence(
-					new Action() {
-						public boolean run(Context context) {
-							return true;
-						}
-					},
 					Ch('{'),
 					PfOptnl(),
 					PfGenericListItem(),
@@ -484,11 +729,6 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfGenericListItem() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						return true;
-					}
-				},
 				TestNot(
 					Ch('}')
 				),
@@ -531,6 +771,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule Parse() {
 		return
 			Sequence(
+				clear(),
 				Sequence(
 					SkipSpaces(),
 					FirstOf(
@@ -551,12 +792,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				/*
 				 * text matched
 				 */
-				new Action() {
-					public boolean run(Context context) {
-						_matchedText = context.getMatch();
-						return true;
-					}
-				}
+				setMatchedText(match())
 			);
 	}
 
@@ -570,12 +806,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				SkipSpaces(),
 				Ch('}'),
 				SkipSpaces(),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "closing brace";
-						return true;
-					}
-				}
+				setRuleName("closing brace")
 			);
 	}
 
@@ -587,27 +818,14 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_name = _pfString;
-						_macroValues.clear();
-						return true;
-					}
-				},
+				setName(_pfString),
+				macroValuesClear(),
 				SkipSpaces(),
 				String("="),
 				SkipSpaces(),
 				PfMacroValue(),
-				new Action() {
-					public boolean run(Context context) {
-						_value = "";
-						for (String s: _macroValues)
-							_value = _value + s + " ";
-						_value = _value.trim();
-						_ruleName = "macro";
-						return true;
-					}
-				}
+				macroValuesToValue(),
+				setRuleName("macro")
 			);
 	}
 
@@ -622,12 +840,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_macroValues.add(_pfString);
-						return true;
-					}
-				},
+				_macroValues.add(_pfString),
 				Optional(
 					Sequence(
 						WhiteSpaces(),
@@ -647,21 +860,11 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfNot() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_pfnot = false;
-						return true;
-					}
-				},
+				setPfnot(false),
 				Optional(
 					Sequence(
 						Ch('!'),
-						new Action() {
-							public boolean run(Context context) {
-								_pfnot = true;
-								return true;
-							}
-						}
+						setPfnot(true)
 					)
 				)
 			);
@@ -677,32 +880,17 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				TABLE(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfTable = new TableTemplate();
-						return true;
-					}
-				},
+				newTableTemplate(),
 				SkipSpaces(),
 				Ch('<'),
 				SkipSpaces(),
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfTable.setName(_pfString);
-						return true;
-					}
-				},
+				_pfTable.setName(_pfString),
 				SkipSpaces(),
 				Ch('>'),
 				SkipSpaces(),
 				PfTableOpts(),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "tabledef";
-						return true;
-					}
-				}
+				setRuleName("tabledef")
 			);
 	}
 
@@ -750,12 +938,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfTableOpt() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_ipspec.clear();
-						return true;
-					}
-				},
+				ipSpecClear(),
 				FirstOf(
 					/*
 					 * FILENAME STRING
@@ -764,12 +947,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						FILENAME(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfTable.getFileNames().add(_pfString);
-								return true;
-							}
-						}
+						_pfTable.getFileNames().add(_pfString)
 					),
 					/*
 					 * '{' optnl '}'
@@ -788,24 +966,14 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						PfHostList(),
 						SkipSpaces(),
 						Ch('}'),
-						new Action() {
-							public boolean run(Context context) {
-								_pfTable.getHosts().addAll(_ipspec);
-								return true;
-							}
-						}
+						_pfTable.getHosts().addAll(_ipspec)
 					),
 					/*
 					 * STRING
 					 */
 					Sequence(
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfTable.getOptions().add(_pfString);
-								return true;
-							}
-						}
+						_pfTable.getOptions().add(_pfString)
 					)
 				)
 			);
@@ -823,13 +991,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				INCLUDE(),
 				WhiteSpaces(),
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_value = _pfString;
-						_ruleName = "include";
-						return true;
-					}
-				},
+				setValue(_pfString),
+				setRuleName("include"),
 				UntilEOI()
 			);
 	}
@@ -849,19 +1012,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				WhiteSpace(),
 				SKIP(),
 				WhiteSpace(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule = new RuleTemplate();
-						return true;
-					}
-				},
+				newRuleTemplate(),
 				PfInterface(),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "option set skip";
-						return true;
-					}
-				}
+				setRuleName("option set skip")
 			);
 	}
 
@@ -879,14 +1032,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 * ANCHOR
 				 */
 				ANCHOR(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfAnchor = new AnchorTemplate();
-						_pfRule = new RuleTemplate();
-						_pfAnchor.setRule(_pfRule);
-						return true;
-					}
-				},
+				newAnchorTemplate(),
+				newRuleTemplate(),
+				_pfAnchor.setRule(_pfRule),
 				/*
 				 * [anchorname]
 				 */
@@ -894,12 +1042,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Sequence(
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfAnchor.setName(_pfString);
-								return true;
-							}
-						}
+						_pfAnchor.setName(_pfString)
 					)
 				),
 				SkipSpaces(),
@@ -909,12 +1052,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				Optional(
 					Sequence(
 						PfDir(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfRule.setDir(context.getMatch());
-								return true;
-							}
-						}
+						_pfRule.setDir(match())
 					)
 				),
 				SkipSpaces(),
@@ -966,21 +1104,11 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				Optional(
 					Sequence(
 						Ch('{'),
-						new Action() {
-						public boolean run(Context context) {
-							_pfAnchor.setInlined(true);
-							return true;
-							}
-						},
+						_pfAnchor.setInlined(true),
 						SkipSpaces()
 					)
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName = "anchorrule";
-						return true;
-					}
-				}
+				setRuleName("anchorrule")
 			);
 	}
 
@@ -998,23 +1126,13 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				ANCHOR(),
 				WhiteSpaces(),
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_name = _pfString;
-						return true;
-					}
-				},
+				setName(_pfString),
 				WhiteSpaces(),
 				FROM(),
 				WhiteSpaces(),
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_value = _pfString;
-						_ruleName = "loadrule";
-						return true;
-					}
-				}
+				setValue(_pfString),
+				setRuleName("loadrule")
 			);
 	}
 	
@@ -1027,12 +1145,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfScrubOpts() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_scrubOpts = new ScrubOptsTemplate();
-						return true;
-					}
-				},			
+				newScrubOptsTemplate(),
 				PfScrubOptsL()
 			);
 	}
@@ -1078,12 +1191,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					NODF(),
-					new Action() {
-						public boolean run(Context context) {
-							_scrubOpts.setNodf(true);
-							return true;
-						}
-					}
+					_scrubOpts.setNodf(true)
 				),
 				/*
 				 * MINTTL NUMBER
@@ -1092,12 +1200,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					MINTTL(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_scrubOpts.setMinttl(_pfString);
-							return true;
-						}
-					}
+					_scrubOpts.setMinttl(_pfString)
 				),
 				/*
 				 * MAXMSS NUMBER
@@ -1106,12 +1209,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					MAXMSS(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_scrubOpts.setMaxmss(_pfString);
-							return true;
-						}
-					}
+					_scrubOpts.setMaxmss(_pfString)
 				),
 				/*
 				 * SETTOS tos
@@ -1120,12 +1218,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					SETTOS(),
 					WhiteSpaces(),
 					PfTos(),
-					new Action() {
-						public boolean run(Context context) {
-							_scrubOpts.setSettos(_pfString);
-							return true;
-						}
-					}
+					_scrubOpts.setSettos(_pfString)
 				),
 				/*
 				 * REASSEMBLE STRING
@@ -1137,24 +1230,14 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					 * scrub reassemble supports only tcp
 					 */
 					String("tcp"),
-					new Action() {
-						public boolean run(Context context) {
-							_scrubOpts.setReassemble_tcp(true);
-							return true;
-						}
-					}
+					_scrubOpts.setReassemble_tcp(true)
 				),
 				/*
 				 * RANDOMID
 				 */
 				Sequence(
 					RANDOMID(),
-					new Action() {
-						public boolean run(Context context) {
-							_scrubOpts.setRandomid(true);
-							return true;
-						}
-					}
+					_scrubOpts.setRandomid(true)
 				)
 			);
 	}
@@ -1169,12 +1252,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfRule() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule = new RuleTemplate();
-						return true;
-					}
-				},
+				newRuleTemplate(),
 				/*
 				 * action
 				 */
@@ -1186,12 +1264,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				Optional(
 					Sequence(
 						PfDir(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfRule.setDir(context.getMatch());
-								return true;
-							}
-						}
+						_pfRule.setDir(match())
 					)
 				),
 				SkipSpaces(),
@@ -1236,12 +1309,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				Optional(
 					PfFilterOpts()
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_ruleName="pfrule";
-						return true;
-					}
-				}
+				setRuleName("pfrule")
 			);
 	}
 
@@ -1255,26 +1323,13 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfFilterOpts() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_icmpspec.clear();
-						_icmp6spec.clear();
-						_flags = null;
-						_flagset = null;
-						_stateOptSpec.clear();
-						return true;
-					}
-				},			
+				icmpSpecClear(),
+				icmp6SpecClear(),
+				setFlags(null),
+				setFlagset(null),
+				stateOptSpecClear(),
 				PfFilterOptsl(),
-				new Action() {
-					public boolean run (Context context) {
-							_pfRule.getFilterOpts().setFlags(_flags);
-							_pfRule.getFilterOpts().setFlagset(_flagset);
-							_pfRule.getFilterOpts().getIcmpspec().addAll(_icmpspec);
-							_pfRule.getFilterOpts().getIcmp6spec().addAll(_icmp6spec);
-							return true;
-					}
-				}
+				pfRuleSetFilterOpts()
 			);
 	}
 
@@ -1368,12 +1423,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					TOS(),
 					SkipSpaces(),
 					PfTos(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setTos(_pfString);
-							return true;
-						}
-					},
+					_pfRule.getFilterOpts().setTos(_pfString),
 					SkipSpaces()
 				),
 				/*
@@ -1389,12 +1439,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				Sequence(
 					FRAGMENT(),
 					SkipSpaces(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setFragment(true);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setFragment(true)
 				),
 				/*
 				 * ALLOWOPTS
@@ -1402,12 +1447,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				Sequence(
 					ALLOWOPTS(),
 					SkipSpaces(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAllowopts(true);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setAllowopts(true)
 				),
 				/*
 				 * LABEL label
@@ -1417,12 +1457,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					WhiteSpaces(),
 					PfLabel(),
 					SkipSpaces(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setLabel(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setLabel(_pfString)
 				),
 				/*
 				 * QUEUE qname
@@ -1431,13 +1466,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					QUEUE(),
 					WhiteSpaces(),
 					PfQname(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setQname(_pfQname);
-							_pfRule.getFilterOpts().setPQname(_pfPQname);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setQname(_pfQname),
+					_pfRule.getFilterOpts().setPQname(_pfPQname)
 				),
 				/*
 				 * TAG string
@@ -1446,12 +1476,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					TAG(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setTag(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setTag(_pfString)
 				),
 				/*
 				 * not TAGGED string
@@ -1462,13 +1487,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					TAGGED(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setMatchTagNot(_pfnot);
-							_pfRule.getFilterOpts().setMatchTag(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setMatchTagNot(_pfnot),
+					_pfRule.getFilterOpts().setMatchTag(_pfString)
 				),
 				/*
 				 * PROBABILITY probability
@@ -1477,12 +1497,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					PROBABILITY(),
 					WhiteSpaces(),
 					PfProbability(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setProbability(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setProbability(_pfString)
 				),
 				/*
 				 * RTABLE NUMBER
@@ -1491,12 +1506,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					RTABLE(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setRtableId(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setRtableId(_pfString)
 				),
 				/*
 				 * DIVERTTO STRING PORT portplain
@@ -1505,34 +1515,19 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					DIVERTTO(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setDivertAddr(_pfString);
-							return true;
-						}
-					},
+					_pfRule.getFilterOpts().setDivertAddr(_pfString),
 					WhiteSpaces(),
 					PORT(),
 					WhiteSpaces(),
 					PfPortPlain(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setDivertPort(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setDivertPort(_pfString)
 				),
 				/*
 				 * DIVERTREPLY
 				 */
 				Sequence(
 					DIVERTREPLY(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setDivertPort("1");
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setDivertPort("1")
 				),
 				/*
 				 * DIVERTPACKET PORT number
@@ -1543,12 +1538,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					PORT(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setDivertPacketPort(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setDivertPacketPort(_pfString)
 				),
 				/*
 				 * SCRUB '(' scrub_opts ')'
@@ -1561,12 +1551,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					PfScrubOpts(),
 					SkipSpaces(),
 					Ch(')'),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setScrubOpts(_scrubOpts);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setScrubOpts(_scrubOpts)
 				),
 				/*
 				 * NATTO redirpool pool_opts
@@ -1575,22 +1560,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					NATTO(),
 					WhiteSpaces(),
 					PfRedirPool(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setNat(_redirSpec);
-							return true;
-						}
-					},
+					_pfRule.getFilterOpts().setNat(_redirSpec),
 					Optional(
 						Sequence(
 							SkipSpaces(),
 							PfPoolOpts(),
-							new Action() {
-								public boolean run(Context context) {
-									_redirSpec.setPoolOpts(_poolOpts);
-									return true;
-								}
-							}
+							_redirSpec.setPoolOpts(_poolOpts)
 						)
 					)
 				),
@@ -1601,22 +1576,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					RDRTO(),
 					WhiteSpaces(),
 					PfRedirPool(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setRdr(_redirSpec);
-							return true;
-						}
-					},
+					_pfRule.getFilterOpts().setRdr(_redirSpec),
 					Optional(
 						Sequence(
 							SkipSpaces(),
 							PfPoolOpts(),
-							new Action() {
-								public boolean run(Context context) {
-									_redirSpec.setPoolOpts(_poolOpts);
-									return true;
-								}
-							}
+							_redirSpec.setPoolOpts(_poolOpts)
 						)
 					)
 				),
@@ -1627,24 +1592,14 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					BINATTO(),
 					WhiteSpaces(),
 					PfRedirPool(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setNat(_redirSpec);
-							_pfRule.getFilterOpts().setBinat(true);
-							return true;
-						}
-					},
+					_pfRule.getFilterOpts().setNat(_redirSpec),
+					_pfRule.getFilterOpts().setBinat(true),
 					Optional(
 						Sequence(
 							SkipSpaces(),
 							PfPoolOpts(),
-							new Action() {
-								public boolean run(Context context) {
-									_redirSpec.setPoolOpts(_poolOpts);
-									_poolOpts.setStaticPort(true);
-									return true;
-								}
-							}
+							_redirSpec.setPoolOpts(_poolOpts),
+							_poolOpts.setStaticPort(true)
 						)
 					)
 				),
@@ -1653,14 +1608,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					FASTROUTE(),
-					new Action() {
-						public boolean run(Context context) {
-							_routeOpts = new RouteOptsTemplate();
-							_routeOpts.setRt(PfConst.PF_FASTROUTE);
-							_pfRule.getFilterOpts().setRouteOpts(_routeOpts);
-							return true;
-						}
-					}
+					newRouteOpts(),
+					_routeOpts.setRt(PfConst.PF_FASTROUTE),
+					_pfRule.getFilterOpts().setRouteOpts(_routeOpts)
 				),
 				/*
 				 * ROUTETO routespec pool_opts
@@ -1673,14 +1623,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Optional(
 						PfPoolOpts()
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_routeOpts.setRt(PfConst.PF_ROUTETO);
-							_routeOpts.setPoolOpts(_poolOpts);
-							_pfRule.getFilterOpts().setRouteOpts(_routeOpts);
-							return true;
-						}
-					}
+					_routeOpts.setRt(PfConst.PF_ROUTETO),
+					_routeOpts.setPoolOpts(_poolOpts),
+					_pfRule.getFilterOpts().setRouteOpts(_routeOpts)
 				),
 				/*
 				 * REPLYTO routespec pool_opts
@@ -1693,14 +1638,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Optional(
 						PfPoolOpts()
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_routeOpts.setRt(PfConst.PF_REPLYTO);
-							_routeOpts.setPoolOpts(_poolOpts);
-							_pfRule.getFilterOpts().setRouteOpts(_routeOpts);
-							return true;
-						}
-					}
+					_routeOpts.setRt(PfConst.PF_REPLYTO),
+					_routeOpts.setPoolOpts(_poolOpts),
+					_pfRule.getFilterOpts().setRouteOpts(_routeOpts)
 				),
 				/*
 				 * DUPTO routespec pool_opts
@@ -1713,14 +1653,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Optional(
 						PfPoolOpts()
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_routeOpts.setRt(PfConst.PF_DUPTO);
-							_routeOpts.setPoolOpts(_poolOpts);
-							_pfRule.getFilterOpts().setRouteOpts(_routeOpts);
-							return true;
-						}
-					}
+					_routeOpts.setRt(PfConst.PF_DUPTO),
+					_routeOpts.setPoolOpts(_poolOpts),
+					_pfRule.getFilterOpts().setRouteOpts(_routeOpts)
 				),
 				/*
 				 * RECEIVEDON if_item
@@ -1729,12 +1664,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					RECEIVEDON(),
 					WhiteSpaces(),
 					PfIfItem(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setRcv(_pfString);
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setRcv(_pfString)
 				)
 			);
 	}
@@ -1765,24 +1695,14 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					PASS(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.setAction("pass");
-							return true;
-						}
-					}
+					_pfRule.setAction("pass")
 				),
 				/*
 				 * MATCH
 				 */
 				Sequence(
 					MATCH(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.setAction("match");
-							return true;
-						}
-					}
+					_pfRule.setAction("match")
 				),
 				/*
 				 * BLOCK blockspec
@@ -1795,12 +1715,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 							PfBlockSpec()
 						)
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.setAction("block");
-							return true;
-						}
-					}
+					_pfRule.setAction("block")
 				)
 			);
 	}
@@ -1949,12 +1864,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				QUICK(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule.setQuick(true);
-						return true;
-					}
-				}
+				_pfRule.setQuick(true)
 			);
 	}
 
@@ -2116,15 +2026,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				PfNot(),
 				SkipSpaces(),
 				PfIfItem(),
-				new Action() {
-					public boolean run(Context context) {
-						String ifname = _ifItem;
-						if (_pfnot)
-							ifname = "!" + ifname;
-						_pfRule.getIfList().add(ifname);
-						return true;
-					}
-				}
+				pfRuleSetIfItem(_pfnot, _ifItem)
 			);
 	}
 
@@ -2138,12 +2040,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_ifItem = _pfString;
-						return true;
-					}
-				}
+				setIfItem(_pfString)
 			);
 	}
 
@@ -2162,12 +2059,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					INET6(),
 					INET()
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule.setAf(context.getMatch());
-						return true;
-					}
-				}
+				_pfRule.setAf(match())
 			);
 	}
 
@@ -2230,12 +2122,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule.getProtoList().add(_pfString);
-						return true;
-					}
-				}
+				_pfRule.getProtoList().add(_pfString)
 			);
 	}
 
@@ -2251,12 +2138,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 			FirstOf(
 				Sequence(
 					ALL(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.setAll(true);
-							return true;
-						}
-					}
+					_pfRule.setAll(true)
 				),
 				/*
 				 * from os to
@@ -2313,12 +2195,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfString(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule.getOsList().add(_pfString);
-						return true;
-					}
-				}
+				_pfRule.getOsList().add(_pfString)
 			);
 	}
 
@@ -2360,13 +2237,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				FROM(),
 				SkipSpaces(),
 				PfIpPortSpec(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule.getSourceHostList().addAll(_ipspec);
-						_pfRule.getSourcePortList().addAll(_portspec);
-						return true;
-					}
-				}
+				_pfRule.addSourceHost(_ipspec),
+				_pfRule.addSourcePort(_portspec)
 			);
 	}
 	
@@ -2383,13 +2255,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				TO(),
 				SkipSpaces(),
 				PfIpPortSpec(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule.getDestHostList().addAll(_ipspec);
-						_pfRule.getDestPortList().addAll(_portspec);
-						return true;
-					}
-				}
+				_pfRule.addDestinationHost(_ipspec),
+				_pfRule.addDestinationPort(_portspec)
 			);
 	}
 
@@ -2404,13 +2271,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfIpPortSpec() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_ipspec.clear();
-						_portspec.clear();
-						return true;
-					}
-				},
+				ipSpecClear(),
+				portSpecClear(),
 				FirstOf(
 					Sequence(
 						PORT(),
@@ -2425,13 +2287,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						PfPortSpec()
 					),
 					Sequence(
-						new Action() {
-							public boolean run(Context context) {
-								// ipspec PORT port may have change _ippsec
-								_ipspec.clear();
-								return true;
-							}
-						},
+						// ipspec PORT port may have change _ippsec
+						ipSpecClear(),
 						PfIpSpec(),
 						SkipSpaces()
 					)
@@ -2474,25 +2331,15 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfIpSpec() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_pfXhost = new Xhost();
-						return true;
-					}
-				},
+				newPfXhost(),
 				FirstOf(
 					/*
 					 * ANY
 					 */
 					Sequence(
 						ANY(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfXhost.setAny(true);
-								_ipspec.add(_pfXhost);
-								return true;
-							}
-						}
+						_pfXhost.setAny(true),
+						_ipspec.add(_pfXhost)
 					),
 					/*
 					 * xhost
@@ -2553,14 +2400,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					PfNot(),
 					SkipSpaces(),
 					NOROUTE(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost.setNot(_pfnot);
-							_pfXhost.setNoroute(true);
-							_ipspec.add(_pfXhost);
-							return true;
-						}
-					}
+					_pfXhost.setNot(_pfnot),
+					_pfXhost.setNoroute(true),
+					_ipspec.add(_pfXhost)
 				),
 				/*
 				 * not URPFFAILED
@@ -2569,14 +2411,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					PfNot(),
 					SkipSpaces(),
 					URPFFAILED(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost.setNot(_pfnot);
-							_pfXhost.setUrpffailed(true);
-							_ipspec.add(_pfXhost);
-							return true;
-						}
-					}
+					_pfXhost.setNot(_pfnot),
+					_pfXhost.setUrpffailed(true),
+					_ipspec.add(_pfXhost)
 				),
 				/*
 				 * not host
@@ -2585,13 +2422,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					PfNot(),
 					SkipSpaces(),
 					PfHost(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost.setNot(_pfnot);
-							_ipspec.add(_pfXhost);
-							return true;
-						}
-					}
+					_pfXhost.setNot(_pfnot),
+					_ipspec.add(_pfXhost)
 				)
 			);
 	}
@@ -2617,48 +2449,27 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setFirstAddress(_pfString);
-							return true;
-						}
-					},
+					newPfXhost(),
+					_pfXhost.setFirstAddress(_pfString),
 					SkipSpaces(),
 					Ch('-'),
 					SkipSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost.setLastAddress(_pfString);
-							return true;
-						}
-					}
+					_pfXhost.setLastAddress(_pfString)
 				),
 				/*
 				 * STRING '/' STRING
 				 */
 				Sequence(
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setFirstAddress(_pfString);
-							return true;
-						}
-					},
+					newPfXhost(),
+					_pfXhost.setFirstAddress(_pfString),
 					SkipSpaces(),
 					Ch('/'),
 					SkipSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							String addr = _pfXhost.getFirstAddress() +
-									"/" + _pfString;
-							_pfXhost.setFirstAddress(addr);
-							return true;
-						}
-					}
+					_pfXhost.setFirstAddress(_pfXhost.getFirstAddress() + "/" +
+						_pfString)
 				),
 				/*
 				 * '<' STRING '>'
@@ -2667,13 +2478,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Ch('<'),
 					SkipSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setTable(_pfString);
-							return true;
-						}
-					},
+					newPfXhost(),
+					_pfXhost.setTable(_pfString),
 					SkipSpaces(),
 					Ch('>')
 				),
@@ -2684,13 +2490,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					ROUTE(),
 					WhiteSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setRoute(_pfString);
-							return true;
-						}
-					}
+					newPfXhost(),
+					_pfXhost.setRoute(_pfString)
 				),
 				/*
 				 * dynaddr
@@ -2700,13 +2501,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Ch('('),
 					SkipSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setDynaddr(_pfString);
-							return true;
-						}
-					},
+					newPfXhost(),
+					_pfXhost.setDynaddr(_pfString),
 					SkipSpaces(),
 					Ch(')'),
 					SkipSpaces(),
@@ -2715,12 +2511,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 							Ch('/'),
 							SkipSpaces(),
 							PfString(),
-							new Action() {
-								public boolean run(Context context) {
-									_pfXhost.setDynaddrMask(_pfString);
-									return true;
-								}
-							}
+							_pfXhost.setDynaddrMask(_pfString)
 						)
 					)
 				),
@@ -2729,13 +2520,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setFirstAddress(_pfString);
-							return true;
-						}
-					}
+					newPfXhost(),
+					_pfXhost.setFirstAddress(_pfString)
 				)
 			);
 	}
@@ -2803,21 +2589,11 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					 */
 					Sequence(
 						PfUnaryOp(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfPortItem = new PortItemTemplate();
-								_pfPortItem.setOperator(context.getMatch());
-								return true;
-							}
-						},
+						newPfPortItem(),
+						_pfPortItem.setOperator(match()),
 						SkipSpaces(),
 						PfPortRange(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfPortItem.setFirstPort(_pfString);
-								return true;
-							}
-						}
+						_pfPortItem.setFirstPort(_pfString)
 					),
 					/*
 					 * portrange PORTBINARY portrange
@@ -2826,54 +2602,26 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						PfPortRange(),
 						SkipSpaces(),
 						PfPortBinary(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfPortItem = new PortItemTemplate();
-								_pfPortItem.setFirstPort(_pfString);
-								_pfPortItem.setOperator(context.getMatch());
-								return true;
-							}
-						},
+						newPfPortItem(),
+						_pfPortItem.setFirstPort(_pfString),
+						_pfPortItem.setOperator(match()),
 						SkipSpaces(),
 						PfPortRange(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfPortItem.setLastPort(_pfString);
-								return true;
-							}
-						}
+						_pfPortItem.setLastPort(_pfString)
 					),
 					/*
 					 * portrange
 					 */
 					Sequence(
 						PfPortRange(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfPortItem = new PortItemTemplate();
-								/*
-								 * XXX: why ':' is not in PORTBINARY?
-								 */
-								int p = _pfString.indexOf(':');
-								if (p > 0 && p < (_pfString.length() -1)) {
-									_pfPortItem.setOperator(":");
-									String first = _pfString.substring(0, p);
-									String last = _pfString.substring(p + 1);
-									_pfPortItem.setFirstPort(first);
-									_pfPortItem.setLastPort(last);
-								} else
-									_pfPortItem.setFirstPort(_pfString);
-								return true;
-							}
-						}
+						newPfPortItem(),
+						/*
+						 * XXX: why ':' is not in PORTBINARY?
+						 */
+						pfPortItemFromRange(_pfString)
 					)
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_portspec.add(_pfPortItem);
-						return true;
-					}
-				}
+				_portspec.add(_pfPortItem)
 			);
 	}
 
@@ -3089,12 +2837,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					FLAGS(),
 					WhiteSpaces(),
 					ANY(),
-					new Action() {
-						public boolean run(Context context) {
-							_flags = "any";
-							return true;
-						}
-					}
+					setFlags("any")
 				),
 				/*
 				 * FLAGS '/' flag
@@ -3105,12 +2848,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Ch('/'),
 					SkipSpaces(),
 					PfFlag(),
-					new Action() {
-						public boolean run(Context context) {
-							_flagset = _pfString;
-							return true;
-						}
-					}
+					setFlagset(_pfString)
 				),
 				/*
 				 * FLAGS flag '/' flag
@@ -3119,22 +2857,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					FLAGS(),
 					SkipSpaces(),
 					PfFlag(),
-					new Action() {
-						public boolean run(Context context) {
-							_flags = _pfString;
-							return true;
-						}
-					},
+					setFlags(_pfString),
 					SkipSpaces(),
 					Ch('/'),
 					SkipSpaces(),
 					PfFlag(),
-					new Action() {
-						public boolean run(Context context) {
-							_flagset = _pfString;
-							return true;
-						}
-					}
+					setFlagset(_pfString)
 				)
 			);
 	}
@@ -3159,12 +2887,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					ICMPTYPE(),
 					SkipSpaces(),
 					PfIcmpItem(),
-					new Action() {
-						public boolean run(Context context) {
-							_icmpspec.add(_pfIcmpItem);
-							return true;
-						}
-					}
+					_icmpspec.add(_pfIcmpItem)
 				),
 				/*
 				 * ICMPTYPE '{' optnl icmp_list '}'
@@ -3185,12 +2908,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					ICMP6TYPE(),
 					SkipSpaces(),
 					PfIcmpItem(),
-					new Action() {
-						public boolean run(Context context) {
-							_icmp6spec.add(_pfIcmpItem);
-							return true;
-						}
-					}
+					_icmp6spec.add(_pfIcmpItem)
 				),
 				/*
 				 * ICMP6TYPE '{' optnl icmp6_list '}'
@@ -3218,12 +2936,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfIcmpItem(),
-				new Action() {
-					public boolean run(Context context) {
-						_icmpspec.add(_pfIcmpItem);
-						return true;
-					}
-				},
+				_icmpspec.add(_pfIcmpItem),
 				PfOptnl(),
 				Optional(
 					Sequence(
@@ -3247,12 +2960,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfIcmpItem(),
-				new Action() {
-					public boolean run(Context context) {
-						_icmp6spec.add(_pfIcmpItem);
-						return true;
-					}
-				},
+				_icmp6spec.add(_pfIcmpItem),
 				PfOptnl(),
 				Optional(
 					Sequence(
@@ -3279,19 +2987,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				/*
 				 * icmptype
 				 */
-				new Action() {
-					public boolean run(Context context) {
-						_pfIcmpItem = new IcmpItem();
-						return true;
-					}
-				},
+				newPfIcmpItem(),
 				PfIcmpType(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfIcmpItem.setIcmpType(_pfString);
-						return true;
-					}
-				},
+				_pfIcmpItem.setIcmpType(_pfString),
 				/*
 				 * [CODE STRING]
 				 */
@@ -3301,12 +2999,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						CODE(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfIcmpItem.setIcmpCode(_pfString);
-								return true;
-							}
-						},
+						_pfIcmpItem.setIcmpCode(_pfString),
 						SkipSpaces()
 					)
 				)
@@ -3383,12 +3076,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					NO(),
 					WhiteSpaces(),
 					STATE(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("no-state");
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setAction("no-state")
 				),
 				/*
 				 * KEEP STATE state_opt_spec
@@ -3403,12 +3091,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 							PfStateOptSpec()
 						)
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("keep-state");
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setAction("keep-state")
 				),
 				/*
 				 * MODULATE STATE state_opt_spec
@@ -3423,12 +3106,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 							PfStateOptSpec()
 						)
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("modulate-state");
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setAction("modulate-state")
 				),
 				/*
 				 * SYNPROXY STATE state_opt_spec
@@ -3443,12 +3121,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 							PfStateOptSpec()
 						)
 					),
-					new Action() {
-						public boolean run(Context context) {
-							_pfRule.getFilterOpts().setAction("synproxy-state");
-							return true;
-						}
-					}
+					_pfRule.getFilterOpts().setAction("synproxy-state")
 				)
 			);
 
@@ -3534,12 +3207,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfStateOptItem() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_pfStateOptItem = "";
-						return true;
-					}
-				},
+				setPfStateOptItem(""),
 				FirstOf(
 					/*
 					 * MAXIMUM NUMBER
@@ -3548,24 +3216,14 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXIMUM(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "MAXIMUM " + _pfString;
-								return true;
-							}
-						}
+						setPfStateOptItem("MAXIMUM " + _pfString)
 					),
 					/*
 					 * NOSYNC
 					 */
 					Sequence(
 						NOSYNC(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "NOSYNC";
-								return true;
-							}
-						}
+						setPfStateOptItem("NOSYNC")
 					),
 					/*
 					 * MAXSRCSTATES NUMBER
@@ -3574,12 +3232,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCSTATES(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "MAXSRCSTATES " + _pfString;
-								return true;
-							}
-						}
+						setPfStateOptItem("MAXSRCSTATES " + _pfString)
 					),
 					/*
 					 * MAXSRCCONN NUMBER
@@ -3588,12 +3241,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCCONN(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "MAXSRCCONN " + _pfString;
-								return true;
-							}
-						}
+						setPfStateOptItem("MAXSRCCONN " + _pfString)
 					),
 					/*
 					 * MAXSRCCONNRATE NUMBER '/' NUMBER
@@ -3602,22 +3250,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCCONNRATE(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "MAXSRCCONNRATE " + _pfString;
-								return true;
-							}
-						},
+						setPfStateOptItem("MAXSRCCONNRATE " + _pfString),
 						SkipSpaces(),
 						Ch('/'),
 						SkipSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem += " " + _pfString;
-								return true;
-							}
-						}
+						setPfStateOptItem(_pfStateOptItem + " " + _pfString)
 					),
 					/*
 					 * OVERLOAD '<' STRING '>' flush
@@ -3630,24 +3268,13 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						PfString(),
 						SkipSpaces(),
 						Ch('>'),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "OVERLOAD " +
-									"<" + _pfString + ">";
-								return true;
-							}
-						},
+						setPfStateOptItem("OVERLOAD " + "<" + _pfString + ">"),
 						SkipSpaces(),
 						Optional(
 							Sequence(
 								PfFlush(),
-								new Action() {
-									public boolean run(Context context) {
-										_pfStateOptItem = _pfStateOptItem +
-											" " + context.getMatch();
-										return true;
-									}
-								}
+								setPfStateOptItem(_pfStateOptItem +	" "
+									+ match())
 							)
 						)
 					),
@@ -3658,35 +3285,20 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCNODES(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "MAXSRCNODES " + _pfString;
-								return true;
-							}
-						}
+						setPfStateOptItem("MAXSRCNODES " + _pfString)
 					),
 					/*
 					 * SOURCETRACK sourcetrack
 					 */
 					Sequence(
 						SOURCETRACK(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "SOURCETRACK";
-								return true;
-							}
-						},
+						setPfStateOptItem("SOURCETRACK"),
 						Optional(
 							Sequence(
 								WhiteSpaces(),
 								PfSourceTrack(),
-								new Action() {
-									public boolean run(Context context) {
-										_pfStateOptItem = _pfStateOptItem +
-											" " + context.getMatch();
-										return true;
-									}
-								}
+								setPfStateOptItem(_pfStateOptItem + " "
+									+ match())
 							)
 						)
 					),
@@ -3695,66 +3307,34 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					 */
 					Sequence(
 						PfStateLock(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "STATELOCK " +
-									context.getMatch();
-								return true;
-							}
-						}
+						setPfStateOptItem("STATELOCK " + match())
 					),
 					/*
 					 * SLOPPY
 					 */
 					Sequence(
 						SLOPPY(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "SLOPPY";
-								return true;
-							}
-						}
+						setPfStateOptItem("SLOPPY")
 					),
 					/*
 					 * PFLOW
 					 */
 					Sequence(
 						PFLOW(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "PFLOW";
-								return true;
-							}
-						}
+						setPfStateOptItem("PFLOW")
 					),
 					/*
 					 * STRING NUMBER
 					 */
 					Sequence(
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = "STRING " + _pfString;
-								return true;
-							}
-						},
+						setPfStateOptItem("STRING " + _pfString),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_pfStateOptItem = _pfStateOptItem +
-									" " +  _pfString;
-								return true;
-							}
-						}
+						setPfStateOptItem(_pfStateOptItem +	" " +  _pfString)
 					)
 				),
-				new Action() {
-					public boolean run(Context context) {
-						_pfRule.getFilterOpts().getOptions().add(_pfStateOptItem);
-						return true;
-					}
-				}
+				_pfRule.getFilterOpts().getOptions().add(_pfStateOptItem)
 			);
 	}
 
@@ -3784,13 +3364,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfQname = _pfString;
-							_pfPQname = null;
-							return true;
-						}
-					}
+					setPfQname(_pfString),
+					setPfPQname(null)
 				),
 				/*
 				 * '(' STRING ')'
@@ -3801,13 +3376,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					PfString(),
 					SkipSpaces(),
 					Ch(')'),
-					new Action() {
-						public boolean run(Context context) {
-							_pfQname = _pfString;
-							_pfPQname = null;
-							return true;
-						}
-					}
+					setPfQname(_pfString),
+					setPfPQname(null)
 				),
 				/*
 				 * '(' STRING comma STRING ')'
@@ -3816,27 +3386,17 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Ch('('),
 					SkipSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfQname = _pfString;
-							_pfPQname = null;
-							return true;
-						}
-					},
+					setPfQname(_pfString),
+					setPfPQname(null),
 					SkipSpaces(),
 					PfComma(),
 					SkipSpaces(),
 					PfString(),
 					SkipSpaces(),
 					Ch(')'),
-					new Action() {
-						public boolean run(Context context) {
-							_pfPQname = _pfString;
-							return true;
-						}
-					}
+					setPfPQname(_pfString)
 				)
-				);
+			);
 	}
 
 	/**
@@ -3849,21 +3409,11 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfRedirSpec() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_redirHosts.clear();
-						return true;
-					}
-				},
+				redirHostsClear(),
 				FirstOf(
 					Sequence(
 						PfHost(),
-						new Action() {
-							public boolean run(Context context) {
-								_redirHosts.add(_pfXhost);
-								return true;
-							}
-						}
+						_redirHosts.add(_pfXhost)
 					),
 					Sequence(
 						Ch('{'),
@@ -3887,12 +3437,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfHost(),
-				new Action() {
-					public boolean run(Context context) {
-						_redirHosts.add(_pfXhost);
-						return true;
-					}
-				},
+				_redirHosts.add(_pfXhost),
 				PfOptnl(),
 				Optional(
 					Sequence(
@@ -3914,12 +3459,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfRedirPool() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_redirSpec = new RedirSpecTemplate();
-						return true;
-					}
-				},
+				newRedirSpec(),
 				FirstOf(
 					/*
 					 * redirspec PORT portstar
@@ -3930,25 +3470,15 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						PORT(),
 						WhiteSpaces(),
 						PfString(),
-						new Action() {
-							public boolean run(Context context) {
-								_redirSpec.getHosts().addAll(_redirHosts);
-								_redirSpec.setPortstar(_pfString);
-								return true;
-							}
-						}
+						_redirSpec.addHost(_redirHosts),
+						_redirSpec.setPortstar(_pfString)
 					),
 					/*
 					 * redirspec
 					 */
 					Sequence(
 						PfRedirSpec(),
-						new Action() {
-							public boolean run(Context context) {
-								_redirSpec.getHosts().addAll(_redirHosts);
-								return true;
-							}
-						}
+						_redirSpec.addHost(_redirHosts)
 					)
 				)
 			);
@@ -3964,12 +3494,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfPoolOpts() {
 		 return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_poolOpts = new PoolOptsTemplate();
-						return true;
-					}
-				},
+				newPoolOpts(),
 				PfPoolOptsL()
 			);
 	}
@@ -4011,46 +3536,26 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					BITMASK(),
-					new Action() {
-						public boolean run(Context context) {
-							_poolOpts.setType(PfConst.PF_POOL_BITMASK);
-							return true;
-						}
-					}
+					_poolOpts.setType(PfConst.PF_POOL_BITMASK)
 				),
 				/*
 				 * RANDOM
 				 */
 				Sequence(
 					RANDOM(),
-					new Action() {
-						public boolean run(Context context) {
-							_poolOpts.setType(PfConst.PF_POOL_RANDOM);
-							return true;
-						}
-					}
+					_poolOpts.setType(PfConst.PF_POOL_RANDOM)
 				),
 				/*
 				 * SOURCEHASH [hashkey]
 				 */
 				Sequence(
 					SOURCEHASH(),
-					new Action() {
-						public boolean run(Context context) {
-							_poolOpts.setType(PfConst.PF_POOL_SRCHASH);
-							return true;
-						}
-					},
+					_poolOpts.setType(PfConst.PF_POOL_SRCHASH),
 					SkipSpaces(),
 					Optional(
 						Sequence(
 							PfString(),
-							new Action() {
-								public boolean run(Context context) {
-									_poolOpts.setKey(_pfString);
-									return true;
-								}
-							}
+							_poolOpts.setKey(_pfString)
 						)
 					)
 				),
@@ -4059,37 +3564,22 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					ROUNDROBIN(),
-					new Action() {
-						public boolean run(Context context) {
-							_poolOpts.setType(PfConst.PF_POOL_ROUNDROBIN);
-							return true;
-						}
-					}
+					_poolOpts.setType(PfConst.PF_POOL_ROUNDROBIN)
 				),
 				/*
 				 * STATICPORT
 				 */
 				Sequence(
 					STATICPORT(),
-					new Action() {
-						public boolean run(Context context) {
-							_poolOpts.setStaticPort(true);
-							return true;
-						}
-					}
+					_poolOpts.setStaticPort(true)
 				),
 				/*
 				 * STICKYADDRESS
 				 */
 				Sequence(
 					STICKYADDRESS(),
-					new Action() {
-						public boolean run(Context context) {
-							_poolOpts.setOpts(_poolOpts.getOpts() |
-								PfConst.PF_POOL_STICKYADDR);
-							return true;
-						}
-					}
+					_poolOpts.setOpts(_poolOpts.getOpts() 
+						| PfConst.PF_POOL_STICKYADDR)
 				)
 			);
 	}
@@ -4112,23 +3602,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setFirstAddress(_pfString);
-							return true;
-						}
-					},
+					newPfXhost(),
+					_pfXhost.setFirstAddress(_pfString),
 					Ch('/'),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							String addr = _pfXhost.getFirstAddress() +
-									"/" + _pfString;
-							_pfXhost.setFirstAddress(addr);
-							return true;
-						}
-					}
+					_pfXhost.setFirstAddress(_pfXhost.getFirstAddress() +
+							"/" + _pfString)
 				),
 				/*
 				 * '<' STRING '>'
@@ -4136,13 +3615,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				Sequence(
 					Ch('<'),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setTable(_pfString);
-							return true;
-						}
-					},
+					newPfXhost(),
+					_pfXhost.setTable(_pfString),
 					Ch('>')
 				),
 				/*
@@ -4153,13 +3627,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Ch('('),
 					SkipSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setDynaddr(_pfString);
-							return true;
-						}
-					},
+					newPfXhost(),
+					_pfXhost.setDynaddr(_pfString),
 					SkipSpaces(),
 					Ch(')'),
 					SkipSpaces(),
@@ -4167,12 +3636,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						Sequence(
 							Ch('/'),
 							PfString(),
-							new Action() {
-								public boolean run(Context context) {
-									_pfXhost.setDynaddrMask(_pfString);
-									return true;
-								}
-							}
+							_pfXhost.setDynaddrMask(_pfString)
 						)
 					)
 				),
@@ -4181,13 +3645,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost = new Xhost();
-							_pfXhost.setFirstAddress(_pfString);
-							return true;
-						}
-					}
+					newPfXhost(),
+					_pfXhost.setFirstAddress(_pfString)
 				),
 				/*
 				 *	'(' STRING host ')'
@@ -4196,20 +3655,10 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Ch('('),
 					SkipSpaces(),
 					PfString(),
-					new Action() {
-						public boolean run(Context context) {
-							_ifname  = _pfString;
-							return true;
-						}
-					},
+					setIfname(_pfString),
 					WhiteSpaces(),
 					PfHost(),
-					new Action() {
-						public boolean run(Context context) {
-							_pfXhost.setIfName(_ifname);
-							return true;
-						}
-					},
+					_pfXhost.setIfName(_ifname),
 					SkipSpaces(),
 					Ch(')')
 				)
@@ -4227,12 +3676,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 			Sequence(
 				PfRouteHost(),
-				new Action() {
-					public boolean run(Context context) {
-						_routeOpts.getHosts().add(_pfXhost);
-						return true;
-					}
-				},
+				_routeOpts.getHosts().add(_pfXhost),
 				PfOptnl(),
 				Optional(
 					Sequence(
@@ -4255,21 +3699,11 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfRouteSpec() {
 		return
 			Sequence(
-				new Action() {
-					public boolean run(Context context) {
-						_routeOpts = new RouteOptsTemplate();
-						return true;
-					}
-				},
+				newRouteOpts(),
 				FirstOf(
 					Sequence(
 						PfRouteHost(),
-						new Action() {
-							public boolean run(Context context) {
-								_routeOpts.getHosts().add(_pfXhost);
-								return true;
-							}
-						}
+						_routeOpts.getHosts().add(_pfXhost)
 					),
 					Sequence(
 						Ch('{'),
@@ -4338,24 +3772,14 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return FirstOf(
 			Sequence(
 				PfQuotedString(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfString = _lastString;
-						return true;
-					}
-				}
+				setPfString(_lastString)
 			),
 			Sequence(
 				TestNot(
 					PfKeyword()
 				),
 				PfAtom(),
-				new Action() {
-					public boolean run(Context context) {
-						_pfString = context.getMatch();
-						return true;
-					}
-				}
+				setPfString(match())
 			)
 		);
 	}
@@ -4368,49 +3792,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return
 		Sequence(
 			AnyOf("'\""),
-			new Action() {
-				public boolean run(Context context) {
-					_quotec = context.getMatch().charAt(0);
-					_lastString = "";
-					_previousChar = '\0';
-					_pfStringEnd = false;
-					return true;
-				}
-			},
+			quotedStringStart(match()),
 			OneOrMore(
 				Sequence(
-					new Action() {
-						public boolean run(Context context) {
-							return !_pfStringEnd;
-						}
-					},
+					quotedStringContinue(),
 					ANY,
-					new Action() {
-						public boolean run(Context context) {
-							char c = context.getMatch().charAt(0);
-							/*
-							 * escaped character.
-							 */
-							if (_previousChar == '\\') {
-								if (c != '\n')
-									_lastString += c;
-								_previousChar = '\0';
-								return true;
-							} else {
-								if (c == '\\') {
-									_previousChar = c;
-									return true;
-								}
-								if (c != _quotec && c != '\n') {
-									_previousChar = c;
-									_lastString += c;
-								}
-								if (c == _quotec)
-									_pfStringEnd = true;
-								return true;
-							}
-						}
-					}
+					quotedString(match())
 				)
 			)
 		);

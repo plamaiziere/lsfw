@@ -1598,7 +1598,6 @@ public class PacketFilter extends GenericEquipment {
 				Log.debug().info("#" + _parseContext.getLineNumber() +
 					": "+ lineCfg);
 
-			parser.clear();
 			result = BasicParseRunner.run(parser.Parse(), lineCfg);
 			if (result.matched) {
 				String rule = parser.getRuleName();
