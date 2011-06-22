@@ -28,8 +28,8 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _destAddress;
 	protected String _equipments;
 	protected String _protoSpecification;
-	protected String _protoSource;
-	protected String _protoDest;
+	protected String _portSource;
+	protected String _portDest;
 
 	protected String _setValueName;
 	protected String _setValueValue;
@@ -46,8 +46,8 @@ public class ShellParser extends CommonRules<Object> {
 		_destAddress = null;
 		_equipments = null;
 		_protoSpecification = null;
-		_protoSource = null;
-		_protoDest = null;
+		_portSource = null;
+		_portDest = null;
 		_setValueName = null;
 		_setValueValue = null;
 		_helpTopic = null;
@@ -103,21 +103,21 @@ public class ShellParser extends CommonRules<Object> {
 		return true;
 	}
 
-	public String getProtoDest() {
-		return _protoDest;
+	public String getPortDest() {
+		return _portDest;
 	}
 
-	public boolean setProtoDest(String protoDest) {
-		_protoDest = protoDest;
+	public boolean setPortDest(String portDest) {
+		_portDest = portDest;
 		return true;
 	}
 
-	public String getProtoSource() {
-		return _protoSource;
+	public String getPortSource() {
+		return _portSource;
 	}
 
-	public boolean setProtoSource(String protoSource) {
-		_protoSource = protoSource;
+	public boolean setPortSource(String portSource) {
+		_portSource = portSource;
 		return true;
 	}
 
@@ -518,7 +518,7 @@ public class ShellParser extends CommonRules<Object> {
 						Sequence(
 							WhiteSpaces(),
 							Identifier(),
-							setProtoSource(match())
+							setPortSource(match())
 						)
 					)
 				)
@@ -534,21 +534,21 @@ public class ShellParser extends CommonRules<Object> {
 				Sequence(
 					TestNot(IgnoreCase("flags")),
 					Identifier(),
-					setProtoSource(match()),
-					setProtoDest(null),
+					setPortSource(match()),
+					setPortDest(null),
 					String(":"),
 					Optional(
 						Sequence(
 							Identifier(),
-							setProtoDest(match())
+							setPortDest(match())
 						)
 					)
 				),
 				Sequence(
 					TestNot(IgnoreCase("flags")),
 					Identifier(),
-					setProtoDest(match()),
-					setProtoSource(null)
+					setPortDest(match()),
+					setPortSource(null)
 				)
 			);
 	}

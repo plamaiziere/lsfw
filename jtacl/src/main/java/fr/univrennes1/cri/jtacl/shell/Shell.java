@@ -606,15 +606,15 @@ public class Shell {
 		 * build the probe request
 		 */
 		String sprotocol = command.getProtoSpecification();
-		String sprotoSource = command.getProtoSource();
-		String sprotoDest = command.getProtoDest();
+		String sportSource = command.getPortSource();
+		String sportDest = command.getPortDest();
 
 		IPProtocols ipProtocols = IPProtocols.getInstance();
 		IPServices ipServices = IPServices.getInstance();
 
 		Integer protocol;
-		Integer protoSource;
-		Integer protoDest;
+		Integer portSource;
+		Integer portDest;
 		
 		ProbeRequest request = new ProbeRequest();
 		if (sprotocol != null) {
@@ -643,30 +643,30 @@ public class Shell {
 				/*
 				 * services lookup
 				 */
-				if (sprotoSource != null) {
-					String port = sprotoSource.toLowerCase();
+				if (sportSource != null) {
+					String port = sportSource.toLowerCase();
 					if (!_specialPorts.contains(port)) {
-						protoSource = ipServices.serviceLookup(sprotoSource, sprotocol);
-						if (protoSource.intValue() == -1) {
-							System.out.println("unknown service: " + sprotoSource);
+						portSource = ipServices.serviceLookup(sportSource, sprotocol);
+						if (portSource.intValue() == -1) {
+							System.out.println("unknown service: " + sportSource);
 							return false;
 						}
-						request.setSourcePort(new PortSpec(PortOperator.EQ, protoSource));
+						request.setSourcePort(new PortSpec(PortOperator.EQ, portSource));
 					} else {
 						PortSpec pSpec = portToPortSpec(port);
 						request.setSourcePort(pSpec);
 					}
 				}
 
-				if (sprotoDest != null) {
-					String port = sprotoDest.toLowerCase();
+				if (sportDest != null) {
+					String port = sportDest.toLowerCase();
 					if (!_specialPorts.contains(port)) {
-						protoDest = ipServices.serviceLookup(sprotoDest, sprotocol);
-						if (protoDest.intValue() == -1) {
-							System.out.println("unknown service: " + sprotoDest);
+						portDest = ipServices.serviceLookup(sportDest, sprotocol);
+						if (portDest.intValue() == -1) {
+							System.out.println("unknown service: " + sportDest);
 							return false;
 						}
-						request.setDestinationPort(new PortSpec(PortOperator.EQ, protoDest));
+						request.setDestinationPort(new PortSpec(PortOperator.EQ, portDest));
 					} else {
 						PortSpec pSpec = portToPortSpec(port);
 						request.setDestinationPort(pSpec);
@@ -730,11 +730,11 @@ public class Shell {
 				else
 					ipIcmp = IPIcmp6.getInstance();
 
-				if (sprotoSource != null) {
-					IPIcmpEnt icmpEnt = ipIcmp.icmpLookup(sprotoSource);
+				if (sportSource != null) {
+					IPIcmpEnt icmpEnt = ipIcmp.icmpLookup(sportSource);
 					if (icmpEnt == null) {
 						System.out.println("unknown icmp-type or message: "
-							+ sprotoSource);
+							+ sportSource);
 						return false;
 					}
 					request.setSubType(icmpEnt.getIcmp());
