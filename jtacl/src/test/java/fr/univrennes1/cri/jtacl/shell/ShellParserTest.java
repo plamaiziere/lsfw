@@ -182,8 +182,8 @@ public class ShellParserTest extends TestCase {
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
 		assertEquals("tcp", parser.getProtoSpecification());
-		assertEquals(null, parser.getProtoSource());
-		assertEquals("PORT", parser.getProtoDest());
+		assertEquals(null, parser.getPortSource());
+		assertEquals("PORT", parser.getPortDest());
 
 		line = "p   SOURCE     DEST   tcp    PORT1:";
 		result = ReportingParseRunner.run(parser.CommandLine(), line);
@@ -191,8 +191,8 @@ public class ShellParserTest extends TestCase {
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
 		assertEquals("tcp", parser.getProtoSpecification());
-		assertEquals("PORT1", parser.getProtoSource());
-		assertEquals(null, parser.getProtoDest());
+		assertEquals("PORT1", parser.getPortSource());
+		assertEquals(null, parser.getPortDest());
 
 		line = "p   SOURCE     DEST   tcp    PORT1:PORT2";
 		result = ReportingParseRunner.run(parser.CommandLine(), line);
@@ -200,8 +200,8 @@ public class ShellParserTest extends TestCase {
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
 		assertEquals("tcp", parser.getProtoSpecification());
-		assertEquals("PORT1", parser.getProtoSource());
-		assertEquals("PORT2", parser.getProtoDest());
+		assertEquals("PORT1", parser.getPortSource());
+		assertEquals("PORT2", parser.getPortDest());
 
 		line = "p   SOURCE     DEST   udp    PORT1:PORT2";
 		result = ReportingParseRunner.run(parser.CommandLine(), line);
@@ -209,8 +209,8 @@ public class ShellParserTest extends TestCase {
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
 		assertEquals("udp", parser.getProtoSpecification());
-		assertEquals("PORT1", parser.getProtoSource());
-		assertEquals("PORT2", parser.getProtoDest());
+		assertEquals("PORT1", parser.getPortSource());
+		assertEquals("PORT2", parser.getPortDest());
 
 		line = "p   SOURCE     DEST   tcp    flags S SA";
 		result = ReportingParseRunner.run(parser.CommandLine(), line);
@@ -218,8 +218,8 @@ public class ShellParserTest extends TestCase {
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
 		assertEquals("tcp", parser.getProtoSpecification());
-		assertEquals(null, parser.getProtoSource());
-		assertEquals(null, parser.getProtoDest());
+		assertEquals(null, parser.getPortSource());
+		assertEquals(null, parser.getPortDest());
 		assertEquals(2, parser.getTcpFlags().size());
 		assertEquals("S", parser.getTcpFlags().get(0));
 		assertEquals("SA", parser.getTcpFlags().get(1));
@@ -230,8 +230,8 @@ public class ShellParserTest extends TestCase {
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
 		assertEquals("tcp", parser.getProtoSpecification());
-		assertEquals(null, parser.getProtoSource());
-		assertEquals("PORT", parser.getProtoDest());
+		assertEquals(null, parser.getPortSource());
+		assertEquals("PORT", parser.getPortDest());
 		assertEquals(2, parser.getTcpFlags().size());
 		assertEquals("S", parser.getTcpFlags().get(0));
 		assertEquals("SA", parser.getTcpFlags().get(1));
