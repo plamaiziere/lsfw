@@ -641,36 +641,36 @@ public class Shell {
 					protocols.add(ipProtocols.IPV6());
 
 				/*
-				 * services lookup
+				 * services lookup, by default "any"
 				 */
-				if (sportSource != null) {
-					String port = sportSource.toLowerCase();
-					if (!_specialPorts.contains(port)) {
-						portSource = ipServices.serviceLookup(sportSource, sprotocol);
-						if (portSource.intValue() == -1) {
-							System.out.println("unknown service: " + sportSource);
-							return false;
-						}
-						request.setSourcePort(new PortSpec(PortOperator.EQ, portSource));
-					} else {
-						PortSpec pSpec = portToPortSpec(port);
-						request.setSourcePort(pSpec);
+				if (sportSource == null)
+					sportSource = "any";
+				String port = sportSource.toLowerCase();
+				if (!_specialPorts.contains(port)) {
+					portSource = ipServices.serviceLookup(sportSource, sprotocol);
+					if (portSource.intValue() == -1) {
+						System.out.println("unknown service: " + sportSource);
+						return false;
 					}
+					request.setSourcePort(new PortSpec(PortOperator.EQ, portSource));
+				} else {
+					PortSpec pSpec = portToPortSpec(port);
+					request.setSourcePort(pSpec);
 				}
 
-				if (sportDest != null) {
-					String port = sportDest.toLowerCase();
-					if (!_specialPorts.contains(port)) {
-						portDest = ipServices.serviceLookup(sportDest, sprotocol);
-						if (portDest.intValue() == -1) {
-							System.out.println("unknown service: " + sportDest);
-							return false;
-						}
-						request.setDestinationPort(new PortSpec(PortOperator.EQ, portDest));
-					} else {
-						PortSpec pSpec = portToPortSpec(port);
-						request.setDestinationPort(pSpec);
+				if (sportDest == null)
+					sportDest = "any";
+				port = sportDest.toLowerCase();
+				if (!_specialPorts.contains(port)) {
+					portDest = ipServices.serviceLookup(sportDest, sprotocol);
+					if (portDest.intValue() == -1) {
+						System.out.println("unknown service: " + sportDest);
+						return false;
 					}
+					request.setDestinationPort(new PortSpec(PortOperator.EQ, portDest));
+				} else {
+					PortSpec pSpec = portToPortSpec(port);
+					request.setDestinationPort(pSpec);
 				}
 
 				/*
