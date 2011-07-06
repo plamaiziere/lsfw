@@ -169,7 +169,7 @@ public class IPNetTest extends TestCase {
 		{"0:0:0:0:0:0:13.1.68.3", "218186755", "128", "6"},
 		{"::13.1.68.3",	"218186755", "128", "6"},
 		// we assume localhost resolves to ::1
-		{"@@localhost",	"1",	"128", "6"},
+//		{"@@localhost",	"1",	"128", "6"},
 		};
 		testDataNetipOk(dtaddrv6);
 
@@ -342,6 +342,21 @@ public class IPNetTest extends TestCase {
 			24,
 			IPversion.IPV4
 		);
+		
+		// invalid range
+		f = false;
+		try {
+			testConstructorNetIP(
+				"192.168.0.0-192.168.191.255",
+				"0",
+				24,
+				IPversion.IPV4					
+			);
+		} catch (UnknownHostException e) {
+			f = true;
+			System.out.println("check : " + e.getMessage());
+		}
+		assertTrue(f);	
 
 	}
 
