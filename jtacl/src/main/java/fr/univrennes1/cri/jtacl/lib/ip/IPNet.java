@@ -337,12 +337,9 @@ public class IPNet implements Comparable {
 		 * otherwise it will return /16 for something like:
 		 * 192.168.0.0-192.168.191.255
 		 */
-		/*
-		 * TODO
-		 if IP('%s/%s' % (ip, 32-netbits)).broadcast().int() != last:
-				raise ValueError, \
-					"the range %s is not on a network boundary." % data
-		*/
+		IPNet checkboundary = broadcastAddress();
+		if (!checkboundary.getIP().equals(last.ipInt))
+			throw new UnknownHostException("Range is not on a network boundary: " + data);
 	}
 
 	protected static int getPrefixFromNetmask(String smask, IPversion ipVersion)
