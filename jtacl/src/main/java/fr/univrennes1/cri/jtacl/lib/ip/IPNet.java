@@ -539,7 +539,7 @@ public class IPNet implements Comparable {
 			}
 		}
 		if (addresses.isEmpty())
-			throw new UnknownHostException(split[0]);
+			throw new UnknownHostException("No IP adress found for: " + split[0]);
 		return addresses;
 	}
 
