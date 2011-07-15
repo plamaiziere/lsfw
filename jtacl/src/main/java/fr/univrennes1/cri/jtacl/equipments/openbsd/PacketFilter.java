@@ -997,7 +997,8 @@ public class PacketFilter extends GenericEquipment {
 		else
 			host = PfNodeHost.newAddrMask();
 
-		if (range && addrRange.size() != addr.size()) {
+		if (range && (addrRange.size() != addr.size() ||
+				addrRange.size() != 1)) {
 			warnConfig("invalid range");
 			return null;
 		}
@@ -2081,7 +2082,7 @@ public class PacketFilter extends GenericEquipment {
 			int mMatch = 0;
 
 			for (IPNet ip: host.getAddr()) {
-				if (!familyFilter(ipAddress, af))
+				if (!ip.sameIPVersion(ipAddress))
 					continue;
 				if (!host.isNot()) {
 					if (ip.networkContains(ipAddress))
@@ -2110,10 +2111,45 @@ public class PacketFilter extends GenericEquipment {
 
 		/*
 		 * addr range
-		 * TODO: not supported.
 		 */
-		if (host.isAddrRange()) {
-			return MatchResult.UNKNOWN;
+		if (host.isAddrRange()) {			
+			if (host.getAddr().size() != 1 || host.geRangeAddr().size() != 1)
+				return MatchResult.UNKNOWN;
+
+			IPNet ipfirst = host.getAddr().get(0);
+			IPNet ipLast = host.geRangeAddr().get(0);
+			
+			if (!ipfirst.sameIPVersion(ipAddress))
+				return MatchResult.NOT;
+
+			int mAll = 0;
+			int mMatch = 0;
+
+			if (ipAddress.isHost()) {
+				if (ipAddress.isBetweenIP(ipfirst, ipLast))
+					mAll++;
+			} else {
+				IPNet ipAddressFirst = ipAddress.networkAddress();
+				IPNet ipAddressLast = ipAddress.broadcastAddress();
+				if (ipAddressFirst.isBetweenIP(ipfirst, ipLast)) {
+					if (ipAddressLast.isBetweenIP(ipfirst, ipLast))
+						mAll++;
+					else
+						mMatch++;
+				} else {
+					if (ipAddressLast.isBetweenIP(ipfirst, ipLast))
+						mMatch++;
+				}
+			}
+
+			MatchResult res = MatchResult.NOT;
+			if (mAll > 0)
+				res = MatchResult.ALL;
+			if (mMatch > 0)
+				res = MatchResult.MATCH;
+			if (host.isNot())
+				res = negMatchResult(res);
+			return res;
 		}
 
 		return MatchResult.UNKNOWN;
