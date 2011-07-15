@@ -1830,6 +1830,18 @@ public class PacketFilter extends GenericEquipment {
 					ipNetRef.addContext(refContext);
 				}
 			}
+
+			if (nodeHost.isAddrRange()) {
+				for (IPNet ip: nodeHost.getAddr()) {
+					IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+					ipNetRef.addContext(refContext);
+				}
+				for (IPNet ip: nodeHost.geRangeAddr()) {
+					IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+					ipNetRef.addContext(refContext);
+				}
+			}
+
 			if (nodeHost.isAddrTable()) {
 				PfTable table = anchor.findTable(nodeHost.getTblName());
 				if (table != null)
