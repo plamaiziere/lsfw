@@ -599,8 +599,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 			"set skip"
 		};
 
+		String nline = line.trim();
 		for (String s: should) {
-			if (line.trim().startsWith(s))
+			if (nline.startsWith(s))
 				return true;
 		}
 		return false;
