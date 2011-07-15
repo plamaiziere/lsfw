@@ -490,7 +490,7 @@ public class PacketFilter extends GenericEquipment {
 			 * add the route.
 			 */
 			if (link == null)
-				throw new JtaclConfigurationException("Invalid route: can not find link " +
+				throw new JtaclConfigurationException("Invalid route: cannot find link " +
 					sroute);
 
 			Route<IfaceLink> route = new Route<IfaceLink>(prefix, nexthop, 1, link);
@@ -657,7 +657,7 @@ public class PacketFilter extends GenericEquipment {
  				anchor = _rootAnchor.findOrCreateAnchor(anchorName);
 				if (anchor == null)
 					throwCfgException("Table: " + tableName +
-							" cannot access anchor: " + anchorName);
+							"  access anchor: " + anchorName);
 			}
 			PfTable table = new PfTable();
 			table.setName(tableName);
