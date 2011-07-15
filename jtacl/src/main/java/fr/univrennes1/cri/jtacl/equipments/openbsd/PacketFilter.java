@@ -490,7 +490,7 @@ public class PacketFilter extends GenericEquipment {
 			 * add the route.
 			 */
 			if (link == null)
-				throw new JtaclConfigurationException("Invalid route: coud not find link " +
+				throw new JtaclConfigurationException("Invalid route: can not find link " +
 					sroute);
 
 			Route<IfaceLink> route = new Route<IfaceLink>(prefix, nexthop, 1, link);
