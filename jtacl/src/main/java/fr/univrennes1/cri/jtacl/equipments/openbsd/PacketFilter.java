@@ -2096,29 +2096,22 @@ public class PacketFilter extends GenericEquipment {
 			for (IPNet ip: host.getAddr()) {
 				if (!ip.sameIPVersion(ipAddress))
 					continue;
-				if (!host.isNot()) {
-					if (ip.networkContains(ipAddress))
-						mAll++;
-					else {
-						if (ip.overlaps(ipAddress))
-							mMatch++;
-					}
+
+				if (ip.networkContains(ipAddress)) {
+					mAll++;
 				} else {
-					if (ip.overlaps(ipAddress)) {
-						if (!ip.networkContains(ipAddress))
-							mAll++;
-						else
-							mMatch++;
-					}
+					if (ip.overlaps(ipAddress))
+						mMatch++;
 				}
 			}
+			MatchResult res = MatchResult.NOT;
 			if (mAll > 0)
-				return MatchResult.ALL;
+				res = MatchResult.ALL;
 			if (mMatch > 0)
-				return MatchResult.MATCH;
+				res = MatchResult.MATCH;
 			if (host.isNot())
-				return MatchResult.ALL;
-			return MatchResult.NOT;
+				res = negMatchResult(res);
+			return res;
 		}
 
 		/*
