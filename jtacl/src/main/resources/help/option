@@ -1,9 +1,9 @@
 --- option ---
-option | o [option-name = value] : Displays or sets Jtacl options.
+option | o [option-name = value] : Displays or sets lsfw options.
 
   Without parameter, option displays the current value of each option.
 
-Jtacl defines five options.
+lsfw defines five options.
   - config.level
   - debug.level
   - notify.level
@@ -27,5 +27,5 @@ is done. If this number reaches 0, the probing is aborted with an error.
   This option can be useful to abort probing loop. If set to '-1'
 there is no limit.
 
-Options can be specified on the Jtacl command line using the switch
+Options can be specified on the lsfw command line using the switch
 "--option option-name=value".

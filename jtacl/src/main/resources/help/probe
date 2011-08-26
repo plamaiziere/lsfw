@@ -18,10 +18,10 @@ of an interface or an IP address:
 
 equipments-spec: equipment'|'interface-name | ip address.
 
-  If an interface name is specified, Jtacl uses the first link available on this
+  If an interface name is specified, lsfw uses the first link available on this
 interface, regardless of the source IP address of the probe (a link describes
 one network connected to an interface).
-  If an IP address is specified, Jtacl uses this IP address to find the link,
+  If an IP address is specified, lsfw uses this IP address to find the link,
 regardless of the source IP address of the probe.
   If the DFLTEQUIPMENT variable is defined, Jtack uses this variable as a default
 equipment specification when no candidate link is found for IPv4 addresses.
@@ -34,9 +34,9 @@ Addresses
 network. If a hostname is specified, it is resolved using DNS. The probe command
 uses IPv4 resolution and the probe6 command uses IPv6 resolution.
 
-  By default, Jtacl tries to find a network equipment where the probe will be
+  By default, lsfw tries to find a network equipment where the probe will be
 injected using the source IP address of the probe. If there is zero or more than
-one candidate, Jtacl rejects the command with an error.
+one candidate, lsfw rejects the command with an error.
 
   The "=host/mask" notation in the source address of the probe specifies to
 use the host address (instead the network address) when looking for the
@@ -93,44 +93,44 @@ Examples:
 ---------
 
   Probe from 192.168.1.2 to google, no protocol specification
-  jtacl> probe 192.168.1.2 www.google.com
+  lsfw> probe 192.168.1.2 www.google.com
 
   Probe from the network 192.168.1.2/24 to google, no protocol specification
-  jtacl> probe 192.168.1.2/24 www.google.com
+  lsfw> probe 192.168.1.2/24 www.google.com
 
   Same for tcp and http for the destination port.
-  jtacl> probe 192.168.1.2/24 www.google.com tcp http
+  lsfw> probe 192.168.1.2/24 www.google.com tcp http
 
   Port source http
-  jtacl> probe 192.168.1.2/24 www.google.com tcp http:
+  lsfw> probe 192.168.1.2/24 www.google.com tcp http:
 
   Port source and port dest
-  jtacl> probe 192.168.1.2/24 www.google.com tcp 1024:http
+  lsfw> probe 192.168.1.2/24 www.google.com tcp 1024:http
 
   Port source and port dest, using a dynamic port for the source port
-  jtacl> probe 192.168.1.2/24 www.google.com tcp dyn:http
+  lsfw> probe 192.168.1.2/24 www.google.com tcp dyn:http
 
   Icmp echo
-  jtacl> probe 192.168.1.2/24 1.2.3.4 icmp echo
+  lsfw> probe 192.168.1.2/24 1.2.3.4 icmp echo
 
   Probe from the equipment "router1", interface 'if0' using an equipment
   specification
-  jtacl> probe on router1|if0 192.168.1.2/24 1.2.3.4 icmp echo
+  lsfw> probe on router1|if0 192.168.1.2/24 1.2.3.4 icmp echo
 
   Probe from "www.afnic.fr" (IpV4), applying a netmask.
-  jtacl> probe www.afnic.fr/16 1.2.3.4
+  lsfw> probe www.afnic.fr/16 1.2.3.4
 
   Probe from "www.afnic.fr" (IpV6), applying a netmask.
-  jtacl> probe6 www.afnic.fr/16 ::1
+  lsfw> probe6 www.afnic.fr/16 ::1
 
   Probe from 192.168.1.2/24, but use the host address 192.168.1.2 to find the
   equipment where the probe should be injected (instead using the network
   192.168.1.0/24).
-  jtacl> probe =192.168.1.2/24 1.2.3.4
+  lsfw> probe =192.168.1.2/24 1.2.3.4
 
   Probe with tcp flag SYN set.
-  jtacl> probe 192.168.1.2/24 www.google.com tcp flags S
+  lsfw> probe 192.168.1.2/24 www.google.com tcp flags S
 
   Probe with tcp flag SYN set or tcp flags SYN and ACK set.
-  jtacl> probe 192.168.1.2/24 www.google.com tcp http flags S SA
+  lsfw> probe 192.168.1.2/24 www.google.com tcp http flags S SA
 

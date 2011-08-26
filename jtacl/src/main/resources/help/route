@@ -10,7 +10,7 @@ If an equipment is specified, displays the routes of this equipment only.
 Example:
 --------
 
-  jtacl> route R1
+  lsfw> route R1
   Routes on R1
   -------------------
   IPv4 routes

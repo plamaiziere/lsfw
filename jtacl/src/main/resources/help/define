@@ -7,7 +7,7 @@ value 'value'
 
   Variables can be used as a macro on the command line preceded by a '$'.
 
-  Variables can be defined in the main jtacl configuration file using the
+  Variables can be defined in the main lsfw configuration file using the
 <define> XML entity:
 <define name="name" value="value" />
 
@@ -20,11 +20,11 @@ specification in the probe command (see probe command) for IPv6.
 Example:
 --------
 
-jtacl> define EXTERN = equipment|interface
-jtacl> define
+lsfw> define EXTERN = equipment|interface
+lsfw> define
 EXTERN=equipment|interface
-jtacl> p on $EXTERN 1.2.3.4 192.168.0.1
+lsfw> p on $EXTERN 1.2.3.4 192.168.0.1
 
 Or to define the variable for each session:
-jtacl.xml
+lsfw.xml
 <define name="EXTERN" value="equipment|interface" />

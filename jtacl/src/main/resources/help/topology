@@ -15,7 +15,7 @@ options:
   IpAddress  : IP address or network. Displays only networks
                matching this address.
 
-  In Jtacl, the topology is described by some objects named 'network links',
+  In lsfw, the topology is described by some objects named 'network links',
 connecting network interfaces to each other by a 'network'.
 
   A Network link contains the IP address of the network (such as 192.168.0.0/16)
@@ -35,23 +35,23 @@ connected to R1, interface eth0, IP address 10.0.0.1.
   The second line displays the topology of the network 10.0.1.0/24. It is
   connected to R1 and R2.
 
-  jtacl> topology
+  lsfw> topology
   10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
   10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}
 
-  jtacl> topology R1
+  lsfw> topology R1
   10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
   10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}
 
-  jtacl> t !connected
+  lsfw> t !connected
   10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
 
-  jtacl> t connected
+  lsfw> t connected
   10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}
 
-  jtacl> t 10.0.0.5
+  lsfw> t 10.0.0.5
   10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
 
-  jtacl> t 10.0.0.0/23
+  lsfw> t 10.0.0.0/23
   10.0.0.0/24 {R1(eth0 - 10.0.0.1)}
   10.0.1.0/24 {R2(eth0 - 10.0.1.2), R1(eth1 - 10.0.1.1)}

@@ -22,7 +22,7 @@ xref ip long 192.168.1.0/24
 Note:
 -----
 This command is only available on equipments of type CiscoRouter via the
-"equipment" command of Jtacl.
+"equipment" command of Lsfw.
 
 Example with a CiscoRouter equipment named "ROUTER":
-  jtacl> equipment ROUTER xref ip short
+  lsfw> equipment ROUTER xref ip short

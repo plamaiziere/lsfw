@@ -1,14 +1,14 @@
 --- reload ---
 reload [equipment-name] : reloads the configuration.
 
-  Without parameter, the reload command reloads all the configuration of Jtacl.
+  Without parameter, the reload command reloads all the configuration of lsfw.
 
-  If an equipment-name is specified, Jtacl reloads the configuration of this
+  If an equipment-name is specified, lsfw reloads the configuration of this
 equipment. The topology is also reloaded and rebuilt.
 
 Example:
 --------
 
-  jtacl> reload
+  lsfw> reload
 
-  jtacl> reload router1
+  lsfw> reload router1

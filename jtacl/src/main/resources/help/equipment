@@ -8,5 +8,5 @@ Example:
 --------
 
 Example with a PacketFilter equipment named "PF".
-  jtacl> equipment PF xref ip short
-  jtacl> equipment PF help
+  lsfw> equipment PF xref ip short
+  lsfw> equipment PF help

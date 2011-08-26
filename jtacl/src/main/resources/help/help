@@ -2,12 +2,12 @@
 
 define       : defines a variable that can be used as a macro.
 equipment    : runs a command on a specific equipment.
-exit         : exits jtacl.
+exit         : exits lsfw.
 help [topic] : displays the [topic] help.
 license      : license informations.
 option       : sets or displays option.
 probe|probe6 : probes the network from a source to a destination.
-quit         : quits jtacl (same as exit).
+quit         : quits lsfw (same as exit).
 reload       : reloads the configuration of an equipment.
 route        : shows the routes.
 shell        : help for the builtin shell

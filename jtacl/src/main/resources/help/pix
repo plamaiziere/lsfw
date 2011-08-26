@@ -36,8 +36,8 @@ xref ip long 192.168.1.0/24
 Note:
 -----
 This command are only available on equipments of type Pix via the
-"equipment" command of Jtacl.
+"equipment" command of lsfw.
 
 Example with a Pix equipment named "PIX":
-  jtacl> equipment PIX show name
-  jtacl> equipment PIX xref ip 192.168.1.1/24
+  lsfw> equipment PIX show name
+  lsfw> equipment PIX xref ip 192.168.1.1/24

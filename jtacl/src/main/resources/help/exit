@@ -1,3 +1,3 @@
 --- exit ---
 
-exit | e : Exits jtacl. Shortcut is 'e' or 'q', same as 'quit'.
+exit | e : Exits lsfw. Shortcut is 'e' or 'q', same as 'quit'.

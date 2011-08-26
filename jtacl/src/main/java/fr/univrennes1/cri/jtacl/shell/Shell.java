@@ -193,7 +193,7 @@ public class Shell {
 	}
 
 	public Shell() {
-		_prompt = "jtacl> ";
+		_prompt = "lsfw> ";
 
 		 _parser = Parboiled.createParser(ShellParser.class);
 		 _monitor = Monitor.getInstance();

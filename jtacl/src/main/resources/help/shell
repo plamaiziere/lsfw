@@ -8,5 +8,5 @@ specified by the string '|>' or '|>>', followed by a filename.
 
 Examples:
 --------
-  jtacl> topology |> topology.txt
-  jtacl> topology |>> topology.txt
+  lsfw> topology |> topology.txt
+  lsfw> topology |>> topology.txt
