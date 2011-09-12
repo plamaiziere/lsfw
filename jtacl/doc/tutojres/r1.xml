@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : ciscorouter.xml
+	Created on : 16 octobre 2010, 12:34
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the CiscoRouter configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/ciscorouter
+-->
+
+<equipment>
+
+	<!-- list of the native Cisco files of the router -->
+	<file filename="./conf/r1-conf" />
+
+	<!-- routing engine -->
+	<routing>
+		<!-- default route to internet -->
+		<route prefix="0.0.0.0/0" nexthop="10.0.3.254" />
+	</routing>
+
+	<!-- options -->
+	<options>
+		<!-- 
+			Add options definitions here.
+			See the file options.xml
+			https://listes.cru.fr/wiki/jtacl/public/commonoptions
+		-->
+	</options>
+
+</equipment>

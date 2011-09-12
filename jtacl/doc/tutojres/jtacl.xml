@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : jtacl.xml
+	Created on : 10 octobre 2010, 21:06
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the main configuration file.
+		See https://listes.cru.fr/wiki/jtacl/public/userconfigmanual
+	
+-->
+
+<!-- 
+	Jtacl does not use any XML hierarchy: <jtacl>, <equipments>, ... entities dont mean
+	anything. XML needs one root entity, <jtacl> here
+-->
+
+<jtacl>
+	<!-- definitions of the equipments -->
+	<equipments>
+
+		<!-- Cisco IOS Router -->
+		<equipment
+			classname="fr.univrennes1.cri.jtacl.equipments.cisco.router.CiscoRouter"
+			name="R1"
+			comment="cisco router #1"
+			filename="./r1.xml"
+		/>
+
+		<!-- OpenBSD PacketFilter -->
+		<equipment
+			classname="fr.univrennes1.cri.jtacl.equipments.openbsd.PacketFilter"
+			name="P1"
+			comment="firewall #1"
+			filename="./p1.xml"
+		/>
+
+	</equipments>
+
+	<!-- definition of the topology -->
+	<topology>
+		<tlink network="10.0.3.0/24" topology="R1|10.0.3.1" border="true" />
+	</topology>
+
+	<!-- shell defines (macros) -->
+	<shell>
+	</shell>
+
+	<!-- names databases override -->
+	<databases>
+	</databases>
+
+</jtacl>

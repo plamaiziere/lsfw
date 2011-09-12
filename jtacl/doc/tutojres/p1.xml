@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : packetfilter.xml
+	Created on : 16 octobre 2010, 12:50
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the PacketFilter configuration.
+		See https://listes.cru.fr/wiki/jtacl/public/packetfilter
+-->
+
+<equipment>
+
+	<!-- interfaces -->
+	<iface name="em0" comment="em0" ip="10.0.1.1" network="10.0.1.0/24" />
+	<iface name="em1" comment="em1" ip="192.168.0.254" network="192.168.0.0/24" />
+	<iface name="em2" comment="em2" ip="192.168.1.254" network="192.168.1.0/24" />
+
+	<!-- PacketFilter file (pf.conf) --> 
+	<pfconf filename="./conf/pf.conf" />
+
+	<!-- routing engine -->
+	<routing>
+		<route prefix="0.0.0.0/0" nexthop="10.0.1.254" />
+	</routing>
+
+	<!-- options -->
+	<options>
+		<!-- 
+			Add options definitions here.
+			See the file options.xml
+			https://listes.cru.fr/wiki/jtacl/public/commonoptions
+
+			Nb: PacketFilter does not handle the filter option
+		-->
+	</options>
+
+		
+</equipment>
