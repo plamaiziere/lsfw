@@ -73,15 +73,15 @@ public class IOSShell implements GenericEquipmentShell {
 
 		for (IPNet ip: _router.getNetCrossRef().keySet()) {
 			IPNetCrossRef crossref = _router.getNetCrossRef().get(ip);
-			if (ipreq != null) {
-				try {
-					if (!ipreq.overlaps(ip))
-						continue;
-				}
-				catch (UnknownHostException ex) {
-					System.out.println("Error " + ex.getMessage());
-					return;
-				}
+			try {
+				if (ipreq != null && !ipreq.overlaps(ip))
+					continue;
+				if (parser.getXrefHost() != null && !ip.isHost())
+					continue;
+			}
+			catch (UnknownHostException ex) {
+				System.out.println("Error " + ex.getMessage());
+				return;
 			}
 			for (CrossRefContext ctx: crossref.getContexts()) {
 				System.out.print(ip.toString("::i"));

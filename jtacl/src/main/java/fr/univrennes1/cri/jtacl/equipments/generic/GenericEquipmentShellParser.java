@@ -29,6 +29,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	protected String _xrefObject = null;
 	protected String _xrefFormat = null;
 	protected String _xrefIp = null;
+	protected String _xrefHost = null;
 
 	protected boolean clear() {
 		_command = "";
@@ -36,6 +37,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		_xrefObject = null;
 		_xrefFormat = null;
 		_xrefIp = null;
+		_xrefHost = null;
 		return true;
 	}
 
@@ -79,6 +81,15 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		return true;
 	}
 
+	public String getXrefHost() {
+		return _xrefHost;
+	}
+
+	public boolean setXrefHost(String xrefHost) {
+		_xrefHost = xrefHost;
+		return true;
+	}
+
 	public Rule CommandHelp() {
 		return Sequence(
 			IgnoreCase("help"),
@@ -88,7 +99,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	}
 
 	/**
-	 * xref [ip [long|short] [IPaddress]]
+	 * xref [ip [long|short] [host] [IPaddress]]
 	 */
 	public Rule CommandXref() {
 		return Sequence(
@@ -106,6 +117,13 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 								IgnoreCase("short")
 							),
 							setXrefFormat(match().toLowerCase())
+						)
+					),
+					Optional(
+						Sequence(
+							WhiteSpaces(),
+							IgnoreCase("host"),
+							setXrefHost(match().toLowerCase())
 						)
 					),
 					Optional(
