@@ -500,6 +500,12 @@ public class IOSParser extends CommonRules<Object> {
 	@SuppressSubnodes
 	public Rule InAclContext() {
 		return Sequence(
+					Optional(
+						Sequence(
+							String("no"),
+							WhiteSpaces()
+						)
+					),
 					FirstOf(
 						String("permit"),
 						String("deny"),
