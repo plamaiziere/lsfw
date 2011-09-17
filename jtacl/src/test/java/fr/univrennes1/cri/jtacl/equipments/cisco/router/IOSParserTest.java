@@ -614,5 +614,46 @@ public class IOSParserTest extends TestCase {
 
 	}
 
-	
+	/**
+	 * Test of InAclContext, of class IOSParser.
+	 */
+	public void testInAclContext() {
+		System.out.println("InAclContext");
+		String line;
+		AclTemplate acl;
+		AceTemplate ace;
+
+		line = "permit   ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+
+		line = "deny   ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+
+		line = "no   permit   ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+		
+		line = "no   deny   ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+
+		line = "remark   ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+
+		line = "no   remark   ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+
+		line = "evaluate  ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+		
+		line = "no evaluate  ";
+		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		assertTrue(result.matched);
+	}
+
 }
