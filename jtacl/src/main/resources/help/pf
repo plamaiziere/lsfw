@@ -2,7 +2,7 @@
 
 help: this help.
 
-xref ip [short|long] [IpAddress]: Outputs the cross reference of IP addresses.
+xref ip [short|long] [host] [IpAddress]: Outputs the cross reference of IP addresses.
 
 The "short" and "long" options allow to specify the output format.
   short: outputs only the first line of configuration.
@@ -10,7 +10,8 @@ The "short" and "long" options allow to specify the output format.
   if short and long are missing, do not output the configuration line.
 
 IPAddress specifies the IP to output. Any IP overlapping this IPAddress are
-displayed.
+  displayed. If "host" is specified, only references to this host ip address are
+  displayed.
 
 examples:
 ---------
