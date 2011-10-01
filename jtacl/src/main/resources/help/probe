@@ -66,13 +66,16 @@ using the form [portsource:][portdest]
 tcp
 ---
   If the protocol is tcp, several tcp flags can be specified using the form
-flags tcpflags [tcpflags].
+flags tcpflags [tcpflags]. If serveral tcpflags are specified, the probe matches
+if at least one tcpflags matches.
 
-tcpFlags can be a combinaison of flags or the keyword 'any' or 'none'.
+tcpFlags can be a combinaison of flags, the keyword 'any' or the keyword 'none'.
 'none' designates a tcpflags with all flags unset.
 'any' matches all tcpflags, and is the default when flags are unspecified.
 
-A TCP flag is specified using a letter:
+A TCP flag is specified using a letter in uppercase or lowercase. A flag in
+uppercase specified that the flag is set, in lowercase the flag is unset.
+
  W: CWR
  E: ECE
  U: URG
@@ -131,6 +134,6 @@ Examples:
   Probe with tcp flag SYN set.
   lsfw> probe 192.168.1.2/24 www.google.com tcp flags S
 
-  Probe with tcp flag SYN set or tcp flags SYN and ACK set.
-  lsfw> probe 192.168.1.2/24 www.google.com tcp http flags S SA
+  Probe with tcp flags SYN set and ACK unset.
+  lsfw> probe 192.168.1.2/24 www.google.com tcp http flags Sa
 
