@@ -66,7 +66,7 @@ using the form [portsource:][portdest]
 tcp
 ---
   If the protocol is tcp, several tcp flags can be specified using the form
-flags tcpflags [tcpflags]. If serveral tcpflags are specified, the probe matches
+flags tcpflags [tcpflags]. If several tcpflags are specified, the probe matches
 if at least one tcpflags matches.
 
 tcpFlags can be a combinaison of flags, the keyword 'any' or the keyword 'none'.
@@ -76,6 +76,7 @@ tcpFlags can be a combinaison of flags, the keyword 'any' or the keyword 'none'.
 A TCP flag is specified using a letter in uppercase or lowercase. A flag in
 uppercase specifies that the flag is set, in lowercase the flag is unset.
 
+TCP flags:
  W: CWR
  E: ECE
  U: URG
