@@ -74,7 +74,7 @@ tcpFlags can be a combinaison of flags, the keyword 'any' or the keyword 'none'.
 'any' matches all tcpflags, and is the default when flags are unspecified.
 
 A TCP flag is specified using a letter in uppercase or lowercase. A flag in
-uppercase specified that the flag is set, in lowercase the flag is unset.
+uppercase specifies that the flag is set, in lowercase the flag is unset.
 
  W: CWR
  E: ECE
