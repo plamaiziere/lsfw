@@ -33,6 +33,26 @@ public enum MatchResult {
 	/**
 	 * Unknown result.
 	 */
-	UNKNOWN
+	UNKNOWN;
+	
+	/**
+	 * Negates this result.
+	 * @return the negated result of this enum instance.
+	 */
+	public MatchResult not() {
+		
+		switch (this) {
+			case ALL:
+				return MatchResult.NOT;
+			case NOT:
+				return MatchResult.ALL;
+			case MATCH:
+				return MatchResult.MATCH;
+			case UNKNOWN:
+				return MatchResult.UNKNOWN;
+			default:
+				return MatchResult.UNKNOWN;
+		}
+	}
 
 }
