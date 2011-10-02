@@ -1989,23 +1989,6 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	/**
-	 * Negates a result.
-	 * @param result result to negate.
-	 * @return the negated result.
-	 */
-	protected MatchResult negMatchResult(MatchResult result) {
-
-		switch (result) {
-			case ALL:
-				return MatchResult.NOT;
-			case NOT:
-				return MatchResult.ALL;
-			default:
-				return result;
-		}
-	}
-
-	/**
 	 * host filter
 	 */
 	protected MatchResult hostFilter(FilterContext context, PfNodeHost host,
@@ -2033,7 +2016,7 @@ public class PacketFilter extends GenericEquipment {
 			if (routes.isEmpty())
 				res = MatchResult.ALL;
 			if (host.isNot())
-				res = negMatchResult(res);
+				res = res.not();
 			return res;
 		}
 
@@ -2053,7 +2036,7 @@ public class PacketFilter extends GenericEquipment {
 				}
 			}
 			if (host.isNot())
-				res = negMatchResult(res);
+				res = res.not();
 			return res;
 		}
 
@@ -2082,7 +2065,7 @@ public class PacketFilter extends GenericEquipment {
 			 */
 			MatchResult res = ipspecFilter(context, table.getIpspec(), ipAddress, af);
 			if (host.isNot())
-				res = negMatchResult(res);
+				res = res.not();
 			return res;
 		}
 
@@ -2110,7 +2093,7 @@ public class PacketFilter extends GenericEquipment {
 			if (mMatch > 0)
 				res = MatchResult.MATCH;
 			if (host.isNot())
-				res = negMatchResult(res);
+				res = res.not();
 			return res;
 		}
 
@@ -2153,7 +2136,7 @@ public class PacketFilter extends GenericEquipment {
 			if (mMatch > 0)
 				res = MatchResult.MATCH;
 			if (host.isNot())
-				res = negMatchResult(res);
+				res = res.not();
 			return res;
 		}
 
