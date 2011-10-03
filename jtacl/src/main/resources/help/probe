@@ -2,8 +2,8 @@
 
 probe|probe6 [on equipment-spec] source destination
 [tcp | udp [portsource:][portdest] [flags tcpflags [tcpflags]]] |
-[icmp [icmptype]] |
-[icmp6 icmp6type]] |
+[icmp [icmptype]] |
+[icmp6 [icmp6type]] |
 [protocol]
 
   The probe command probes the network from a source IP address to a destination IP
