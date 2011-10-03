@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.core.monitor;
+package fr.univrennes1.cri.jtacl.core.probing;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;

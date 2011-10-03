@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.core.monitor;
+package fr.univrennes1.cri.jtacl.core.probing;
 
 import java.util.HashMap;
 

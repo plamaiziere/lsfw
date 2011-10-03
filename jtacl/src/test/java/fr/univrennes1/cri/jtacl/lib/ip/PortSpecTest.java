@@ -13,7 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
-import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import junit.framework.TestCase;
 
 /**

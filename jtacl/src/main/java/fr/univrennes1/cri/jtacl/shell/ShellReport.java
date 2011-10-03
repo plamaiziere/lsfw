@@ -13,10 +13,10 @@
 
 package fr.univrennes1.cri.jtacl.shell;
 
-import fr.univrennes1.cri.jtacl.core.monitor.Probe;
-import fr.univrennes1.cri.jtacl.core.monitor.ProbesByUid;
-import fr.univrennes1.cri.jtacl.core.monitor.ProbesList;
-import fr.univrennes1.cri.jtacl.core.monitor.ProbesTracker;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
+import fr.univrennes1.cri.jtacl.core.probing.ProbesByUid;
+import fr.univrennes1.cri.jtacl.core.probing.ProbesList;
+import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import java.io.CharArrayWriter;

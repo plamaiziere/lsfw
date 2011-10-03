@@ -11,15 +11,14 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.core.monitor;
+package fr.univrennes1.cri.jtacl.core.probing;
 
 import java.util.ArrayList;
 
 /**
- * A probing is a collection of probes (owned by a ProbesTracker) which are
- * probing to a destination.
+ * An {@link ArrayList} of {@link Probe} items.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class Probing extends ArrayList<ProbesTracker> {
-	
+public class ProbesList extends ArrayList<Probe> {
+
 }

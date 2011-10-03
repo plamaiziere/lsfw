@@ -14,7 +14,7 @@
 package fr.univrennes1.cri.jtacl.lib.ip;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
-import fr.univrennes1.cri.jtacl.core.monitor.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import java.util.ArrayList;
 import java.util.List;
 
