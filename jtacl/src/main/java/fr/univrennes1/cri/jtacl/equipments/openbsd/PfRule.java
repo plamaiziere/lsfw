@@ -15,7 +15,6 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
-import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,6 +114,11 @@ public class PfRule extends PfGenericRule {
 	 * filter action (no-state, keep-state...)
 	 */
 	protected String _filterAction;
+	
+	/**
+	 * route options (route-to, dup-to, ...)
+	 */
+	protected PfRouteOpts _routeOpts;
 
 	/**
 	 * Returns the action of this rule (pass, match, block).
@@ -324,4 +328,19 @@ public class PfRule extends PfGenericRule {
 		_filterAction = action;
 	}
 
+	/**
+	 * Returns the route options of this rule (null = none).
+	 * @return the route options of this rule.
+	 */
+	public PfRouteOpts getRouteOpts() {
+		return _routeOpts;
+	}
+
+	/**
+	 * Sets the route options of this rule (null = none).
+	 * @param routeOpts route options to set.
+	 */
+	public void SetRouteOpts(PfRouteOpts routeOpts) {
+		_routeOpts = routeOpts;
+	}	
 }

@@ -1122,6 +1122,51 @@ public class PacketFilter extends GenericEquipment {
 		return ent;
 	}
 
+	protected PfRouteOpts parseRouteOpts(RouteOptsTemplate template) {
+
+		/*
+		 * XXX: we just handle route-to (interface nexthop)
+		 */
+		if (template.getRt() != PfConst.PF_ROUTETO)
+			return null;
+		if (template.getHosts().size() != 1)
+			return null;
+		Xhost xhost = template.getHosts().get(0);
+		String sifname = xhost.getIfName();
+		if (sifname == null)
+			return null;
+		if (xhost == null)
+			return null;
+		
+		/*
+		 * check ifname
+		 */
+		if (!_pfIfaces.containsKey(sifname)) {
+				warnConfig("unknown interface: " + sifname);
+				return null;
+		}		
+		
+		/*
+		 * nexthop
+		 */
+		PfNodeHost nhost = null;
+		try {
+			nhost = xhostToHost(xhost);
+		} catch (UnknownHostException ex) {
+			warnConfig("invalid nexthop: " + xhost.getFirstAddress());
+			return null;
+		}
+		if (nhost == null || !nhost.isAddrMask() ||
+				nhost.getAddr().size() != 1) {
+			warnConfig("invalid nexthop: " + xhost.getFirstAddress());
+			return null;
+		}
+
+		PfRouteOpts ropts = PfRouteOpts.newRouteOptsRouteTo();
+		ropts.setRoute(sifname, nhost.getAddr().get(0));
+		return ropts;
+	}
+
 	protected PfIpSpec loadTable(String fileName) {
 
 		StringBuilder buf = new StringBuilder("");
@@ -1299,6 +1344,17 @@ public class PacketFilter extends GenericEquipment {
 		 * options
 		 */
 		FilterOptsTemplate opts = ruleTpl.getFilterOpts();
+		
+		if (opts != null) {
+			/*
+			 * route options
+			 */			
+			RouteOptsTemplate rot = opts.getRouteOpts();
+			if (rot != null) {
+				PfRouteOpts routeOpts = parseRouteOpts(rot);
+				rule.SetRouteOpts(routeOpts);
+			}
+		}
 
 		/*
 		 * icmp specification
@@ -1404,7 +1460,8 @@ public class PacketFilter extends GenericEquipment {
 					"\nicmp " + rule.getIcmpspec() +
 					"\nfAction " + rule.getFilterAction() +
 					"\nflags " + rule.getFlags() +
-					"\nflagset " + rule.getFlagset();
+					"\nflagset " + rule.getFlagset() +
+					"\nrouteOpts " + rule.getRouteOpts();
 			Log.debug().info(s);
 		}
 

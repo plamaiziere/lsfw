@@ -17,8 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Template to build route options. This class is used at parsing time
+ * Template to build route options. This class is used at parsing time
  * as an intermediate storage.
+ * @see PfRouteOpts
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class RouteOptsTemplate {
