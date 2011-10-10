@@ -1011,24 +1011,34 @@ public class PacketFilter extends GenericEquipment {
 		return host;
 	}
 
-	protected StringsList parseIfList(StringsList list) {
-		StringsList ifList = new StringsList();
+	protected PfIfListSpec parseIfList(StringsList list) {
+		PfIfListSpec ifList = new PfIfListSpec();
 		for (String ifname: list) {
+			/*
+			 * not interface
+			 */
+			boolean ifnot = false;
+			if (ifname.startsWith("!")) {
+				ifnot = true;
+				ifname = ifname.substring(1);
+			}
 			/*
 			 * lookup for interface group
 			 */
 			StringsList group = ifaGroupLookup(ifname);
 			if (group.isEmpty())
-				ifList.add(ifname);
-			else
-				ifList.addAll(group);
+				group.add(ifname);
+			for (String ifgroup: group) {
+				PfIfSpec ifspec = new PfIfSpec(ifnot, ifgroup);
+				ifList.add(ifspec);
+			}
 		 }
 		/*
 		 * check associated iface
 		 */
-		for (String ifname: ifList) {
-			if (!_pfIfaces.containsKey(ifname)) {
-				warnConfig("unknown interface: " + ifname);
+		for (PfIfSpec ifspec: ifList) {
+			if (!_pfIfaces.containsKey(ifspec.getIfName())) {
+				warnConfig("unknown interface: " + ifspec.getIfName());
 			}
 		}
 		return ifList;
@@ -1220,7 +1230,7 @@ public class PacketFilter extends GenericEquipment {
 		 * interfaces
 		 */
 		if (ruleTpl.getIfList() != null) {
-			StringsList ifList = parseIfList(ruleTpl.getIfList());
+			PfIfListSpec ifList = parseIfList(ruleTpl.getIfList());
 			rule.getIfList().addAll(ifList);
 		 }
 
@@ -1547,10 +1557,10 @@ public class PacketFilter extends GenericEquipment {
 		 * put the interfaces into the skipped interface map
 		 */
 		if (ruleTpl.getIfList() != null) {
-			StringsList ifList = parseIfList(ruleTpl.getIfList());
-			for (String iface: ifList) {
-				if (!_skippedIfaces.containsKey(iface))
-					_skippedIfaces.put(iface, iface);
+			PfIfListSpec ifList = parseIfList(ruleTpl.getIfList());
+			for (PfIfSpec ifspec: ifList) {
+				if (!_skippedIfaces.containsKey(ifspec.getIfName()))
+					_skippedIfaces.put(ifspec.getIfName(), ifspec.getIfName());
 			}
 		 }
 
@@ -2249,7 +2259,7 @@ public class PacketFilter extends GenericEquipment {
 		 * interfaces
 		 */
 		String ifname = context.getLink().getIface().getName();
-		if (!rule.getIfList().isEmpty() && !rule.getIfList().contains(ifname)) {
+		if (!rule.getIfList().isEmpty() && !rule.getIfList().matches(ifname)) {
 			return MatchResult.NOT;
 		}
 

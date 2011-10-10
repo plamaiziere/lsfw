@@ -59,7 +59,7 @@ public class PfRule extends PfGenericRule {
 	/**
 	 * interfaces list of the rule
 	 */
-	protected StringsList _ifList = new StringsList();
+	protected PfIfListSpec _ifList = new PfIfListSpec();
 
 	/**
 	 * protocols list
@@ -224,7 +224,7 @@ public class PfRule extends PfGenericRule {
 	 * returns the interfaces list of this rule.
 	 * @return the interfaces list of this rule.
 	 */
-	public StringsList getIfList() {
+	public PfIfListSpec getIfList() {
 		return _ifList;
 	}
 
