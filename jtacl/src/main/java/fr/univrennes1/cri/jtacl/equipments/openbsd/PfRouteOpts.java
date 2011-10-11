@@ -13,6 +13,7 @@
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
+import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 
 /**
@@ -25,6 +26,7 @@ public class PfRouteOpts {
 	protected PfRouteOptsType _type;
 	protected String _ifName;
 	protected IPNet _nextHop;
+	protected IfaceLink _link;
 
 	/**
 	 * Creates a new PfRouteOpts of type PF_ROUTETO.
@@ -37,18 +39,20 @@ public class PfRouteOpts {
 	}
 
 	/**
-	 * Set the route
-	 * @param ifName name of the interface
+	 * Set the route.
+	 * @param ifName name of the interface.
 	 * @param nextHop IP address of the nexthop.
+	 * @param link IfaceLink on the interface.
 	 * @throws JtaclInternalException if the type of this instance is not of
 	 * type ROUTETO
 	 * 
 	 */
-	public void setRoute(String ifName, IPNet nextHop) {
+	public void setRoute(String ifName, IPNet nextHop, IfaceLink link) {
 		if (!isRouteTo())
 			throw new JtaclInternalException("invalid route opt type");
 		_ifName = ifName;
 		_nextHop = nextHop;
+		_link = link;
 	}
 
 	/**
@@ -73,7 +77,19 @@ public class PfRouteOpts {
 		if (!isRouteTo())
 			throw new JtaclInternalException("invalid route opt type");
 		return _nextHop;
-	}	
+	}
+
+	/**
+	 * Returns the link.
+	 * @return the link.
+	 * @throws JtaclInternalException if the type of this instance is not of
+	 * type ROUTETO 
+	 */
+	public IfaceLink getLink() {
+		if (!isRouteTo())
+			throw new JtaclInternalException("invalid route opt type");
+		return _link;		
+	}
 
 	/**
 	 * Checks that this instance is of type ROUTETO.

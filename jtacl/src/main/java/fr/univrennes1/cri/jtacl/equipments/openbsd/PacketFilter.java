@@ -29,6 +29,7 @@ import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLinksByIp;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
+import fr.univrennes1.cri.jtacl.core.network.RoutingEngine;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
@@ -257,6 +258,16 @@ public class PacketFilter extends GenericEquipment {
 		_anchorNextUid++;
 		return uid;
 	}
+	
+	/**
+	 * route to engine.
+	 */
+	protected RoutingEngine _routeToEngine = null;
+	
+	/**
+	 * filtering flag done, used at filtering time.
+	 */
+	protected boolean _filteringDone = false;
 
 	protected void throwCfgException(String msg) {
 		if (_parseContext != null)
@@ -1141,7 +1152,8 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * check ifname
 		 */
-		if (!_pfIfaces.containsKey(sifname)) {
+		PfIface pfiface = _pfIfaces.get(sifname);
+		if (pfiface == null) {
 				warnConfig("unknown interface: " + sifname);
 				return null;
 		}		
@@ -1161,9 +1173,22 @@ public class PacketFilter extends GenericEquipment {
 			warnConfig("invalid nexthop: " + xhost.getFirstAddress());
 			return null;
 		}
+		
+		/*
+		 * link
+		 */
+		IfaceLink link;
+		try {
+			link = pfiface.getIface().getLinkConnectedTo(nhost.getAddr().get(0));
+		} catch (UnknownHostException ex) {
+			link = null;
+		}
+		if (link == null) {
+			warnConfig("invalid nexthop (no link): " + xhost.getFirstAddress());
+		}
 
 		PfRouteOpts ropts = PfRouteOpts.newRouteOptsRouteTo();
-		ropts.setRoute(sifname, nhost.getAddr().get(0));
+		ropts.setRoute(sifname, nhost.getAddr().get(0), link);
 		return ropts;
 	}
 
@@ -1968,6 +1993,11 @@ public class PacketFilter extends GenericEquipment {
 		}
 
 		/*
+		 * reset route-to Engine
+		 */
+		_routeToEngine = null;
+
+		/*
 		 * Filter in the probe
 		 */
 		packetFilter(link, Direction.IN, probe);
@@ -1989,7 +2019,11 @@ public class PacketFilter extends GenericEquipment {
 		 * Route the probe.
 		 */
 		Routes routes = null;
-		routes = _routingEngine.getRoutes(probe);
+		if (_routeToEngine != null)
+			routes = _routeToEngine.getRoutes(probe);
+		else
+			routes = _routingEngine.getRoutes(probe);
+
 		if (routes.isEmpty()) {
 			probe.killNoRoute("No route to " + probe.getDestinationAddress());
 			return;
@@ -2420,11 +2454,31 @@ public class PacketFilter extends GenericEquipment {
 				return MatchResult.NOT;
 		}
 
+		MatchResult mResult = MatchResult.MATCH;
+		
 		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
 				mSourcePort == MatchResult.ALL && mDestPort == MatchResult.ALL)
-			return MatchResult.ALL;
+			mResult = MatchResult.ALL;
 
-		return MatchResult.MATCH;
+		if (mResult == MatchResult.MATCH)
+			return MatchResult.MATCH;
+		
+		if (_filteringDone)
+			return mResult;
+		
+		/*
+		 * route-to
+		 */
+		PfRouteOpts routeOpts = rule.getRouteOpts();
+		if (routeOpts == null || !routeOpts.isRouteTo())
+			return mResult;
+		
+		Route<IfaceLink> route = new Route(probe.getDestinationAddress(),
+				routeOpts.getNextHop(), 0, routeOpts.getLink());
+		_routeToEngine = new RoutingEngine();
+		_routeToEngine.addRoute(route);
+		
+		return mResult;
 	}
 
 	protected class RuleResult {
@@ -2610,12 +2664,14 @@ public class PacketFilter extends GenericEquipment {
 			if (rule instanceof PfRule) {
 				PfRule pfrule = (PfRule) rule;
 				MatchResult match = ruleFilter(context, pfrule, probe);
-				if (match != MatchResult.NOT) {
+				if (match != MatchResult.NOT) {				
 					RuleResult result = anchorResult.addRuleResult(rule, match,
 						pfrule.getAction(), anchorPath);
 					anchorResult.setLastResult(result);
-					if (pfrule.isQuick())
+					if (pfrule.isQuick()) {
 						anchorResult.setQuickRule(true);
+						_filteringDone = true;
+					}
 				}
 			}
 		}
@@ -2629,6 +2685,7 @@ public class PacketFilter extends GenericEquipment {
 			link.getIface().getComment() + ")";
 		ProbeResults probeResults = probe.getResults();
 
+		_filteringDone = false;
 		/*
 		 * skipped interface
 		 */
@@ -2677,6 +2734,11 @@ public class PacketFilter extends GenericEquipment {
 				aclResult.addResult(AclResult.MAY);
 			probeResults.addActiveAcl(direction, lastResult.getText(), aclResult);
 			probeResults.setAclResult(direction, aclResult);
+			
+			/*
+			 * routing by rule
+			 */
+			PfRule rule = (PfRule) lastResult.getRule();
 		} else {
 			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
 		}
