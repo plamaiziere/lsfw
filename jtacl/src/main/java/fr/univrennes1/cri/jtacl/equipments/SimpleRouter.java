@@ -30,6 +30,8 @@ import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,6 +44,27 @@ import org.w3c.dom.NodeList;
 public class SimpleRouter extends GenericEquipment {
 
 	protected ArrayList<String> _acls = new ArrayList<String>();
+	
+	protected class SimpleRouterLink {
+		IfaceLink _link;
+		boolean _border;
+		
+		protected SimpleRouterLink(IfaceLink link, boolean border) {
+			_link = link;
+			_border = border;
+		}
+		
+		protected IfaceLink getLink() {
+			return _link;
+		}
+		
+		protected boolean isBorder() {
+			return _border;
+		}
+	}
+	
+	Map<IfaceLink, SimpleRouterLink> _srlinks =
+		new HashMap<IfaceLink, SimpleRouterLink>();
 
 	/**
 	 * Create a new {@link SimpleRouter} with this name and this comment.<br/>
@@ -50,7 +73,8 @@ public class SimpleRouter extends GenericEquipment {
 	 * @param comment a free comment for this equipment.
 	 * @param configurationFileName name of the configuration file to use (may be null).
 	 */
-	public SimpleRouter(Monitor monitor, String name, String comment, String configurationFileName) {
+	public SimpleRouter(Monitor monitor, String name, String comment,
+			String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
 	}
 
@@ -75,10 +99,15 @@ public class SimpleRouter extends GenericEquipment {
 			String comment = e.getAttribute("comment");
 			String ifIp = e.getAttribute("ip");
 			String ifNetwork = e.getAttribute("network");
+			String ifBorder = e.getAttribute("border");
 
 			String s = "name: " + name + " comment: " + comment +
-					" IP: " + ifIp + " network: " + ifNetwork;
+					" IP: " + ifIp + " network: " + ifNetwork + 
+					" border: " + ifBorder;
 
+			if (ifBorder.isEmpty())
+				ifBorder = "false";
+			
 			if (name.isEmpty())
 				throw new JtaclConfigurationException("Missing interface name: " + s);
 
@@ -117,7 +146,14 @@ public class SimpleRouter extends GenericEquipment {
 					throw new JtaclConfigurationException("Missing interface comment: " + s);
 				iface = addIface(name, comment);
 			}
-			iface.addLink(ip, network);
+			IfaceLink link = iface.addLink(ip, network);
+			
+			/*
+			 * a border link accept all the probe in incomming.
+			 */
+			boolean border = Boolean.parseBoolean(ifBorder);
+			SimpleRouterLink srlink = new SimpleRouterLink(link, border);		
+			_srlinks.put(link, srlink);
 		}
 	}
 
@@ -155,9 +191,14 @@ public class SimpleRouter extends GenericEquipment {
 		packetFilter(link, Direction.IN, probe);
 
 		/*
-		 * Check if the destination of the probe is on this equipment.
+		 * Check if the destination of the probe is on this equipment or if
+		 * this link is a border.
 		 */
 		IfaceLink ilink = getIfaceLink(probe.getDestinationAddress());
+		SimpleRouterLink srlink = _srlinks.get(link);
+		if (srlink.isBorder() && ilink == null)
+			ilink = srlink.getLink();
+		
 		if (ilink != null) {
 			/*
 			 * Set the probe's final position and notify the monitor
