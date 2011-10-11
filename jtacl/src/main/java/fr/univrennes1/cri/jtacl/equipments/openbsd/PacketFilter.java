@@ -2734,11 +2734,6 @@ public class PacketFilter extends GenericEquipment {
 				aclResult.addResult(AclResult.MAY);
 			probeResults.addActiveAcl(direction, lastResult.getText(), aclResult);
 			probeResults.setAclResult(direction, aclResult);
-			
-			/*
-			 * routing by rule
-			 */
-			PfRule rule = (PfRule) lastResult.getRule();
 		} else {
 			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
 		}
