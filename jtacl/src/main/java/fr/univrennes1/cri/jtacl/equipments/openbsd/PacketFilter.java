@@ -1955,6 +1955,12 @@ public class PacketFilter extends GenericEquipment {
 		
 		if (rule.getToIpSpec() != null)
 			crossRefIpSpec(rule.getOwnerAnchor(), rule.getToIpSpec(), refContext);
+		
+		PfRouteOpts ropts = rule.getRouteOpts();
+		if (ropts != null && ropts.isRouteTo()) {
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ropts.getNextHop());
+			ipNetRef.addContext(refContext);
+		}
 
 	}
 
