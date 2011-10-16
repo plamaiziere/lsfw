@@ -167,6 +167,33 @@ public class ShellParserTest extends TestCase {
 		assertEquals("EXPECT", parser.getProbeExpect());
 		assertEquals("ON", parser.getEquipments());
 
+		line = "p    on    ON   expect    EXPECT        SOURCE     DEST";
+		result = ReportingParseRunner.run(parser.CommandLine(), line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("EXPECT", parser.getProbeExpect());
+		assertEquals("ON", parser.getEquipments());
+		assertFalse(parser.getProbeOptNoAction());
+		
+		line = "p    on    ON   expect    EXPECT   no-action       SOURCE     DEST";
+		result = ReportingParseRunner.run(parser.CommandLine(), line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("EXPECT", parser.getProbeExpect());
+		assertEquals("ON", parser.getEquipments());
+		assertTrue(parser.getProbeOptNoAction());
+
+		line = "p    on    ON   na expect    EXPECT     SOURCE     DEST";
+		result = ReportingParseRunner.run(parser.CommandLine(), line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("EXPECT", parser.getProbeExpect());
+		assertEquals("ON", parser.getEquipments());
+		assertTrue(parser.getProbeOptNoAction());
+				
 		line = "p   SOURCE     DEST   tcp";
 		result = ReportingParseRunner.run(parser.CommandLine(), line);
 		assertEquals("probe", parser.getCommand());

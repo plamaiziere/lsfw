@@ -37,6 +37,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _topologyOption;
 	protected String _probeExpect;
 	protected boolean _probe6flag;
+	protected boolean _probeOptNoAction;
 	protected String _subCommand;
 	protected StringsList _tcpFlags;
 
@@ -55,6 +56,8 @@ public class ShellParser extends CommonRules<Object> {
 		_probeExpect = null;
 		_subCommand = null;
 		_tcpFlags = null;
+		_probeOptNoAction = false;
+		_probe6flag = false;
 		return true;
 	}
 
@@ -195,6 +198,15 @@ public class ShellParser extends CommonRules<Object> {
 	public boolean setProbe6flag(boolean probe6flag) {
 		_probe6flag = probe6flag;
 		return true;
+	}
+	
+	public boolean setProbeOptNoAction(boolean probeOptNoAction) {
+		_probeOptNoAction = probeOptNoAction;
+		return true;
+	}
+	
+	public boolean getProbeOptNoAction() {
+		return _probeOptNoAction;
 	}
 
 	public Rule CommandLine() {
@@ -408,7 +420,7 @@ public class ShellParser extends CommonRules<Object> {
 	}
 
 	/*
-	 * (probe | p | probe6 | p6) [ProbeExpect] [OnEquipment]
+	 * (probe | p | probe6 | p6) [ProbeOptions]
 	 *		SourceSpec DestSpec [ProtoSpec]
 	 */
 	public Rule CommandProbe() {
@@ -427,8 +439,7 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("p")
 				),
 				WhiteSpaces(),
-				Optional(ProbeExpect()),
-				Optional(OnEquipments()),
+				Optional(ProbeOptions()),
 				SourceSpecification(),
 				setSrcAddress(match()),
 				WhiteSpaces(),
@@ -449,6 +460,23 @@ public class ShellParser extends CommonRules<Object> {
 					setCommand("probe")
 				)
 		);
+	}
+	
+	/*
+	 * ProbeOptions: ( ProbeExpect | OnEquipments | OptNoAction) ProbeOptions
+	 */
+	public Rule ProbeOptions() {
+		return
+			Sequence(
+				FirstOf(
+					ProbeExpect(),
+					OnEquipments(),
+					OptNoAction()
+				),
+				Optional(
+					ProbeOptions()
+				)
+			);
 	}
 
 	/*
@@ -477,6 +505,21 @@ public class ShellParser extends CommonRules<Object> {
 		);
 	}
 
+	/*
+	 * OptNoAction: no-action | na
+	 */
+	public Rule OptNoAction() {
+		return
+			Sequence(
+				FirstOf(
+					IgnoreCase("no-action"),
+					IgnoreCase("na")
+				),
+				WhiteSpaces(),
+				setProbeOptNoAction(true)
+			);
+	}
+	
 	public Rule SourceSpecification() {
 		return StringAtom();
 	}

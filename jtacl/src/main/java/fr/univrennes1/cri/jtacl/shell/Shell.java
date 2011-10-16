@@ -742,6 +742,11 @@ public class Shell {
 				}
 			}
 		}
+		
+		/*
+		 * probe options
+		 */
+		request.getProbeOptions().setNoAction(command.getProbeOptNoAction());
 
 		/*
 		 * probe

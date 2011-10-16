@@ -56,6 +56,11 @@ public class ProbeRequest {
 	 * TCP flags we should match (null: any)
 	 */
 	protected ProbeTcpFlags _tcpFlags;
+	
+	/**
+	 * Probe options
+	 */
+	protected ProbeOptions _probeOptions = new ProbeOptions();
 
 	/**
 	 * Returns the internet protocols we should match.
@@ -158,6 +163,10 @@ public class ProbeRequest {
 	public void setTcpFlags(ProbeTcpFlags tcpFlags) {
 		_tcpFlags = tcpFlags;
 	}
+	
+	public ProbeOptions getProbeOptions() {
+		return _probeOptions;
+	}
 
 	/**
 	 * Creates and returns a new copy of this instance.
@@ -171,6 +180,7 @@ public class ProbeRequest {
 		req._sourcePort = _sourcePort;
 		req._destPort = _destPort;
 		req._tcpFlags = _tcpFlags;
+		req._probeOptions.setFlags(_probeOptions.getFlags());
 		return req;
 	}
 
