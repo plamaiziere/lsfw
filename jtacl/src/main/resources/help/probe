@@ -1,6 +1,6 @@
 --- probe ---
 
-probe|probe6 [on equipment-spec] source destination
+probe|probe6 [ProbeOptions] source destination
 [tcp | udp [portsource:][portdest] [flags tcpflags [tcpflags]]] |
 [icmp [icmptype]] |
 [icmp6 [icmp6type]] |
@@ -9,6 +9,14 @@ probe|probe6 [on equipment-spec] source destination
   The probe command probes the network from a source IP address to a destination IP
 address. Optionally, the protocol and dependent options can be specified.
 
+ProbeOptions
+-------------
+  Several options can be specified for the probe:
+
+ on equipment-spec     : specification of the equipment to start the probing.
+ expect expected-result: the expected result of the probing.
+ no-action             : do not make any probe transformation while probing.
+
 on equipment-spec
 ------------------
   The 'on' keyword allows to specify one interface on a network equipement
@@ -16,7 +24,7 @@ where the probe will be injected. The equipment specification specifies the
 name of the equipment, followed by a '|' and then followed by the name
 of an interface or an IP address:
 
-equipments-spec: equipment'|'interface-name | ip address.
+equipments-spec: equipment'|'(interface-name | ip address).
 
   If an interface name is specified, lsfw uses the first link available on this
 interface, regardless of the source IP address of the probe (a link describes
@@ -27,6 +35,34 @@ regardless of the source IP address of the probe.
 equipment specification when no candidate link is found for IPv4 addresses.
   If the DFLTEQUIPMENT6 variable is defined, Jtack uses this variable as a default
 equipment specification when no candidate link is found for IPv6 addresses.
+
+expect expected-result
+----------------------
+  In test mode, the keyword ?expect? specifies the expected result of the probe
+command. The expected result can be one of the following values:
+
+ routed
+True if all the probes reach their destination address (or a border link).
+
+ none-routed
+True if all the probes don't reach their destination address.
+
+ accept
+True if all the probes are accepted by filtering rule, implies ?routed?.
+
+ deny
+True if all the probes are denied by filtering rule, implies ?routed?.
+
+ may
+True if some probes are not routed to their destination, or if some filtering
+rules are ambiguous.
+
+The test can be negated by using a '!' before the expected result (ex: !routed)
+
+no-action
+---------
+  If no-action is set, an equipment must not do any action on the probe like
+transformation or routing.
 
 Addresses
 ---------
@@ -44,7 +80,6 @@ equipment where the probe will be injected.
 
 Protocol
 --------
-
   The protocol is specified using a number or the name of the protocol.
 Names are resolved using an internal database.
 
