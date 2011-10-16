@@ -2476,7 +2476,8 @@ public class PacketFilter extends GenericEquipment {
 		 * route-to
 		 */
 		PfRouteOpts routeOpts = rule.getRouteOpts();
-		if (routeOpts == null || !routeOpts.isRouteTo())
+		if (routeOpts == null || !routeOpts.isRouteTo() ||
+				request.getProbeOptions().hasNoAction())
 			return mResult;
 		
 		Route<IfaceLink> route = new Route(probe.getDestinationAddress(),
