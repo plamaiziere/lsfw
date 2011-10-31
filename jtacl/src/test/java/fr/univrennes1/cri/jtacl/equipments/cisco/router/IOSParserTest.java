@@ -27,6 +27,8 @@ public class IOSParserTest extends TestCase {
 
 	IOSParser parser = Parboiled.createParser(IOSParser.class);
 	ParsingResult<?> result;
+	ReportingParseRunner parseRunerParse =
+		new ReportingParseRunner(parser.Parse());
 
     public IOSParserTest(String testName) {
         super(testName);
@@ -79,7 +81,7 @@ public class IOSParserTest extends TestCase {
 	public void testInterface() {
 		System.out.println("Interface");
 		String line = "interface foo bar";
-		 result = ReportingParseRunner.run(parser.Interface(), line);
+		 result = new ReportingParseRunner(parser.Interface()).run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("foo bar", parser.getName());
@@ -104,7 +106,7 @@ public class IOSParserTest extends TestCase {
 			"access-list"
 		};
 		for (String s: dt) {
-			 result = ReportingParseRunner.run(parser.ExitInterface(), s);
+			 result = new ReportingParseRunner(parser.ExitInterface()).run(s);
 			 System.out.println("test: " + s);
 			 assertTrue(result.matched);
 		}
@@ -116,7 +118,7 @@ public class IOSParserTest extends TestCase {
 	public void testIfDescription() {
 		System.out.println("IfDescription");
 		String line = "description an interface";
-		result = ReportingParseRunner.run(parser.InInterface(), line);
+		result = new ReportingParseRunner(parser.InInterface()).run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("an interface", parser.getDescription());
@@ -130,7 +132,7 @@ public class IOSParserTest extends TestCase {
 	public void testIfShutdown() {
 		System.out.println("IfShutdown");
 		String line = "shutdown";
-		result = ReportingParseRunner.run(parser.InInterface(), line);
+		result = new ReportingParseRunner(parser.InInterface()).run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("shutdown", parser.getRuleName());
@@ -143,7 +145,7 @@ public class IOSParserTest extends TestCase {
 	public void testIfAddress() {
 		System.out.println("IfAddress");
 		String line = "ip  address    IPADDRESS    NETMASK   secondary or something else";
-		result = ReportingParseRunner.run(parser.InInterface(), line);
+		result = new ReportingParseRunner(parser.InInterface()).run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("IPADDRESS", parser.getIpAddress());
@@ -158,7 +160,7 @@ public class IOSParserTest extends TestCase {
 	public void testIfIpv6Address() {
 		System.out.println("IfIpv6Address");
 		String line = "ipv6     address      IPADDRESS";
-		result = ReportingParseRunner.run(parser.InInterface(), line);
+		result = new ReportingParseRunner(parser.InInterface()).run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("IPADDRESS", parser.getIpAddress());
@@ -172,7 +174,8 @@ public class IOSParserTest extends TestCase {
 	public void testIpRoute() {
 		System.out.println("IpRoute");
 		String line = "ip route    IPADDRESS   NETMASK    NEXTHOP";
-		result = ReportingParseRunner.run(parser.Parse(), line);
+	
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("IPADDRESS", parser.getIpAddress());
@@ -188,7 +191,7 @@ public class IOSParserTest extends TestCase {
 	public void testIpv6Route() {
 		System.out.println("Ipv6Route");
 		String line = "ipv6 route    IPADDRESS     NEXTHOP";
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("IPADDRESS", parser.getIpAddress());
@@ -208,7 +211,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 1 permit any log";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -222,7 +225,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 99 deny any";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -236,7 +239,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 1399 deny 1.2.3.4 log";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -250,7 +253,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 1999 deny 1.2.3.4 5.6.7.8 log";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -264,7 +267,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 15 deny 1.2.3.4 5.6.7.8";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -279,7 +282,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 90 permit host 127.0.0.1";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -297,7 +300,7 @@ public class IOSParserTest extends TestCase {
 		line = "deny 1.2.3.4 5.6.7.8";
 
 		parser.setAclContext(context);
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -326,7 +329,7 @@ public class IOSParserTest extends TestCase {
 		context.setIpVersion(IPversion.IPV4);
 
 		parser.setAclContext(context);
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -348,7 +351,7 @@ public class IOSParserTest extends TestCase {
 		context.setIpVersion(IPversion.IPV4);
 
 		parser.setAclContext(context);
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -370,7 +373,7 @@ public class IOSParserTest extends TestCase {
 		context.setIpVersion(IPversion.IPV4);
 
 		parser.setAclContext(context);
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -396,7 +399,7 @@ public class IOSParserTest extends TestCase {
 		context.setIpVersion(IPversion.IPV4);
 
 		parser.setAclContext(context);
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -420,7 +423,7 @@ public class IOSParserTest extends TestCase {
 		context.setIpVersion(IPversion.IPV4);
 
 		parser.setAclContext(context);
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -445,7 +448,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 100 permit tcp any any";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -462,7 +465,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 100 permit tcp any any established";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -482,7 +485,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 100 permit tcp any any ack rst psh fin syn urg";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -506,7 +509,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 100 permit tcp any any match-any +ack +rst +psh +fin +syn +urg";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -530,7 +533,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 100 permit tcp any any match-all +ack +rst +psh +fin +syn +urg";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -554,7 +557,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "access-list 100 permit tcp any any match-all -ack -rst -psh -fin -syn -urg";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -588,7 +591,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "ip access-list standard NAME";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();
@@ -601,7 +604,7 @@ public class IOSParserTest extends TestCase {
 
 		line = "ip access-list extended NAME";
 
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			acl = parser.getAclTemplate();

@@ -29,6 +29,7 @@ import org.parboiled.support.ParsingResult;
 public class PacketFilterParserTest extends TestCase {
 
 	PacketFilterParser parser = Parboiled.createParser(PacketFilterParser.class);
+	ReportingParseRunner parseRunParse = new ReportingParseRunner(parser.Parse());
 	ParsingResult<?> result;
 
     public PacketFilterParserTest(String testName) {
@@ -93,7 +94,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "foobar=\"FOOBAR\"";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("foobar", parser.getName());
@@ -103,7 +104,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "foobar = \"FOOBAR \nFOOBAR\"";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("foobar", parser.getName());
@@ -113,7 +114,7 @@ public class PacketFilterParserTest extends TestCase {
 		
 		line = "foobar = \"FOOBAR FOOBAR\"";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("foobar", parser.getName());
@@ -123,7 +124,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "foobar = \"FOOBAR\" FOOBAR";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("foobar", parser.getName());
@@ -196,7 +197,7 @@ public class PacketFilterParserTest extends TestCase {
 
  		line = "include \"FILE NAME\"";
 		
-		 result = ReportingParseRunner.run(parser.Parse(), line);
+		 result = parseRunParse.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("FILE NAME", parser.getValue());
@@ -205,7 +206,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "include FILENAME";
 		
-		 result = ReportingParseRunner.run(parser.Parse(), line);
+		 result = parseRunParse.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("FILENAME", parser.getValue());
@@ -214,7 +215,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "include \"FILE NAME\"";
 		
-		 result = ReportingParseRunner.run(parser.Parse(), line);
+		 result = parseRunParse.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("FILE NAME", parser.getValue());
@@ -223,7 +224,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "include 'FILE\\ NAME'";
 		
-		 result = ReportingParseRunner.run(parser.Parse(), line);
+		 result = parseRunParse.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("FILE NAME", parser.getValue());
@@ -256,7 +257,7 @@ public class PacketFilterParserTest extends TestCase {
  		line = "pass in";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -269,7 +270,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass in quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -282,7 +283,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -295,7 +296,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -308,7 +309,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -321,7 +322,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "block out quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -334,7 +335,7 @@ public class PacketFilterParserTest extends TestCase {
  		line = "block in";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -347,7 +348,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "block in quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -360,7 +361,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "block quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -373,7 +374,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "block";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -386,7 +387,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "block out quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -400,7 +401,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "match out quick";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -413,7 +414,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick on IFACE";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -427,7 +428,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick on ! IFACE";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -441,7 +442,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick on !IFACE";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -455,7 +456,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick on { IFACE0   , IFACE1 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -471,7 +472,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick on { ! IFACE0   , IFACE1 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -487,7 +488,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick on {\n! IFACE0   , IFACE1 \n}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -504,7 +505,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -518,7 +519,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -532,7 +533,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -548,7 +549,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto { PROTO }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -564,7 +565,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto { PROTO1, PROTO2 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -581,7 +582,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO all";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -597,7 +598,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from HOST";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -616,7 +617,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from <TABLE>";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -635,7 +636,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from HOST/FOO";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -653,7 +654,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from !HOST/FOO";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -672,7 +673,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from any";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -692,7 +693,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{ HOST1, HOST2/MASK2, !RANGE1 - RANGE2, <TABLE>}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -721,7 +722,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{\n HOST1, HOST2/MASK2, !RANGE1 - RANGE2, <TABLE>\n}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -748,7 +749,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{ \"HOST1\", \"HOST2/MASK2\", !\"RANGE1\" - \"RANGE2\", <\"TABLE\">}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -775,7 +776,7 @@ public class PacketFilterParserTest extends TestCase {
 				"<TABLE>";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -794,7 +795,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{ HOST1 HOST2/MASK2 !RANGE1 - RANGE2 <TABLE>}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -822,7 +823,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{ HOST1, no-route, !no-route}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -845,7 +846,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from urpf-failed";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -864,7 +865,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from !urpf-failed";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -883,7 +884,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from (iface0:broadcast)";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -903,7 +904,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from (iface0:network)/24";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -923,7 +924,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from any port PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -943,7 +944,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from port PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -961,7 +962,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from port=PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -980,7 +981,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from port!=PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -999,7 +1000,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from port<PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1018,7 +1019,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from port<=PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1037,7 +1038,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from port>PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1056,7 +1057,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from port>=PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1075,7 +1076,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from any port PORT1 <> PORT2 ";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1097,7 +1098,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO from any port PORT1:PORT2 ";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1119,7 +1120,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{PORT1:PORT2, =PORT3} ";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1146,7 +1147,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{\nPORT1, PORT2\n} ";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1170,7 +1171,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO os {OS1,OS2,OS3}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1188,7 +1189,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO from any os {\nOS1,OS2,OS3\n}";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1207,7 +1208,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to HOST";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1225,7 +1226,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to \"HOST \nFOO\"";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1243,7 +1244,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to HOST/FOO";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1260,7 +1261,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to !HOST/FOO";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1278,7 +1279,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO from any to any";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1297,7 +1298,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick inet6 proto PROTO to " +
 				"{ HOST1, HOST2/MASK2, !RANGE1 - RANGE2, <TABLE>}";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1323,7 +1324,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to {\n HOST1, no-route, !no-route\n}";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1345,7 +1346,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to urpf-failed";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1363,7 +1364,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to !urpf-failed";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1381,7 +1382,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to (iface0:broadcast)";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1400,7 +1401,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to (iface0:network)/24";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1419,7 +1420,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to (iface0:network)/24";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1438,7 +1439,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO from any port PORT1 to any port PORT2";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1460,7 +1461,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to port PORT";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1477,7 +1478,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO to port=PORT";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1495,7 +1496,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass out quick inet6 proto PROTO from any to any port {PORT1:PORT2, =PORT3} ";
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1523,7 +1524,7 @@ public class PacketFilterParserTest extends TestCase {
 				"user 20";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1551,7 +1552,7 @@ public class PacketFilterParserTest extends TestCase {
 				"user { patrick, 20 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1580,7 +1581,7 @@ public class PacketFilterParserTest extends TestCase {
 				"group { root, 0 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1609,7 +1610,7 @@ public class PacketFilterParserTest extends TestCase {
 				"group {\n root, 0 \n}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1638,7 +1639,7 @@ public class PacketFilterParserTest extends TestCase {
 				"group { root, 0 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1668,7 +1669,7 @@ public class PacketFilterParserTest extends TestCase {
 				"flags S/SA";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1704,7 +1705,7 @@ public class PacketFilterParserTest extends TestCase {
 
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1745,7 +1746,7 @@ public class PacketFilterParserTest extends TestCase {
 
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1786,7 +1787,7 @@ public class PacketFilterParserTest extends TestCase {
 
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1825,7 +1826,7 @@ public class PacketFilterParserTest extends TestCase {
 				"icmp-type {ICMP code ICMPCODE}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1865,7 +1866,7 @@ public class PacketFilterParserTest extends TestCase {
 				"icmp-type {\nICMP0, ICMP1 code ICMP1CODE \n}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1907,7 +1908,7 @@ public class PacketFilterParserTest extends TestCase {
 				"icmp6-type {ICMP code ICMPCODE}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1946,7 +1947,7 @@ public class PacketFilterParserTest extends TestCase {
 				"icmp6-type ICMP code ICMPCODE";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -1985,7 +1986,7 @@ public class PacketFilterParserTest extends TestCase {
 				"icmp6-type {ICMP0, ICMP1 code ICMP1CODE}";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2029,7 +2030,7 @@ public class PacketFilterParserTest extends TestCase {
 				"tos TOS";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2074,7 +2075,7 @@ public class PacketFilterParserTest extends TestCase {
 				"no state";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2114,7 +2115,7 @@ public class PacketFilterParserTest extends TestCase {
 				"keep state";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2133,7 +2134,7 @@ public class PacketFilterParserTest extends TestCase {
 				"modulate state";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2152,7 +2153,7 @@ public class PacketFilterParserTest extends TestCase {
 				"synproxy state";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2186,7 +2187,7 @@ public class PacketFilterParserTest extends TestCase {
 				")";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2219,7 +2220,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick fragment";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2233,7 +2234,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick fragment allow-opts";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2248,7 +2249,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick fragment allow-opts label LABEL";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2264,7 +2265,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick queue QNAME";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2279,7 +2280,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick queue ( QNAME )";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2294,7 +2295,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick queue ( QNAME, PQNAME )";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2309,7 +2310,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick tag TAG";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2323,7 +2324,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick tagged TAGGED";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2338,7 +2339,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick !tagged TAGGED";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2353,7 +2354,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick !tagged TAGGED probability PROBABILITY";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2369,7 +2370,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick probability PROBABILITY rtable RTABLE";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2384,7 +2385,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick probability PROBABILITY divert-to HOST port PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2399,7 +2400,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick probability PROBABILITY divert-reply";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2414,7 +2415,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick probability PROBABILITY divert-packet port PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2436,7 +2437,7 @@ public class PacketFilterParserTest extends TestCase {
 				"   )";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2457,7 +2458,7 @@ public class PacketFilterParserTest extends TestCase {
 				"nat-to HOST";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2474,7 +2475,7 @@ public class PacketFilterParserTest extends TestCase {
 				"nat-to HOST port PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2492,7 +2493,7 @@ public class PacketFilterParserTest extends TestCase {
 				"nat-to { HOST ,  HOST1,   HOST2 } port PORT";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2515,7 +2516,7 @@ public class PacketFilterParserTest extends TestCase {
 				"bitmask static-port sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2542,7 +2543,7 @@ public class PacketFilterParserTest extends TestCase {
 				"random static-port sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2569,7 +2570,7 @@ public class PacketFilterParserTest extends TestCase {
 				"source-hash static-port sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2596,7 +2597,7 @@ public class PacketFilterParserTest extends TestCase {
 				"source-hash     KEY     static-port      sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2624,7 +2625,7 @@ public class PacketFilterParserTest extends TestCase {
 				"round-robin     static-port      sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2651,7 +2652,7 @@ public class PacketFilterParserTest extends TestCase {
 				"round-robin     static-port      sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2677,7 +2678,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick fastroute";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2693,7 +2694,7 @@ public class PacketFilterParserTest extends TestCase {
 				"route-to HOST";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2711,7 +2712,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{ HOST1, HOST2/MASK2, <TABLE>, (DYNADDR)/24, (IFNAME HOST)  }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2741,7 +2742,7 @@ public class PacketFilterParserTest extends TestCase {
 				"round-robin     static-port      sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2774,7 +2775,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{ HOST1, HOST2/MASK2, <TABLE>, (DYNADDR)/24, (IFNAME HOST)  }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2804,7 +2805,7 @@ public class PacketFilterParserTest extends TestCase {
 				"round-robin     static-port      sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2837,7 +2838,7 @@ public class PacketFilterParserTest extends TestCase {
 				"{\n HOST1, HOST2/MASK2, <TABLE>, (DYNADDR)/24, (IFNAME HOST) \n }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2867,7 +2868,7 @@ public class PacketFilterParserTest extends TestCase {
 				"round-robin     static-port      sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2899,7 +2900,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "pass out quick received-on IFNAME";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -2924,7 +2925,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "table < TABLE >" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			table = parser.getPfTable();
@@ -2935,7 +2936,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "table < TABLE > const counter persist {}" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			table = parser.getPfTable();
@@ -2949,7 +2950,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "table < TABLE > const counter \\\npersist { HOST1 HOST2 }" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			table = parser.getPfTable();
@@ -2966,7 +2967,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "table < TABLE > const counter persist { \nHOST1, HOST2 \n}" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			table = parser.getPfTable();
@@ -2985,7 +2986,7 @@ public class PacketFilterParserTest extends TestCase {
 				" file \"FILE 2\"" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			table = parser.getPfTable();
@@ -3002,7 +3003,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "table < TABLE > const counter persist { \n  \n   HOST1\n\n HOST2 \n\n}" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			table = parser.getPfTable();
@@ -3028,7 +3029,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "load anchor ANCHOR from FILENAME";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("ANCHOR", parser.getName());
@@ -3053,7 +3054,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "anchor ANCHORNAME out quick on { ! IFACE0   , IFACE1 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			anchor = parser.getPfAnchor();
@@ -3070,7 +3071,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "anchor out quick on { ! IFACE0   , IFACE1 } {";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			anchor = parser.getPfAnchor();
@@ -3087,7 +3088,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "anchor out quick inet";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfAnchor().getRule();
@@ -3100,7 +3101,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "anchor in inet6 proto PROTO from HOST";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			anchor = parser.getPfAnchor();
@@ -3120,7 +3121,7 @@ public class PacketFilterParserTest extends TestCase {
 				"round-robin     static-port      sticky-address" ;
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			anchor = parser.getPfAnchor();
@@ -3270,7 +3271,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "set skip on IFACE";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
@@ -3281,7 +3282,7 @@ public class PacketFilterParserTest extends TestCase {
 		line = "set skip on { IFACE0 IFACE1 }";
 
 		
-		result = ReportingParseRunner.run(parser.Parse(), line);
+		result = parseRunParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			rule = parser.getPfRule();
