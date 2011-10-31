@@ -302,7 +302,7 @@ public class IPNet implements Comparable {
 		_ipVersion = ipVersion;
 	}
 
-	protected void makeFromIP(String data, String sip)
+	protected void makeFromIP(String sip)
 			throws UnknownHostException {
 
 		IPNetParseResult result = parseAddress(sip);
@@ -489,7 +489,7 @@ public class IPNet implements Comparable {
 
 			if (split.length == 1) {
 				// no prefix given, use defaults
-				makeFromIP(data, split[0]);
+				makeFromIP(split[0]);
 				return;
 			} else {
 				makeFromNetMask(data, split[0], split[1]);
