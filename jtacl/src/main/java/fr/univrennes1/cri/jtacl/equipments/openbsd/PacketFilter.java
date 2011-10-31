@@ -171,6 +171,24 @@ public class PacketFilter extends GenericEquipment {
 		}
 
 	}
+	
+	/**
+	 * Parser
+	 */	
+	protected PacketFilterParser _parser =
+			Parboiled.createParser(PacketFilterParser.class);
+
+	/**
+	 * ParseRunner for parse()
+	 */
+	protected BasicParseRunner _parseRunParse =
+			new BasicParseRunner(_parser.Parse());
+
+	/**
+	 * ParseRunner for PfGenericRule
+	 */
+	protected BasicParseRunner _parseRunePfGenericRule =
+			new BasicParseRunner(_parser.PfGenericRule());
 
 	/*
 	 * interfaces
@@ -1239,15 +1257,14 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * use the parser to retrieve the values
 		 */
-		PacketFilterParser parser = Parboiled.createParser(PacketFilterParser.class);
 		ParsingResult<?> result;
-		result = BasicParseRunner.run(parser.Parse(), buf.toString());
+		result = _parseRunParse.run(buf.toString());
 
 		if (!result.matched)
 			throwCfgException("cannot parse table's file:  " + fileName);
 
 		famAdd(fileName);
-		return parseIpSpec(parser.getPfTable().getHosts());
+		return parseIpSpec(_parser.getPfTable().getHosts());
 	}
 	
 	/*
@@ -1653,7 +1670,7 @@ public class PacketFilter extends GenericEquipment {
 
 	protected void parse(ConfigurationFile cfg) {
 		ParsingResult<?> result;
-		PacketFilterParser parser = Parboiled.createParser(PacketFilterParser.class);
+
 		Map<String, String> macros = new HashMap<String, String>();
 
 		famAdd(cfg.getFileName());
@@ -1670,9 +1687,9 @@ public class PacketFilter extends GenericEquipment {
 			_parseContext = new ParseContext();
 			ExpandedRule exRule = null;
 			try {
-				exRule = parser.getRule(buffer, macros);
+				exRule = _parser.getRule(buffer, macros);
 			} catch (JtaclConfigurationException ex) {
-				StringBuilder ctx = parser.getCurExpandedContext();
+				StringBuilder ctx = _parser.getCurExpandedContext();
 				_parseContext.set(cfg.getFileName(), lineNumber, ctx.toString());
 				throwCfgException(ex.getMessage());
 			}
@@ -1690,14 +1707,14 @@ public class PacketFilter extends GenericEquipment {
 				Log.debug().info("#" + _parseContext.getLineNumber() +
 					": "+ lineCfg);
 
-			result = BasicParseRunner.run(parser.Parse(), lineCfg);
+			result = _parseRunParse.run(lineCfg);
 			if (result.matched) {
-				String rule = parser.getRuleName();
+				String rule = _parser.getRuleName();
 
 				/*
 				 * some text may not have been parsed, keep it.
 				 */
-				String matchedText = parser.getMatchedText();
+				String matchedText = _parser.getMatchedText();
 				int n = 0;
 				for (int i = 0; i < matchedText.length(); i++) {
 					if (matchedText.charAt(i) == '\n')
@@ -1717,13 +1734,13 @@ public class PacketFilter extends GenericEquipment {
 
 				if (Log.debug().isLoggable(Level.INFO)) {
 					Log.debug().info("rule = " + rule);
-					Log.debug().info("match = " + parser.getMatchedText());
+					Log.debug().info("match = " + _parser.getMatchedText());
 				}
 				/*
 				 * macros
 				 */
 				if (rule.equals("macro")) {
-					macros.put(parser.getName(), parser.getValue());
+					macros.put(_parser.getName(), _parser.getValue());
 				}
 
 				/*
@@ -1737,7 +1754,7 @@ public class PacketFilter extends GenericEquipment {
 				 * anchor
 				 */
 				if (rule.equals("anchorrule")) {
-					PfAnchorRule anchorRule = ruleAnchor(parser.getPfAnchor());
+					PfAnchorRule anchorRule = ruleAnchor(_parser.getPfAnchor());
 					anchorRule.setOwnerAnchor(_curAnchor);
 					_curAnchor.addRule(anchorRule);
 					/*
@@ -1777,8 +1794,8 @@ public class PacketFilter extends GenericEquipment {
 				 * load anchor rule
 				 */
 				if (rule.equals("loadrule")) {
-					String fileName = translateFileName(parser.getValue());
-					ruleLoadAnchor(parser.getName(), fileName);
+					String fileName = translateFileName(_parser.getValue());
+					ruleLoadAnchor(_parser.getName(), fileName);
 				}
 
 				if (!hasOptParseOnly()) {
@@ -1786,13 +1803,13 @@ public class PacketFilter extends GenericEquipment {
 					 * set skip
 					 */
 					if (rule.equals("option set skip")) {
-						ruleSetSkip(parser.getPfRule());
+						ruleSetSkip(_parser.getPfRule());
 					}
 					/*
 					 * pfrule
 					 */
 					if (rule.equals("pfrule")) {
-						PfRule pfrule = rulePfRule(parser.getPfRule(), false);
+						PfRule pfrule = rulePfRule(_parser.getPfRule(), false);
 						_curAnchor.addRule(pfrule);
 						pfrule.setOwnerAnchor(_curAnchor);
 						_refRules.add(pfrule);
@@ -1802,7 +1819,7 @@ public class PacketFilter extends GenericEquipment {
 					 * tabledef
 					 */
 					if (rule.equals("tabledef")) {
-						PfTable pfTable = ruleTableDef(parser.getPfTable());
+						PfTable pfTable = ruleTableDef(_parser.getPfTable());
 						/*
 						 * Check for dupplicate
 						 */
@@ -1827,10 +1844,10 @@ public class PacketFilter extends GenericEquipment {
 				 * use a generic rule to known the number of lines taken by
 				 * the rule.
 				 */
-				result = BasicParseRunner.run(parser.PfGenericRule(), lineCfg);
+				result = _parseRunePfGenericRule.run(lineCfg);
 				if (result.matched) {
 					nbLine = 0;
-					String matchedText = parser.getMatchedText();
+					String matchedText = _parser.getMatchedText();
 					for (int i = 0; i < matchedText.length(); i++) {
 						if (matchedText.charAt(i) == '\n')
 							nbLine++;
@@ -1843,7 +1860,7 @@ public class PacketFilter extends GenericEquipment {
 				/*
 				 * check if we should match a rule.
 				 */
-				if (parser.shouldMatch(lineCfg)) {
+				if (_parser.shouldMatch(lineCfg)) {
 					Log.config().warning(_parseContext.toString() +
 						"does not match any rule (but should).\n" + lineCfg);
 				}

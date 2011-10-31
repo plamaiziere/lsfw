@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
-import org.parboiled.parserunners.ReportingParseRunner;
+import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -119,6 +119,35 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			_fileName = fileName;
 		}
 	}
+	
+	/**
+	 * Parser
+	 */	
+	protected PixParser _parser = Parboiled.createParser(PixParser.class);
+
+	/**
+	 * ParseRunner for Parse()
+	 */
+	protected BasicParseRunner _parseRunParse =
+			new BasicParseRunner(_parser.Parse());
+	
+	/**
+	 * ParseRunner for ExitInterface()
+	 */
+	protected BasicParseRunner _parseRunExitInterface =
+			new BasicParseRunner(_parser.ExitInterface());
+
+	/**
+	 * ParseRunner for InInterface()
+	 */
+	protected BasicParseRunner _parseRunInInterface =
+			new BasicParseRunner(_parser.InInterface());
+
+	/**
+	 * ParseRunner for Interface()
+	 */
+	protected BasicParseRunner _parseRunInterface =
+			new BasicParseRunner(_parser.Interface());	
 
 	/**
 	 * the list of configuration files, mapped into strings.
@@ -325,37 +354,36 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		ParsingResult<?> result;
 
 		CiscoIface curCsIface = null;
-		PixParser parser = Parboiled.createParser(PixParser.class);
 
 		for (int i = 0; i < cfg.size(); i++) {
 			String line = cfg.get(i);
-			line = parser.stripWhiteSpaces(line);
+			line = _parser.stripWhiteSpaces(line);
 			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
-			String lineCfg = parser.stripComment(line).trim();
+			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
 			if (inInterface) {
-				result = ReportingParseRunner.run(parser.ExitInterface(), lineCfg);
+				result = _parseRunExitInterface.run(lineCfg);
 				if (result.matched) {
 					inInterface = false;
 					curCsIface = null;
 				} else {
-					result = ReportingParseRunner.run(parser.InInterface(), lineCfg);
+					result = _parseRunInInterface.run(lineCfg);
 					if (result.matched) {
-						String rule = parser.getRuleName();
+						String rule = _parser.getRuleName();
 
 						/*
 						 * nameif
 						 */
 						if (rule.equals("nameif"))
-							curCsIface.setName(parser.getName());
+							curCsIface.setName(_parser.getName());
 
 						/*
 						 * ip address
 						 */
 						if (rule.equals("ip address")) {
-							String ip = nameLookup(parser.getIpAddress());
-							String ipNetmask = nameLookup(parser.getIpNetmask());
+							String ip = nameLookup(_parser.getIpAddress());
+							String ipNetmask = nameLookup(_parser.getIpNetmask());
 							IPNet ipnet = parseIp(ip + "/" + ipNetmask);
 							curCsIface.getIpAddresses().add(ipnet);
 						}
@@ -364,7 +392,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						 * ipv6 address
 						 */
 						if (rule.equals("ipv6 address")) {
-							String ipv6Address = nameLookup(parser.getIpAddress());
+							String ipv6Address = nameLookup(_parser.getIpAddress());
 							IPNet ipnet = parseIp(ipv6Address);
 							curCsIface.getIpAddresses().add(ipnet);
 						}
@@ -373,7 +401,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						/*
 						 * check if we should match a rule
 						 */
-						if (parser.shouldMatchInInterface(lineCfg)) {
+						if (_parser.shouldMatchInInterface(lineCfg)) {
 							Log.config().warning(_parseContext.toString() +
 								"does not match any rule (but should).");
 						}
@@ -381,15 +409,15 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				}
 			}
 			if (lineCfg.startsWith("interface")) {
-				result = ReportingParseRunner.run(parser.Interface(), lineCfg);
+				result = _parseRunInterface.run(lineCfg);
 				if (result.matched) {
 					inInterface = true;
-					String interfaceName = parser.getName();
+					String interfaceName = _parser.getName();
 					// strip any space in the name.
 					interfaceName = interfaceName.replace(" ", "");
 					curCsIface = new CiscoIface();
 					curCsIface.setName(interfaceName);
-					curCsIface.setShutdown(parser.getShutdown() != null);
+					curCsIface.setShutdown(_parser.getShutdown() != null);
 					_ciscoIfaces.put(curCsIface.getName(), curCsIface);
 
 					dumpConfiguration(line);
@@ -999,13 +1027,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 
 		ParsingResult<?> result;
 
-		PixParser parser = Parboiled.createParser(PixParser.class);
-		parser.setGroupTypeSearch(this);
+		_parser.setGroupTypeSearch(this);
 
 		for (int i = 0; i < cfg.size(); i++) {
 			String line = cfg.get(i);
-			line = parser.stripWhiteSpaces(line);
-			String lineCfg = parser.stripComment(line).trim();
+			line = _parser.stripWhiteSpaces(line);
+			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
 			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
@@ -1013,9 +1040,9 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			/*
 			 * parse the line
 			 */
-			result = ReportingParseRunner.run(parser.Parse(), lineCfg);
+			result = _parseRunParse.run(lineCfg);
 			if (result.matched) {
-				String rule = parser.getRuleName();
+				String rule = _parser.getRuleName();
 				dumpConfiguration(line);
 
 				if (hasOptParseOnly())
@@ -1027,13 +1054,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				if (rule.equals("ip route") ||
 						rule.equals("ipv6 route") ||
 						rule.equals("route"))
-					ruleRoute(rule, parser);
+					ruleRoute(rule, _parser);
 
 				/*
 				 * name
 				 */
 				if (rule.equals("name")) {
-					ruleName(parser);
+					ruleName(_parser);
 				}
 
 				/*
@@ -1043,7 +1070,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						rule.equals("object-group protocol") ||
 						rule.equals("object-group service") ||
 						rule.equals("object-group icmp-type"))
-					ruleObjectGroup(parser);
+					ruleObjectGroup(_parser);
 
 				/*
 				 * network-object / protocol-object / port-object 
@@ -1054,27 +1081,27 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						rule.equals("port-object") ||
 						rule.equals("service-object") ||
 						rule.equals("icmp-object"))
-					ruleOtherObject(parser);
+					ruleOtherObject(_parser);
 
 				/*
 				 * description for object-group
 				 */
 				if (rule.equals("description"))
-					ruleDescription(parser);
+					ruleDescription(_parser);
 
 				/*
 				 * group-object
 				 */
 				if (rule.equals("group-object"))
-					ruleGroupObjectGroupID(parser);
+					ruleGroupObjectGroupID(_parser);
 
 				/*
 				 * access-group
 				 */
 				if (rule.equals("access-group")) {
-					String name = parser.getName();
-					String ifname = parser.getInterface();
-					String sdirection = parser.getDirection();
+					String name = _parser.getName();
+					String ifname = _parser.getInterface();
+					String sdirection = _parser.getDirection();
 					Direction direction;
 					if (sdirection.equals("in"))
 						direction = Direction.IN;
@@ -1093,13 +1120,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				 */
 				if (rule.equals("access-list acl") ||
 						rule.equals("access-list remark"))
-					ruleAcl(parser.getAcl());
+					ruleAcl(_parser.getAcl());
 
 			} else {
 				/*
 				 * check if we should match a rule
 				 */
-				if (parser.shouldMatchInMain(lineCfg)) {
+				if (_parser.shouldMatchInMain(lineCfg)) {
 					Log.config().warning(_parseContext.toString() +
 						"does not match any rule (but should).");
 				}

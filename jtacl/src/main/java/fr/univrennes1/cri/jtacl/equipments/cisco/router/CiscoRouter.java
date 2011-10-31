@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
-import org.parboiled.parserunners.ReportingParseRunner;
+import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -147,6 +147,41 @@ public class CiscoRouter extends GenericEquipment {
 			_fileName = fileName;
 		}
 	}
+
+	/**
+	 * Parser
+	 */	
+	protected IOSParser _parser = Parboiled.createParser(IOSParser.class);
+
+	/**
+	 * ParseRunner for Parse()
+	 */
+	protected BasicParseRunner _parseRunParse =
+			new BasicParseRunner(_parser.Parse());
+
+	/**
+	 * ParseRunner for InAclContext()
+	 */
+	protected BasicParseRunner _parseRunInAclContext =
+			new BasicParseRunner(_parser.InAclContext());	
+	
+	/**
+	 * ParseRunner for ExitInterface()
+	 */
+	protected BasicParseRunner _parseRunExitInterface =
+			new BasicParseRunner(_parser.ExitInterface());
+
+	/**
+	 * ParseRunner for InInterface()
+	 */
+	protected BasicParseRunner _parseRunInInterface =
+			new BasicParseRunner(_parser.InInterface());
+
+	/**
+	 * ParseRunner for Interface()
+	 */
+	protected BasicParseRunner _parseRunInterface =
+			new BasicParseRunner(_parser.Interface());
 
 	/**
 	 * the list of configuration files, mapped into strings.
@@ -265,21 +300,20 @@ public class CiscoRouter extends GenericEquipment {
 		ParsingResult<?> result;
 
 		CiscoIface curCsIface = null;
-		IOSParser parser = Parboiled.createParser(IOSParser.class);
 
 		for (int i = 0; i < cfg.size(); i++) {
 			String line = cfg.get(i);
-			line = parser.stripWhiteSpaces(line);
+			line = _parser.stripWhiteSpaces(line);
 			_parseContext.set(cfg.getFileName(), i + 1, line);
-			String lineCfg = parser.stripComment(line).trim();
+			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
 			if (inInterface) {
-				result = ReportingParseRunner.run(parser.ExitInterface(), lineCfg);
+				result = _parseRunExitInterface.run(lineCfg);
 				if (result.matched) {
 					inInterface = false;
 					curCsIface = null;
 				} else {
-					result = ReportingParseRunner.run(parser.InInterface(), lineCfg);
+					result = _parseRunInInterface.run(lineCfg);
 					if (result.matched) {
 						dumpConfiguration(line);
 						if (hasOptParseOnly())
@@ -287,17 +321,17 @@ public class CiscoRouter extends GenericEquipment {
 						/*
 						 * Interface description
 						 */
-						String rule = parser.getRuleName();
+						String rule = _parser.getRuleName();
 						if (rule.equals("description")) {
-							String description = parser.getDescription();
+							String description = _parser.getDescription();
 							curCsIface.setDescription(description);
 						}
 						/*
 						 * ip address
 						 */
 						if (rule.equals("ip address")) {
-							String ip = parser.getIpAddress();
-							String ipNetmask = parser.getIpNetmask();
+							String ip = _parser.getIpAddress();
+							String ipNetmask = _parser.getIpNetmask();
 							IPNet ipnet = parseIp(ip + "/" + ipNetmask);
 							curCsIface.getIpAddresses().add(ipnet);
 						}
@@ -305,7 +339,7 @@ public class CiscoRouter extends GenericEquipment {
 						 * ipv6 address
 						 */
 						if (rule.equals("ipv6 address")) {
-							String ipv6Address = parser.getIpAddress();
+							String ipv6Address = _parser.getIpAddress();
 							IPNet ipnet = parseIp(ipv6Address);
 							curCsIface.getIpAddresses().add(ipnet);
 						}
@@ -314,8 +348,8 @@ public class CiscoRouter extends GenericEquipment {
 						 * ip access-group
 						 */
 						if (rule.equals("ip access-group")) {
-							String name = parser.getName();
-							String sdirection = parser.getDirection();
+							String name = _parser.getName();
+							String sdirection = _parser.getDirection();
 							Direction direction;
 							if (sdirection.equals("in"))
 								direction = Direction.IN;
@@ -336,8 +370,8 @@ public class CiscoRouter extends GenericEquipment {
 						 * ipv6 traffic-filter
 						 */
 						if (rule.equals("ipv6 traffic-filter")) {
-							String name = parser.getName();
-							String sdirection = parser.getDirection();
+							String name = _parser.getName();
+							String sdirection = _parser.getDirection();
 							Direction direction;
 							if (sdirection.equals("in"))
 								direction = Direction.IN;
@@ -364,7 +398,7 @@ public class CiscoRouter extends GenericEquipment {
 						/*
 						 * check if we should match a rule
 						 */
-						if (parser.shouldMatchInInterface(lineCfg)) {
+						if (_parser.shouldMatchInInterface(lineCfg)) {
 							Log.config().warning(_parseContext.toString() +
 								"does not match any rule (but should).");
 						}
@@ -372,13 +406,13 @@ public class CiscoRouter extends GenericEquipment {
 				}
 			}
 			if (lineCfg.startsWith("interface")) {
-				result = ReportingParseRunner.run(parser.Interface(), lineCfg);
+				result = _parseRunInterface.run(lineCfg);
 				if (result.matched) {
 					inInterface = true;
 					dumpConfiguration(line);
 					if (hasOptParseOnly())
 						continue;
-					String interfaceName = parser.getName();
+					String interfaceName = _parser.getName();
 					// strip any space in the name.
 					interfaceName = interfaceName.replace(" ", "");
 					curCsIface = new CiscoIface();
@@ -701,13 +735,11 @@ public class CiscoRouter extends GenericEquipment {
 	protected void parse(ConfigurationFile cfg) {
 		ParsingResult<?> result;
 
-		IOSParser parser = Parboiled.createParser(IOSParser.class);
-
 		for (int i = 0; i < cfg.size(); i++) {
 
 			String line = cfg.get(i);
-			line = parser.stripWhiteSpaces(line);
-			String lineCfg = parser.stripComment(line).trim();
+			line = _parser.stripWhiteSpaces(line);
+			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
 
 			_parseContext = new ParseContext();
@@ -717,7 +749,7 @@ public class CiscoRouter extends GenericEquipment {
 			 * check if we are still in an access-list context
 			 */
 			if (_lastAcl != null && !lineCfg.isEmpty()) {
-				result = ReportingParseRunner.run(parser.InAclContext(), lineCfg);
+				result = _parseRunInAclContext.run(lineCfg);
 				if (!result.matched)
 					_lastAcl = null;
 			}
@@ -725,11 +757,11 @@ public class CiscoRouter extends GenericEquipment {
 			/*
 			 * parse the line
 			 */
-			parser.setAclContext(_lastAcl);
+			_parser.setAclContext(_lastAcl);
 
-			result = ReportingParseRunner.run(parser.Parse(), lineCfg);
+			result = _parseRunParse.run(lineCfg);
 			if (result.matched) {
-				String rule = parser.getRuleName();
+				String rule = _parser.getRuleName();
 				dumpConfiguration(line);
 
 				if (hasOptParseOnly())
@@ -739,20 +771,21 @@ public class CiscoRouter extends GenericEquipment {
 				 * route command
 				 */
 				if (rule.equals("ip route") || rule.equals("ipv6 route"))
-					ruleRoute(rule, parser);
+					ruleRoute(rule, _parser);
 
 				/*
 				 * ip access list named
 				 */
 				if (rule.equals("ip access-list named") ||
 						rule.equals("ipv6 access-list named"))
-					ruleIpAccessList(parser.getAclTemplate());
+					ruleIpAccessList(_parser.getAclTemplate());
 
 				/*
 				 * access-list (number)
 				 */
 				 if (rule.equals("access-list"))
-					ruleAccessList(parser.getAclTemplate(), parser.getAceTemplate());
+					ruleAccessList(_parser.getAclTemplate(), 
+						_parser.getAceTemplate());
 
 				/*
 				 * ACE standard / extended
@@ -760,14 +793,14 @@ public class CiscoRouter extends GenericEquipment {
 				if (rule.equals("ace standard") ||
 						rule.equals("ace extended")) {
 					if (_lastAcl != null)
-						ruleAce(_lastAcl, parser.getAceTemplate());
+						ruleAce(_lastAcl, _parser.getAceTemplate());
 				}
 
 			} else {
 				/*
 				 * check if we should match a rule
 				 */
-				if (parser.shouldMatchInMain(lineCfg)) {
+				if (_parser.shouldMatchInMain(lineCfg)) {
 					Log.config().warning(_parseContext.toString() +
 						"does not match any rule (but should).");
 				}

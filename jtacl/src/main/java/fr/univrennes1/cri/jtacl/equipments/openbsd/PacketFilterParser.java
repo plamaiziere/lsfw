@@ -519,6 +519,15 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 			throw new JtaclConfigurationException("unterminated string");
 	}
 
+	/*
+	 * Parse Runners for getRule
+	 */
+	protected BasicParseRunner _parseRunIsClosingBrace =
+			new BasicParseRunner(IsClosingBrace());
+
+	protected BasicParseRunner _parseRunIsNewRule =
+			new BasicParseRunner(IsNewRule());
+	
 	public ExpandedRule getRule(StringBuilder buffer, Map<String, String> symbols) {
 
 		ParsingResult<?> result;
@@ -537,8 +546,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		/*
 		 * brace '}\n'
 		 */
-		result = BasicParseRunner.run(IsClosingBrace(),
-				exRule.expandedToString());
+		result = _parseRunIsClosingBrace.run(exRule.expandedToString());
 		if (!result.matched) {
 			/*
 			 * find the next rule.
@@ -553,9 +561,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					nextFound = true;
 				}
 				if (!nextFound) {
-					result = BasicParseRunner.run(IsNewRule(),
-						nextRule.expandedToString());
-						nextFound = result.matched;
+					result = _parseRunIsNewRule.run(nextRule.expandedToString());
+					nextFound = result.matched;
 				}
 				if (nextFound)
 					break;
