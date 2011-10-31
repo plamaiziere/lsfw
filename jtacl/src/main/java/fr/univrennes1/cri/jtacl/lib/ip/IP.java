@@ -39,7 +39,17 @@ public class IP {
 	 * Array of prefixlen to netmaks (IPv6)
 	 */
 	private static final BigInteger [] _netmaskIpV6 = new BigInteger[129];
+	
+	/**
+	 * Array of networks length
+	 */
+	private static final BigInteger [] _networksLength = new BigInteger[129];
 
+	/**
+	 * number "2"
+	 */
+	private static final BigInteger _TWO = new BigInteger("2");
+	
 	/**
 	 * Largest value for an IPv6 address: 2^128 -1.
 	 */
@@ -170,8 +180,10 @@ public class IP {
 	 */
 	public static BigInteger networkLength(int prefixLen, IPversion ipVersion) {
 		int netlen = maxPrefixLen(ipVersion) - prefixLen;
-		BigInteger bi = new BigInteger("2");
-		bi = bi.pow(netlen);
+		if (_networksLength[netlen] != null)
+			return _networksLength[netlen];
+		BigInteger bi = _TWO.pow(netlen);
+		_networksLength[netlen] = bi;
 		return bi;
 	}
 	/**
