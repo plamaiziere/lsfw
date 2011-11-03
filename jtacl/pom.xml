@@ -9,22 +9,12 @@
 	<url>http://maven.apache.org</url>
 	<repositories>
 		<repository>
-			<id>codehaus</id>
-			<name>codehaus Project Repository</name>
-			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>
-		</repository>
-		<repository>
 			<id>scala-tools</id>
 			<name>scala repository</name>
 			<url>http://scala-tools.org/repo-releases/</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
-		<pluginRepository>
-			<id>codhaus</id>
-			<name>codehaus Project Repository</name>
-			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>
-		</pluginRepository>
 	</pluginRepositories>
 	<build>
 		<plugins>
@@ -54,6 +44,7 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				 <showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
 			<plugin>
