@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.lib.ip;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import junit.framework.TestCase;
 
@@ -356,7 +357,14 @@ public class IPNetTest extends TestCase {
 			f = true;
 			System.out.println("check : " + e.getMessage());
 		}
-		assertTrue(f);	
+		assertTrue(f);
+
+		/*
+		 * from InetAddress
+		 */
+		InetAddress inet = InetAddress.getByName("127.0.0.1");
+		IPNet ip = new IPNet(inet);
+		assertEquals(new IPNet("127.0.0.1"), ip);
 
 	}
 
@@ -615,6 +623,16 @@ public class IPNetTest extends TestCase {
 		assertFalse(ip.isHost());
 		ip = new IPNet("::1/127");
 		assertFalse(ip.isHost());
+	}
+	
+	/**
+	 * Test of getCannonicalHostname()
+	 */
+	public void testgetCannonicalHostname() throws UnknownHostException {
+
+		IPNet ip = new IPNet("127.0.0.1/25");
+		String hostname = ip.getCannonicalHostname();
+		assertEquals("localhost", hostname);
 	}
 
 }

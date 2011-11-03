@@ -498,6 +498,15 @@ public class IPNet implements Comparable {
 		}
 		throw new UnknownHostException("Can't parse IP Address: " + data);
 	}
+	
+	/**
+	 * Constructs a new {@link IPNet} object from an InetAddress in argument.
+	 * @param address InetAddress to construct from.
+	 * @throws UnknownHostException if problem occurs.
+	 */
+	public IPNet(InetAddress address) throws UnknownHostException {
+		makeFromIP(address.getHostAddress());
+	}
 
 	/**
 	 * Given the name of a host, returns a list of its IP addresses
@@ -532,14 +541,14 @@ public class IPNet implements Comparable {
 		for (InetAddress addr: inet) {
 			if ((addr instanceof Inet4Address && ipVersion == IPversion.IPV4) ||
 				(addr instanceof Inet6Address && ipVersion == IPversion.IPV6)) {
-				IPNet address = new IPNet(addr.getHostAddress());
+				IPNet address = new IPNet(addr);
 				if (prefix != -1)
 					address = address.setMask(prefix);
 				addresses.add(address);
 			}
 		}
 		if (addresses.isEmpty())
-			throw new UnknownHostException("No IP adress found for: " + split[0]);
+			throw new UnknownHostException("No IP Address found for: " + split[0]);
 		return addresses;
 	}
 
@@ -561,6 +570,18 @@ public class IPNet implements Comparable {
 			throws UnknownHostException {
 
 		return getAllByName(hostname, ipVersion).get(0);
+	}
+	
+	/**
+     * Gets the fully qualified domain name for this IP address.
+     * Best effort method, meaning we may not be able to return 
+     * the FQDN depending on the underlying system configuration.
+     * @throws UnknownHostException if problem occurs.
+     * @see InetAddress#canonicalHostName
+	 */
+	public String getCannonicalHostname() throws UnknownHostException {
+		InetAddress ip = toInetAddress();
+		return ip.getCanonicalHostName();
 	}
 
 	/**
@@ -831,7 +852,7 @@ public class IPNet implements Comparable {
 	 * Returns a {@link String} representation of this {@link IPNet} instance
 	 * according to the {@link String} format.<br/><br/>
 	 * Formats:<ul>
-	 * <li>'i': (ip) do not output the prefix length.</li>
+	 * <li>'i': (ip) do not output the prefix length if this a host.</li>
 	 * <li>'n': (netmask use a netmask representation to output the prefix
 	 * length (IPv4 only).</li>
 	 * <li>'s': (short) never output the prefix length.</li>
@@ -871,6 +892,17 @@ public class IPNet implements Comparable {
 		if (equals(obj))
 			return 0;
 		return getIP().compareTo(obj.getIP());
+	}
+
+	/**
+	 * Converts this instance to an InetAddress.<br/>
+	 * Does not convert the prefix length.
+	 * @return An InetAddress corresponding to this instance.
+	 * @throws UnknownHostException if problem occurs.
+	 */
+	public InetAddress toInetAddress() throws UnknownHostException {
+		InetAddress ip = InetAddress.getByName(toString("s"));
+		return ip;
 	}
 }
 
