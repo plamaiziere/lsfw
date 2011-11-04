@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Universite de Rennes 1
+ * Copyright (c) 2011, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -19,8 +19,10 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class and tools to deal with IPv4 and IPv6 addresses and networks.<br/>
@@ -37,6 +39,13 @@ public class IPNet implements Comparable {
 	protected BigInteger _ip;
 	protected IPversion _ipVersion;
 
+	protected static long _dnsCacheTtl = 60000; 
+	
+	protected static Map<String, DnsCacheEntry> _dnsCache =
+			new HashMap<String, DnsCacheEntry>();
+
+	protected static Map<InetAddress, RevertDnsCacheEntry> _dnsRevertCache =
+			new HashMap<InetAddress, RevertDnsCacheEntry>();
 
 	protected static String[] ipV4ToHextet(String addr) throws UnknownHostException {
 		String [] result = new String[2];
@@ -536,7 +545,21 @@ public class IPNet implements Comparable {
 		if (split.length == 2)
 			prefix = getPrefixFromNetmask(split[1], ipVersion);
 
-		InetAddress inet [] = InetAddress.getAllByName(split[0]);
+		InetAddress inet [] = null;
+		DnsCacheEntry entry = _dnsCache.get(split[0]);
+		long date = new Date().getTime();
+		if (entry != null) {
+			if (date - entry.getDate() < _dnsCacheTtl)
+				inet = entry.getIps();
+			else
+				_dnsCache.remove(split[0]);
+		}
+		if (inet == null) {
+			inet = InetAddress.getAllByName(split[0]);
+			entry = new DnsCacheEntry(inet, date);
+			_dnsCache.put(split[0], entry);
+		}	
+		
 		ArrayList<IPNet> addresses = new ArrayList<IPNet>();
 		for (InetAddress addr: inet) {
 			if ((addr instanceof Inet4Address && ipVersion == IPversion.IPV4) ||
@@ -581,7 +604,22 @@ public class IPNet implements Comparable {
 	 */
 	public String getCannonicalHostname() throws UnknownHostException {
 		InetAddress ip = toInetAddress();
-		return ip.getCanonicalHostName();
+		RevertDnsCacheEntry entry = _dnsRevertCache.get(ip);
+		long date = new Date().getTime();
+		String hostname = null;
+		if (entry != null) {
+			if (date - entry.getDate() < _dnsCacheTtl)
+				hostname = entry.getHostname();
+			else
+				_dnsRevertCache.remove(ip);
+		}	
+		if (hostname == null) {
+			hostname = ip.getCanonicalHostName();
+			entry = new RevertDnsCacheEntry(hostname, date);
+			_dnsRevertCache.put(ip, entry);
+		}	
+
+		return hostname;
 	}
 
 	/**
@@ -904,6 +942,23 @@ public class IPNet implements Comparable {
 		InetAddress ip = InetAddress.getByName(toString("s"));
 		return ip;
 	}
+
+	/**
+	 * Returns the time to live of the DNS cache.
+	 * @return the time to live of the DNS cache.
+	 */
+	public static long getDnsCacheTtl() {
+		return _dnsCacheTtl;
+	}
+
+	/**
+	 * Set the time to live of the DNS cache.
+	 * @param ttl value to set in ms.
+	 */
+	public static void setDnsCacheTt(long ttl) {
+		_dnsCacheTtl = ttl;
+	}
+
 }
 
 class IPNetParseResult {
