@@ -3,9 +3,10 @@ option | o [option-name = value] : Displays or sets lsfw options.
 
   Without parameter, option displays the current value of each option.
 
-lsfw defines five options.
+lsfw defines six options.
   - config.level
   - debug.level
+  - dns.cache.ttl
   - notify.level
   - maxhop
 
@@ -14,6 +15,9 @@ The level of the logger used while reading configuration or parsing files.
 
 * option debug.level:
 The level of the debugging logger.
+
+* dns.cache.ttl:
+The time-to-live value (in ms) of an entry in the lsfw's DNS cache.
 
 * option notify.level:
 The level of the notify logger used when using the application.

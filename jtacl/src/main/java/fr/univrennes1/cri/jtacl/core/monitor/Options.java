@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.core.monitor;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.util.logging.Level;
 
 /**
@@ -115,6 +116,23 @@ public class Options {
 	}
 
 	/**
+	 * Gets the DNS cache TTL value.
+	 * @return the DNS cache TTL value.
+	 */
+	public long getDnsCacheTTL() {
+		return IPNet.getDnsCacheTtl();
+	}
+
+	/**
+	 * Sets the DNS cache TTL value.
+	 * @param value value to set.
+	 * @return the DNS cache TTL value.
+	 */
+	public void setDnsCacheTTL(long value) {
+		IPNet.setDnsCacheTt(value);
+	}
+		
+	/**
 	 * Sets the option with the specified value.
 	 * @param optionName the name of the option to set.
 	 * @param value value to set.
@@ -148,6 +166,12 @@ public class Options {
 				return;
 			}
 
+			if (optionName.equalsIgnoreCase("dns.cache.ttl")) {
+				setDnsCacheTTL(Long.valueOf(value));
+				return;
+			}
+			
+
 		} catch (Exception e) {
 			throw new JtaclConfigurationException(e.getMessage());
 		}
@@ -163,7 +187,8 @@ public class Options {
 				"notify.level=" + getNotifyLevel() + "\n" +
 				"config.level=" + getConfigLevel() + "\n" +
 				"maxhop=" + getMaxHop() + "\n" +
-				"autoreload=" + getAutoReload();
+				"autoreload=" + getAutoReload() + "\n" +
+				"dns.cache.ttl=" + getDnsCacheTTL();
 	}
 
 }
