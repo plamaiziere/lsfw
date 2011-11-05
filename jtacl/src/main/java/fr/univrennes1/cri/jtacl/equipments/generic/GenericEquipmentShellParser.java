@@ -112,10 +112,9 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 					Optional(
 						Sequence(
 							WhiteSpaces(),
-							FirstOf(
-								IgnoreCase("long"),
-								IgnoreCase("short")
-							),
+							IgnoreCase("format"),
+							WhiteSpaces(),
+							StringAtom(),
 							setXrefFormat(match().toLowerCase())
 						)
 					),

@@ -110,6 +110,13 @@ public class PixShell implements GenericEquipmentShell {
 			}
 		}
 
+		String format = parser.getXrefFormat();
+		if (format != null)
+			format = format.toLowerCase();
+		boolean fshort = format != null && format.contains("s");
+		boolean flong = format != null && format.contains("l");
+		boolean fhost = format != null && format.contains("h");		
+
 		for (IPNet ip: _pix.getNetCrossRef().keySet()) {
 			IPNetCrossRef crossref = _pix.getNetCrossRef().get(ip);
 			try {
@@ -124,25 +131,30 @@ public class PixShell implements GenericEquipmentShell {
 			}
 			for (CrossRefContext ctx: crossref.getContexts()) {
 				System.out.print(ip.toString("::i"));
+				if (fhost) {
+					try {
+						System.out.print("; " + ip.getCannonicalHostname());
+					} catch (UnknownHostException ex) {
+						System.out.print("; nohost");
+					}
+				}
 				System.out.print("; " + ctx.getContextName());
 				System.out.print("; " + ctx.getComment());
-				String format = parser.getXrefFormat();
-				if (format != null) {
+				String line = ctx.getParseContext().getLine().trim();
+				if (fshort) {
 					System.out.print("; ");
-					if (format.equals("short")) {
-						String line = ctx.getParseContext().getLine();
-						Scanner sc = new Scanner(line);
-						if (sc.hasNextLine())
-							System.out.println(sc.nextLine());
-						else
-							System.out.println(line);
-					}
-					if (format.equals("long")) {
-						String line = ctx.getParseContext().getLine();
+					Scanner sc = new Scanner(line);
+					if (sc.hasNextLine())
+						System.out.println(sc.nextLine());
+					else
 						System.out.println(line);
-					}
 				} else {
-					System.out.println();
+					if (flong) {
+						System.out.print("; ");					
+						System.out.println(line);
+					} else {
+						System.out.println();
+					}
 				}
 			}
 		}
