@@ -1,0 +1,32 @@
+--- Xref Help ---
+
+xref ip [format formatstring] [host] [IpAddress]: Outputs the cross-reference
+  of IP addresses on an equipment.
+
+IPAddress specifies the IP to output. Any IP overlapping this IPAddress are
+  displayed. If "host" is specified, only references to this host ip address are
+  displayed.
+
+format formatstring allows to specify the output format by a combinaison
+  of letters:
+
+  h: (hostname) outputs the hostname of IP addresses, doing a revert DNS
+        request.
+  l: (long) ouptuts all the lines of configuration.
+  s: (short) outputs only the first line of configuration.
+
+
+examples:
+---------
+
+xref ip
+xref ip format s
+xref ip format sh host 192.168.1.0/24
+
+Note:
+-----
+This command is only available on some equipments via the "equipment"
+  command of lsfw.
+
+Example with a PacketFilter equipment named "PF":
+  lsfw> equipment PF xref ip format s

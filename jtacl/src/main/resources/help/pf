@@ -2,28 +2,4 @@
 
 help: this help.
 
-xref ip [short|long] [host] [IpAddress]: Outputs the cross reference of IP addresses.
-
-The "short" and "long" options allow to specify the output format.
-  short: outputs only the first line of configuration.
-  long: ouptuts all the lines of configuration.
-  if short and long are missing, do not output the configuration line.
-
-IPAddress specifies the IP to output. Any IP overlapping this IPAddress are
-  displayed. If "host" is specified, only references to this host ip address are
-  displayed.
-
-examples:
----------
-
-xref ip
-xref ip short
-xref ip long 192.168.1.0/24
-
-Note:
------
-This command is only available on equipments of type PacketFilter via the
-"equipment" command of lsfw.
-
-Example with a PacketFilter equipment named "PF":
-  lsfw> equipment PF xref ip short
+xref ip : see help xref.
