@@ -632,7 +632,9 @@ public class IPNetTest extends TestCase {
 
 		IPNet ip = new IPNet("127.0.0.1/25");
 		String hostname = ip.getCannonicalHostname();
-		assertEquals("localhost", hostname);
+		InetAddress inet = InetAddress.getByName("127.0.0.1");
+		String ihostname = inet.getCanonicalHostName();
+		assertEquals(ihostname, hostname);
 	}
 
 }
