@@ -44,6 +44,7 @@
 
 	<!-- shell defines (macros) -->
 	<shell>
+		<define name="DFLTEQUIPMENT" value = "R1|10.0.3.1" />
 	</shell>
 
 	<!-- names databases override -->
