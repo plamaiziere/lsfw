@@ -62,6 +62,7 @@ import joptsimple.OptionSet;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
+import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
@@ -73,6 +74,7 @@ public class Shell {
 
 	protected String _prompt;
 	protected ShellParser _parser;
+	protected BasicParseRunner _parseRunner;
 	protected Monitor _monitor;
 	protected OptionParser _optParser;
 	protected boolean _interactiveMode;
@@ -195,9 +197,10 @@ public class Shell {
 	public Shell() {
 		_prompt = "lsfw> ";
 
-		 _parser = Parboiled.createParser(ShellParser.class);
-		 _monitor = Monitor.getInstance();
-		 _lastProbing = null;
+		_parser = Parboiled.createParser(ShellParser.class);
+		_parseRunner = new BasicParseRunner(_parser.CommandLine());
+		_monitor = Monitor.getInstance();
+		_lastProbing = null;
 
 		_optParser = new OptionParser();
 		_optParser.acceptsAll(asList("c", "command"),
@@ -939,8 +942,7 @@ public class Shell {
 		if (subs.isEmpty())
 			return;
 
-		ParsingResult<?> result = ReportingParseRunner.run(_parser.CommandLine(),
-				subs);
+		ParsingResult<?> result = _parseRunner.run(subs);
 
 		if (!result.matched) {
 			if (result.hasErrors()) {

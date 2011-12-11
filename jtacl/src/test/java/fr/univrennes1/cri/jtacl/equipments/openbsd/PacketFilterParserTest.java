@@ -139,17 +139,19 @@ public class PacketFilterParserTest extends TestCase {
 	public void testPfQuotedString() {
 		System.out.println("PfQuotedString");
 
+		ReportingParseRunner parseRunner =
+				new ReportingParseRunner(parser.PfQuotedString());
 		String line = "\"abc\nde\"";
 		
-		 result = ReportingParseRunner.run(parser.PfQuotedString(), line);
-		 assertTrue(result.matched);
+		result = parseRunner.run(line);
+		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abcde", parser.getLastString());
 		}
 
 		line = "'abcde'";
 		
-		 result = ReportingParseRunner.run(parser.PfQuotedString(), line);
+		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abcde", parser.getLastString());
@@ -157,7 +159,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "'abc\"de'";
 		
-		 result = ReportingParseRunner.run(parser.PfQuotedString(), line);
+		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abc\"de", parser.getLastString());
@@ -165,7 +167,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "'abc\\'de'";
 		
-		 result = ReportingParseRunner.run(parser.PfQuotedString(), line);
+		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abc'de", parser.getLastString());
@@ -173,7 +175,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "'abc\\ de'";
 		
-		 result = ReportingParseRunner.run(parser.PfQuotedString(), line);
+		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abc de", parser.getLastString());
@@ -181,7 +183,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "'abc\\de'";
 		
-		 result = ReportingParseRunner.run(parser.PfQuotedString(), line);
+		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abcde", parser.getLastString());
@@ -3157,12 +3159,13 @@ public class PacketFilterParserTest extends TestCase {
 	 */
 	public void testPfGenericRule() {
 		System.out.println("PfGenericRule");
+		ReportingParseRunner parseRunner =
+				new ReportingParseRunner(parser.PfGenericRule());
 		String line;
 
 		line = "abcd { \n item , item \n} abcd\nnaaaa";
-
 		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abcd { \n item , item \n} abcd\n", parser.getMatchedText());
@@ -3170,8 +3173,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "{ \n < > = \n}\naaaa";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("{ \n < > = \n}\n", parser.getMatchedText());
@@ -3179,8 +3181,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "{ \n < > = }";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("{ \n < > = }", parser.getMatchedText());
@@ -3188,8 +3189,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "{ < > = }";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("{ < > = }", parser.getMatchedText());
@@ -3197,8 +3197,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "{ }";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("{ }", parser.getMatchedText());
@@ -3206,8 +3205,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "abcd +-/ < > = \"ABCD\nEFGH\"\n";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abcd +-/ < > = \"ABCD\nEFGH\"\n", parser.getMatchedText());
@@ -3215,8 +3213,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "abcd ABCD \n";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("abcd ABCD \n", parser.getMatchedText());
@@ -3224,8 +3221,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass\nPASS";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("pass\n", parser.getMatchedText());
@@ -3233,8 +3229,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass\n";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("pass\n", parser.getMatchedText());
@@ -3242,8 +3237,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "pass";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("pass", parser.getMatchedText());
@@ -3251,8 +3245,7 @@ public class PacketFilterParserTest extends TestCase {
 
 		line = "\n";
 
-		
-		result = ReportingParseRunner.run(parser.PfGenericRule(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
 			assertEquals("\n", parser.getMatchedText());

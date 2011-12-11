@@ -623,39 +623,40 @@ public class IOSParserTest extends TestCase {
 	public void testInAclContext() {
 		System.out.println("InAclContext");
 		String line;
-		AclTemplate acl;
 		AceTemplate ace;
+		ReportingParseRunner parseRunner =
+				new ReportingParseRunner(parser.InAclContext());
 
 		line = "permit   ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 
 		line = "deny   ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 
 		line = "no   permit   ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		
 		line = "no   deny   ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 
 		line = "remark   ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 
 		line = "no   remark   ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 
 		line = "evaluate  ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
-		
+
 		line = "no evaluate  ";
-		result = ReportingParseRunner.run(parser.InAclContext(), line);
+		result = parseRunner.run(line);
 		assertTrue(result.matched);
 	}
 

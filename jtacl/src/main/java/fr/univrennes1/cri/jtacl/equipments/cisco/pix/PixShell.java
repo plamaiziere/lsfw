@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 import org.parboiled.Parboiled;
-import org.parboiled.parserunners.ReportingParseRunner;
+import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
@@ -37,6 +37,7 @@ public class PixShell implements GenericEquipmentShell {
 
 	protected Pix _pix;
 	protected PixShellParser _shellParser;
+	protected BasicParseRunner _parseRunner;
 
 	protected void commandShowNames(PixShellParser parser) {
 
@@ -163,12 +164,12 @@ public class PixShell implements GenericEquipmentShell {
 	public PixShell(Pix pix) {
 		_pix = pix;
 		_shellParser = Parboiled.createParser(PixShellParser.class);
+		_parseRunner = new BasicParseRunner(_shellParser.CommandLine());
 	}
-
+		
 	public boolean shellCommand(String command) {
 
-		ParsingResult<?> result = ReportingParseRunner.run(_shellParser.CommandLine(),
-			command);
+		ParsingResult<?> result = _parseRunner.run(command);
 
 		if (!result.matched) {
 			return false;

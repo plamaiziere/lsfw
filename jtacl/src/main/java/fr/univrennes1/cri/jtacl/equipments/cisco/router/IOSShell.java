@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 import org.parboiled.Parboiled;
-import org.parboiled.parserunners.ReportingParseRunner;
+import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
@@ -35,6 +35,7 @@ public class IOSShell implements GenericEquipmentShell {
 
 	protected CiscoRouter _router;
 	protected IOSShellParser _shellParser;
+	protected BasicParseRunner _parseRunner;
 
 	public void shellHelp() {
 		try {
@@ -124,12 +125,12 @@ public class IOSShell implements GenericEquipmentShell {
 	public IOSShell(CiscoRouter router) {
 		_router = router;
 		_shellParser = Parboiled.createParser(IOSShellParser.class);
+		_parseRunner = new BasicParseRunner(_shellParser.CommandLine());		
 	}
 
 	public boolean shellCommand(String command) {
 
-		ParsingResult<?> result = ReportingParseRunner.run(_shellParser.CommandLine(),
-			command);
+		ParsingResult<?> result = _parseRunner.run(command);
 
 		if (!result.matched) {
 			return false;
