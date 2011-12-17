@@ -31,14 +31,15 @@ import java.util.Map;
  * Mostly taken from IPy http://pypi.python.org/pypi/IPy
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class IPNet implements Comparable {
+public final class IPNet implements Comparable {
 
-	protected HashMap<String, String> _ipRange;
-
-	protected final IPBase _ip;
-	
 	/*
-	 * cache of these values
+	 * ip, prefixlen, ipversion
+	 */
+	protected final IPBase _ip;
+
+	/*
+	 * cache of these costly to compute values
 	 */
 	protected IPNet _hostAddress;
 	protected IPNet _networkAddress;
@@ -47,15 +48,17 @@ public class IPNet implements Comparable {
 	/*
 	 * dns cache
 	 */
-	protected static long _dnsCacheTtl = 60000; 
-	
-	protected static Map<String, DnsCacheEntry> _dnsCache =
+	protected static long _dnsCacheTtl = 60000;
+
+	protected static final Map<String, DnsCacheEntry> _dnsCache =
 			new HashMap<String, DnsCacheEntry>();
 
-	protected static Map<InetAddress, RevertDnsCacheEntry> _dnsRevertCache =
+	protected static final Map<InetAddress, RevertDnsCacheEntry> _dnsRevertCache =
 			new HashMap<InetAddress, RevertDnsCacheEntry>();
 
-	protected static String[] ipV4ToHextet(String addr) throws UnknownHostException {
+	protected static String[] ipV4ToHextet(String addr)
+			throws UnknownHostException {
+
 		String [] result = new String[2];
 		/*
 		 * parse the IPv4 address and return it as two hextets
@@ -114,7 +117,8 @@ public class IPNet implements Comparable {
 			return ipInt;
 		}
 
-	protected static BigInteger parseAddressIPv6(String addr) throws UnknownHostException {
+	protected static BigInteger parseAddressIPv6(String addr)
+			throws UnknownHostException {
 
 		/*
 		 * Split the address into two lists, one for items on the left of the '::'
@@ -132,7 +136,8 @@ public class IPNet implements Comparable {
 
 		if (count > 2)
 			// Invalid IPv6, eg. '1::2::'
-			throw new UnknownHostException("Invalid IPv6 address: more than one '::' : " + addr);
+			throw new UnknownHostException(
+					"Invalid IPv6 address: more than one '::' : " + addr);
 
 		if (count == 0) {
 			// addr == "::"
@@ -176,7 +181,9 @@ public class IPNet implements Comparable {
 				// IPv6 ending with IPv4 like '::ffff:192.168.0.1'
 				if (i != rItems.length - 1)
 					// Invalid IPv6: 'ffff:192.168.0.1::'
-					throw new UnknownHostException("Invalid IPv6 address: IPv4 only allowed at the tail: " + addr);
+					throw new UnknownHostException(
+						"Invalid IPv6 address: IPv4 only allowed at the tail: "
+						+ addr);
 				String [] hextets = ipV4ToHextet(s);
 				rightItems.add(hextets[0]);
 				rightItems.add(hextets[1]);
@@ -192,7 +199,9 @@ public class IPNet implements Comparable {
 					// IPv6 ending with IPv4 like '::ffff:192.168.0.1'
 					if ((i != lItems.length - 1) || rItems != null)
 						// Invalid IPv6: 'ffff:192.168.0.1::'
-						throw new UnknownHostException("Invalid IPv6 address: IPv4 only allowed at the tail: " + addr);
+						throw new UnknownHostException(
+							"Invalid IPv6 address: IPv4 only allowed at the tail: "
+							+ addr);
 					String [] hextets = ipV4ToHextet(s);
 					items.add(hextets[0]);
 					items.add(hextets[1]);
@@ -214,7 +223,8 @@ public class IPNet implements Comparable {
 		 */
 		if (items.size() != 8)
 			// Invalid IPv6, eg. '1:2:3'
-			throw new UnknownHostException("Invalid IPv6 address: should have 8 hextets: " + addr);
+			throw new UnknownHostException(
+				"Invalid IPv6 address: should have 8 hextets: " + addr);
 
 		 /*
 		  * Convert hextets to BigInteger
@@ -226,10 +236,12 @@ public class IPNet implements Comparable {
 			try {
 				hexlet = new BigInteger(item, 16);
 			} catch (NumberFormatException e) {
-				throw new UnknownHostException("Invalid IPv6 address: invalid hextet: " + addr);
+				throw new UnknownHostException(
+					"Invalid IPv6 address: invalid hextet: " + addr);
 			}
 			if ((hexlet.compareTo(BigInteger.ZERO) < 0) || (hexlet.compareTo(IP.BIG_INT_0xFFFF) > 0))
-				throw new UnknownHostException("Invalid IPv6 address: invalid hextet: " + addr);
+				throw new UnknownHostException(
+					"Invalid IPv6 address: invalid hextet: " + addr);
 			value = value.multiply(IP.BIG_INT_0x10000);
 			value = value.add(hexlet);
 		}
@@ -247,7 +259,8 @@ public class IPNet implements Comparable {
 				BigInteger bi = new BigInteger(addr.substring(2), 16);
 
 				if (!IP.isValidIP(bi, IPversion.IPV6))
-					throw new UnknownHostException("IP Address must be 0 <= IP < 2^128: " + addr);
+					throw new UnknownHostException(
+						"IP Address must be 0 <= IP < 2^128: " + addr);
 
 				if (bi.compareTo(IP.MAX_IPV4_NUMBER) <= 0) {
 					result = new IPBase(bi, 0, IPversion.IPV4);
@@ -275,7 +288,7 @@ public class IPNet implements Comparable {
 
 			if (addr.contains(".") || (addr.length() < 4) &&
 					Integer.parseInt(addr) < 256) {
-				
+
 				BigInteger bi = parseAddressIPv4(addr);
 				result = new IPBase(bi, 0, IPversion.IPV4);
 				return result;
@@ -291,7 +304,7 @@ public class IPNet implements Comparable {
 			if (!IP.isValidIP(bi, IPversion.IPV6))
 				throw new UnknownHostException(
 					"IP Address must be 0 <= IP < 2^128: " + addr);
-			
+
 			if (bi.compareTo(IP.MAX_IPV4_NUMBER) <= 0) {
 				result = new IPBase(bi, 0, IPversion.IPV4);
 				return result;
@@ -324,7 +337,7 @@ public class IPNet implements Comparable {
 			throws UnknownHostException {
 
 		IPBase result = parseAddress(sip);
-		return makeIP(result.getIP(), IP.maxPrefixLen(result.getIpVersion()), 
+		return makeIP(result.getIP(), IP.maxPrefixLen(result.getIpVersion()),
 			result.getIpVersion());
 	}
 
@@ -344,7 +357,7 @@ public class IPNet implements Comparable {
 					"Last address must be greater than first: " + data);
 
 		// size = last - first
-		BigInteger size = last.getIP(); 
+		BigInteger size = last.getIP();
 		size = size.subtract(first.getIP());
 
 		// IPV4 only
@@ -403,7 +416,6 @@ public class IPNet implements Comparable {
 		return makeIP(result.getIP(), prefix, result.getIpVersion());
 	}
 
-
 	/**
 	 * Constructs a new {@link IPNet} IP address.
 	 * @param ip the {@link BigInteger} IP address as a number
@@ -411,7 +423,7 @@ public class IPNet implements Comparable {
 	 * @param prefixLen the prefixlen for this IP address.
 	 * @throws UnknownHostException if some parameters are invalid
 	 */
-	private IPNet(IPBase ip) throws UnknownHostException {
+	public IPNet(IPBase ip) throws UnknownHostException {
 
 		_ip = ip;
 	}
@@ -423,12 +435,12 @@ public class IPNet implements Comparable {
 	 * @param prefixLen the prefixlen for this IP address.
 	 * @throws UnknownHostException if some parameters are invalid
 	 */
-	public IPNet(BigInteger ip, IPversion ipVersion, int prefixLen) 
+	public IPNet(BigInteger ip, IPversion ipVersion, int prefixLen)
 			throws UnknownHostException {
 
 		_ip = makeIP(ip, prefixLen, ipVersion);
 	}
-	
+
 	/**
 	 * Constructs a new {@link IPNet} object as a single IP with a prefixlen set
 	 * to 32 or 128 according to the IP version.
@@ -534,7 +546,7 @@ public class IPNet implements Comparable {
 		}
 		throw new UnknownHostException("Can't parse IP Address: " + data);
 	}
-	
+
 	/**
 	 * Constructs a new {@link IPNet} object from an InetAddress in argument.
 	 * @param address InetAddress to construct from.
@@ -542,8 +554,8 @@ public class IPNet implements Comparable {
 	 */
 	public IPNet(InetAddress address) throws UnknownHostException {
 		_ip = makeFromIP(address.getHostAddress());
-	}	
-	
+	}
+
 	/**
 	 * Given the name of a host, returns a list of its IP addresses
 	 * matching the IP version in argument.
@@ -585,8 +597,8 @@ public class IPNet implements Comparable {
 			inet = InetAddress.getAllByName(split[0]);
 			entry = new DnsCacheEntry(inet, date);
 			_dnsCache.put(split[0], entry);
-		}	
-		
+		}
+
 		ArrayList<IPNet> addresses = new ArrayList<IPNet>();
 		for (InetAddress addr: inet) {
 			if ((addr instanceof Inet4Address && ipVersion == IPversion.IPV4) ||
@@ -621,10 +633,10 @@ public class IPNet implements Comparable {
 
 		return getAllByName(hostname, ipVersion).get(0);
 	}
-	
+
 	/**
      * Gets the fully qualified domain name for this IP address.
-     * Best effort method, meaning we may not be able to return 
+     * Best effort method, meaning we may not be able to return
      * the FQDN depending on the underlying system configuration.
      * @throws UnknownHostException if problem occurs.
      * @see InetAddress#canonicalHostName
@@ -639,28 +651,18 @@ public class IPNet implements Comparable {
 				hostname = entry.getHostname();
 			else
 				_dnsRevertCache.remove(ip);
-		}	
+		}
 		if (hostname == null) {
 			hostname = ip.getCanonicalHostName();
 			entry = new RevertDnsCacheEntry(hostname, date);
 			_dnsRevertCache.put(ip, entry);
-		}	
+		}
 
 		return hostname;
 	}
 
-	/**
-	 * Returns a copy of an {@link IPNet} instance.
-	 * @param ipnet the {@link IPNet} instance to copy
-	 * @return a copy of the {@link IPNet} ipnet object.
-	 * @throws UnknownHostException
-	 */
-	public static IPNet newInstance(IPNet ipnet) throws UnknownHostException {
-		return new IPNet(ipnet.getIP(), ipnet.getIpVersion(), ipnet.getPrefixLen());
-	}
-
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -672,7 +674,7 @@ public class IPNet implements Comparable {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return _ip.hashCode();
 	}
 
@@ -682,7 +684,7 @@ public class IPNet implements Comparable {
 	 * @param ipnet the {@link IPNet} object to compare.
 	 * @return true if the {@link IPversion} IP versions are equal.
 	 */
-	public boolean sameIPVersion(IPNet ipnet) {
+	public final boolean sameIPVersion(IPNet ipnet) {
 		return getIpVersion().equals(ipnet.getIpVersion());
 	}
 
@@ -695,13 +697,16 @@ public class IPNet implements Comparable {
 	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
 	 * included in this instance.
 	 */
-	public boolean networkContains(IPNet ipnet) throws UnknownHostException {
+	public final boolean networkContains(IPNet ipnet)
+			throws UnknownHostException {
+
 		IPNet first = networkAddress();
 		IPNet last  = broadcastAddress();
 		IPNet firstOther = ipnet.networkAddress();
 		IPNet lastOther = ipnet.broadcastAddress();
 
-		return firstOther.isBetweenIP(first, last) && lastOther.isBetweenIP(first, last);
+		return firstOther.isBetweenIP(first, last) &&
+				lastOther.isBetweenIP(first, last);
 	}
 
 	/**
@@ -710,14 +715,14 @@ public class IPNet implements Comparable {
 	 * @param ipnet IPNet object to compare.
 	 * @return true if this IPNet instance overlaps the IPNet object in argument.
 	 */
-	public boolean overlaps(IPNet ipnet) throws UnknownHostException {
+	public final boolean overlaps(IPNet ipnet) throws UnknownHostException {
 		IPNet first = networkAddress();
 		IPNet last  = broadcastAddress();
 		IPNet firstOther = ipnet.networkAddress();
 		IPNet lastOther = ipnet.broadcastAddress();
 
-		return first.isBetweenIP(firstOther, lastOther) || 
-				last.isBetweenIP(firstOther, lastOther) || 
+		return first.isBetweenIP(firstOther, lastOther) ||
+				last.isBetweenIP(firstOther, lastOther) ||
 				firstOther.isBetweenIP(first, last) ||
 				lastOther.isBetweenIP(first, last);
 	}
@@ -731,7 +736,7 @@ public class IPNet implements Comparable {
 	 * first &lt= IP &lt= second.
 	 * We do not take care of the prefix length of the {@link IPNet} objects.
 	 */
-	public boolean isBetweenIP(IPNet first, IPNet second) {
+	public final boolean isBetweenIP(IPNet first, IPNet second) {
 		if (getIP().compareTo(first.getIP()) < 0)
 			return false;
 		if (getIP().compareTo(second.getIP()) > 0)
@@ -745,7 +750,7 @@ public class IPNet implements Comparable {
 	 * @throws UnknownHostException if this instance can not be expressed as a
 	 * network IP address.
 	 */
-	public IPNet networkAddress() throws UnknownHostException {
+	public final IPNet networkAddress() throws UnknownHostException {
 		if (_networkAddress == null) {
 			BigInteger bi = IP.prefixLenToNetmask(_ip.getPrefixlen(),
 				_ip.getIpVersion());
@@ -763,7 +768,7 @@ public class IPNet implements Comparable {
 	 * @return the {@link IPNet} host address.
 	 * @throws UnknownHostException
 	 */
-	public IPNet hostAddress() throws UnknownHostException {
+	public final IPNet hostAddress() throws UnknownHostException {
 		if (_hostAddress == null) {
 			IPBase ip = new IPBase(_ip.getIP(),
 					IP.maxPrefixLen(_ip.getIpVersion()), _ip.getIpVersion());
@@ -779,7 +784,7 @@ public class IPNet implements Comparable {
 	 * @throws UnknownHostException if this instance can not be expressed as a
 	 * network.
 	 */
-	public IPNet broadcastAddress() throws UnknownHostException {
+	public final IPNet broadcastAddress() throws UnknownHostException {
 		if (_broadcastAddress == null) {
 			IPNet net = networkAddress();
 			BigInteger bi = net.getIP().add(IP.networkLength(_ip.getPrefixlen(),
@@ -798,7 +803,7 @@ public class IPNet implements Comparable {
 	 * @return a new {@link IPNet} instance.
 	 * @throws UnknownHostException
 	 */
-	public IPNet setMask(int mask) throws UnknownHostException {
+	public final IPNet setMask(int mask) throws UnknownHostException {
 		return new IPNet(_ip.getIP(), _ip.getIpVersion(), mask);
 	}
 
@@ -807,7 +812,7 @@ public class IPNet implements Comparable {
 	 * @return true if this {@link IPNet} instance is a single host IP address.
 	 * @throws UnknownHostException
 	 */
-	public boolean isHost() throws UnknownHostException {
+	public final boolean isHost() throws UnknownHostException {
 		return _ip.getPrefixlen() == IP.maxPrefixLen(_ip.getIpVersion());
 	}
 
@@ -834,7 +839,7 @@ public class IPNet implements Comparable {
 	 * Checks if the {@link IPversion} IP version of this {@link IPNet} instance is IPv4.
 	 * @return true if this {@link IPNet} instance is an IPv4 address.
 	 */
-	public boolean isIPv4() {
+	public final boolean isIPv4() {
 		return _ip.isIPv4();
 	}
 
@@ -843,7 +848,7 @@ public class IPNet implements Comparable {
 	 * The "null" network is 0.0.0.0/0 for IPv4 and ::0/0 for IPv6
 	 * @return true if this {@link IPNet} instance designates the "null" network.
 	 */
-	public boolean isNullNetwork() {
+	public final boolean isNullNetwork() {
 		return (_ip.getIpVersion() == IPversion.IPV4) ?
 			equals(NULL_IPV4) : equals(NULL_IPV6);
 	}
@@ -852,7 +857,7 @@ public class IPNet implements Comparable {
 	 * Checks if the {@link IPversion} IP version of this {@link IPNet} instance is IPv6.
 	 * @return true if this {@link IPNet} instance is an IPv6 address.
 	 */
-	public boolean isIPv6() {
+	public final boolean isIPv6() {
 		return _ip.isIPv6();
 	}
 
@@ -860,7 +865,7 @@ public class IPNet implements Comparable {
 	 * Returns the {@link IPversion} IP version of this {@link IPNet} instance.
 	 * @return the {@link IPversion} IP version of this {@link IPNet} instance.
 	 */
-	public IPversion getIpVersion() {
+	public final IPversion getIpVersion() {
 		return _ip.getIpVersion();
 	}
 
@@ -868,7 +873,7 @@ public class IPNet implements Comparable {
 	 * Returns the prefix length of this {@link IPNet} instance.
 	 * @return the prefix length of this {@link IPNet} instance.
 	 */
-	public int getPrefixLen() {
+	public final int getPrefixLen() {
 		return _ip.getPrefixlen();
 	}
 
@@ -877,7 +882,7 @@ public class IPNet implements Comparable {
 	 * as a number.
 	 * @return the {@link BigInteger} IP address of this {@link IPNet} instance.
 	 */
-	public BigInteger getIP() {
+	public final BigInteger getIP() {
 		return _ip.getIP();
 	}
 
@@ -891,7 +896,7 @@ public class IPNet implements Comparable {
 	 * @return the {@link BigInteger} number of IP addresses associates to the
 	 * network designated by the {@link IPNet} instance.
 	 */
-	public BigInteger networkLength() {
+	public final BigInteger networkLength() {
 		return IP.networkLength(_ip.getPrefixlen(), _ip.getIpVersion());
 	}
 
@@ -913,7 +918,7 @@ public class IPNet implements Comparable {
 	 * @param format Format string
 	 * @return a {@link String} representation of this {@link IPNet} instance.
 	 */
-	public String toString(String format) {
+	public final String toString(String format) {
 		boolean fshort = format.contains("s");
 		boolean fcompress = format.contains("::");
 		boolean fnetmask = format.contains("n");
@@ -941,7 +946,7 @@ public class IPNet implements Comparable {
 		return result;
 	}
 
-	public int compareTo(Object o) {
+	public final int compareTo(Object o) {
 		IPNet obj = (IPNet) o;
 		if (equals(obj))
 			return 0;
@@ -954,7 +959,7 @@ public class IPNet implements Comparable {
 	 * @return An InetAddress corresponding to this instance.
 	 * @throws UnknownHostException if problem occurs.
 	 */
-	public InetAddress toInetAddress() throws UnknownHostException {
+	public final InetAddress toInetAddress() throws UnknownHostException {
 		InetAddress ip = InetAddress.getByName(toString("s"));
 		return ip;
 	}
