@@ -39,7 +39,7 @@ public class IP {
 	 * Array of prefixlen to netmaks (IPv6)
 	 */
 	private static final BigInteger [] _netmaskIpV6 = new BigInteger[129];
-	
+
 	/**
 	 * Array of networks length
 	 */
@@ -49,7 +49,7 @@ public class IP {
 	 * number "2"
 	 */
 	private static final BigInteger _TWO = new BigInteger("2");
-	
+
 	/**
 	 * Largest value for an IPv6 address: 2^128 -1.
 	 */
@@ -63,7 +63,7 @@ public class IP {
 			new BigInteger("ffffffff", 16);
 
 	/**
-	 * Value 0x1000.
+	 * Value 0x10000.
 	 */
 	public static final BigInteger BIG_INT_0x10000 = new BigInteger("10000", 16);
 
@@ -127,7 +127,7 @@ public class IP {
 			case IPV6:
 				return _netmaskIpV6[prefixLen];
 		}
-		return null; 
+		return null;
 	}
 
 	/**
@@ -324,7 +324,7 @@ public class IP {
 		int p2 = -1;
 
 		/*
-		 * slit the ip into 8 hextets
+		 * split the ip into 8 hextets
 		 */
 		BigInteger bi = ip;
 		for (int i = 0; i < 8; i++) {
