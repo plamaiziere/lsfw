@@ -109,7 +109,7 @@ public class RoutingEngine implements ShowableRoutes {
 				 */
 				if (previous != null && prefix.equals(previous))
 					continue;
-				previous = IPNet.newInstance(prefix);
+				previous = prefix;
 			} catch (UnknownHostException ex) {
 				throw new JtaclRoutingException(ex.getMessage());
 			}
