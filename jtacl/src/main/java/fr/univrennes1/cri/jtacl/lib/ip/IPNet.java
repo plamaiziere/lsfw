@@ -38,7 +38,17 @@ public class IPNet implements Comparable {
 	protected int _prefixLen;
 	protected BigInteger _ip;
 	protected IPversion _ipVersion;
+	
+	/*
+	 * cache of these values
+	 */
+	protected IPNet _hostAddress;
+	protected IPNet _networkAddress;
+	protected IPNet _broadcastAddress;
 
+	/*
+	 * dns cache
+	 */
 	protected static long _dnsCacheTtl = 60000; 
 	
 	protected static Map<String, DnsCacheEntry> _dnsCache =
@@ -515,6 +525,22 @@ public class IPNet implements Comparable {
 	 */
 	public IPNet(InetAddress address) throws UnknownHostException {
 		makeFromIP(address.getHostAddress());
+	}	
+	
+	/**
+	 * returns a new instance of this {@link IPNet} object.
+	 * @return a new instance of this {@link IPNet} object.
+	 * @throws UnknownHostException if problem occurs.
+	 */
+	public IPNet newInstance() throws UnknownHostException {
+		IPNet ipnet = new IPNet(_ip, _ipVersion, _prefixLen);
+		if (_networkAddress != null)
+			ipnet._networkAddress = _networkAddress.newInstance();
+		if (_hostAddress != null)
+			ipnet._hostAddress = _hostAddress.newInstance();
+		if (_broadcastAddress != null)
+			ipnet._broadcastAddress = _broadcastAddress.newInstance();
+		return ipnet;
 	}
 
 	/**
@@ -683,9 +709,9 @@ public class IPNet implements Comparable {
 	 */
 	public boolean networkContains(IPNet ipnet) throws UnknownHostException {
 		IPNet first = networkAddress();
-		IPNet last  = broadcastAddressOf(first);
+		IPNet last  = broadcastAddress();
 		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = broadcastAddressOf(firstOther);
+		IPNet lastOther = ipnet.broadcastAddress();
 
 		return firstOther.isBetweenIP(first, last) && lastOther.isBetweenIP(first, last);
 	}
@@ -698,9 +724,9 @@ public class IPNet implements Comparable {
 	 */
 	public boolean overlaps(IPNet ipnet) throws UnknownHostException {
 		IPNet first = networkAddress();
-		IPNet last  = broadcastAddressOf(first);
+		IPNet last  = broadcastAddress();
 		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = broadcastAddressOf(firstOther);
+		IPNet lastOther = ipnet.broadcastAddress();
 
 		return first.isBetweenIP(firstOther, lastOther) || 
 				last.isBetweenIP(firstOther, lastOther) || 
@@ -732,9 +758,12 @@ public class IPNet implements Comparable {
 	 * network IP address.
 	 */
 	public IPNet networkAddress() throws UnknownHostException {
-		BigInteger bi = IP.prefixLenToNetmask(_prefixLen, _ipVersion);
-		bi = _ip.and(bi);
-		return new IPNet(bi, _ipVersion, _prefixLen);
+		if (_networkAddress == null) {
+			BigInteger bi = IP.prefixLenToNetmask(_prefixLen, _ipVersion);
+			bi = _ip.and(bi);
+			_networkAddress = new IPNet(bi, _ipVersion, _prefixLen);
+		}
+		return _networkAddress.newInstance();
 	}
 
 	/**
@@ -745,7 +774,10 @@ public class IPNet implements Comparable {
 	 * @throws UnknownHostException
 	 */
 	public IPNet hostAddress() throws UnknownHostException {
-		return new IPNet(_ip, _ipVersion, IP.maxPrefixLen(_ipVersion));
+		if (_hostAddress == null) {
+			_hostAddress = new IPNet(_ip, _ipVersion, IP.maxPrefixLen(_ipVersion));
+		}
+		return _hostAddress.newInstance();
 	}
 
 	/**
@@ -756,25 +788,13 @@ public class IPNet implements Comparable {
 	 * network.
 	 */
 	public IPNet broadcastAddress() throws UnknownHostException {
-		IPNet net = networkAddress();
-		BigInteger bi = net.getIP().add(IP.networkLength(_prefixLen, _ipVersion));
-		bi = bi.subtract(BigInteger.ONE);
-		return new IPNet(bi, _ipVersion, _prefixLen);
-	}
-
-	/**
-	 * Returns the broadcast IP address of the network in argument.
-	 * @param network network to use to compute the broadcast address.
-	 * @return the {@link IPNet} broadcast IP address of the network in argument.
-	 * @throws UnknownHostException if the network in argument can not be
-	 * expressed as a network.
-	 */
-	public static IPNet broadcastAddressOf(IPNet network) throws UnknownHostException {
-		IPversion ipVersion = network.getIpVersion();
-		int prefixLen = network.getPrefixLen();
-		BigInteger bi = network.getIP().add(IP.networkLength(prefixLen, ipVersion));
-		bi = bi.subtract(BigInteger.ONE);
-		return new IPNet(bi, ipVersion, prefixLen);
+		if (_broadcastAddress == null) {
+			IPNet net = networkAddress();
+			BigInteger bi = net.getIP().add(IP.networkLength(_prefixLen, _ipVersion));
+			bi = bi.subtract(BigInteger.ONE);
+			_broadcastAddress = new IPNet(bi, _ipVersion, _prefixLen);
+		}
+		return _broadcastAddress.newInstance();
 	}
 
 	/**
