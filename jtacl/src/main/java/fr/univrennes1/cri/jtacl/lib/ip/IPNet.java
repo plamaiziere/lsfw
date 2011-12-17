@@ -91,7 +91,7 @@ public class IPNet implements Comparable {
 					throw new UnknownHostException("IPv4 Address with ! 0 <= bytes <= 255: " + addr);
 			}
 
-			BigInteger ipInt = BigInteger.valueOf(0);
+			BigInteger ipInt = BigInteger.ZERO;
 			BigInteger bi;
 
 			// ipInts[0] << 24
@@ -221,7 +221,7 @@ public class IPNet implements Comparable {
 		 /*
 		  * Convert hextets to BigInteger
 		  */
-		BigInteger value = BigInteger.valueOf(0);
+		BigInteger value = BigInteger.ZERO;
 
 		for (String item: items)  {
 			BigInteger hexlet;
