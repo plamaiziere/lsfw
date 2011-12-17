@@ -171,10 +171,10 @@ public class PacketFilter extends GenericEquipment {
 		}
 
 	}
-	
+
 	/**
 	 * Parser
-	 */	
+	 */
 	protected PacketFilterParser _parser =
 			Parboiled.createParser(PacketFilterParser.class);
 
@@ -276,12 +276,12 @@ public class PacketFilter extends GenericEquipment {
 		_anchorNextUid++;
 		return uid;
 	}
-	
+
 	/**
 	 * route to engine.
 	 */
 	protected RoutingEngine _routeToEngine = null;
-	
+
 	/**
 	 * filtering flag done, used at filtering time.
 	 */
@@ -487,7 +487,7 @@ public class PacketFilter extends GenericEquipment {
 			try {
 				nexthop = new IPNet(snexthop);
 			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid route nexthop: " 
+				throw new JtaclConfigurationException("Invalid route nexthop: "
 					+ sroute);
 			}
 			Iface iface = null;
@@ -529,7 +529,7 @@ public class PacketFilter extends GenericEquipment {
 		} // for
 	}
 
-	
+
 	protected void loadConfiguration(Document doc) {
 
 		/*
@@ -545,7 +545,7 @@ public class PacketFilter extends GenericEquipment {
 		String filename = e.getAttribute("filename");
 		if (filename.isEmpty())
 			throw new JtaclConfigurationException("Missing pfconf file name");
-		
+
 		_pfConf = new ConfigurationFile();
 		try {
 			_pfConf.readFromFile(filename);
@@ -774,7 +774,7 @@ public class PacketFilter extends GenericEquipment {
 				 */
 				if ((flags & PfConst.PFI_AFLAG_BROADCAST) > 0) {
 					try {
-						IPNet ip = link.getNetwork().broadcastAddress().hostAddress();
+						IPNet ip = link.getNetwork().lastNetworkAddress().hostAddress();
 						addr.add(ip);
 					} catch (UnknownHostException ex) {
 						throwCfgException("invalid IP address: " + ex.getMessage());
@@ -1166,7 +1166,7 @@ public class PacketFilter extends GenericEquipment {
 			return null;
 		if (xhost == null)
 			return null;
-		
+
 		/*
 		 * check ifname
 		 */
@@ -1174,8 +1174,8 @@ public class PacketFilter extends GenericEquipment {
 		if (pfiface == null) {
 				warnConfig("unknown interface: " + sifname);
 				return null;
-		}		
-		
+		}
+
 		/*
 		 * nexthop
 		 */
@@ -1191,7 +1191,7 @@ public class PacketFilter extends GenericEquipment {
 			warnConfig("invalid nexthop: " + xhost.getFirstAddress());
 			return null;
 		}
-		
+
 		/*
 		 * link
 		 */
@@ -1266,7 +1266,7 @@ public class PacketFilter extends GenericEquipment {
 		famAdd(fileName);
 		return parseIpSpec(_parser.getPfTable().getHosts());
 	}
-	
+
 	/*
 	 * PF filtering rule
 	 */
@@ -1282,7 +1282,7 @@ public class PacketFilter extends GenericEquipment {
 			_parseContext.getLineNumber() + ": ");
 		rule.setText(text);
 		rule.setParseContext(_parseContext);
-		
+
 		/*
 		 * action
 		 */
@@ -1341,7 +1341,7 @@ public class PacketFilter extends GenericEquipment {
 				if (af.equals("inet6")) {
 					rule.setAf(AddressFamily.INET6);
 				} else
-					throwCfgException("invalid address family: " + af);		
+					throwCfgException("invalid address family: " + af);
 			}
 		}
 
@@ -1386,11 +1386,11 @@ public class PacketFilter extends GenericEquipment {
 		 * options
 		 */
 		FilterOptsTemplate opts = ruleTpl.getFilterOpts();
-		
+
 		if (opts != null) {
 			/*
 			 * route options
-			 */			
+			 */
 			RouteOptsTemplate rot = opts.getRouteOpts();
 			if (rot != null) {
 				PfRouteOpts routeOpts = parseRouteOpts(rot);
@@ -1453,7 +1453,7 @@ public class PacketFilter extends GenericEquipment {
 			flags = "S";
 			flagset = "SA";
 		}
-		
+
 		if ((flags != null || flagset != null) && !acceptflags)
 			throwCfgException("tcp flags not allowed here");
 
@@ -1487,7 +1487,7 @@ public class PacketFilter extends GenericEquipment {
 			rule.setFlags(tcpFlags);
 			rule.setFlagset(tcpFlagsSet);
 		}
-		
+
 		if (Log.debug().isLoggable(Level.INFO)) {
 			String s = "pfrule: " +
 					rule.getAction() + " " + rule.getDirection() + " af=" +
@@ -1548,7 +1548,7 @@ public class PacketFilter extends GenericEquipment {
 			famAdd(n);
 		}
 		/*
-		 * use rule's ip 
+		 * use rule's ip
 		 */
 		if (ipspec.isEmpty()) {
 			PfIpSpec ip = parseIpSpec(tableTpl.getHosts());
@@ -1593,7 +1593,7 @@ public class PacketFilter extends GenericEquipment {
 		 * anchor name
 		 */
 		String name = anchorTpl.getName();
-		
+
 		/*
 		 * use a fake name for anonymous anchor
 		 */
@@ -1927,11 +1927,11 @@ public class PacketFilter extends GenericEquipment {
 		}
 		return ref;
 	}
-	
+
 	/*
 	 * Cross reference for ipspec
 	 */
-	protected void crossRefIpSpec(PfAnchor anchor, PfIpSpec ipspec, CrossRefContext refContext) {		
+	protected void crossRefIpSpec(PfAnchor anchor, PfIpSpec ipspec, CrossRefContext refContext) {
 		for (PfNodeHost nodeHost: ipspec) {
 			if (nodeHost.isAddrMask()) {
 				for (IPNet ip: nodeHost.getAddr()) {
@@ -1958,7 +1958,7 @@ public class PacketFilter extends GenericEquipment {
 			}
 		}
 	}
-	
+
 	/*
 	 * Cross reference for a rule
 	 */
@@ -1969,10 +1969,10 @@ public class PacketFilter extends GenericEquipment {
 
 		if (rule.getFromIpSpec() != null)
 			crossRefIpSpec(rule.getOwnerAnchor(), rule.getFromIpSpec(), refContext);
-		
+
 		if (rule.getToIpSpec() != null)
 			crossRefIpSpec(rule.getOwnerAnchor(), rule.getToIpSpec(), refContext);
-		
+
 		PfRouteOpts ropts = rule.getRouteOpts();
 		if (ropts != null && ropts.isRouteTo()) {
 			IPNetCrossRef ipNetRef = getIPNetCrossRef(ropts.getNextHop());
@@ -2224,13 +2224,13 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * addr range
 		 */
-		if (host.isAddrRange()) {			
+		if (host.isAddrRange()) {
 			if (host.getAddr().size() != 1 || host.geRangeAddr().size() != 1)
 				return MatchResult.UNKNOWN;
 
 			IPNet ipfirst = host.getAddr().get(0);
 			IPNet ipLast = host.geRangeAddr().get(0);
-			
+
 			if (!ipfirst.sameIPVersion(ipAddress))
 				return MatchResult.NOT;
 
@@ -2242,7 +2242,7 @@ public class PacketFilter extends GenericEquipment {
 					mAll++;
 			} else {
 				IPNet ipAddressFirst = ipAddress.networkAddress();
-				IPNet ipAddressLast = ipAddress.broadcastAddress();
+				IPNet ipAddressLast = ipAddress.lastNetworkAddress();
 				if (ipAddressFirst.isBetweenIP(ipfirst, ipLast)) {
 					if (ipAddressLast.isBetweenIP(ipfirst, ipLast))
 						mAll++;
@@ -2446,7 +2446,7 @@ public class PacketFilter extends GenericEquipment {
 				mDestPort = portspecFilter(rule.getToPortSpec(), port);
 				if (mDestPort == MatchResult.NOT)
 					return MatchResult.NOT;
-			}			
+			}
 		}
 
 		/*
@@ -2478,17 +2478,17 @@ public class PacketFilter extends GenericEquipment {
 		}
 
 		MatchResult mResult = MatchResult.MATCH;
-		
+
 		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
 				mSourcePort == MatchResult.ALL && mDestPort == MatchResult.ALL)
 			mResult = MatchResult.ALL;
 
 		if (mResult == MatchResult.MATCH)
 			return MatchResult.MATCH;
-		
+
 		if (_filteringDone)
 			return mResult;
-		
+
 		/*
 		 * route-to
 		 */
@@ -2496,12 +2496,12 @@ public class PacketFilter extends GenericEquipment {
 		if (routeOpts == null || !routeOpts.isRouteTo() ||
 				request.getProbeOptions().hasNoAction())
 			return mResult;
-		
+
 		Route<IfaceLink> route = new Route(probe.getDestinationAddress(),
 				routeOpts.getNextHop(), 0, routeOpts.getLink());
 		_routeToEngine = new RoutingEngine();
 		_routeToEngine.addRoute(route);
-		
+
 		return mResult;
 	}
 
@@ -2511,7 +2511,7 @@ public class PacketFilter extends GenericEquipment {
 		protected String _action;
 		protected String _text;
 
-		protected RuleResult(PfGenericRule rule, MatchResult match, 
+		protected RuleResult(PfGenericRule rule, MatchResult match,
 				String action, String text) {
 			_rule = rule;
 			_match = match;
@@ -2688,7 +2688,7 @@ public class PacketFilter extends GenericEquipment {
 			if (rule instanceof PfRule) {
 				PfRule pfrule = (PfRule) rule;
 				MatchResult match = ruleFilter(context, pfrule, probe);
-				if (match != MatchResult.NOT) {				
+				if (match != MatchResult.NOT) {
 					RuleResult result = anchorResult.addRuleResult(rule, match,
 						pfrule.getAction(), anchorPath);
 					anchorResult.setLastResult(result);
@@ -2765,5 +2765,5 @@ public class PacketFilter extends GenericEquipment {
 		probeResults.setInterface(direction, interfaceDesc);
 
 	}
-	
+
 }

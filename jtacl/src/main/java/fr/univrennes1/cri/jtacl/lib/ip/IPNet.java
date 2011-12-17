@@ -43,7 +43,7 @@ public final class IPNet implements Comparable {
 	 */
 	protected IPNet _hostAddress;
 	protected IPNet _networkAddress;
-	protected IPNet _broadcastAddress;
+	protected IPNet _lastNetworkAddress;
 
 	/*
 	 * dns cache
@@ -369,7 +369,7 @@ public final class IPNet implements Comparable {
 		 * otherwise it will return /16 for something like:
 		 * 192.168.0.0-192.168.191.255
 		 */
-		IPNet checkboundary = new IPNet(ipbase).broadcastAddress();
+		IPNet checkboundary = new IPNet(ipbase).lastNetworkAddress();
 		if (!checkboundary.getIP().equals(last.getIP()))
 			throw new UnknownHostException(
 					"Range is not on a network boundary: " + data);
@@ -701,9 +701,9 @@ public final class IPNet implements Comparable {
 			throws UnknownHostException {
 
 		IPNet first = networkAddress();
-		IPNet last  = broadcastAddress();
+		IPNet last  = lastNetworkAddress();
 		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.broadcastAddress();
+		IPNet lastOther = ipnet.lastNetworkAddress();
 
 		return firstOther.isBetweenIP(first, last) &&
 				lastOther.isBetweenIP(first, last);
@@ -717,9 +717,9 @@ public final class IPNet implements Comparable {
 	 */
 	public final boolean overlaps(IPNet ipnet) throws UnknownHostException {
 		IPNet first = networkAddress();
-		IPNet last  = broadcastAddress();
+		IPNet last  = lastNetworkAddress();
 		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.broadcastAddress();
+		IPNet lastOther = ipnet.lastNetworkAddress();
 
 		return first.isBetweenIP(firstOther, lastOther) ||
 				last.isBetweenIP(firstOther, lastOther) ||
@@ -778,22 +778,23 @@ public final class IPNet implements Comparable {
 	}
 
 	/**
-	 * Returns the broadcast IP address of this {@link IPNet} instance.
-	 * @return the {@link IPNet} broadcast IP address of the network associated
+	 * Returns the last network IP address of this {@link IPNet} instance.<br/>
+	 * For IPv4, this is the broadcast address.
+	 * @return the {@link IPNet} last network IP address of the network associated
 	 * to this instance.
 	 * @throws UnknownHostException if this instance can not be expressed as a
 	 * network.
 	 */
-	public final IPNet broadcastAddress() throws UnknownHostException {
-		if (_broadcastAddress == null) {
+	public final IPNet lastNetworkAddress() throws UnknownHostException {
+		if (_lastNetworkAddress == null) {
 			IPNet net = networkAddress();
 			BigInteger bi = net.getIP().add(IP.networkLength(_ip.getPrefixlen(),
 			 _ip.getIpVersion()));
 			bi = bi.subtract(BigInteger.ONE);
 			IPBase ip = new IPBase(bi, _ip.getPrefixlen(), _ip.getIpVersion());
-			_broadcastAddress = new IPNet(ip);
+			_lastNetworkAddress = new IPNet(ip);
 		}
-		return _broadcastAddress;
+		return _lastNetworkAddress;
 	}
 
 	/**

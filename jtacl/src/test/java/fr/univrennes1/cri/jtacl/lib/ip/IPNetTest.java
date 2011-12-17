@@ -23,7 +23,7 @@ import junit.framework.TestCase;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IPNetTest extends TestCase {
-    
+
 	/**
 	 *
 	 * @param testName
@@ -343,7 +343,7 @@ public class IPNetTest extends TestCase {
 			24,
 			IPversion.IPV4
 		);
-		
+
 		// invalid range
 		f = false;
 		try {
@@ -351,7 +351,7 @@ public class IPNetTest extends TestCase {
 				"192.168.0.0-192.168.191.255",
 				"0",
 				24,
-				IPversion.IPV4					
+				IPversion.IPV4
 			);
 		} catch (UnknownHostException e) {
 			f = true;
@@ -476,39 +476,39 @@ public class IPNetTest extends TestCase {
 
 
 	/**
-	 * Test of broadcastAddress
+	 * Test of lastNetworkAddress
 	 * @throws UnknownHostException
 	 */
-	public void testBroadcastAddress() throws UnknownHostException {
-		System.out.println("broadcastAddress");
+	public void testLastNetworkAddress() throws UnknownHostException {
+		System.out.println("lastNetworkAddress");
 
 		IPNet ip1 = new IPNet("127.0.0.0/24");
-		IPNet ip2 = ip1.broadcastAddress();
+		IPNet ip2 = ip1.lastNetworkAddress();
 		IPNet eq = new IPNet("127.0.0.255/24");
 		assertEquals(eq, ip2);
 
 		ip1 = new IPNet("127.0.0.0/16");
-		ip2 = ip1.broadcastAddress();
+		ip2 = ip1.lastNetworkAddress();
 		eq = new IPNet("127.0.255.255/16");
 		assertEquals(eq, ip2);
 
 		ip1 = new IPNet("127.0.0.0/8");
-		ip2 = ip1.broadcastAddress();
+		ip2 = ip1.lastNetworkAddress();
 		eq = new IPNet("127.255.255.255/8");
 		assertEquals(eq, ip2);
 
 		ip1 = new IPNet("0.0.0.0/8");
-		ip2 = ip1.broadcastAddress();
+		ip2 = ip1.lastNetworkAddress();
 		eq = new IPNet("0.255.255.255/8");
 		assertEquals(eq, ip2);
 
 		ip1 = new IPNet("0.0.0.0/0");
-		ip2 = ip1.broadcastAddress();
+		ip2 = ip1.lastNetworkAddress();
 		eq = new IPNet("255.255.255.255/0");
 		assertEquals(eq, ip2);
 
 		ip1 = new IPNet("::0/0");
-		ip2 = ip1.broadcastAddress();
+		ip2 = ip1.lastNetworkAddress();
 		eq = new IPNet("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0");
 		assertEquals(eq, ip2);
 
@@ -522,7 +522,7 @@ public class IPNetTest extends TestCase {
 
 		IPNet ip1;
 		IPNet ip2;
-		
+
 		ip1 = new IPNet("127.0.0.1");
 		ip2 = new IPNet("127.0.0.1");
 		assertTrue(ip1.overlaps(ip2));
@@ -624,7 +624,7 @@ public class IPNetTest extends TestCase {
 		ip = new IPNet("::1/127");
 		assertFalse(ip.isHost());
 	}
-	
+
 	/**
 	 * Test of getCannonicalHostname()
 	 */
