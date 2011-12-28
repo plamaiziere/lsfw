@@ -1668,6 +1668,38 @@ public class PacketFilter extends GenericEquipment {
 		}
 	}
 
+	protected void ruleMacro(Map<String, String> macros, String name,
+			String value) {
+
+		macros.put(name, value);
+		/*
+		 * Check for IP addresses in the macro and add them in cross ref.
+		 */
+		while (!value.isEmpty()) {
+			int n = PacketFilterParser.untilSpecials(value);
+			String s = value.substring(0, n);
+			if (!s.isEmpty() && (s.contains(".") || s.contains(":"))) {
+				// ip
+				IPNet ipnet = null;
+				try {
+					ipnet = new IPNet(s);
+				} catch (UnknownHostException ex) {
+					// not an IP
+				}
+				if (ipnet != null) {
+					CrossRefContext refContext = new CrossRefContext(_parseContext,
+						"macro", name + "; " + _parseContext.getFileNameAndLine());
+					IPNetCrossRef ipNetRef = getIPNetCrossRef(ipnet);
+					ipNetRef.addContext(refContext);
+				}
+			}
+			if (n < value.length())
+				value = value.substring(n + 1);
+			else
+				value = "";
+		}
+	}
+
 	protected void parse(ConfigurationFile cfg) {
 		ParsingResult<?> result;
 
@@ -1740,7 +1772,7 @@ public class PacketFilter extends GenericEquipment {
 				 * macros
 				 */
 				if (rule.equals("macro")) {
-					macros.put(_parser.getName(), _parser.getValue());
+					ruleMacro(macros, _parser.getName(), _parser.getValue());
 				}
 
 				/*
