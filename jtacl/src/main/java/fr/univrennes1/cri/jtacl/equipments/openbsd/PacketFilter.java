@@ -38,6 +38,7 @@ import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
+import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.io.BufferedReader;
@@ -1675,28 +1676,46 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * Check for IP addresses in the macro and add them in cross ref.
 		 */
+		String SPECIALS = "{},!=<>() \t\n";
 		while (!value.isEmpty()) {
-			int n = PacketFilterParser.untilSpecials(value);
+			int n = StringTools.IndexOfChars(value, SPECIALS);
+			if (n == -1)
+				n = value.length();
 			String s = value.substring(0, n);
-			if (!s.isEmpty() && (s.contains(".") || s.contains(":"))) {
-				// ip
-				IPNet ipnet = null;
-				try {
-					ipnet = new IPNet(s);
-				} catch (UnknownHostException ex) {
-					// not an IP
-				}
-				if (ipnet != null) {
-					CrossRefContext refContext = new CrossRefContext(_parseContext,
-						"macro", name + "; " + _parseContext.getFileNameAndLine());
-					IPNetCrossRef ipNetRef = getIPNetCrossRef(ipnet);
-					ipNetRef.addContext(refContext);
-				}
-			}
 			if (n < value.length())
 				value = value.substring(n + 1);
 			else
 				value = "";
+
+			if (s.isEmpty())
+				continue;
+
+			if (s.contains(":")) {
+				/*
+				 * XXX: avoid port:port to be interpreted as IPV6
+				 */
+				String[] dot = s.split(":");
+				if (dot.length <= 2) {
+					if (! s.contains("::"))
+						continue;
+				}
+			} else {
+				if (!s.contains("."))
+					continue;
+			}
+			// ip
+			IPNet ipnet = null;
+			try {
+				ipnet = new IPNet(s);
+			} catch (UnknownHostException ex) {
+				// not an IP
+			}
+			if (ipnet != null) {
+				CrossRefContext refContext = new CrossRefContext(_parseContext,
+					"macro", name + "; " + _parseContext.getFileNameAndLine());
+				IPNetCrossRef ipNetRef = getIPNetCrossRef(ipnet);
+				ipNetRef.addContext(refContext);
+			}
 		}
 	}
 
