@@ -19,14 +19,21 @@ package fr.univrennes1.cri.jtacl.lib.misc;
  */
 public class StringTools {
 
+	/**
+	 * Returns the index of the first occurence of any character specified in
+	 * characters in the string string.
+	 * @param string String to search in
+	 * @param characters Characters to search.
+	 * @return the index of the first occurence, -1 otherwise.
+	 */
 	public static int IndexOfChars(String string, String characters) {
 
 		int i = 0;
 		for (i = 0; i < string.length(); i++) {
 			if (characters.indexOf(string.charAt(i)) >= 0)
-				break;
+				return i;
 		}
-		return i;
+		return -1;
 	}
 
 
