@@ -138,7 +138,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		_pfRule.getIfList().add(ifName);
 		return true;
 	}
-	
+
 	protected boolean newRouteOpts() {
 		_routeOpts = new RouteOptsTemplate();
 		return true;
@@ -394,11 +394,21 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return true;
 	}
 
+	public static int untilSpecials(String string) {
+
+		int i = 0;
+		for (i = 0; i < string.length(); i++) {
+			if (SPECIALS.indexOf(string.charAt(i)) >= 0)
+				break;
+		}
+		return i;
+	}
+
 	private List<StringBuilder> expandLine(StringBuilder line, Map<String, String> symbols) {
-		
+
 		StringBuilder sb = new StringBuilder("");
 		int length = line.length();
-		
+
 		for (int i = 0; i < line.length(); ) {
 			char c = line.charAt(i);
 			/*
@@ -431,7 +441,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 
 			/*
 			 * macro expansion
-			 */	
+			 */
 			if (c == '$') {
 				StringBuilder sym = new StringBuilder("");
 				for (i++; i < length; ) {
@@ -450,7 +460,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				sb.append(value);
 				continue;
 			}
-			
+
 			/*
 			 * other
 			 */
@@ -527,7 +537,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 
 	protected BasicParseRunner _parseRunIsNewRule =
 			new BasicParseRunner(IsNewRule());
-	
+
 	public ExpandedRule getRule(StringBuilder buffer, Map<String, String> symbols) {
 
 		ParsingResult<?> result;
@@ -828,7 +838,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	 * macro value
 	 * macrovalue : STRING
 	 *   | STRING macrovalue
-	 * 
+	 *
 	 * @return a Rule
 	 */
 	public Rule PfMacroValue() {
@@ -864,7 +874,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				)
 			);
 	}
-	
+
 	/**
 	 * Matches tabledef
 	 * tabledef	: TABLE '<' STRING '>' table_opts
@@ -1130,7 +1140,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				setRuleName("loadrule")
 			);
 	}
-	
+
 	/**
 	 * Matches scrub_opts
 	 * scrub_opts :	scrub_opts_l
@@ -2236,7 +2246,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				_pfRule.addSourcePort(_portspec)
 			);
 	}
-	
+
 	/**
 	 * Matches to
 	 *  to	: empty
@@ -3022,7 +3032,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	public Rule PfTos() {
 		return PfString();
 	}
-	
+
 	/**
 	 * Matches sourcetrack
 	 * sourcetrack : empty
@@ -3478,7 +3488,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				)
 			);
 	}
-	 
+
 	/**
 	 * Matches pool_opts
 	 *	pool_opts :	pool_opts_l
@@ -3573,12 +3583,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				 */
 				Sequence(
 					STICKYADDRESS(),
-					_poolOpts.setOpts(_poolOpts.getOpts() 
+					_poolOpts.setOpts(_poolOpts.getOpts()
 						| PfConst.PF_POOL_STICKYADDR)
 				)
 			);
 	}
-	
+
 	/**
 	 * Matches route_host
 	 * route_host : STRING
@@ -3681,7 +3691,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						PfRouteHostList()
 					)
 				)
-			);	
+			);
 	}
 
 	/**
