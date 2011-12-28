@@ -394,16 +394,6 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return true;
 	}
 
-	public static int untilSpecials(String string) {
-
-		int i = 0;
-		for (i = 0; i < string.length(); i++) {
-			if (SPECIALS.indexOf(string.charAt(i)) >= 0)
-				break;
-		}
-		return i;
-	}
-
 	private List<StringBuilder> expandLine(StringBuilder line, Map<String, String> symbols) {
 
 		StringBuilder sb = new StringBuilder("");
