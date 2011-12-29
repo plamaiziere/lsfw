@@ -130,6 +130,7 @@ public class PacketFilterShell implements GenericEquipmentShell {
 
 	public boolean shellCommand(String command) {
 
+		_parseRunner.getParseErrors().clear();
 		ParsingResult<?> result = _parseRunner.run(command);
 
 		if (!result.matched) {

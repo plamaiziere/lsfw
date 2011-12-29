@@ -941,6 +941,7 @@ public class Shell {
 		if (subs.isEmpty())
 			return;
 
+		_parseRunner.getParseErrors().clear();
 		ParsingResult<?> result = _parseRunner.run(subs);
 
 		if (!result.matched) {
