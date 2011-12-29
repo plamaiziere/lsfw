@@ -62,7 +62,6 @@ import joptsimple.OptionSet;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
-import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
@@ -74,7 +73,7 @@ public class Shell {
 
 	protected String _prompt;
 	protected ShellParser _parser;
-	protected BasicParseRunner _parseRunner;
+	protected ReportingParseRunner _parseRunner;
 	protected Monitor _monitor;
 	protected OptionParser _optParser;
 	protected boolean _interactiveMode;
@@ -198,7 +197,7 @@ public class Shell {
 		_prompt = "lsfw> ";
 
 		_parser = Parboiled.createParser(ShellParser.class);
-		_parseRunner = new BasicParseRunner(_parser.CommandLine());
+		_parseRunner = new ReportingParseRunner(_parser.CommandLine());
 		_monitor = Monitor.getInstance();
 		_lastProbing = null;
 
@@ -207,7 +206,7 @@ public class Shell {
 				"Execute the command in argument and quit.")
 				.withRequiredArg().describedAs("command to execute");
 
-		_optParser.acceptsAll(asList("f", "file"), 
+		_optParser.acceptsAll(asList("f", "file"),
 				"Use the configuration file in argument.")
 				.withRequiredArg().describedAs("configuration file");
 
@@ -215,18 +214,18 @@ public class Shell {
 				"Read and execute commands from the input file and quit.")
 				.withRequiredArg().describedAs("input file");
 
-		_optParser.acceptsAll(asList("h", "help"), 
+		_optParser.acceptsAll(asList("h", "help"),
 				"This help.");
 
-		_optParser.acceptsAll(asList("n", "no-interactive"), 
+		_optParser.acceptsAll(asList("n", "no-interactive"),
 				"Non interactive mode.");
 
-		_optParser.acceptsAll(asList("t", "test"), 
+		_optParser.acceptsAll(asList("t", "test"),
 				"Test mode.");
 
 		_optParser.acceptsAll(asList("v", "verbose"),
 				"Use verbose reports.");
-		
+
 		_optParser.acceptsAll(asList("o", "option"), "Set option").
 				withRequiredArg().describedAs("option to set (option=value)");
 
@@ -263,7 +262,7 @@ public class Shell {
 	protected void autoReload() {
 
 		for (String eqName: _monitor.getEquipments().keySet()) {
-		
+
 			NetworkEquipment equipment =
 					_monitor.getEquipments().get(eqName);
 			if (equipment.hasChanged()) {
@@ -537,7 +536,7 @@ public class Shell {
 			return false;
 		}
 
-		/* 
+		/*
 		 * We can specify where we want to inject the probes.
 		 */
 		IfaceLinks ilinks = null;
@@ -618,7 +617,7 @@ public class Shell {
 		Integer protocol;
 		Integer portSource;
 		Integer portDest;
-		
+
 		ProbeRequest request = new ProbeRequest();
 		if (sprotocol != null) {
 			protocol = ipProtocols.protocolLookup(sprotocol);
@@ -629,14 +628,14 @@ public class Shell {
 			List<Integer> protocols = new ArrayList<Integer>();
 			request.setProtocols(protocols);
 			protocols.add(protocol);
-			
+
 			/*
 			 * tcp or udp with port source/port destination
 			 */
 			if (sprotocol.equalsIgnoreCase("tcp") ||
 					sprotocol.equalsIgnoreCase("udp")) {
 				/*
-				 * if tcp or udp we want to match ip too. 
+				 * if tcp or udp we want to match ip too.
 				 */
 				if (sourceAddress.isIPv4())
 					protocols.add(ipProtocols.IP());
@@ -721,9 +720,9 @@ public class Shell {
 				protocols.add(ipProtocols.ICMP());
 				protocols.add(ipProtocols.ICMP6());
 			}
-			
+
 			/*
-			 * icmp with icmp-type 
+			 * icmp with icmp-type
 			 */
 			if (sprotocol.equalsIgnoreCase("icmp") ||
 					sprotocol.equalsIgnoreCase("icmp6")) {
@@ -745,7 +744,7 @@ public class Shell {
 				}
 			}
 		}
-		
+
 		/*
 		 * probe options
 		 */
@@ -952,7 +951,7 @@ public class Shell {
 					buf.extract(0, error.getStartIndex()));
 			}
 		}
-		
+
 		/*
 		 * tee stdout
 		 */
@@ -1022,7 +1021,7 @@ public class Shell {
 	}
 
 	public void runFromFile(String fileName) {
-		
+
 		BufferedReader dataIn = null;
 		if (fileName == null) {
 			 dataIn = new BufferedReader(new InputStreamReader(System.in));
@@ -1097,11 +1096,11 @@ public class Shell {
 				_interactiveMode = false;
 				runFromFile(fileName);
 			}
-			
+
 			_interactiveMode = !option.has("no-interactive");
 			if (!option.has("command") && !option.has("input"))
 				runFromFile(null);
-			
+
 			if (_testMode) {
 				if (!_testResult)
 					System.exit(Shell.EXIT_FAILURE);

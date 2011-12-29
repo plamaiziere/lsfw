@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 import org.parboiled.Parboiled;
-import org.parboiled.parserunners.BasicParseRunner;
+import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
@@ -37,7 +37,7 @@ public class PixShell implements GenericEquipmentShell {
 
 	protected Pix _pix;
 	protected PixShellParser _shellParser;
-	protected BasicParseRunner _parseRunner;
+	protected ReportingParseRunner _parseRunner;
 
 	protected void commandShowNames(PixShellParser parser) {
 
@@ -116,7 +116,7 @@ public class PixShell implements GenericEquipmentShell {
 			format = format.toLowerCase();
 		boolean fshort = format != null && format.contains("s");
 		boolean flong = format != null && format.contains("l");
-		boolean fhost = format != null && format.contains("h");		
+		boolean fhost = format != null && format.contains("h");
 
 		for (IPNet ip: _pix.getNetCrossRef().keySet()) {
 			IPNetCrossRef crossref = _pix.getNetCrossRef().get(ip);
@@ -151,7 +151,7 @@ public class PixShell implements GenericEquipmentShell {
 						System.out.println(line);
 				} else {
 					if (flong) {
-						System.out.print("; ");					
+						System.out.print("; ");
 						System.out.println(line);
 					} else {
 						System.out.println();
@@ -164,9 +164,9 @@ public class PixShell implements GenericEquipmentShell {
 	public PixShell(Pix pix) {
 		_pix = pix;
 		_shellParser = Parboiled.createParser(PixShellParser.class);
-		_parseRunner = new BasicParseRunner(_shellParser.CommandLine());
+		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
 	}
-		
+
 	public boolean shellCommand(String command) {
 
 		ParsingResult<?> result = _parseRunner.run(command);
