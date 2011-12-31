@@ -45,6 +45,9 @@ import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
+import groovy.lang.Binding;
+import groovy.ui.Console;
+import groovy.util.GroovyScriptEngine;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -910,6 +913,35 @@ public class Shell {
 		return testExpect;
 	}
 
+	public void groovyCommand(ShellParser parser) {
+
+		Binding lsfwBinding = new Binding();
+		lsfwBinding.setVariable("lsfwMonitor", _monitor);
+		lsfwBinding.setVariable("lsfwArgs", parser.getGroovyArgs());
+
+		GroovyScriptEngine scriptEngine;
+		try {
+			scriptEngine = new GroovyScriptEngine(parser.getGroovyDirectory());
+		} catch (IOException ex) {
+			System.out.println(ex.getMessage());
+			return;
+		}
+		try {
+			scriptEngine.run(parser.getGroovyScript(), lsfwBinding);
+		} catch (Exception ex) {
+			System.out.println();
+			System.out.println("Error: " + ex.getMessage());
+		}
+	}
+
+	public void groovyConsoleCommand(ShellParser parser) {
+		Binding lsfwBinding = new Binding();
+		lsfwBinding.setVariable("lsfwMonitor", _monitor);
+		lsfwBinding.setVariable("lsfwArgs", parser.getGroovyArgs());
+		Console console = new Console(lsfwBinding);
+		console.run();
+	}
+
 	public void parseShellCommand(String commandLine) {
 		// comment
 		if (commandLine.startsWith("#"))
@@ -995,6 +1027,10 @@ public class Shell {
 			equipmentCommand(_parser);
 		if (_parser.getCommand().equals("reload"))
 			reloadCommand(_parser);
+		if (_parser.getCommand().equals("groovy"))
+			groovyCommand(_parser);
+		if (_parser.getCommand().equals("groovyconsole"))
+			groovyConsoleCommand(_parser);
 
 		/*
 		 * 'untee' stdout

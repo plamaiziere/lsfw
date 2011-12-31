@@ -40,6 +40,9 @@ public class ShellParser extends CommonRules<Object> {
 	protected boolean _probeOptNoAction;
 	protected String _subCommand;
 	protected StringsList _tcpFlags;
+	protected String _groovyDirectory;
+	protected String _groovyScript;
+	protected String _groovyArgs;
 
 	protected boolean clear() {
 		_command = "";
@@ -194,19 +197,46 @@ public class ShellParser extends CommonRules<Object> {
 	public boolean getProbe6flag() {
 		return _probe6flag;
 	}
-	
+
 	public boolean setProbe6flag(boolean probe6flag) {
 		_probe6flag = probe6flag;
 		return true;
 	}
-	
+
 	public boolean setProbeOptNoAction(boolean probeOptNoAction) {
 		_probeOptNoAction = probeOptNoAction;
 		return true;
 	}
-	
+
 	public boolean getProbeOptNoAction() {
 		return _probeOptNoAction;
+	}
+
+	public boolean setGroovyDirectory(String directory) {
+		_groovyDirectory = directory;
+		return true;
+	}
+
+	public String getGroovyDirectory() {
+		return _groovyDirectory;
+	}
+
+	public boolean setGroovyScript(String script) {
+		_groovyScript = script;
+		return true;
+	}
+
+	public String getGroovyScript() {
+		return _groovyScript;
+	}
+
+	public String getGroovyArgs() {
+		return _groovyArgs;
+	}
+
+	public boolean setGroovyArgs(String groovyArgs) {
+		_groovyArgs = groovyArgs;
+		return true;
 	}
 
 	public Rule CommandLine() {
@@ -222,7 +252,9 @@ public class ShellParser extends CommonRules<Object> {
 					CommandRoute(),
 					CommandHelp(),
 					CommandEquipment(),
-					CommandReload()
+					CommandReload(),
+					CommandGroovy(),
+					CommandGroovyConsole()
 				)
 			);
 	}
@@ -461,7 +493,7 @@ public class ShellParser extends CommonRules<Object> {
 				)
 		);
 	}
-	
+
 	/*
 	 * ProbeOptions: ( ProbeExpect | OnEquipments | OptNoAction) ProbeOptions
 	 */
@@ -519,7 +551,7 @@ public class ShellParser extends CommonRules<Object> {
 				setProbeOptNoAction(true)
 			);
 	}
-	
+
 	public Rule SourceSpecification() {
 		return StringAtom();
 	}
@@ -611,6 +643,46 @@ public class ShellParser extends CommonRules<Object> {
 						SkipSpaces()
 					)
 				)
+			);
+	}
+
+	/*
+	 * groovy string string
+	 */
+	public Rule CommandGroovy() {
+		return
+			Sequence(
+				FirstOf(
+					IgnoreCase("groovy"),
+					IgnoreCase("g")
+				),
+				WhiteSpaces(),
+				StringAtom(),
+				setGroovyDirectory(match()),
+				WhiteSpaces(),
+				StringAtom(),
+				setGroovyScript(match()),
+				SkipSpaces(),
+				UntilEOI(),
+				setGroovyArgs(match()),
+				setCommand("groovy")
+			);
+	}
+
+	/*
+	 * groovyConsole | gc
+	 */
+	public Rule CommandGroovyConsole() {
+		return
+			Sequence(
+				FirstOf(
+					IgnoreCase("groovyconsole"),
+					IgnoreCase("gc")
+				),
+				SkipSpaces(),
+				UntilEOI(),
+				setGroovyArgs(match()),
+				setCommand("groovyconsole")
 			);
 	}
 
