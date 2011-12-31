@@ -108,6 +108,11 @@
 			<artifactId>parboiled-java</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>1.8.5</version>
+		</dependency>
 	</dependencies>
 </project>
 
