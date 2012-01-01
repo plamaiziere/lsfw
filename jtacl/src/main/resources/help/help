@@ -15,3 +15,5 @@ route        : shows the routes.
 shell        : help for the builtin shell.
 topology     : shows the topology of the network.
 xref         : shows cross-references on an equipment.
+
+See also https://listes.cru.fr/wiki/jtacl/index
