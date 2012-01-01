@@ -29,11 +29,11 @@ if (argss.size() == 0) {
 for (sport in argss) {
     def port = sport.toInteger();
     def ent = services.getServByPort(port, null);
-    
+
     if (!ent) {
-        println "port:" + port + " not found!";
+        println "port: " + port + " not found!";
     } else {
-        print("port:" + port + ", name: " + ent.getName());
+        print("port: " + port + ", name: " + ent.getName());
         print(", aliases:");
         ent.getAliases().each() { print " " + it; }
         println();
