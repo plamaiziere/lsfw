@@ -3,6 +3,8 @@
 define       : defines a variable that can be used as a macro.
 equipment    : runs a command on a specific equipment.
 exit         : exits lsfw.
+groovy       : runs groovy script.
+groovyconsole: runs the groovy console.
 help [topic] : displays the [topic] help.
 license      : license informations.
 option       : sets or displays option.
@@ -12,4 +14,4 @@ reload       : reloads the configuration of an equipment.
 route        : shows the routes.
 shell        : help for the builtin shell.
 topology     : shows the topology of the network.
-xref         : shows cross-references on an equipment.    
+xref         : shows cross-references on an equipment.

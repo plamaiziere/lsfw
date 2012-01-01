@@ -1,0 +1,11 @@
+--- groovyconsole ---
+groovyconsole|gc [args]
+
+runs the groovy console with the string args in argument. The groovy console is
+useful to load and debug groovy script within lsfw.
+
+Example:
+--------
+  lsfw> groovyconsole 80 110 25
+
+Runs the groovy console with arguments '80 110 25'

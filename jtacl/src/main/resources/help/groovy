@@ -1,0 +1,14 @@
+--- groovy ---
+groovy|g path scriptname [args]
+
+runs the specified groovy script with the string args in argument.
+
+path: the path to the script.
+scriptname: name of the script.
+
+Example:
+--------
+  lsfw> groovy /path/to/script srvbyport.groovy 80 110 25
+
+Runs the groovy script 'srvbyport.groovy' in '/path/to/script' with arguments
+'80 110 25'
