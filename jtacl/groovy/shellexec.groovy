@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) 2012, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
+
+/*
+ * Execute the command in argument via a shell
+ * (NB: stdinput is not forwarded to the process)
+ * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ */
+
+if (lsfwArgs.isEmpty()) {
+	println("Usage: shellexec command")
+	return
+}
+
+def procb = new ProcessBuilder("/bin/sh", "-c" , lsfwArgs)
+def proc = procb.start()
+proc.waitFor()
+print proc.text
