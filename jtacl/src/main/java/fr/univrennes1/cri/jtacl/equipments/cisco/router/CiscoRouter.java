@@ -150,7 +150,7 @@ public class CiscoRouter extends GenericEquipment {
 
 	/**
 	 * Parser
-	 */	
+	 */
 	protected IOSParser _parser = Parboiled.createParser(IOSParser.class);
 
 	/**
@@ -163,8 +163,8 @@ public class CiscoRouter extends GenericEquipment {
 	 * ParseRunner for InAclContext()
 	 */
 	protected BasicParseRunner _parseRunInAclContext =
-			new BasicParseRunner(_parser.InAclContext());	
-	
+			new BasicParseRunner(_parser.InAclContext());
+
 	/**
 	 * ParseRunner for ExitInterface()
 	 */
@@ -307,6 +307,11 @@ public class CiscoRouter extends GenericEquipment {
 			_parseContext.set(cfg.getFileName(), i + 1, line);
 			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
+
+			if (Log.debug().isLoggable(Level.INFO))
+				Log.debug().info("#" + _parseContext.getLineNumber() +
+					": " + line);
+
 			if (inInterface) {
 				result = _parseRunExitInterface.run(lineCfg);
 				if (result.matched) {
@@ -698,7 +703,7 @@ public class CiscoRouter extends GenericEquipment {
 		 * add the ACE to the access list
 		 */
 		acl.add(ace);
-		
+
 	}
 
 	protected void ruleAccessList(AclTemplate aclTpl, AceTemplate aceTpl) {
@@ -745,6 +750,10 @@ public class CiscoRouter extends GenericEquipment {
 			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
 
+			if (Log.debug().isLoggable(Level.INFO))
+				Log.debug().info("#" + _parseContext.getLineNumber() +
+					": " + lineCfg);
+
 			/*
 			 * check if we are still in an access-list context
 			 */
@@ -784,7 +793,7 @@ public class CiscoRouter extends GenericEquipment {
 				 * access-list (number)
 				 */
 				 if (rule.equals("access-list"))
-					ruleAccessList(_parser.getAclTemplate(), 
+					ruleAccessList(_parser.getAclTemplate(),
 						_parser.getAceTemplate());
 
 				/*
@@ -821,7 +830,7 @@ public class CiscoRouter extends GenericEquipment {
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
 		loadConfiguration(doc);
-		
+
 		/*
 		 * parse and add interfaces
 		 */
@@ -952,7 +961,7 @@ public class CiscoRouter extends GenericEquipment {
 		if (routes.isEmpty()) {
 			probe.killNoRoute("No route to " + probe.getDestinationAddress());
 			return;
-		}	
+		}
 		probe.routed(probe.getDestinationAddress().toString("i::"));
 
 		if (Log.debug().isLoggable(Level.INFO)) {
@@ -960,7 +969,7 @@ public class CiscoRouter extends GenericEquipment {
 				Log.debug().info("route: " + r.toString());
 			}
 		}
-		
+
 		/*
 		 * if we have several routes for a destination, we have to probe these
 		 * routes too because our goal is to know if a probe is able to
@@ -1016,7 +1025,7 @@ public class CiscoRouter extends GenericEquipment {
  			if (!aceIp.networkContains(ip)) {
 				if (!aceIp.overlaps(ip))
 					return MatchResult.NOT;
-				else 
+				else
 					return MatchResult.MATCH;
 			}
 			return MatchResult.ALL;
@@ -1025,7 +1034,7 @@ public class CiscoRouter extends GenericEquipment {
 		/*
 		 * if the ace address is not a valid network.
 		 *
-		 * compare IP 
+		 * compare IP
 		 */
 		if (ip.isHost()) {
 			BigInteger res = ip.getIP().and(aceNetmask.getIP());
@@ -1079,7 +1088,7 @@ public class CiscoRouter extends GenericEquipment {
 	protected MatchResult probeFilter(Probe probe, AccessListElement ace,
 				Direction direction)
 			throws UnknownHostException {
-	
+
 	ProbeRequest request = probe.getRequest();
 
 	/*
@@ -1095,7 +1104,7 @@ public class CiscoRouter extends GenericEquipment {
 			aceSourceNetmask);
 		if (mIpSource == MatchResult.NOT)
 			return MatchResult.NOT;
-		
+
 	}
 
 	/*
@@ -1277,7 +1286,7 @@ public class CiscoRouter extends GenericEquipment {
 							AclResult.ACCEPT : AclResult.DENY);
 						if (match != MatchResult.ALL)
 							aclResult.addResult(AclResult.MAY);
-						
+
 						results.addMatchingAcl(direction,
 							ace.getConfigurationLine(),
 							aclResult);
