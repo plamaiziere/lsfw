@@ -41,7 +41,6 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
-import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
@@ -245,19 +244,19 @@ public class Shell {
 
 	protected PortSpec portToPortSpec(String port) {
 		if (port.equalsIgnoreCase("none"))
-			return new PortSpec(PortOperator.NONE);
+			return PortSpec.NONE;
 
 		if (port.equalsIgnoreCase("any"))
-			return new PortSpec(PortOperator.ANY);
+			return PortSpec.ANY;
 
 		if (port.equalsIgnoreCase("reg"))
-			return new PortSpec(PortOperator.RANGE, 1024, 49151);
+			return PortSpec.REGISTERED;
 
 		if (port.equalsIgnoreCase("dyn"))
-			return new PortSpec(PortOperator.RANGE, 49152, PortRange.MAX);
+			return PortSpec.DYNAMIC;
 
 		if (port.equalsIgnoreCase("known"))
-			return new PortSpec(PortOperator.LT, 1024);
+			return PortSpec.WELLKNOWN;
 
 		return null;
 	}
