@@ -1118,6 +1118,13 @@ public class PacketFilter extends GenericEquipment {
 			if (operator == null)
 				operator = "=";
 
+			/*
+			 * XXX: PF allows range with first port > last port but
+			 * this does not mean anything. Reject this.
+			 */
+			if (last != -1 && (last < first))
+				throwCfgException("invalid port range: " + first + " " + last);
+
 			if (last != -1) {
 				PfPortItem portItem = new PfPortItem(operator, first, last);
 				portspec.add(portItem);
