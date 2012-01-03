@@ -16,11 +16,12 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Port specification in a ProbeRequest.
- *
+ * Immutable classe.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PortSpec {
@@ -34,6 +35,34 @@ public class PortSpec {
 	 * Range(s) of ports.
 	 */
 	protected List<PortRange> _ranges = new ArrayList<PortRange>();
+
+	/**
+	 * PortSpec NONE
+	 */
+	public static final PortSpec NONE = new PortSpec(PortOperator.NONE);
+
+	/**
+	 * PortSpec ANY
+	 */
+	public static final PortSpec ANY = new PortSpec(PortOperator.ANY);
+
+	/**
+	 * PortSpec WELLKNOWN: port < 1024
+	 */
+	public static final PortSpec WELLKNOWN =
+			new PortSpec(PortOperator.LT, 1024);
+
+	/**
+	 * PortSpec REGISTERED: 1024 <= port <= 49151
+	 */
+	public static final PortSpec REGISTERED =
+			new PortSpec(PortOperator.RANGE, 1024, 49151);
+
+	/**
+	 * PortSpec DYNAMIC: port > 49151
+	 */
+	public static final PortSpec DYNAMIC =
+			new	PortSpec(PortOperator.RANGE, 49152, PortRange.MAX);
 
 	/**
 	 * Constructs a new instance using an operator with none operand.
@@ -68,7 +97,7 @@ public class PortSpec {
 				break;
 
 			case NEQ:
-				if (port > 0) 
+				if (port > 0)
 					_ranges.add(new PortRange(0, port - 1));
 
 				if (port < PortRange.MAX)
@@ -101,25 +130,35 @@ public class PortSpec {
 
 	/**
 	 * Constructs a new instance using an operator with two operands
-	 * (operator range).
+	 * (operator range). lastPort may be &lt firstPort.
 	 * @param operator operator to apply.
 	 * @param firstPort first port operand.
 	 * @param lastPort last port operand.
 	 */
 	public PortSpec(PortOperator operator, int firstPort, int lastPort) {
+		int first;
+		int last;
+
+		if (firstPort <= lastPort) {
+			first = firstPort;
+			last = lastPort;
+		} else {
+			first = lastPort;
+			last = firstPort;
+		}
 		_operator = operator;
 		switch (operator) {
 			case RANGE:
-				_ranges.add(new PortRange(firstPort, lastPort));
+				_ranges.add(new PortRange(first, last));
 				break;
 
 			case RANGEEX:
-				_ranges.add(new PortRange(firstPort + 1, lastPort - 1));
+				_ranges.add(new PortRange(first + 1, last - 1));
 				break;
 
 			case EXCLUDE:
-				_ranges.add(new PortRange(0, firstPort - 1));
-				_ranges.add(new PortRange(lastPort + 1, PortRange.MAX));
+				_ranges.add(new PortRange(0, first - 1));
+				_ranges.add(new PortRange(last + 1, PortRange.MAX));
 				break;
 
 			default:
@@ -130,14 +169,13 @@ public class PortSpec {
 	}
 
 	/**
-	 * Returns the list of {@link PortRange} of this instance.
-	 * @return the list of {@link PortRange} of this instance. The list could
-	 * be empty but not null.
+	 * Returns an immutable list of {@link PortRange} of this instance.
+	 * @return an immutable list of {@link PortRange} of this instance.
+	 * The list could be empty but not null.
 	 */
 	public List<PortRange> getRanges() {
-		return _ranges;
+		return Collections.unmodifiableList(_ranges);
 	}
-
 
 	/**
 	 * Checks if this instance matches the port spec in argument.
