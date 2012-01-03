@@ -119,10 +119,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			_fileName = fileName;
 		}
 	}
-	
+
 	/**
 	 * Parser
-	 */	
+	 */
 	protected PixParser _parser = Parboiled.createParser(PixParser.class);
 
 	/**
@@ -130,7 +130,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 */
 	protected BasicParseRunner _parseRunParse =
 			new BasicParseRunner(_parser.Parse());
-	
+
 	/**
 	 * ParseRunner for ExitInterface()
 	 */
@@ -147,7 +147,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 * ParseRunner for Interface()
 	 */
 	protected BasicParseRunner _parseRunInterface =
-			new BasicParseRunner(_parser.Interface());	
+			new BasicParseRunner(_parser.Interface());
 
 	/**
 	 * the list of configuration files, mapped into strings.
@@ -360,6 +360,11 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			line = _parser.stripWhiteSpaces(line);
 			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
+
+			if (Log.debug().isLoggable(Level.INFO))
+				Log.debug().info("#" + _parseContext.getLineNumber() +
+					": " + line);
+
 			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
 			if (inInterface) {
@@ -649,7 +654,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				IPNetCrossRef ixref = getIPNetCrossRef(ip);
 				CrossRefContext refctx =
 						new CrossRefContext(_parseContext,
-						"network-object-group", _lastGroup.getGroupId() + 
+						"network-object-group", _lastGroup.getGroupId() +
 						"; " + _parseContext.getFileNameAndLine());
 				ixref.addContext(refctx);
 				break;
@@ -683,7 +688,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 					portObject = new PortObject(operator, firstPort, lastPort);
 				}
 
-				ServiceObjectGroupItem sobject = 
+				ServiceObjectGroupItem sobject =
 					new ServiceObjectGroupItem(_lastGroup, line, portObject);
 				_lastGroup.add(sobject);
 				break;
@@ -712,7 +717,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				EnhancedServiceObjectGroupItem eobject =
 					new EnhancedServiceObjectGroupItem(_lastGroup,
 					 line, servObject);
-				
+
 				_lastGroup.add(eobject);
 				break;
 			case ICMP:
@@ -971,7 +976,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			throwCfgException("conflict enhanced service group/destination");
 
 		acg.add(acl);
-		
+
 	}
 
 	/*
@@ -1037,6 +1042,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			_parseContext = new ParseContext();
 			_parseContext.set(cfg.getFileName(), i + 1, line);
 
+			if (Log.debug().isLoggable(Level.INFO))
+				Log.debug().info("#" + _parseContext.getLineNumber() +
+					": " + lineCfg);
+
 			/*
 			 * parse the line
 			 */
@@ -1073,7 +1082,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 					ruleObjectGroup(_parser);
 
 				/*
-				 * network-object / protocol-object / port-object 
+				 * network-object / protocol-object / port-object
 				 * / service- object / icmp-object
 				 */
 				if (rule.equals("network-object") ||
@@ -1133,7 +1142,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			}
 		}
 	}
-	
+
 	@Override
 	public void configure() {
 		if (_configurationFileName.isEmpty())
@@ -1541,7 +1550,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 
 		return MatchResult.ALL;
 	}
-	
+
 	/**
 	 * Packet filter for the pix.
 	 */
@@ -1622,5 +1631,5 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			}
 		}
 	}
-	
+
 }
