@@ -1556,7 +1556,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 */
 	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
 
-		String ifaceName = link.getIface().getName();
+		String ifaceName = link.getIfaceName();
 		ProbeResults results = probe.getResults();
 
 		/*
