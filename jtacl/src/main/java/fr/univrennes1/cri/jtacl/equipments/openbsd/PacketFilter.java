@@ -305,7 +305,7 @@ public class PacketFilter extends GenericEquipment {
 
 		Log.config().warning(context + msg);
 	}
-	
+
 	protected void severeConfig(String msg) {
 
 		String context = "";
@@ -315,7 +315,7 @@ public class PacketFilter extends GenericEquipment {
 			context = "";
 
 		Log.config().severe(context + msg);
-	}	
+	}
 
 	protected IPNet parseIp(String ip) {
 
@@ -2442,7 +2442,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * interfaces
 		 */
-		String ifname = context.getLink().getIface().getName();
+		String ifname = context.getLink().getIfaceName();
 		if (!rule.getIfList().isEmpty() && !rule.getIfList().matches(ifname)) {
 			return MatchResult.NOT;
 		}
@@ -2775,7 +2775,7 @@ public class PacketFilter extends GenericEquipment {
 
 	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
 
-		String interfaceDesc = link.getIface().getName() + " (" +
+		String interfaceDesc = link.getIfaceName() + " (" +
 			link.getIface().getComment() + ")";
 		ProbeResults probeResults = probe.getResults();
 
@@ -2783,7 +2783,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * skipped interface
 		 */
-		if (_skippedIfaces.containsKey(link.getIface().getName())) {
+		if (_skippedIfaces.containsKey(link.getIfaceName())) {
 			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
 			probeResults.setInterface(direction, interfaceDesc + " SKIPPED");
 			return;
