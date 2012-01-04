@@ -24,7 +24,7 @@ import java.io.PrintWriter;
 
 /**
  * Report output on probing.
- * 
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ShellReport {
@@ -43,17 +43,17 @@ public class ShellReport {
 
 			IfaceLink in = probe.getIncomingLink();
 			IfaceLink out = probe.getOutgoingLink();
-			NetworkEquipment equipment = in.getIface().getEquipment();
+			NetworkEquipment equipment = in.getEquipment();
 
 			writer.println("On: " + equipment.getName() + " (" +
 				equipment.getComment() + ")");
 
-			writer.print("    " + in.getIface().getName());
+			writer.print("    " + in.getIfaceName());
 			writer.println(" (" + in.getIface().getComment() + ")");
 			writer.print("        interface IP: " + in.getIp().toString("i::"));
 			writer.println(" network: " + in.getNetwork().toString("i::"));
 			if (out != null) {
-				writer.print("    " + out.getIface().getName());
+				writer.print("    " + out.getIfaceName());
 				writer.println(" (" + out.getIface().getComment() + ")");
 				writer.print("        interface IP: " + out.getIp().toString("i::"));
 				writer.println(" network: " + out.getNetwork().toString("i::"));
@@ -95,7 +95,7 @@ public class ShellReport {
 		PrintWriter writer = new PrintWriter(swriter);
 
 		IfaceLink in = probe.getIncomingLink();
-		NetworkEquipment equipment = in.getIface().getEquipment();
+		NetworkEquipment equipment = in.getEquipment();
 
 		writer.println("------");
 		writer.println(equipment.getName() + " (" + equipment.getComment() + ")");
