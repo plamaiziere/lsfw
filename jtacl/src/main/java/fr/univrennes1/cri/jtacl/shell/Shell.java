@@ -148,7 +148,7 @@ public class Shell {
 			 * by interface name
 			 */
 			if (iface != null) {
-				if (link.getIface().getName().equals(ifaceName)) {
+				if (link.getIfaceName().equals(ifaceName)) {
 					/*
 					 * pick up the first link
 					 */
@@ -406,11 +406,11 @@ public class Shell {
 			 */
 			if (candidate != null && option != null) {
 				if (option.equalsIgnoreCase("connected")) {
-					if (candidate.getIfaceLinks().size() <= 1)
+					if (!candidate.isInterconnection())
 						candidate = null;
 				}
 				if (option.equalsIgnoreCase("!connected")) {
-					if (candidate.getIfaceLinks().size() > 1)
+					if (candidate.isInterconnection())
 						candidate = null;
 				}
 			}
