@@ -117,7 +117,7 @@ public class Probe {
 	protected void logNotification(String message) {
 		String s = uidToString();
 		if (!isNotProbing())
-			s += " on: " + getIncomingLink().getIface().getEquipment().getName();
+			s += " on: " + getIncomingLink().getEquipmentName();
 		Log.notifier().finest(s + " " + message);
 	}
 
@@ -130,7 +130,7 @@ public class Probe {
 	 * @param destinationAddress the {@link IPNet} destination IP address of the probe.
 	 * @param request the {@link ProbeRequest} associated to this probe.
 	 */
-	public Probe(ProbesTracker probesTracker, IPNet sourceAddress, 
+	public Probe(ProbesTracker probesTracker, IPNet sourceAddress,
 			IPNet destinationAddress, ProbeRequest request) {
 		initialize();
 		_parentProbe = null;
@@ -431,11 +431,14 @@ public class Probe {
 		if (_parentProbe != null )
 			str = _parentProbe.path() + "/";
 
-		str += (_position.getIncoming() != null) ? _position.getIncoming().getIface().getEquipment().getName() : null;
+		str += (_position.getIncoming() != null) ?
+					_position.getIncoming().getEquipmentName() : null;
 		str += "(";
-		str += (_position.getIncoming() != null) ? _position.getIncoming().getIface().getName() : null;
+		str += (_position.getIncoming() != null) ?
+					_position.getIncoming().getIfaceName() : null;
 		str += "-";
-		str += (_position.getOutgoing() != null) ? _position.getOutgoing().getIface().getName() : null;
+		str += (_position.getOutgoing() != null) ?
+					_position.getOutgoing().getIfaceName() : null;
 		str += ")";
 		return str;
 	}
