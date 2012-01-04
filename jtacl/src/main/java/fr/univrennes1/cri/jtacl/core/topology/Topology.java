@@ -100,9 +100,9 @@ public class Topology {
 			 */
 			// each IfaceLink of the topological link
 			for (IfaceLink ilink: tlink.getLinks()) {
-				if (!nlink.getIfaceLinks().contains(ilink))
+				if (!nlink.isConnectedTo(ilink))
 					throw new JtaclTopologyException("Can't connect topological link" +
-						" equipment: " + ilink.getIface().getEquipment().getName() +
+						" equipment: " + ilink.getEquipmentName() +
 						" link: " + ilink.toString());
 			}
 			// add the network link to the list and remove it from the known list
@@ -130,8 +130,8 @@ public class Topology {
 					throw new JtaclTopologyException("More than one network" +
 							" was found. Topology is ambiguous." +
 							" network: " + iLink.getNetwork().toString() +
-							" equipment: " + iLink.getIface().getEquipment().getName() +
-							" interface: " + iLink.getIface().getName());
+							" equipment: " + iLink.getEquipmentName() +
+							" interface: " + iLink.getIfaceName());
 				}
 			}
 			// connect this iface to this link
@@ -203,7 +203,7 @@ public class Topology {
 	}
 
 	/**
-	 * Returns all the {@link NetworkLink} links containing this {@link IPNet} IP 
+	 * Returns all the {@link NetworkLink} links containing this {@link IPNet} IP
 	 * on their subnet.
 	 * @param ip the {@link IPNet} IP Address contained by the {@link NetworkLink} links.
 	 * @return a {@link NetworkLinks} list containing the links.
