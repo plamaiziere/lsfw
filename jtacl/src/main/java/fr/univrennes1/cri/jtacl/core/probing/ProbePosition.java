@@ -94,7 +94,7 @@ public class ProbePosition {
 		_outgoing = link;
 		_nextHop = nextHop;
 
-		if (!_incoming.getIface().getEquipment().equals(_outgoing.getIface().getEquipment()))
+		if (!_incoming.getEquipment().equals(_outgoing.getEquipment()))
 			throw new JtaclInternalException("The 'incoming' and 'outgoing'" +
 					" IfaceLink must refered to the same equipment");
 	}
@@ -115,13 +115,13 @@ public class ProbePosition {
 		String str = "";
 
 		if (_incoming != null) {
-			str += _incoming.getIface().getEquipment().getName() + "(";
-			str += _incoming.getIface().getName() + "-";
+			str += _incoming.getEquipmentName() + "(";
+			str += _incoming.getIfaceName() + "-";
 		} else
 			return "none";
 
 		if (_outgoing != null) {
-			str += _outgoing.getIface().getName();
+			str += _outgoing.getIfaceName();
 			str += "[" +_nextHop.toString("i") + "]";
 		} else
 			str += "none";
