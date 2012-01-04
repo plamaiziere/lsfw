@@ -75,6 +75,35 @@ public class IfaceLink {
 	}
 
 	/**
+	 * Returns the name of the {@link Iface} interface associated to this
+	 * {@link IfaceLink} link. This is a shortcut for getIface().getName().
+	 * @return the name of the {@link Iface} interface associated to this link.
+	 */
+	public String getIfaceName() {
+		return _iface.getName();
+	}
+
+	/**
+	 * Returns the {@link NetworkEquipment} equipment associated to this
+	 * {@link IfaceLink} link. This is a shortcut for getIface().getEquipment().
+	 * @return the {@link NetworkEquipment} equipment associated to this
+	 * {@link IfaceLink} link.
+	 */
+	public NetworkEquipment getEquipment() {
+		return _iface.getEquipment();
+	}
+
+	/**
+	 * Returns the name of the equipment associated to this {@link IfaceLink}
+	 * link. This is a shortcut for getIface().getEquipment().getName()
+	 * @return the name of the equipment associated to this {@link IfaceLink}
+	 * link.
+	 */
+	public String getEquipmentName() {
+		return _iface.getEquipment().getName();
+	}
+
+	/**
 	 * Returns the {@link IPNet} IP address of this {@link IfaceLink} link.
 	 * @return the {@link IPNet} IP address of this {@link IfaceLink} link.
 	 */
