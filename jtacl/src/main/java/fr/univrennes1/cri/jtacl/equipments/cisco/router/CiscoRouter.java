@@ -1222,7 +1222,7 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
 
-		String ifaceName = link.getIface().getName();
+		String ifaceName = link.getIfaceName();
 		String ifaceComment = link.getIface().getComment();
 		ProbeResults results = probe.getResults();
 
