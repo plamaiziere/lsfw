@@ -108,7 +108,7 @@ public class NetworkLink implements Comparable {
 	 * @param ifaceLink The {@link IfaceLink} link to add.
 	 */
 	public void addIfaceLink(IfaceLink ifaceLink) {
-		NetworkEquipment ne = ifaceLink.getIface().getEquipment();
+		NetworkEquipment ne = ifaceLink.getEquipment();
 
 		_ifaceLinks.add(ifaceLink);
 		if (!isConnectedTo(ne))
@@ -152,7 +152,7 @@ public class NetworkLink implements Comparable {
 			return links;
 
 		for (IfaceLink link: _ifaceLinks) {
-			if (link.getIface().getEquipment().equals(equipment))
+			if (link.getEquipment().equals(equipment))
 				links.add(link);
 		}
 		return links;
@@ -180,8 +180,8 @@ public class NetworkLink implements Comparable {
 		String net = _network.toString();
 		String r = "";
 		for (IfaceLink link: _ifaceLinks) {
-			String equipmentName = link.getIface().getEquipment().getName();
-			String eq = equipmentName + "(" + link.getIface().getName() + " - " +
+			String equipmentName = link.getEquipmentName();
+			String eq = equipmentName + "(" + link.getIfaceName() + " - " +
 					link.getIp().toString("i::");
 			r = r + eq + "), ";
 		}
