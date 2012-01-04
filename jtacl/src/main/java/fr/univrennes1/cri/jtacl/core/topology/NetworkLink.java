@@ -26,7 +26,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 public class NetworkLink implements Comparable {
 
 	/**
-	 * the netork IP address.
+	 * the network IP address.
 	 */
 	protected IPNet _network;
 
@@ -121,10 +121,20 @@ public class NetworkLink implements Comparable {
 	 * @param equipment the {@link NetworkEquipment} to test.
 	 * @return true if the {@link NetworkEquipment} equipment is connected to this
 	 * {@link NetworkLink} link.
-
 	 */
 	public boolean isConnectedTo(NetworkEquipment equipment) {
 		return _equipments.get(equipment.getName()) != null;
+	}
+
+	/**
+	 * Checks if an {@link IfaceLink} iface link is connected to this
+	 * {@link NetworkLink} link.
+	 * @param ifaceLink the {@link IfaceLink} to test.
+	 * @return true if the {@link IfaceLink} iface link is connected to this
+	 * {@link NetworkLink} link.
+	 */
+	public boolean isConnectedTo(IfaceLink ifaceLink) {
+		return _ifaceLinks.contains(ifaceLink);
 	}
 
 	/**
@@ -150,10 +160,19 @@ public class NetworkLink implements Comparable {
 
 	/**
 	 * Checks if this {@link NetworkLink} link is a 'border link'.
-	 * @return if this {@link NetworkLink} link is a 'border link'.
+	 * @return true if this {@link NetworkLink} link is a 'border link'.
 	 */
 	public boolean isBorderLink() {
 		return _borderLink;
+	}
+
+	/**
+	 * Checks if this {@link NetworkLink} link is an interconnection network.
+	 * @return true if this {@link NetworkLink} link is an interconnection
+	 * network.
+	 */
+	public boolean isInterconnection() {
+		return _ifaceLinks.size() > 1;
 	}
 
 	@Override
