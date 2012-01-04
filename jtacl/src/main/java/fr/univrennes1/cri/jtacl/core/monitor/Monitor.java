@@ -75,7 +75,7 @@ public class Monitor {
 	 * configuration XML document
 	 */
 	protected Document _xmlConfiguration;
-	
+
 	/**
 	 * configuration file name
 	 */
@@ -368,7 +368,7 @@ public class Monitor {
 		} catch (IllegalArgumentException ex) {
 			throw new JtaclConfigurationException(ex.getMessage());
 		} catch (InvocationTargetException ex) {
-			throw new JtaclConfigurationException(ex.getMessage());	
+			throw new JtaclConfigurationException(ex.getMessage());
 		}
 		return equipment;
 	}
@@ -420,7 +420,7 @@ public class Monitor {
 	public void configure(String fileName) {
 
 		_configurationFileName = fileName;
-		
+
 		/*
 		 * Read the protocols from ressources.
 		 */
@@ -459,7 +459,7 @@ public class Monitor {
 	 * Initializes the monitor.
 	 */
 	public void init() {
-		
+
 		for (String name : _equipments.keySet()) {
 			NetworkEquipment eq = _equipments.get(name);
 			eq.configure();
@@ -469,7 +469,7 @@ public class Monitor {
 		loadTopology(_xmlConfiguration, _topology);
 		_topology.makeTopology();
 	}
-	
+
 	/**
 	 * Reload the monitor
 	 */
@@ -543,7 +543,7 @@ public class Monitor {
 
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info(probe.uidToString() +
-				" received from: " + link.getIface().getEquipment().getName() + " "
+				" received from: " + link.getEquipmentName() + " "
 				+ link.toString() + " to: " + nextHop.toString("::i"));
 
 		/*
@@ -628,7 +628,7 @@ public class Monitor {
 
 			if (Log.debug().isLoggable(Level.INFO)) {
 				Log.debug().info("----- loop killer on " +
-					link.getIface().getEquipment().getName() +
+					link.getEquipmentName() +
 					" probe" + probe.uidToString());
 				Log.debug().info("probe: " + probe.showSimplePath());
 			}
@@ -643,7 +643,7 @@ public class Monitor {
 			}
 			if (loop) {
 				Log.notifier().warning("Loop detected on " +
-						link.getIface().getEquipment().getName() +
+						link.getEquipmentName() +
 						" probe" + probe.uidToString());
 				probe.setIncomingLink(link);
 				probe.killLoop("loop detected");
@@ -665,9 +665,9 @@ public class Monitor {
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info("probe" + probe.uidToString() +
 						" probing on " +
-						link.getIface().getEquipment() +
+						link.getEquipment() +
 						" link: " + link.toString());
-		
+
 		probe.setIncomingLink(link);
 		link.incoming(probe);
 	}
@@ -713,7 +713,7 @@ public class Monitor {
 	 */
 	public void newProbing(IfaceLink link, IPNet sourceAddress,
 			IPNet destinationAddress, ProbeRequest request) {
-		
+
 		ProbesTracker tracker = new ProbesTracker();
 		Probe probe = new Probe(tracker, sourceAddress, destinationAddress, request);
 		probe.setIncomingLink(link);
