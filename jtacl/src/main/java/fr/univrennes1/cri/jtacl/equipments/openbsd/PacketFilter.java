@@ -305,6 +305,17 @@ public class PacketFilter extends GenericEquipment {
 
 		Log.config().warning(context + msg);
 	}
+	
+	protected void severeConfig(String msg) {
+
+		String context = "";
+		if (_parseContext != null)
+			context = _parseContext.toString();
+		else
+			context = "";
+
+		Log.config().severe(context + msg);
+	}	
 
 	protected IPNet parseIp(String ip) {
 
@@ -1123,7 +1134,8 @@ public class PacketFilter extends GenericEquipment {
 			 * this does not mean anything. Reject this.
 			 */
 			if (last != -1 && (last < first))
-				throwCfgException("invalid port range: " + first + " " + last);
+				severeConfig("invalid port range: " + first +
+					" " + last);
 
 			if (last != -1) {
 				PfPortItem portItem = new PfPortItem(operator, first, last);
