@@ -44,25 +44,25 @@ import org.w3c.dom.NodeList;
 public class SimpleRouter extends GenericEquipment {
 
 	protected ArrayList<String> _acls = new ArrayList<String>();
-	
+
 	protected class SimpleRouterLink {
 		IfaceLink _link;
 		boolean _border;
-		
+
 		protected SimpleRouterLink(IfaceLink link, boolean border) {
 			_link = link;
 			_border = border;
 		}
-		
+
 		protected IfaceLink getLink() {
 			return _link;
 		}
-		
+
 		protected boolean isBorder() {
 			return _border;
 		}
 	}
-	
+
 	Map<IfaceLink, SimpleRouterLink> _srlinks =
 		new HashMap<IfaceLink, SimpleRouterLink>();
 
@@ -102,12 +102,12 @@ public class SimpleRouter extends GenericEquipment {
 			String ifBorder = e.getAttribute("border");
 
 			String s = "name: " + name + " comment: " + comment +
-					" IP: " + ifIp + " network: " + ifNetwork + 
+					" IP: " + ifIp + " network: " + ifNetwork +
 					" border: " + ifBorder;
 
 			if (ifBorder.isEmpty())
 				ifBorder = "false";
-			
+
 			if (name.isEmpty())
 				throw new JtaclConfigurationException("Missing interface name: " + s);
 
@@ -136,7 +136,7 @@ public class SimpleRouter extends GenericEquipment {
 			} catch (UnknownHostException ex) {
 				throw new JtaclConfigurationException("Invalid interface network: " + s);
 			}
-			
+
 			/*
 			 * Append the link to an existing Iface or create a new one.
 			 */
@@ -147,12 +147,12 @@ public class SimpleRouter extends GenericEquipment {
 				iface = addIface(name, comment);
 			}
 			IfaceLink link = iface.addLink(ip, network);
-			
+
 			/*
 			 * a border link accept all the probe in incomming.
 			 */
 			boolean border = Boolean.parseBoolean(ifBorder);
-			SimpleRouterLink srlink = new SimpleRouterLink(link, border);		
+			SimpleRouterLink srlink = new SimpleRouterLink(link, border);
 			_srlinks.put(link, srlink);
 		}
 	}
@@ -198,7 +198,7 @@ public class SimpleRouter extends GenericEquipment {
 		SimpleRouterLink srlink = _srlinks.get(link);
 		if (srlink.isBorder() && ilink == null)
 			ilink = srlink.getLink();
-		
+
 		if (ilink != null) {
 			/*
 			 * Set the probe's final position and notify the monitor
@@ -297,11 +297,11 @@ public class SimpleRouter extends GenericEquipment {
 				 * Compare iface * == any
 				 */
 				if (!riface.equals("*")) {
-					if (!riface.equals(link.getIface().getName())) {
+					if (!riface.equals(link.getIfaceName())) {
 						continue;
 					}
 				}
-				
+
 				/*
 				 * Check the direction
 				 */
