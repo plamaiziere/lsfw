@@ -126,12 +126,11 @@ public class Options {
 	/**
 	 * Sets the DNS cache TTL value.
 	 * @param value value to set.
-	 * @return the DNS cache TTL value.
 	 */
 	public void setDnsCacheTTL(long value) {
 		IPNet.setDnsCacheTt(value);
 	}
-		
+
 	/**
 	 * Sets the option with the specified value.
 	 * @param optionName the name of the option to set.
@@ -170,7 +169,7 @@ public class Options {
 				setDnsCacheTTL(Long.valueOf(value));
 				return;
 			}
-			
+
 
 		} catch (Exception e) {
 			throw new JtaclConfigurationException(e.getMessage());
