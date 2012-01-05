@@ -417,13 +417,10 @@ public final class IPNet implements Comparable {
 	}
 
 	/**
-	 * Constructs a new {@link IPNet} IP address.
-	 * @param ip the {@link BigInteger} IP address as a number
-	 * @param ipVersion the {@link IPversion} IP version of this address.
-	 * @param prefixLen the prefixlen for this IP address.
-	 * @throws UnknownHostException if some parameters are invalid
+	 * Constructs a new {@link IPNet} IP address from an IPBase address.
+	 * @param ip the {@link IPBase} IP address.
 	 */
-	public IPNet(IPBase ip) throws UnknownHostException {
+	public IPNet(IPBase ip) {
 
 		_ip = ip;
 	}
