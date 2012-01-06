@@ -54,6 +54,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,6 +81,7 @@ public class Shell {
 	protected boolean _verbose;
 	protected Probing _lastProbing;
 	protected boolean _testResult;
+	protected PrintStream _outStream = System.out;
 
 	static protected final List<String> _specialPorts = Arrays.asList(
 		"none", "any", "known", "reg", "dyn");
@@ -103,7 +105,7 @@ public class Shell {
 		String equipmentName = specSplit[0];
 		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
 		if (equipment == null) {
-			System.out.println("No such equipment: " + equipmentName);
+			_outStream.println("No such equipment: " + equipmentName);
 			return null;
 		}
 		IPNet ipaddress = null;
@@ -127,7 +129,7 @@ public class Shell {
 				ifaceName = specSplit[1];
 				iface = equipment.getIface(ifaceName);
 				if (iface == null) {
-					System.out.println("No such interface: " + ifaceName);
+					_outStream.println("No such interface: " + ifaceName);
 					return null;
 				}
 			}
@@ -258,11 +260,11 @@ public class Shell {
 				if (line == null) {
 					break;
 				}
-				System.out.println(line);
+				_outStream.println(line);
 			}
 			reader.close();
 		} catch (IOException ex) {
-			System.out.println("cannot print help");
+			_outStream.println("cannot print help");
 		}
 
 	}
@@ -275,10 +277,10 @@ public class Shell {
 			try {
 				_monitor.getOptions().setOption(name, value);
 			} catch (JtaclConfigurationException e) {
-				System.out.println("Error: " + e.getMessage());
+				_outStream.println("Error: " + e.getMessage());
 			}
 		else
-			System.out.println(_monitor.getOptions().getOptionsList());
+			_outStream.println(_monitor.getOptions().getOptionsList());
 	}
 
 	public void defineCommand(ShellParser command) {
@@ -294,7 +296,7 @@ public class Shell {
 			}
 		} else {
 			for (String d: _monitor.getDefines().keySet()) {
-				System.out.println(d + "=" + _monitor.getDefines().get(d));
+				_outStream.println(d + "=" + _monitor.getDefines().get(d));
 			}
 		}
 
@@ -322,7 +324,7 @@ public class Shell {
 			if (ip == null) {
 				equipment = _monitor.getEquipments().get(equipmentName);
 				if (equipment == null) {
-					System.out.println("No such equipment: " + equipmentName);
+					_outStream.println("No such equipment: " + equipmentName);
 					return;
 				}
 			}
@@ -344,7 +346,7 @@ public class Shell {
 						candidate = link;
 					}
 				} catch (UnknownHostException ex) {
-					System.out.println("Error " + ex.getMessage());
+					_outStream.println("Error " + ex.getMessage());
 					return;
 				}
 			} else {
@@ -378,7 +380,7 @@ public class Shell {
 			 * output
 			 */
 			if (candidate != null)
-				System.out.println(candidate.toString());
+				_outStream.println(candidate.toString());
 
 		}
 	}
@@ -388,18 +390,18 @@ public class Shell {
 		String equipmentName = command.getEquipments();
 		if (equipmentName != null) {
 			if (!_monitor.getEquipments().containsKey(equipmentName)) {
-				System.out.println("No such equipment: " + equipmentName);
+				_outStream.println("No such equipment: " + equipmentName);
 				return;
 			}
 		}
 		NetworkEquipmentsByName equipments = _monitor.getEquipments();
 		for (NetworkEquipment equipment: equipments.values()) {
 			if (equipmentName== null || equipment.getName().equals(equipmentName)) {
-				System.out.println("Routes on " + equipment.getName());
-				System.out.println("-------------------");
-				System.out.println(equipment.getShowableRoutes().showRoutes());
-				System.out.println("-------------------");
-				System.out.println();
+				_outStream.println("Routes on " + equipment.getName());
+				_outStream.println("-------------------");
+				_outStream.println(equipment.getShowableRoutes().showRoutes());
+				_outStream.println("-------------------");
+				_outStream.println();
 			}
 		}
 	}
@@ -409,11 +411,11 @@ public class Shell {
 		String equipmentName = command.getEquipments();
 		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
 		if (equipment == null) {
-			System.out.println("No such equipment: " + equipmentName);
+			_outStream.println("No such equipment: " + equipmentName);
 			return;
 		}
 
-		equipment.runShell(command.getSubCommand());
+		equipment.runShell(command.getSubCommand(), _outStream);
 	}
 
 	public void reloadCommand(ShellParser command) {
@@ -427,7 +429,7 @@ public class Shell {
 
 		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
 		if (equipment == null) {
-			System.out.println("No such equipment: " + equipmentName);
+			_outStream.println("No such equipment: " + equipmentName);
 			return;
 		}
 
@@ -467,10 +469,10 @@ public class Shell {
 				// not an IP try to resolve as a host.
 				sourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
 				if (!testMode)
-					System.out.println(sSourceAddress + " => " +
+					_outStream.println(sSourceAddress + " => " +
 						sourceAddress.toString("::i"));
 			} catch (UnknownHostException ex1) {
-				System.out.println("Error: " + ex1.getMessage());
+				_outStream.println("Error: " + ex1.getMessage());
 				return false;
 			}
 		}
@@ -482,10 +484,10 @@ public class Shell {
 				// not an IP try to resolve as a host.
 				destinationAdress = IPNet.getByName(command.getDestAddress(), ipVersion);
 				if (!testMode)
-					System.out.println(command.getDestAddress() + " => " +
+					_outStream.println(command.getDestAddress() + " => " +
 						destinationAdress.toString("::i"));
 			} catch (UnknownHostException ex1) {
-				System.out.println("Error: " + ex1.getMessage());
+				_outStream.println("Error: " + ex1.getMessage());
 				return false;
 			}
 		}
@@ -494,7 +496,7 @@ public class Shell {
 		 * Check address family
 		 */
 		if (!sourceAddress.sameIPVersion(destinationAdress)) {
-			System.out.println("Error: source address and destination address" +
+			_outStream.println("Error: source address and destination address" +
 					" must have the same address family");
 			return false;
 		}
@@ -520,7 +522,7 @@ public class Shell {
 				try {
 					nlinks = topology.getNetworkLinksByIP(sourceAddress.hostAddress());
 				}  catch (UnknownHostException ex1) {
-					System.out.println("Error: " + ex1.getMessage());
+					_outStream.println("Error: " + ex1.getMessage());
 					return false;
 				}
 			}
@@ -539,12 +541,12 @@ public class Shell {
 					if (ilinks == null)
 						return false;
 				} else {
-					System.out.println("No network matches");
+					_outStream.println("No network matches");
 					return false;
 				}
 			} else {
 				if (nlinks.size() > 1) {
-					System.out.println("Too many networks match this source IP address");
+					_outStream.println("Too many networks match this source IP address");
 					return false;
 				}
 				ilinks = nlinks.get(0).getIfaceLinks();
@@ -552,12 +554,12 @@ public class Shell {
 		}
 
 		if (ilinks.isEmpty()) {
-			System.out.println("No link found");
+			_outStream.println("No link found");
 			return false;
 		}
 
 		if (ilinks.size() > 1) {
-			System.out.println("Too many links");
+			_outStream.println("Too many links");
 			return false;
 		}
 
@@ -585,7 +587,7 @@ public class Shell {
 		if (sprotocol != null) {
 			protocol = ipProtocols.protocolLookup(sprotocol);
 			if (protocol.intValue() == -1)  {
-				System.out.println("unknown protocol: " + sprotocol);
+				_outStream.println("unknown protocol: " + sprotocol);
 				return false;
 			}
 			List<Integer> protocols = new ArrayList<Integer>();
@@ -614,7 +616,7 @@ public class Shell {
 				if (!_specialPorts.contains(port)) {
 					portSource = ipServices.serviceLookup(sportSource, sprotocol);
 					if (portSource.intValue() == -1) {
-						System.out.println("unknown service: " + sportSource);
+						_outStream.println("unknown service: " + sportSource);
 						return false;
 					}
 					request.setSourcePort(new PortSpec(PortOperator.EQ, portSource));
@@ -629,7 +631,7 @@ public class Shell {
 				if (!_specialPorts.contains(port)) {
 					portDest = ipServices.serviceLookup(sportDest, sprotocol);
 					if (portDest.intValue() == -1) {
-						System.out.println("unknown service: " + sportDest);
+						_outStream.println("unknown service: " + sportDest);
 						return false;
 					}
 					request.setDestinationPort(new PortSpec(PortOperator.EQ, portDest));
@@ -644,7 +646,7 @@ public class Shell {
 				StringsList tcpFlags = command.getTcpFlags();
 				if (tcpFlags != null) {
 					if (sprotocol.equalsIgnoreCase("udp")) {
-						System.out.println("TCP flags not allowed for UDP!");
+						_outStream.println("TCP flags not allowed for UDP!");
 						return false;
 					}
 
@@ -663,7 +665,7 @@ public class Shell {
 							continue;
 						}
 						if (!checkTcpFlags(flag)) {
-							System.out.println("invalid TCP flags: " + flag);
+							_outStream.println("invalid TCP flags: " + flag);
 							return false;
 						}
 						TcpFlags tf = new TcpFlags(flag);
@@ -698,7 +700,7 @@ public class Shell {
 				if (sportSource != null) {
 					IPIcmpEnt icmpEnt = ipIcmp.icmpLookup(sportSource);
 					if (icmpEnt == null) {
-						System.out.println("unknown icmp-type or message: "
+						_outStream.println("unknown icmp-type or message: "
 							+ sportSource);
 						return false;
 					}
@@ -744,7 +746,7 @@ public class Shell {
 		for (ProbesTracker tracker: _lastProbing) {
 			if (!testMode) {
 				ShellReport report = new ShellReport((tracker));
-				System.out.print(report.showResults(_verbose));
+				_outStream.print(report.showResults(_verbose));
 			}
 			AclResult aclResult = tracker.getAclResult();
 			if (aclResult.hasAccept())
@@ -834,9 +836,9 @@ public class Shell {
 		}
 
 		if (!testMode) {
-			System.out.println("Global ACL result is: " + aclResult);
-			System.out.println("Global routing result is: " + routingResult);
-			System.out.println();
+			_outStream.println("Global ACL result is: " + aclResult);
+			_outStream.println("Global routing result is: " + routingResult);
+			_outStream.println();
 		}
 
 		/*
@@ -883,14 +885,14 @@ public class Shell {
 		try {
 			scriptEngine = new GroovyScriptEngine(parser.getGroovyDirectory());
 		} catch (IOException ex) {
-			System.out.println(ex.getMessage());
+			_outStream.println(ex.getMessage());
 			return;
 		}
 		try {
 			scriptEngine.run(parser.getGroovyScript(), lsfwBinding);
 		} catch (Exception ex) {
-			System.out.println();
-			System.out.println("Error: " + ex.getMessage());
+			_outStream.println();
+			_outStream.println("Error: " + ex.getMessage());
 		}
 	}
 
@@ -940,7 +942,7 @@ public class Shell {
 			if (result.hasErrors()) {
 				ParseError error = result.parseErrors.get(0);
 				InputBuffer buf = error.getInputBuffer();
-				System.out.println("Syntax error: " +
+				_outStream.println("Syntax error: " +
 					buf.extract(0, error.getStartIndex()));
 			}
 		}
@@ -952,14 +954,14 @@ public class Shell {
 			try {
 				ShellConsole.out().tee(teeFile, teeAppend);
 			} catch (FileNotFoundException ex) {
-				System.out.println("Cannot open file: " + teeFile);
+				_outStream.println("Cannot open file: " + teeFile);
 				return;
 			}
 		}
 
 		if (_parser.getCommand().equals("quit")) {
 			if (_interactive)
-				System.out.println("Goodbye!");
+				_outStream.println("Goodbye!");
 			System.exit(0);
 		}
 		if (_parser.getCommand().equals("probe") ||
@@ -968,9 +970,9 @@ public class Shell {
 			if (_parser.getProbeExpect() != null) {
 				if (!test) {
 					_testResult = false;
-					System.out.println(commandLine + " [FAILED]");
+					_outStream.println(commandLine + " [FAILED]");
 				} else {
-					System.out.println(commandLine + " [OK]");
+					_outStream.println(commandLine + " [OK]");
 				}
 			}
 		}
@@ -1000,7 +1002,7 @@ public class Shell {
 			try {
 				ShellConsole.out().unTee();
 			} catch (IOException ex) {
-				System.out.println("Cannot unTee file: " + teeFile);
+				_outStream.println("Cannot unTee file: " + teeFile);
 			}
 		}
 	}
@@ -1028,7 +1030,7 @@ public class Shell {
 
 		for (;;) {
 			if (_interactive)
-				System.out.print(_prompt);
+				_outStream.print(_prompt);
 			String commandLine;
 			try {
 				commandLine = dataIn.readLine();
@@ -1052,6 +1054,14 @@ public class Shell {
 		if (!_testResult)
 			return App.EXIT_FAILURE;
 		return App.EXIT_SUCCESS;
+	}
+
+	public PrintStream getOutputStream() {
+		return _outStream;
+	}
+
+	public void setOutputStream(PrintStream outStream) {
+		_outStream = outStream;
 	}
 
 }
