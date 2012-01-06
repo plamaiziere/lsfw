@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.shell;
 
+import fr.univrennes1.cri.jtacl.App;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
@@ -56,11 +57,8 @@ import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import static java.util.Arrays.* ;
 import java.util.Collections;
 import java.util.List;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
@@ -73,20 +71,16 @@ import org.parboiled.support.ParsingResult;
  */
 public class Shell {
 
-	protected String _prompt;
-	protected ShellParser _parser;
-	protected ReportingParseRunner _parseRunner;
-	protected Monitor _monitor;
-	protected OptionParser _optParser;
+	protected String _prompt = "lsfw> ";
+	protected ShellParser _parser = Parboiled.createParser(ShellParser.class);
+	protected ReportingParseRunner _parseRunner =
+		new ReportingParseRunner(_parser.CommandLine());
+	protected Monitor _monitor = Monitor.getInstance();;
 	protected boolean _interactiveMode;
 	protected boolean _testMode;
 	protected boolean _verbose;
 	protected Probing _lastProbing;
 	protected boolean _testResult;
-
-	static public final int EXIT_SUCCESS = 0;
-	static public final int EXIT_FAILURE = 1;
-	static public final int EXIT_ERROR = 255;
 
 	static protected final List<String> _specialPorts = Arrays.asList(
 		"none", "any", "known", "reg", "dyn");
@@ -195,42 +189,9 @@ public class Shell {
 		return true;
 	}
 
-	public Shell() {
-		_prompt = "lsfw> ";
-
-		_parser = Parboiled.createParser(ShellParser.class);
-		_parseRunner = new ReportingParseRunner(_parser.CommandLine());
-		_monitor = Monitor.getInstance();
-		_lastProbing = null;
-
-		_optParser = new OptionParser();
-		_optParser.acceptsAll(asList("c", "command"),
-				"Execute the command in argument and quit.")
-				.withRequiredArg().describedAs("command to execute");
-
-		_optParser.acceptsAll(asList("f", "file"),
-				"Use the configuration file in argument.")
-				.withRequiredArg().describedAs("configuration file");
-
-		_optParser.acceptsAll(asList("i", "input"),
-				"Read and execute commands from the input file and quit.")
-				.withRequiredArg().describedAs("input file");
-
-		_optParser.acceptsAll(asList("h", "help"),
-				"This help.");
-
-		_optParser.acceptsAll(asList("n", "no-interactive"),
-				"Non interactive mode.");
-
-		_optParser.acceptsAll(asList("t", "test"),
-				"Test mode.");
-
-		_optParser.acceptsAll(asList("v", "verbose"),
-				"Use verbose reports.");
-
-		_optParser.acceptsAll(asList("o", "option"), "Set option").
-				withRequiredArg().describedAs("option to set (option=value)");
-
+	public Shell(boolean interactive, boolean verbose) {
+		_interactiveMode = interactive;
+		_verbose = verbose;
 	}
 
 	protected String substitute(String line) {
@@ -1043,20 +1004,14 @@ public class Shell {
 		}
 	}
 
-	protected void printUsage() {
-		try {
-			_optParser.printHelpOn(System.out);
-		} catch (IOException ex) {
-			// do nothing
-		}
-	}
-
-	public void runCommand(String commandLine) {
-
+	public int runCommand(String commandLine) {
 		parseShellCommand(commandLine.trim());
+		if (!_testResult)
+			return App.EXIT_FAILURE;
+		return App.EXIT_SUCCESS;
 	}
 
-	public void runFromFile(String fileName) {
+	public int runFromFile(String fileName) {
 
 		BufferedReader dataIn = null;
 		if (fileName == null) {
@@ -1093,64 +1048,9 @@ public class Shell {
 		} catch (IOException ex) {
 				throw new JtaclRuntimeException(ex.getMessage());
 		}
-	}
-
-	public void run(String[] args) {
-		try {
-			ShellConsole.install();
-			OptionSet option = _optParser.parse(args);
-			String configFile = null;
-			_testMode = option.has("test");
-			if (_testMode)
-				_testResult = true;
-			if (option.has("file")) {
-				configFile = (String) option.valueOf("file");
-			} else {
-				printUsage();
-				System.exit(Shell.EXIT_ERROR);
-			}
-
-			_verbose = option.has("verbose");
-			if (option.has("option")) {
-				_interactiveMode = false;
-				List<?> options = option.valuesOf("o");
-				for (Object o: options) {
-					parseShellCommand("option " + (String)o);
-				}
-			}
-
-			_monitor.configure(configFile);
-			_monitor.init();
-
-			if (option.has("command")) {
-				String line = (String) option.valueOf("command");
-				_interactiveMode = false;
-				runCommand(line);
-			}
-			if (option.has("input")) {
-				String fileName = (String) option.valueOf("input");
-				_interactiveMode = false;
-				runFromFile(fileName);
-			}
-
-			_interactiveMode = !option.has("no-interactive");
-			if (!option.has("command") && !option.has("input"))
-				runFromFile(null);
-
-			if (_testMode) {
-				if (!_testResult)
-					System.exit(Shell.EXIT_FAILURE);
-				else
-					System.exit(Shell.EXIT_SUCCESS);
-			}
-			System.exit(Shell.EXIT_SUCCESS);
-
-		} catch (Exception ex) {
-			System.err.println("Error: " + ex.getMessage());
-			if (!(ex instanceof JtaclConfigurationException))
-				ex.printStackTrace();
-			System.exit(Shell.EXIT_ERROR);
-		}
+		if (!_testResult)
+			return App.EXIT_FAILURE;
+		return App.EXIT_SUCCESS;
 	}
 
 }
