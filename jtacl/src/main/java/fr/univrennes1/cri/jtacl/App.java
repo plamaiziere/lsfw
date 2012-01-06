@@ -79,9 +79,6 @@ public class App
 		optParser.acceptsAll(asList("n", "no-interactive"),
 			"Non interactive mode.");
 
-		optParser.acceptsAll(asList("t", "test"),
-			"Test mode.");
-
 		optParser.acceptsAll(asList("v", "verbose"),
 			"Use verbose reports.");
 
