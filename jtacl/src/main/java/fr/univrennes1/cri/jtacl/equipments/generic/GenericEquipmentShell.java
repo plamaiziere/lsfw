@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.generic;
 
+import java.io.PrintStream;
+
 /**
  * Equipment sub shell generic interface.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -21,14 +23,16 @@ public interface GenericEquipmentShell {
 
 	/**
 	 * Displays the help of this shell
+	 * @param output Stream to output.
 	 */
-	void shellHelp();
+	void shellHelp(PrintStream output);
 
 	/**
 	 * Runs the specified shell command in argument.
 	 * @param command command to run.
+	 * @param output Stream to output.
 	 * @return true if the command is part of this shell, false otherwise.
 	 */
-	boolean shellCommand(String command);
+	boolean shellCommand(String command, PrintStream output);
 
 }

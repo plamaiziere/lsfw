@@ -16,6 +16,7 @@ package fr.univrennes1.cri.jtacl.core.network;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import java.io.PrintStream;
 import java.net.UnknownHostException;
 
 /**
@@ -74,7 +75,7 @@ public class NetworkEquipment {
 	 * @param name the name of the Interface. The name of an {@link Iface} must
 	 * be unique in one {@link NetworkEquipment}.
 	 * @param comment a free comment for this interface.
-	 * @return the {@link Iface} created 
+	 * @return the {@link Iface} created
 	 */
 	public Iface addIface(String name, String comment) {
 		Iface iface = new Iface(_monitor, name, comment, this);
@@ -114,7 +115,7 @@ public class NetworkEquipment {
 	public IfacesByName getIfaces() {
 		return _ifaces;
 	}
-	
+
 	/**
 	 * Returns the {@link Iface} named 'name' in this {@link NetworkEquipment}.
 	 * @param name the name of the {@link Iface} interface.
@@ -187,7 +188,7 @@ public class NetworkEquipment {
 
 	/**
 	 * Configures this {@link NetworkEquipment} equipment.<br/>
-	 * This method is called by the {@link Monitor} monitor when all the 
+	 * This method is called by the {@link Monitor} monitor when all the
 	 * {@link NetworkEquipment} equipments have been created. This method should
 	 * be overrided, by example to read the configuration file of the equipment.
 	 */
@@ -223,12 +224,13 @@ public class NetworkEquipment {
 	 * Interprets and runs a shell command. This method is called by the shell
 	 * and could be overrided to implement commands specific to the equipment.
 	 * @param command the command to run.
+	 * @param output Stream to output.
 	 */
-	public void runShell(String command) {
+	public void runShell(String command, PrintStream output) {
 		/*
 		 * do nothing by default
 		 */
-		System.out.println("Unknown equipment command");
+		output.println("Unknown equipment command");
 	}
 
 	/**

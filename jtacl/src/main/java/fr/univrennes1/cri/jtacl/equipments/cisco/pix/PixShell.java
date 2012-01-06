@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -38,6 +39,7 @@ public class PixShell implements GenericEquipmentShell {
 	protected Pix _pix;
 	protected PixShellParser _shellParser;
 	protected ReportingParseRunner _parseRunner;
+	protected PrintStream _outStream;
 
 	protected void commandShowNames(PixShellParser parser) {
 
@@ -53,17 +55,18 @@ public class PixShell implements GenericEquipmentShell {
 						!name.isUsed())
 					continue;
 			}
-			System.out.println(name.getName() + " = " + name.getIpValue() +
+			_outStream.println(name.getName() + " = " + name.getIpValue() +
 					" [" + name.getRefCount() + "]");
 		}
 	}
 
-	public void shellHelp() {
+	public void shellHelp(PrintStream output) {
+		_outStream = output;
 		try {
 			InputStream stream = null;
 			stream = this.getClass().getResourceAsStream("/help/pix");
 			if (stream == null) {
-				System.out.println("cannot print help");
+				_outStream.println("cannot print help");
 				return;
 			}
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -72,11 +75,11 @@ public class PixShell implements GenericEquipmentShell {
 				if (line == null) {
 					break;
 				}
-				System.out.println(line);
+				_outStream.println(line);
 			}
 			reader.close();
 		} catch (IOException ex) {
-			System.out.println("cannot print help");
+			_outStream.println("cannot print help");
 		}
 
 	}
@@ -95,7 +98,7 @@ public class PixShell implements GenericEquipmentShell {
 						!group.isUsed())
 					continue;
 			}
-			System.out.println(group.getGroupId() + " [" + group.getRefCount() + "]");
+			_outStream.println(group.getGroupId() + " [" + group.getRefCount() + "]");
 		}
 	}
 
@@ -106,7 +109,7 @@ public class PixShell implements GenericEquipmentShell {
 			try {
 				ipreq = new IPNet(parser.getXrefIp());
 			} catch (UnknownHostException ex) {
-				System.out.println("Error: " + ex.getMessage());
+				_outStream.println("Error: " + ex.getMessage());
 				return;
 			}
 		}
@@ -127,34 +130,34 @@ public class PixShell implements GenericEquipmentShell {
 					continue;
 			}
 			catch (UnknownHostException ex) {
-				System.out.println("Error " + ex.getMessage());
+				_outStream.println("Error " + ex.getMessage());
 				return;
 			}
 			for (CrossRefContext ctx: crossref.getContexts()) {
-				System.out.print(ip.toString("::i"));
+				_outStream.print(ip.toString("::i"));
 				if (fhost) {
 					try {
-						System.out.print("; " + ip.getCannonicalHostname());
+						_outStream.print("; " + ip.getCannonicalHostname());
 					} catch (UnknownHostException ex) {
-						System.out.print("; nohost");
+						_outStream.print("; nohost");
 					}
 				}
-				System.out.print("; " + ctx.getContextName());
-				System.out.print("; " + ctx.getComment());
+				_outStream.print("; " + ctx.getContextName());
+				_outStream.print("; " + ctx.getComment());
 				String line = ctx.getParseContext().getLine().trim();
 				if (fshort) {
-					System.out.print("; ");
+					_outStream.print("; ");
 					Scanner sc = new Scanner(line);
 					if (sc.hasNextLine())
-						System.out.println(sc.nextLine());
+						_outStream.println(sc.nextLine());
 					else
-						System.out.println(line);
+						_outStream.println(line);
 				} else {
 					if (flong) {
-						System.out.print("; ");
-						System.out.println(line);
+						_outStream.print("; ");
+						_outStream.println(line);
 					} else {
-						System.out.println();
+						_outStream.println();
 					}
 				}
 			}
@@ -167,8 +170,8 @@ public class PixShell implements GenericEquipmentShell {
 		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
 	}
 
-	public boolean shellCommand(String command) {
-
+	public boolean shellCommand(String command, PrintStream output) {
+		_outStream = output;
 		_parseRunner.getParseErrors().clear();
 		ParsingResult<?> result = _parseRunner.run(command);
 
@@ -179,7 +182,7 @@ public class PixShell implements GenericEquipmentShell {
 		String shellCmd = _shellParser.getCommand();
 
 		if (shellCmd.equals("help")) {
-			shellHelp();
+			shellHelp(output);
 			return true;
 		}
 

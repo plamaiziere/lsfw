@@ -35,6 +35,7 @@ import fr.univrennes1.cri.jtacl.lib.misc.KeyValue;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -413,25 +414,25 @@ public class GenericEquipment extends NetworkEquipment {
 	}
 
 	@Override
-	public void runShell(String command) {
+	public void runShell(String command, PrintStream output) {
 
 		if (command.equalsIgnoreCase("help")) {
 			for (GenericEquipmentShell shell: _shells) {
-				shell.shellHelp();
+				shell.shellHelp(output);
 			}
 			return;
 		}
-		
+
 		boolean cmdMatch = false;
 		for (GenericEquipmentShell shell: _shells) {
-			if (shell.shellCommand(command)) {
+			if (shell.shellCommand(command, output)) {
 				cmdMatch = true;
  				break;
 			}
 		}
 
 		if (!cmdMatch) {
-			super.runShell(command);
+			super.runShell(command, output);
 		}
 	}
 
