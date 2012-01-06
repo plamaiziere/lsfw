@@ -76,8 +76,7 @@ public class Shell {
 	protected ReportingParseRunner _parseRunner =
 		new ReportingParseRunner(_parser.CommandLine());
 	protected Monitor _monitor = Monitor.getInstance();;
-	protected boolean _interactiveMode;
-	protected boolean _testMode;
+	protected boolean _interactive;
 	protected boolean _verbose;
 	protected Probing _lastProbing;
 	protected boolean _testResult;
@@ -190,7 +189,7 @@ public class Shell {
 	}
 
 	public Shell(boolean interactive, boolean verbose) {
-		_interactiveMode = interactive;
+		_interactive = interactive;
 		_verbose = verbose;
 	}
 
@@ -441,6 +440,7 @@ public class Shell {
 
 	public boolean probeCommand(ShellParser command) {
 
+		boolean testMode = command.getProbeExpect() != null;
 		IPversion ipVersion;
 		if (command.getCommand().equals("probe6"))
 			ipVersion = IPversion.IPV6;
@@ -466,7 +466,7 @@ public class Shell {
 			try {
 				// not an IP try to resolve as a host.
 				sourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
-				if (!_testMode)
+				if (!testMode)
 					System.out.println(sSourceAddress + " => " +
 						sourceAddress.toString("::i"));
 			} catch (UnknownHostException ex1) {
@@ -481,7 +481,7 @@ public class Shell {
 			try {
 				// not an IP try to resolve as a host.
 				destinationAdress = IPNet.getByName(command.getDestAddress(), ipVersion);
-				if (!_testMode)
+				if (!testMode)
 					System.out.println(command.getDestAddress() + " => " +
 						destinationAdress.toString("::i"));
 			} catch (UnknownHostException ex1) {
@@ -742,7 +742,7 @@ public class Shell {
 		 * each tracker
 		 */
 		for (ProbesTracker tracker: _lastProbing) {
-			if (!_testMode) {
+			if (!testMode) {
 				ShellReport report = new ShellReport((tracker));
 				System.out.print(report.showResults(_verbose));
 			}
@@ -833,7 +833,7 @@ public class Shell {
 			}
 		}
 
-		if (!_testMode) {
+		if (!testMode) {
 			System.out.println("Global ACL result is: " + aclResult);
 			System.out.println("Global routing result is: " + routingResult);
 			System.out.println();
@@ -958,13 +958,14 @@ public class Shell {
 		}
 
 		if (_parser.getCommand().equals("quit")) {
-			System.out.println("Goodbye!");
+			if (_interactive)
+				System.out.println("Goodbye!");
 			System.exit(0);
 		}
 		if (_parser.getCommand().equals("probe") ||
 			  _parser.getCommand().equals("probe6")) {
 			boolean test = probeCommand(_parser);
-			if (_testMode) {
+			if (_parser.getProbeExpect() != null) {
 				if (!test) {
 					_testResult = false;
 					System.out.println(commandLine + " [FAILED]");
@@ -1005,6 +1006,7 @@ public class Shell {
 	}
 
 	public int runCommand(String commandLine) {
+		_testResult = true;
 		parseShellCommand(commandLine.trim());
 		if (!_testResult)
 			return App.EXIT_FAILURE;
@@ -1012,7 +1014,7 @@ public class Shell {
 	}
 
 	public int runFromFile(String fileName) {
-
+		_testResult = true;
 		BufferedReader dataIn = null;
 		if (fileName == null) {
 			 dataIn = new BufferedReader(new InputStreamReader(System.in));
@@ -1025,7 +1027,7 @@ public class Shell {
 		}
 
 		for (;;) {
-			if (_interactiveMode && !_testMode)
+			if (_interactive)
 				System.out.print(_prompt);
 			String commandLine;
 			try {
@@ -1036,10 +1038,9 @@ public class Shell {
 			if (commandLine == null) {
 				break;
 			}
-			if (_interactiveMode && !_testMode &&
-					_monitor.getOptions().getAutoReload()) {
+			if (_interactive && _monitor.getOptions().getAutoReload())
 				autoReload();
-			}
+
 			commandLine = commandLine.trim();
 			parseShellCommand(commandLine);
 		}
