@@ -79,9 +79,6 @@ public class App
 		optParser.acceptsAll(asList("n", "no-interactive"),
 			"Non interactive mode.");
 
-		optParser.acceptsAll(asList("v", "verbose"),
-			"Use verbose reports.");
-
 		optParser.acceptsAll(asList("o", "option"), "Set option").
 			withRequiredArg().describedAs("option to set (option=value)");
 
@@ -163,7 +160,7 @@ public class App
 			 */
 			if (optionSet.has("command")) {
 				String line = (String) optionSet.valueOf("command");
-				shell = new Shell(false, verbose);
+				shell = new Shell(false);
 				ret = shell.runCommand(line);
 				quit(ret);
 			}
@@ -173,7 +170,7 @@ public class App
 			 */
 			if (optionSet.has("input")) {
 				String fileName = (String) optionSet.valueOf("input");
-				shell = new Shell(false, verbose);
+				shell = new Shell(false);
 				ret = shell.runFromFile(fileName);
 				quit(ret);
 			}
@@ -182,7 +179,7 @@ public class App
 			 * normal shell
 			 */
 			boolean interactive = !optionSet.has("no-interactive");
-			shell = new Shell(interactive, verbose);
+			shell = new Shell(interactive);
 			ret = shell.runFromFile(null);
 			quit(ret);
 		} catch (Exception ex) {

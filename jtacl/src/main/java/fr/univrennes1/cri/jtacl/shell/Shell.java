@@ -79,7 +79,6 @@ public class Shell {
 		new ReportingParseRunner(_parser.CommandLine());
 	protected Monitor _monitor = Monitor.getInstance();;
 	protected boolean _interactive;
-	protected boolean _verbose;
 	protected Probing _lastProbing;
 	protected boolean _testResult;
 	protected PrintStream _outStream = System.out;
@@ -191,9 +190,12 @@ public class Shell {
 		return true;
 	}
 
-	public Shell(boolean interactive, boolean verbose) {
+	public Shell() {
+		_interactive = false;
+	}
+
+	public Shell(boolean interactive) {
 		_interactive = interactive;
-		_verbose = verbose;
 	}
 
 	protected String substitute(String line) {
@@ -744,10 +746,11 @@ public class Shell {
 		/*
 		 * each tracker
 		 */
+		boolean verbose = command.getProbeOptVerbose();
 		for (ProbesTracker tracker: _lastProbing) {
 			if (!testMode) {
 				ShellReport report = new ShellReport((tracker));
-				_outStream.print(report.showResults(_verbose));
+				_outStream.print(report.showResults(verbose));
 			}
 			AclResult aclResult = tracker.getAclResult();
 			if (aclResult.hasAccept())
