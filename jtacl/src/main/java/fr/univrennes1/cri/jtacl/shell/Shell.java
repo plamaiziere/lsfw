@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
@@ -67,7 +68,7 @@ import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
- *
+ * lsfw shell
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class Shell {
@@ -905,6 +906,10 @@ public class Shell {
 	}
 
 	public void parseShellCommand(String commandLine) {
+
+		if (Log.debug().isLoggable(Level.INFO))
+			Log.debug().info(commandLine);
+
 		// comment
 		if (commandLine.startsWith("#"))
 			return;
