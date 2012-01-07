@@ -175,7 +175,7 @@ public class ShellParserTest extends TestCase {
 		assertEquals("EXPECT", parser.getProbeExpect());
 		assertEquals("ON", parser.getEquipments());
 		assertFalse(parser.getProbeOptNoAction());
-		
+
 		line = "p    on    ON   expect    EXPECT   no-action       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
@@ -193,7 +193,17 @@ public class ShellParserTest extends TestCase {
 		assertEquals("EXPECT", parser.getProbeExpect());
 		assertEquals("ON", parser.getEquipments());
 		assertTrue(parser.getProbeOptNoAction());
-				
+
+		line = "p    on    ON   verbose  na expect    EXPECT     SOURCE     DEST";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("EXPECT", parser.getProbeExpect());
+		assertEquals("ON", parser.getEquipments());
+		assertTrue(parser.getProbeOptNoAction());
+		assertTrue(parser.getProbeOptVerbose());
+
 		line = "p   SOURCE     DEST   tcp";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
@@ -202,7 +212,9 @@ public class ShellParserTest extends TestCase {
 		assertEquals(null, parser.getProbeExpect());
 		assertEquals(null, parser.getEquipments());
 		assertEquals("tcp", parser.getProtoSpecification());
-		
+		assertFalse(parser.getProbeOptNoAction());
+		assertFalse(parser.getProbeOptVerbose());
+
 		line = "p   SOURCE     DEST   tcp      PORT";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
@@ -213,7 +225,7 @@ public class ShellParserTest extends TestCase {
 		assertEquals("PORT", parser.getPortDest());
 
 		line = "p   SOURCE     DEST   tcp    PORT1:";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
@@ -222,7 +234,7 @@ public class ShellParserTest extends TestCase {
 		assertEquals(null, parser.getPortDest());
 
 		line = "p   SOURCE     DEST   tcp    PORT1:PORT2";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
@@ -231,7 +243,7 @@ public class ShellParserTest extends TestCase {
 		assertEquals("PORT2", parser.getPortDest());
 
 		line = "p   SOURCE     DEST   udp    PORT1:PORT2";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
@@ -240,7 +252,7 @@ public class ShellParserTest extends TestCase {
 		assertEquals("PORT2", parser.getPortDest());
 
 		line = "p   SOURCE     DEST   tcp    flags S SA";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
@@ -252,7 +264,7 @@ public class ShellParserTest extends TestCase {
 		assertEquals("SA", parser.getTcpFlags().get(1));
 
 		line = "p   SOURCE     DEST   tcp  PORT  flags S SA";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
 		assertEquals("SOURCE", parser.getSrcAddress());
 		assertEquals("DEST", parser.getDestAddress());
@@ -268,11 +280,11 @@ public class ShellParserTest extends TestCase {
 		System.out.println("reload");
 
 		String line = "reload";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("reload", parser.getCommand());
 
 		line = "reload     EQ";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("reload", parser.getCommand());
 		assertEquals("EQ", parser.getEquipments());
 	}
@@ -281,11 +293,11 @@ public class ShellParserTest extends TestCase {
 		System.out.println("route");
 
 		String line = "route";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("route", parser.getCommand());
 
 		line = "route     EQ";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("route", parser.getCommand());
 		assertEquals("EQ", parser.getEquipments());
 	}
@@ -294,22 +306,22 @@ public class ShellParserTest extends TestCase {
 		System.out.println("topology");
 
 		String line = "topology";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("topology", parser.getCommand());
 
 		line = "topology   EQ";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("topology", parser.getCommand());
 		assertEquals("EQ", parser.getEquipments());
 
 		line = "topology   connected  EQ";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("topology", parser.getCommand());
 		assertEquals("EQ", parser.getEquipments());
 		assertEquals("connected", parser.getTopologyOption());
 
 		line = "topology   !connected";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line); 
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("topology", parser.getCommand());
 		assertEquals(null, parser.getEquipments());
 		assertEquals("!connected", parser.getTopologyOption());

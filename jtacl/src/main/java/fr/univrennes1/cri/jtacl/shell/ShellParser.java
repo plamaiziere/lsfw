@@ -38,6 +38,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _probeExpect;
 	protected boolean _probe6flag;
 	protected boolean _probeOptNoAction;
+	protected boolean _probeOptVerbose;
 	protected String _subCommand;
 	protected StringsList _tcpFlags;
 	protected String _groovyDirectory;
@@ -60,6 +61,7 @@ public class ShellParser extends CommonRules<Object> {
 		_subCommand = null;
 		_tcpFlags = null;
 		_probeOptNoAction = false;
+		_probeOptVerbose = false;
 		_probe6flag = false;
 		return true;
 	}
@@ -211,6 +213,16 @@ public class ShellParser extends CommonRules<Object> {
 	public boolean getProbeOptNoAction() {
 		return _probeOptNoAction;
 	}
+
+	public boolean setProbeOptVerbose(boolean probeOptVerbose) {
+		_probeOptVerbose = probeOptVerbose;
+		return true;
+	}
+
+	public boolean getProbeOptVerbose() {
+		return _probeOptVerbose;
+	}
+
 
 	public boolean setGroovyDirectory(String directory) {
 		_groovyDirectory = directory;
@@ -495,7 +507,8 @@ public class ShellParser extends CommonRules<Object> {
 	}
 
 	/*
-	 * ProbeOptions: ( ProbeExpect | OnEquipments | OptNoAction) ProbeOptions
+	 * ProbeOptions: ( ProbeExpect | OnEquipments | OptNoAction | OptVerbose)
+	 *					ProbeOptions
 	 */
 	public Rule ProbeOptions() {
 		return
@@ -503,7 +516,8 @@ public class ShellParser extends CommonRules<Object> {
 				FirstOf(
 					ProbeExpect(),
 					OnEquipments(),
-					OptNoAction()
+					OptNoAction(),
+					OptVerbose()
 				),
 				Optional(
 					ProbeOptions()
@@ -549,6 +563,18 @@ public class ShellParser extends CommonRules<Object> {
 				),
 				WhiteSpaces(),
 				setProbeOptNoAction(true)
+			);
+	}
+
+	/*
+	 * OptVerbose: verbose
+	 */
+	public Rule OptVerbose() {
+		return
+			Sequence(
+				IgnoreCase("verbose"),
+				WhiteSpaces(),
+				setProbeOptVerbose(true)
 			);
 	}
 
