@@ -84,7 +84,6 @@ if (!tcp && !udp) {
 	return;
 }
 
-def shell = new Shell(false, false);
+def shell = new Shell();
 shell.setOutputStream(DevNull.out);
 VirtualNmap.nmap(shell, source, sourceport, dest, udp, tcp, first, last);
-
