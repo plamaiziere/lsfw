@@ -81,6 +81,7 @@ public class IOSShell implements GenericEquipmentShell {
 		boolean fshort = format != null && format.contains("s");
 		boolean flong = format != null && format.contains("l");
 		boolean fhost = format != null && format.contains("h");
+		boolean fptr = format != null && format.contains("p");
 
 		for (IPNet ip: _router.getNetCrossRef().keySet()) {
 			IPNetCrossRef crossref = _router.getNetCrossRef().get(ip);
@@ -96,9 +97,11 @@ public class IOSShell implements GenericEquipmentShell {
 			}
 			for (CrossRefContext ctx: crossref.getContexts()) {
 				_outStream.print(ip.toString("::i"));
-				if (fhost) {
+				if (fhost || fptr) {
 					try {
-						_outStream.print("; " + ip.getCannonicalHostname());
+						String hostname = fhost ? ip.getCannonicalHostname() :
+							ip.getHostname();
+						_outStream.print("; " + hostname);
 					} catch (UnknownHostException ex) {
 						_outStream.print("; nohost");
 					}
