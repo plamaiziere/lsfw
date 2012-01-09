@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -23,6 +24,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.xbill.DNS.DClass;
+import org.xbill.DNS.ExtendedResolver;
+import org.xbill.DNS.Message;
+import org.xbill.DNS.Name;
+import org.xbill.DNS.PTRRecord;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.Resolver;
+import org.xbill.DNS.ReverseMap;
+import org.xbill.DNS.Section;
+import org.xbill.DNS.Type;
 
 /**
  * Class and tools to deal with IPv4 and IPv6 addresses and networks.<br/>
@@ -54,6 +65,9 @@ public final class IPNet implements Comparable {
 			new HashMap<String, DnsCacheEntry>();
 
 	protected static final Map<InetAddress, RevertDnsCacheEntry> _dnsRevertCache =
+			new HashMap<InetAddress, RevertDnsCacheEntry>();
+
+	protected static final Map<InetAddress, RevertDnsCacheEntry> _dnsPtrCache =
 			new HashMap<InetAddress, RevertDnsCacheEntry>();
 
 	protected static String[] ipV4ToHextet(String addr)
@@ -635,6 +649,7 @@ public final class IPNet implements Comparable {
      * Gets the fully qualified domain name for this IP address.
      * Best effort method, meaning we may not be able to return
      * the FQDN depending on the underlying system configuration.
+	 * @return the cannonical hostname for this IP address.
      * @throws UnknownHostException if problem occurs.
      * @see InetAddress#canonicalHostName
 	 */
@@ -654,6 +669,62 @@ public final class IPNet implements Comparable {
 			entry = new RevertDnsCacheEntry(hostname, date);
 			_dnsRevertCache.put(ip, entry);
 		}
+		return hostname;
+	}
+
+	/**
+     * Gets the DNS PTR entry for this IP address.
+	 * @return The PTR entry for this IP address, null if not found.
+     * @throws UnknownHostException if problem occurs.
+     * @see InetAddress#canonicalHostName
+	 */
+	public String getPtrHostname() throws UnknownHostException {
+		InetAddress ip = toInetAddress();
+		RevertDnsCacheEntry entry = _dnsPtrCache.get(ip);
+		long date = new Date().getTime();
+		String hostname = null;
+		if (entry != null) {
+			if (date - entry.getDate() < _dnsCacheTtl)
+				hostname = entry.getHostname();
+			else
+				_dnsPtrCache.remove(ip);
+		}
+		if (hostname == null) {
+			Resolver res = new ExtendedResolver();
+			Name name = ReverseMap.fromAddress(ip);
+			Record rec = Record.newRecord(name, Type.PTR, DClass.IN);
+			Message query = Message.newQuery(rec);
+			Message response;
+			try {
+				response = res.send(query);
+			} catch (IOException ex) {
+				throw new UnknownHostException(ex.getMessage());
+			}
+			Record[] answers = response.getSectionArray(Section.ANSWER);
+			hostname = null;
+			if (answers.length > 0) {
+				for (Record r: answers) {
+					if (r.getType() == Type.PTR) {
+						hostname = ((PTRRecord) r).getTarget().toString();
+						hostname = hostname.substring(0, hostname.length() - 1);
+						break;
+					}
+				}
+			}
+			entry = new RevertDnsCacheEntry(hostname, date);
+			_dnsPtrCache.put(ip, entry);
+		}
+		return hostname;
+	}
+
+	/**
+     * Gets the hostname for this IP address.
+	 * @return The hostname for this IP address.
+     * @throws UnknownHostException if problem occurs.
+	 */
+	public String getHostname() throws UnknownHostException {
+		String hostname = getPtrHostname();
+		hostname = hostname != null ? hostname : toString("i");
 
 		return hostname;
 	}

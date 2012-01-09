@@ -13,10 +13,12 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import junit.framework.TestCase;
+import org.xbill.DNS.*;
 
 /**
  * Test class for {@link IPNet}.
@@ -517,7 +519,7 @@ public class IPNetTest extends TestCase {
 	/**
 	 * Test of overlaps, of class IPNet.
 	 */
-	public void testOverlaps() throws UnknownHostException  {
+	public void testOverlaps() throws UnknownHostException, IOException  {
 		System.out.println("overlaps");
 
 		IPNet ip1;
@@ -554,7 +556,24 @@ public class IPNetTest extends TestCase {
 		assertTrue(ip1.overlaps(ip2));
 		assertTrue(ip2.overlaps(ip1));
 
-	}
+		String hostIp = "129.20.254.1";
+		Resolver res = new ExtendedResolver();
+
+             Name name = ReverseMap.fromAddress(hostIp);
+             int type = Type.PTR;
+             int dclass = DClass.IN;
+             Record rec = Record.newRecord(name, type, dclass);
+             Message query = Message.newQuery(rec);
+             Message response = res.send(query);
+
+             Record[] answers = response.getSectionArray(Section.ANSWER);
+//             if (answers.length == 0)
+
+                //return hostIp;
+//             else
+                System.out.println(answers[0].rdataToString());
+
+ 	}
 
 
 	/**
@@ -629,6 +648,7 @@ public class IPNetTest extends TestCase {
 	 * Test of getCannonicalHostname()
 	 */
 	public void testgetCannonicalHostname() throws UnknownHostException {
+		System.out.println("getCannonicalHostname");
 
 		IPNet ip = new IPNet("127.0.0.1/25");
 		String hostname = ip.getCannonicalHostname();
@@ -636,5 +656,18 @@ public class IPNetTest extends TestCase {
 		String ihostname = inet.getCanonicalHostName();
 		assertEquals(ihostname, hostname);
 	}
+
+	/**
+	 * Test of getPtrHostname()
+	 */
+	public void testgetPtrHostname() throws UnknownHostException {
+		System.out.println("getPtrHostname");
+
+		// poor test case...
+		IPNet ip = new IPNet("127.0.0.1/25");
+		String hostname = ip.getPtrHostname();
+		assertEquals(null, hostname);
+	}
+
 
 }
