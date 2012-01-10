@@ -139,7 +139,7 @@ public class PixShell implements GenericEquipmentShell {
 				if (fhost || fptr) {
 					try {
 						String hostname = fhost ? ip.getCannonicalHostname() :
-							ip.getPtrHostname();
+							ip.getHostname();
 						_outStream.print("; " + hostname);
 					} catch (UnknownHostException ex) {
 						_outStream.print("; nohost");
