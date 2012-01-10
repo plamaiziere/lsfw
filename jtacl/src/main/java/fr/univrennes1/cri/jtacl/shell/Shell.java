@@ -972,6 +972,10 @@ public class Shell {
 				_outStream.println("Goodbye!");
 			System.exit(0);
 		}
+
+		if (_interactive && _monitor.getOptions().getAutoReload())
+			autoReload();
+		
 		if (_parser.getCommand().equals("probe") ||
 			  _parser.getCommand().equals("probe6")) {
 			boolean test = probeCommand(_parser);
@@ -1048,9 +1052,6 @@ public class Shell {
 			if (commandLine == null) {
 				break;
 			}
-			if (_interactive && _monitor.getOptions().getAutoReload())
-				autoReload();
-
 			commandLine = commandLine.trim();
 			parseShellCommand(commandLine);
 		}
