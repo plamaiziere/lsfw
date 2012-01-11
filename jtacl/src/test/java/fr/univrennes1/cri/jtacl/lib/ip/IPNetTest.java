@@ -637,4 +637,20 @@ public class IPNetTest extends TestCase {
 		String ihostname = inet.getCanonicalHostName();
 		assertEquals(ihostname, hostname);
 	}
+
+	public void testIsReachable() throws UnknownHostException {
+		System.out.println("testIsReachable");
+
+		IPNet ip = new IPNet("127.0.0.1");
+		boolean f = ip.isReachable(1000);
+		assertTrue(f);
+
+		/*
+		 * IPv6 might not be available
+		 */
+		//ip = new IPNet("::1");
+		//f = ip.isReachable(1000);
+		//assertTrue(f);
+
+	}
 }

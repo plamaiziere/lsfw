@@ -1034,6 +1034,22 @@ public final class IPNet implements Comparable {
 	}
 
 	/**
+	 * Test whether that address is reachable.
+	 * This method uses InetAddress.isReachable() to test.
+	 * @param timeout the time, in milliseconds, before the call aborts.
+	 * @return true if the address is reachable.
+	 * @throws UnknownHostException if problem occurs.
+	 * @see InetAddress#isReachable(int)
+	 */
+	public final boolean isReachable(int timeout) throws UnknownHostException {
+		try {
+			return toInetAddress().isReachable(timeout);
+		} catch (IOException ex) {
+			throw new UnknownHostException(ex.getMessage());
+		}
+	}
+
+	/**
 	 * Returns the time to live of the DNS cache.
 	 * @return the time to live of the DNS cache.
 	 */
