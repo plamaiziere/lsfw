@@ -18,7 +18,6 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import junit.framework.TestCase;
-import org.xbill.DNS.*;
 
 /**
  * Test class for {@link IPNet}.
