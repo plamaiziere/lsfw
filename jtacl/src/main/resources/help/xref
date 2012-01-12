@@ -12,6 +12,8 @@ format formatstring allows to specify the output format by a combinaison
 
   h: (hostname) outputs the hostname of IP addresses, doing a revert DNS
         request.
+  p: (PTR) outputs the hostname, doing a PTR revert DNS request. This is faster
+        than 'h'.
   l: (long) ouptuts all the lines of configuration.
   s: (short) outputs only the first line of configuration.
 
