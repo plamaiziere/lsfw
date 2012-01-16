@@ -243,6 +243,9 @@ public class Shell {
 		}
 	}
 
+	protected LsfwBinding newBinding(String args) {
+		return new LsfwBinding(args);
+	}
 
 	public void helpCommand(ShellParser command) {
 		try {
@@ -881,9 +884,9 @@ public class Shell {
 
 	public void groovyCommand(ShellParser parser) {
 
-		Binding lsfwBinding = new Binding();
-		lsfwBinding.setVariable("lsfwMonitor", _monitor);
-		lsfwBinding.setVariable("lsfwArgs", parser.getGroovyArgs());
+		Binding binding = new Binding();
+		LsfwBinding lsfw = newBinding(parser.getGroovyArgs());
+		binding.setVariable("lsfw", lsfw);
 
 		GroovyScriptEngine scriptEngine;
 		try {
@@ -893,7 +896,7 @@ public class Shell {
 			return;
 		}
 		try {
-			scriptEngine.run(parser.getGroovyScript(), lsfwBinding);
+			scriptEngine.run(parser.getGroovyScript(), binding);
 		} catch (Exception ex) {
 			_outStream.println();
 			_outStream.println("Error: " + ex.getMessage());
@@ -901,10 +904,10 @@ public class Shell {
 	}
 
 	public void groovyConsoleCommand(ShellParser parser) {
-		Binding lsfwBinding = new Binding();
-		lsfwBinding.setVariable("lsfwMonitor", _monitor);
-		lsfwBinding.setVariable("lsfwArgs", parser.getGroovyArgs());
-		Console console = new Console(lsfwBinding);
+		Binding binding = new Binding();
+		LsfwBinding lsfw = newBinding(parser.getGroovyArgs());
+		binding.setVariable("lsfw", lsfw);
+		Console console = new Console(binding);
 		console.run();
 	}
 
@@ -975,7 +978,7 @@ public class Shell {
 
 		if (_interactive && _monitor.getOptions().getAutoReload())
 			autoReload();
-		
+
 		if (_parser.getCommand().equals("probe") ||
 			  _parser.getCommand().equals("probe6")) {
 			boolean test = probeCommand(_parser);
