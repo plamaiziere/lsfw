@@ -19,7 +19,7 @@
 import fr.univrennes1.cri.jtacl.lib.ip.*;
 
 def services = IPServices.getInstance();
-def String[] argss = lsfwArgs.split();
+def argss = lsfw.getArgs();
 
 if (argss.size() == 0) {
     println("Usage portbysrv servicename [servicename]");

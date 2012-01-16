@@ -21,25 +21,25 @@ import fr.univrennes1.cri.jtacl.shell.*;
 
 def void usage() {
     println("Usage xrefip xrefargs");
-	println();
-	println('This script runs the command "xref ip xrefargs" on all the equipments.');
-	println('Example:');
-	println('    xrefip format sh host 192.168.1.0/24');
+    println();
+    println('This script runs the command "xref ip xrefargs" on all the equipments.');
+    println('Example:');
+    println('    xrefip format sh host 192.168.1.0/24');
 }
 
-def String[] argss = lsfwArgs.split();
-
-if (argss.size() == 0 || argss[0] == 'help') {
+def String[] argss = lsfw.getArgs();
+def String cargs = lsfw.getcArgs();
+if (argss.size() == 0 || argss[0] == '-help') {
     usage();
     return;
 }
 
 def shell = new Shell();
-def equipments = lsfwMonitor.getEquipments();
+def equipments = lsfw.getMonitor().getEquipments();
 equipments.each() {
-    entry -> 
+    entry ->
        String name = entry.getKey();
        String className = entry.getValue().getClass().getName();
-       if (className != 'fr.univrennes1.cri.jtacl.equipments.SimpleRouter') 
-           shell.runCommand("eq $name xref ip $lsfwArgs");
+       if (className != 'fr.univrennes1.cri.jtacl.equipments.SimpleRouter')
+           shell.runCommand("eq $name xref ip $cargs");
 }

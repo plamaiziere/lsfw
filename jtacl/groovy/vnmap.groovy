@@ -53,8 +53,8 @@ class VirtualNmap {
 	}
 }
 
-def args = lsfwArgs.split();
-if (args.size() == 1 && args[0] == 'help') {
+def args = lsfw.getArgs();
+if (args.size() == 1 && args[0] == '-help') {
 	VirtualNmap.usage();
 	return;
 }

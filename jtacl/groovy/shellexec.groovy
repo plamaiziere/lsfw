@@ -17,12 +17,12 @@
  * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
-if (lsfwArgs.isEmpty()) {
+if (lsfw.getArgs().isEmpty()) {
 	println("Usage: shellexec command")
 	return
 }
 
-def procb = new ProcessBuilder("/bin/sh", "-c" , lsfwArgs)
+def procb = new ProcessBuilder("/bin/sh", "-c" , lsfw.getcArgs())
 def proc = procb.start()
 proc.waitFor()
 print proc.text
