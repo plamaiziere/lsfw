@@ -15,7 +15,6 @@ package fr.univrennes1.cri.jtacl.shell;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Binding between lsfw and groovy scripts
