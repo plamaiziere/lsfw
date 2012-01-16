@@ -29,15 +29,19 @@ public class LsfwBinding {
 
 	public LsfwBinding(String cArgs) {
 		_cArgs = cArgs;
-		String[] args = cArgs.split("\\s+");
-		_args = new ArrayList<String>(Arrays.asList(cArgs));
+		_args = new ArrayList<String>();
+		if (cArgs.length() != 0) {
+			String[] args = cArgs.split("\\s+");
+			_args.addAll(Arrays.asList(args));
+		} else
+			_args = new ArrayList<String>();
 	}
 
 	public ArrayList<String> getArgs() {
 		return _args;
 	}
 
-	public String getCargs() {
+	public String getcArgs() {
 		return _cArgs;
 	}
 
