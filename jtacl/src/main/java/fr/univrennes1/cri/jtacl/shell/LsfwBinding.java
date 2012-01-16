@@ -36,14 +36,26 @@ public class LsfwBinding {
 			_args = new ArrayList<String>();
 	}
 
+	/**
+	 * Returns the arguments as a List.
+	 * @return the arguments as a List.
+	 */
 	public ArrayList<String> getArgs() {
 		return _args;
 	}
 
+	/**
+	 * Returns the arguments as a String.
+	 * @return the arguments as a String.
+	 */
 	public String getcArgs() {
 		return _cArgs;
 	}
 
+	/**
+	 * Returns the lsfw's monitor instance.
+	 * @return the lsfw's monitor instance.
+	 */
 	public Monitor getMonitor() {
 		return _monitor;
 	}
