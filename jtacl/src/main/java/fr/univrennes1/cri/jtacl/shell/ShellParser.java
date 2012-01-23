@@ -38,6 +38,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _probeExpect;
 	protected boolean _probe6flag;
 	protected boolean _probeOptActive;
+	protected boolean _probeOptMatching;
 	protected boolean _probeOptNoAction;
 	protected boolean _probeOptVerbose;
 	protected String _subCommand;
@@ -62,6 +63,7 @@ public class ShellParser extends CommonRules<Object> {
 		_subCommand = null;
 		_tcpFlags = null;
 		_probeOptActive = false;
+		_probeOptMatching = false;
 		_probeOptNoAction = false;
 		_probeOptVerbose = false;
 		_probe6flag = false;
@@ -231,6 +233,15 @@ public class ShellParser extends CommonRules<Object> {
 
 	public boolean setProbeOptActive(boolean probeOptActive) {
 		_probeOptActive = probeOptActive;
+		return true;
+	}
+
+	public boolean getProbeOptMatching() {
+		return _probeOptMatching;
+	}
+
+	public boolean setProbeOptMatching(boolean probeOptMatching) {
+		_probeOptMatching = probeOptMatching;
 		return true;
 	}
 
@@ -528,7 +539,8 @@ public class ShellParser extends CommonRules<Object> {
 					OnEquipments(),
 					OptNoAction(),
 					OptVerbose(),
-					OptActive()
+					OptActive(),
+					OptMatching()
 				),
 				Optional(
 					ProbeOptions()
@@ -601,6 +613,18 @@ public class ShellParser extends CommonRules<Object> {
 				),
 				WhiteSpaces(),
 				setProbeOptActive(true)
+			);
+	}
+
+	/*
+	 * OptMatching: match
+	 */
+	public Rule OptMatching() {
+		return
+			Sequence(
+				IgnoreCase("match"),
+				WhiteSpaces(),
+				setProbeOptMatching(true)
 			);
 	}
 
