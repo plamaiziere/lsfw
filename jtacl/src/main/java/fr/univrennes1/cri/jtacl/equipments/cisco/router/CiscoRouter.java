@@ -266,6 +266,56 @@ public class CiscoRouter extends GenericEquipment {
 		return ipnet;
 	}
 
+	protected List<IPNet> parseRouterIp(String sIP, String sNetmask) {
+		List<IPNet> iplist = new ArrayList<IPNet>();
+
+		if (sIP.equals("any"))
+			return iplist;
+
+		if (sNetmask != null) {
+			// negate the mask
+			IPNet netmask = parseIp(sNetmask);
+			long mask = netmask.getIP().longValue();
+			mask = ~mask;
+			mask = mask & 0xFFFFFFFFL;
+			try {
+				netmask = new IPNet(BigInteger.valueOf(mask), IPversion.IPV4);
+				sNetmask = netmask.toString("i");
+			} catch (UnknownHostException ex) {
+				throwCfgException("invalid netmask: " + sNetmask +
+					" " + ex.getMessage());
+				}
+			/*
+			 * warn if "ip/netmask" is not a network.
+			 */
+			IPNet ip = null;
+			String sIpNetmask = sIP + "/" + sNetmask;
+			boolean notANetwork = false;
+			try {
+				ip = new IPNet(sIpNetmask);
+				iplist.add(ip);
+			} catch (UnknownHostException ex) {
+				notANetwork = true;
+				Log.config().warning(_parseContext.toString() +
+					"netmask is not a network prefix: " + sIpNetmask +
+					" " + ex.getMessage());
+			}
+			if (notANetwork) {
+				ip = parseIp(sIP);
+				iplist.add(ip);
+				iplist.add(netmask);
+			} else {
+				ip = parseIp(sIpNetmask);
+				iplist.add(ip);
+			}
+			return iplist;
+		}
+
+		iplist.add(parseIp(sIP));
+		return iplist;
+	}
+
+
 	protected int parseService(String service, String protocol) {
 
 		int port = _ipServices.serviceLookup(service, protocol);
@@ -555,40 +605,12 @@ public class CiscoRouter extends GenericEquipment {
 			 * if 'any', ip address and network group are null.
 			 */
 			if (!sIP.equals("any")) {
-				if (sNetmask != null) {
-					// negate the mask
-					IPNet netmask = parseIp(sNetmask);
-					long mask = netmask.getIP().longValue();
-					mask = ~mask;
-					mask = mask & 0xFFFFFFFFL;
-					try {
-						netmask = new IPNet(BigInteger.valueOf(mask), IPversion.IPV4);
-						sNetmask = netmask.toString("i");
-					} catch (UnknownHostException ex) {
-						throwCfgException("invalid netmask: " + sNetmask +
-							" " + ex.getMessage());
-					}
-					/*
-					 * warn if "ip/netmask" is not a network.
-					 */
-					IPNet ip = null;
-					String sIpNetmask = sIP + "/" + sNetmask;
-					boolean notANetwork = false;
-					try {
-						ip = new IPNet(sIpNetmask);
-					} catch (UnknownHostException ex) {
-						notANetwork = true;
-						Log.config().warning(_parseContext.toString() +
-							"netmask is not a network prefix: " + sIpNetmask +
-							" " + ex.getMessage());
-					}
-					if (notANetwork)
-						ace.setSourceNetmask(netmask);
-					else
-						sIP = sIpNetmask;
+				List<IPNet> iplist = parseRouterIp(sIP, sNetmask);
+				if (iplist.size() == 2) {
+					// not a network
+					ace.setSourceNetmask(iplist.get(1));
 				}
-				IPNet ip = parseIp(sIP);
-				ace.setSourceIp(ip);
+				ace.setSourceIp(iplist.get(0));
 			}
 		}
 
@@ -618,40 +640,12 @@ public class CiscoRouter extends GenericEquipment {
 			 * if 'any', ip address and network group are null.
 			 */
 			if (!sIP.equals("any")) {
-				if (sNetmask != null) {
-					// negate the mask
-					IPNet netmask = parseIp(sNetmask);
-					long mask = netmask.getIP().longValue();
-					mask = ~mask;
-					mask = mask & 0xFFFFFFFFL;
-					try {
-						netmask = new IPNet(BigInteger.valueOf(mask), IPversion.IPV4);
-						sNetmask = netmask.toString("i");
-					} catch (UnknownHostException ex) {
-						throwCfgException("invalid netmask: " + sNetmask +
-							" " + ex.getMessage());
-					}
-					/*
-					 * warn if "ip/netmask" is not a network.
-					 */
-					IPNet ip = null;
-					String sIpNetmask = sIP + "/" + sNetmask;
-					boolean notANetwork = false;
-					try {
-						ip = new IPNet(sIpNetmask);
-					} catch (UnknownHostException ex) {
-						notANetwork = true;
-						Log.config().warning(_parseContext.toString() +
-							"netmask is not a network prefix: " + sIpNetmask +
-							" " + ex.getMessage());
-					}
-					if (notANetwork)
-						ace.setDestNetmask(netmask);
-					else
-						sIP = sIpNetmask;
+				List<IPNet> iplist = parseRouterIp(sIP, sNetmask);
+				if (iplist.size() == 2) {
+					// not a network
+					ace.setDestNetmask(iplist.get(1));
 				}
-				IPNet ip = parseIp(sIP);
-				ace.setDestIp(ip);
+				ace.setDestIp(iplist.get(0));
 			}
 		}
 
