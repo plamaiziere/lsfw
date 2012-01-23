@@ -37,6 +37,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _topologyOption;
 	protected String _probeExpect;
 	protected boolean _probe6flag;
+	protected boolean _probeOptActive;
 	protected boolean _probeOptNoAction;
 	protected boolean _probeOptVerbose;
 	protected String _subCommand;
@@ -60,6 +61,7 @@ public class ShellParser extends CommonRules<Object> {
 		_probeExpect = null;
 		_subCommand = null;
 		_tcpFlags = null;
+		_probeOptActive = false;
 		_probeOptNoAction = false;
 		_probeOptVerbose = false;
 		_probe6flag = false;
@@ -223,6 +225,14 @@ public class ShellParser extends CommonRules<Object> {
 		return _probeOptVerbose;
 	}
 
+	public boolean getProbeOptActive() {
+		return _probeOptActive;
+	}
+
+	public boolean setProbeOptActive(boolean probeOptActive) {
+		_probeOptActive = probeOptActive;
+		return true;
+	}
 
 	public boolean setGroovyDirectory(String directory) {
 		_groovyDirectory = directory;
@@ -517,7 +527,8 @@ public class ShellParser extends CommonRules<Object> {
 					ProbeExpect(),
 					OnEquipments(),
 					OptNoAction(),
-					OptVerbose()
+					OptVerbose(),
+					OptActive()
 				),
 				Optional(
 					ProbeOptions()
@@ -575,6 +586,21 @@ public class ShellParser extends CommonRules<Object> {
 				IgnoreCase("verbose"),
 				WhiteSpaces(),
 				setProbeOptVerbose(true)
+			);
+	}
+
+	/*
+	 * OptActive: active | act
+	 */
+	public Rule OptActive() {
+		return
+			Sequence(
+				FirstOf(
+					IgnoreCase("active"),
+					IgnoreCase("act")
+				),
+				WhiteSpaces(),
+				setProbeOptActive(true)
 			);
 	}
 
