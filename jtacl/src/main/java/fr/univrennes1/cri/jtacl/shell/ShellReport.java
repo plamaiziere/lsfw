@@ -33,9 +33,19 @@ import java.util.List;
 public class ShellReport {
 
 	protected ProbesTracker _tracker;
+	protected boolean _verbose;
+	protected boolean _matching;
+	protected boolean _active;
 
-	public ShellReport(ProbesTracker tracker) {
+	public ShellReport(ProbesTracker tracker,
+			boolean verbose,
+			boolean active,
+			boolean matching) {
+
 		_tracker = tracker;
+		_verbose = verbose;
+		_active = active;
+		_matching = matching;
 	}
 
 	public String showPath(ProbesList probes) {
@@ -69,8 +79,7 @@ public class ShellReport {
 		return swriter.toString();
 	}
 
-	public String showResultingProbes(ProbesByUid probes,
-			boolean verbose) {
+	public String showResultingProbes(ProbesByUid probes) {
 
 		CharArrayWriter swriter = new CharArrayWriter();
 		PrintWriter writer = new PrintWriter(swriter);
@@ -84,7 +93,7 @@ public class ShellReport {
 			writer.println(showPath(linkedProbes));
 
 			for (Probe pi: linkedProbes) {
-				writer.print(showProbeResult(pi, verbose));
+				writer.print(showProbeResult(pi));
 			}
 			writer.println("-----------------");
 		}
@@ -93,7 +102,7 @@ public class ShellReport {
 		return swriter.toString();
 	}
 
-	public String showProbeResult(Probe probe, boolean verbose) {
+	public String showProbeResult(Probe probe) {
 		CharArrayWriter swriter = new CharArrayWriter();
 		PrintWriter writer = new PrintWriter(swriter);
 
@@ -102,7 +111,7 @@ public class ShellReport {
 
 		writer.println("------");
 		writer.println(equipment.getName() + " (" + equipment.getComment() + ")");
-		if (verbose) {
+		if (_verbose) {
 			writer.print("Probe" + probe.uidToString());
 			writer.println(" path: " + probe.showPath());
 			writer.println();
@@ -111,14 +120,14 @@ public class ShellReport {
 			writer.println("ACL Result: " + probe.getResults().getAclResult());
 		}
 
-		writer.println(showAclResults(probe.getResults(),verbose));
+		writer.println(showAclResults(probe.getResults()));
 
 		writer.flush();
 		return swriter.toString();
 
 	}
 
-	public String showAclResults(ProbeResults results, boolean verbose) {
+	public String showAclResults(ProbeResults results) {
 		CharArrayWriter swriter = new CharArrayWriter();
 		PrintWriter writer = new PrintWriter(swriter);
 
@@ -137,33 +146,33 @@ public class ShellReport {
 		String interfaceIn = results.getInterfaceIn();
 		String interfaceOut = results.getInterfaceOut();
 
-		if (verbose || ! matchingAclsIn.isEmpty()) {
+		if (_matching) {
 			writer.println("Matching ACL on input: " + interfaceIn);
 			for (AccessControlList acl: matchingAclsIn)
 				writer.println("  " + acl.toString());
-
-			if (verbose) {
-				writer.println("Active ACL on input: " + interfaceIn);
-				for (AccessControlList acl: activesAclsIn)
-					writer.println("  " + acl.toString());
-			}
 		}
-		if (verbose || ! matchingAclsOut.isEmpty()) {
+		if (_active) {
+			writer.println("Active ACL on input: " + interfaceIn);
+			for (AccessControlList acl: activesAclsIn)
+				writer.println("  " + acl.toString());
+		}
+
+		if (_matching) {
 			writer.println("Matching ACL on output: " + interfaceOut);
 			for (AccessControlList acl: matchingAclsOut)
 				writer.println("  " + acl.toString());
-
-			if (verbose) {
-				writer.println("Active ACL on output: " + interfaceOut);
-				for (AccessControlList acl: activesAclsOut)
-					writer.println("  " + acl.toString());
-			}
 		}
+		if (_active) {
+			writer.println("Active ACL on output: " + interfaceOut);
+			for (AccessControlList acl: activesAclsOut)
+				writer.println("  " + acl.toString());
+		}
+
 		writer.flush();
 		return swriter.toString();
 	}
 
-	public String showResults(boolean verbose) {
+	public String showResults() {
 		CharArrayWriter swriter = new CharArrayWriter();
 		PrintWriter writer = new PrintWriter(swriter);
 
@@ -175,17 +184,17 @@ public class ShellReport {
 
 			writer.println("###############################");
 			writer.println("-------- Routed probes --------");
-			writer.print(showResultingProbes(finalProbes, verbose));
+			writer.print(showResultingProbes(finalProbes));
 		}
 		if (!killedProbes.isEmpty()) {
 			writer.println("###############################");
 			writer.println("------- Killed probes  --------");
-			writer.print(showResultingProbes(killedProbes, verbose));
+			writer.print(showResultingProbes(killedProbes));
 		}
 		if (!loopingProbes.isEmpty()) {
 			writer.println("###############################");
 			writer.println("-------- Looping probes -------");
-			writer.print(showResultingProbes(loopingProbes, verbose));
+			writer.print(showResultingProbes(loopingProbes));
 		}
 
 		writer.flush();

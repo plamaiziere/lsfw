@@ -449,6 +449,7 @@ public class Shell {
 	public boolean probeCommand(ShellParser command) {
 
 		boolean testMode = command.getProbeExpect() != null;
+
 		IPversion ipVersion;
 		if (command.getCommand().equals("probe6"))
 			ipVersion = IPversion.IPV6;
@@ -750,10 +751,22 @@ public class Shell {
 		 * each tracker
 		 */
 		boolean verbose = command.getProbeOptVerbose();
+		boolean active = command.getProbeOptActive();
+		boolean matching = command.getProbeOptMatching();
+
+		if (verbose) {
+			active = true;
+			matching = true;
+		}
+
+		if (!active)
+			matching = true;
+
 		for (ProbesTracker tracker: _lastProbing) {
 			if (!testMode) {
-				ShellReport report = new ShellReport((tracker));
-				_outStream.print(report.showResults(verbose));
+				ShellReport report = new ShellReport(tracker, verbose, active,
+					matching);
+				_outStream.print(report.showResults());
 			}
 			AclResult aclResult = tracker.getAclResult();
 			if (aclResult.hasAccept())
