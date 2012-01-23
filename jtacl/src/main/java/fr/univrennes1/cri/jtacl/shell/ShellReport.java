@@ -19,8 +19,11 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbesList;
 import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
+import fr.univrennes1.cri.jtacl.core.probing.AccessControlList;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import java.io.CharArrayWriter;
 import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * Report output on probing.
@@ -108,11 +111,56 @@ public class ShellReport {
 			writer.println("ACL Result: " + probe.getResults().getAclResult());
 		}
 
-		writer.println(probe.getResults().showAclResults(verbose));
+		writer.println(showAclResults(probe.getResults(),verbose));
 
 		writer.flush();
 		return swriter.toString();
 
+	}
+
+	public String showAclResults(ProbeResults results, boolean verbose) {
+		CharArrayWriter swriter = new CharArrayWriter();
+		PrintWriter writer = new PrintWriter(swriter);
+
+		List<AccessControlList> matchingAclsIn =
+			results.getMatchingAclsIn();
+
+		List<AccessControlList> activesAclsIn =
+			results.getActivesAclsIn();
+
+		List<AccessControlList> matchingAclsOut =
+			results.getMatchingAclsOut();
+
+		List<AccessControlList> activesAclsOut =
+			results.getActivesAclsOut();
+
+		String interfaceIn = results.getInterfaceIn();
+		String interfaceOut = results.getInterfaceOut();
+
+		if (verbose || ! matchingAclsIn.isEmpty()) {
+			writer.println("Matching ACL on input: " + interfaceIn);
+			for (AccessControlList acl: matchingAclsIn)
+				writer.println("  " + acl.toString());
+
+			if (verbose) {
+				writer.println("Active ACL on input: " + interfaceIn);
+				for (AccessControlList acl: activesAclsIn)
+					writer.println("  " + acl.toString());
+			}
+		}
+		if (verbose || ! matchingAclsOut.isEmpty()) {
+			writer.println("Matching ACL on output: " + interfaceOut);
+			for (AccessControlList acl: matchingAclsOut)
+				writer.println("  " + acl.toString());
+
+			if (verbose) {
+				writer.println("Active ACL on output: " + interfaceOut);
+				for (AccessControlList acl: activesAclsOut)
+					writer.println("  " + acl.toString());
+			}
+		}
+		writer.flush();
+		return swriter.toString();
 	}
 
 	public String showResults(boolean verbose) {

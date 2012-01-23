@@ -13,8 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.core.probing;
 
-import java.io.CharArrayWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 
@@ -189,7 +187,7 @@ public class ProbeResults {
 			result.addResult(AclResult.MATCH);
 			return result;
 		}
-		
+
 		return null;
 	}
 
@@ -236,36 +234,6 @@ public class ProbeResults {
 		pr._interfaceIn = _interfaceIn;
 		pr._interfaceOut = _interfaceOut;
 		return pr;
-	}
-
-	public String showAclResults(boolean verbose) {
-		CharArrayWriter swriter = new CharArrayWriter();
-		PrintWriter writer = new PrintWriter(swriter);
-
-		if (verbose || ! _matchingAclsIn.isEmpty()) {
-			writer.println("Matching ACL on input: " + _interfaceIn);
-			for (AccessControlList acl: _matchingAclsIn)
-				writer.println("  " + acl.toString());
-
-			if (verbose) {
-				writer.println("Active ACL on input: " + _interfaceIn);
-				for (AccessControlList acl: _activesAclsIn)
-					writer.println("  " + acl.toString());
-			}
-		}
-		if (verbose || !_matchingAclsOut.isEmpty()) {
-			writer.println("Matching ACL on output: " + _interfaceOut);
-			for (AccessControlList acl: _matchingAclsOut)
-				writer.println("  " + acl.toString());
-
-			if (verbose) {
-				writer.println("Active ACL on output: " + _interfaceOut);
-				for (AccessControlList acl: _activesAclsOut)
-					writer.println("  " + acl.toString());
-			}
-		}
-		writer.flush();
-		return swriter.toString();
 	}
 
 }
