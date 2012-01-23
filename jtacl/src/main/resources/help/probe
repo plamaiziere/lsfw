@@ -14,8 +14,11 @@ ProbeOptions
   Several options can be specified for the probe:
 
  on equipment-spec     : specification of the equipment to start the probing.
- expect expected-result: the expected result of the probing.
+ expect expected-result: specify the expected result of the probing.
  no-action             : do not make any probe transformation while probing.
+ verbose               : verbose reports.
+ match                 : display matching access list. This is the default.
+ active                : display active access lists.
 
 on equipment-spec
 ------------------
