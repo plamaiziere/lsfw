@@ -34,14 +34,14 @@ interface, regardless of the source IP address of the probe (a link describes
 one network connected to an interface).
   If an IP address is specified, lsfw uses this IP address to find the link,
 regardless of the source IP address of the probe.
-  If the DFLTEQUIPMENT variable is defined, Jtack uses this variable as a default
+  If the DFLTEQUIPMENT variable is defined, lsfw uses this variable as a default
 equipment specification when no candidate link is found for IPv4 addresses.
-  If the DFLTEQUIPMENT6 variable is defined, Jtack uses this variable as a default
+  If the DFLTEQUIPMENT6 variable is defined, lsfw uses this variable as a default
 equipment specification when no candidate link is found for IPv6 addresses.
 
 expect expected-result
 ----------------------
-  In test mode, the keyword ?expect? specifies the expected result of the probe
+  In test mode, the keyword 'expect' specifies the expected result of the probe
 command. The expected result can be one of the following values:
 
  routed
@@ -51,10 +51,10 @@ True if all the probes reach their destination address (or a border link).
 True if all the probes don't reach their destination address.
 
  accept
-True if all the probes are accepted by filtering rule, implies ?routed?.
+True if all the probes are accepted by filtering rule, implies 'routed'.
 
  deny
-True if all the probes are denied by filtering rule, implies ?routed?.
+True if all the probes are denied by filtering rule, implies 'routed'.
 
  may
 True if some probes are not routed to their destination, or if some filtering
