@@ -747,9 +747,6 @@ public class Shell {
 		int notrouted = 0;
 		int routeunknown =0;
 
-		/*
-		 * each tracker
-		 */
 		boolean verbose = command.getProbeOptVerbose();
 		boolean active = command.getProbeOptActive();
 		boolean matching = command.getProbeOptMatching();
@@ -761,7 +758,9 @@ public class Shell {
 
 		if (!active)
 			matching = true;
-
+		/*
+		 * each tracker
+		 */
 		for (ProbesTracker tracker: _lastProbing) {
 			if (!testMode) {
 				ShellReport report = new ShellReport(tracker, verbose, active,
