@@ -41,6 +41,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected boolean _probeOptMatching;
 	protected boolean _probeOptNoAction;
 	protected boolean _probeOptVerbose;
+	protected boolean _probeOptLearn;
 	protected String _subCommand;
 	protected StringsList _tcpFlags;
 	protected String _groovyDirectory;
@@ -66,6 +67,7 @@ public class ShellParser extends CommonRules<Object> {
 		_probeOptMatching = false;
 		_probeOptNoAction = false;
 		_probeOptVerbose = false;
+		_probeOptLearn = false;
 		_probe6flag = false;
 		return true;
 	}
@@ -242,6 +244,15 @@ public class ShellParser extends CommonRules<Object> {
 
 	public boolean setProbeOptMatching(boolean probeOptMatching) {
 		_probeOptMatching = probeOptMatching;
+		return true;
+	}
+
+	public boolean getProbeOptLearn() {
+		return _probeOptLearn;
+	}
+
+	public boolean setProbeOptLearn(boolean probeOptLearn) {
+		_probeOptLearn = probeOptLearn;
 		return true;
 	}
 
@@ -540,7 +551,8 @@ public class ShellParser extends CommonRules<Object> {
 					OptNoAction(),
 					OptVerbose(),
 					OptActive(),
-					OptMatching()
+					OptMatching(),
+					OptLearn()
 				),
 				Optional(
 					ProbeOptions()
@@ -625,6 +637,18 @@ public class ShellParser extends CommonRules<Object> {
 				IgnoreCase("match"),
 				WhiteSpaces(),
 				setProbeOptMatching(true)
+			);
+	}
+
+	/*
+	 * OptLearn: learn
+	 */
+	public Rule OptLearn() {
+		return
+			Sequence(
+				IgnoreCase("learn"),
+				WhiteSpaces(),
+				setProbeOptLearn(true)
 			);
 	}
 
