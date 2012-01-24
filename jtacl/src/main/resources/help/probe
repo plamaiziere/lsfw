@@ -15,7 +15,9 @@ ProbeOptions
 
  on equipment-spec     : specification of the equipment to start the probing.
  expect expected-result: specify the expected result of the probing.
- no-action             : do not make any probe transformation while probing.
+ learn                 : display a short summary of the result of the probing.
+ no-action             : do not make any probe transformation or action while
+                            probing.
  verbose               : verbose reports.
  match                 : display matching access list. This is the default.
  active                : display active access lists.
