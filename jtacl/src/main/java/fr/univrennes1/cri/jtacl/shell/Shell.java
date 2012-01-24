@@ -446,9 +446,11 @@ public class Shell {
 		}
 	}
 
-	public boolean probeCommand(ShellParser command) {
+	public boolean probeCommand(String commandLine, ShellParser command) {
 
 		boolean testMode = command.getProbeExpect() != null;
+		boolean learnMode = command.getProbeOptLearn();
+		boolean silent = testMode || learnMode;
 
 		IPversion ipVersion;
 		if (command.getCommand().equals("probe6"))
@@ -475,7 +477,7 @@ public class Shell {
 			try {
 				// not an IP try to resolve as a host.
 				sourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
-				if (!testMode)
+				if (!silent)
 					_outStream.println(sSourceAddress + " => " +
 						sourceAddress.toString("::i"));
 			} catch (UnknownHostException ex1) {
@@ -490,7 +492,7 @@ public class Shell {
 			try {
 				// not an IP try to resolve as a host.
 				destinationAdress = IPNet.getByName(command.getDestAddress(), ipVersion);
-				if (!testMode)
+				if (!silent)
 					_outStream.println(command.getDestAddress() + " => " +
 						destinationAdress.toString("::i"));
 			} catch (UnknownHostException ex1) {
@@ -762,7 +764,7 @@ public class Shell {
 		 * each tracker
 		 */
 		for (ProbesTracker tracker: _lastProbing) {
-			if (!testMode) {
+			if (!silent) {
 				ShellReport report = new ShellReport(tracker, verbose, active,
 					matching);
 				_outStream.print(report.showResults());
@@ -854,7 +856,7 @@ public class Shell {
 			}
 		}
 
-		if (!testMode) {
+		if (!silent) {
 			_outStream.println("Global ACL result is: " + aclResult);
 			_outStream.println("Global routing result is: " + routingResult);
 			_outStream.println();
@@ -891,6 +893,22 @@ public class Shell {
 
 		if (notExpect)
 			testExpect = !testExpect;
+
+		if (testMode) {
+			if (!testExpect) {
+				_outStream.println(commandLine + " [FAILED]");
+			} else {
+				_outStream.println(commandLine + " [OK]");
+			}
+		}
+
+		if (learnMode) {
+			_outStream.print(commandLine);
+			_outStream.print(" [ACL: " + aclResult);
+			_outStream.print("; Routing: " + routingResult);
+			_outStream.println("]");
+		}
+
 		return testExpect;
 	}
 
@@ -993,14 +1011,10 @@ public class Shell {
 
 		if (_parser.getCommand().equals("probe") ||
 			  _parser.getCommand().equals("probe6")) {
-			boolean test = probeCommand(_parser);
+			boolean test = probeCommand(commandLine, _parser);
 			if (_parser.getProbeExpect() != null) {
-				if (!test) {
+				if (!test)
 					_testResult = false;
-					_outStream.println(commandLine + " [FAILED]");
-				} else {
-					_outStream.println(commandLine + " [OK]");
-				}
 			}
 		}
 		if (_parser.getCommand().equals("option"))
