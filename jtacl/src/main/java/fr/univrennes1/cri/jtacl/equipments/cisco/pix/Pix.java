@@ -1578,7 +1578,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			AccessListGroup acg = _accessListGroups.get(group.getName());
 			if (acg == null) {
 				/*
-				 * XXX: what we shoud do?
+				 * XXX: what we should do?
 				 */
 				continue;
 			}
