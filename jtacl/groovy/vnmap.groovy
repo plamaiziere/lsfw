@@ -73,10 +73,10 @@ int last = args[5].toInteger();
 boolean udp = false;
 boolean tcp = false;
 
-if (proto == 'udp' || proto == 'udp/tcp')
+if (proto == 'udp' || proto == 'udp/tcp' || proto = 'tcp/udp')
 	udp = true;
 
-if (proto == 'tcp' || proto == 'udp/tcp')
+if (proto == 'tcp' || proto == 'udp/tcp' || proto = 'tcp/udp')
 	tcp = true;
 
 if (!tcp && !udp) {
