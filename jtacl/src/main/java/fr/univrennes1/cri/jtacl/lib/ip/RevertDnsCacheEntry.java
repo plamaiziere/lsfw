@@ -13,16 +13,20 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
+import java.net.InetAddress;
+
 /**
  * Hostname revert entry in the dns cache.
  * @author patrick.lamaiziere@univ-rennes1.fr
  */
 
 public class RevertDnsCacheEntry {
+	protected InetAddress _address;
 	protected String _hostname;
 	protected long _date;
 
-	public RevertDnsCacheEntry(String hostname, long date) {
+	public RevertDnsCacheEntry(InetAddress address, String hostname, long date) {
+		_address = address;
 		_hostname = hostname;
 		_date = date;
 	}
@@ -34,4 +38,9 @@ public class RevertDnsCacheEntry {
 	public String getHostname() {
 		return _hostname;
 	}
+
+	public InetAddress getAddress() {
+		return _address;
+	}
+
 }

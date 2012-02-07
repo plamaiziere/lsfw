@@ -21,9 +21,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.xbill.DNS.DClass;
 import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.Message;
@@ -62,13 +62,49 @@ public final class IPNet implements Comparable {
 	protected static long _dnsCacheTtl = 60000;
 
 	protected static final Map<String, DnsCacheEntry> _dnsCache =
-			new HashMap<String, DnsCacheEntry>();
+			new ConcurrentHashMap<String, DnsCacheEntry>();
 
 	protected static final Map<InetAddress, RevertDnsCacheEntry> _dnsRevertCache =
-			new HashMap<InetAddress, RevertDnsCacheEntry>();
+			new ConcurrentHashMap<InetAddress, RevertDnsCacheEntry>();
 
 	protected static final Map<InetAddress, RevertDnsCacheEntry> _dnsPtrCache =
-			new HashMap<InetAddress, RevertDnsCacheEntry>();
+			new ConcurrentHashMap<InetAddress, RevertDnsCacheEntry>();
+
+	protected static class CacheCollector extends Thread {
+
+		protected void collect() {
+			long date = new Date().getTime();
+			for (DnsCacheEntry ce: _dnsCache.values()) {
+				if (date - ce.getDate() >= _dnsCacheTtl) {
+					_dnsCache.remove(ce.getHostname());
+				}
+			}
+			for (RevertDnsCacheEntry ce: _dnsPtrCache.values()) {
+				if (date - ce.getDate() >= _dnsCacheTtl) {
+					_dnsPtrCache.remove(ce.getAddress());
+				}
+			}
+			for (RevertDnsCacheEntry ce: _dnsRevertCache.values()) {
+				if (date - ce.getDate() >= _dnsCacheTtl) {
+					_dnsPtrCache.remove(ce.getAddress());
+				}
+			}
+		}
+
+		@Override
+		public void run() {
+			while (true) {
+				collect();
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException ex) {
+					//
+				}
+			}
+		}
+	}
+
+	protected static final CacheCollector _collector = new CacheCollector();
 
 	protected static String[] ipV4ToHextet(String addr)
 			throws UnknownHostException {
@@ -606,7 +642,7 @@ public final class IPNet implements Comparable {
 		}
 		if (inet == null) {
 			inet = InetAddress.getAllByName(split[0]);
-			entry = new DnsCacheEntry(inet, date);
+			entry = new DnsCacheEntry(split[0], inet, date);
 			_dnsCache.put(split[0], entry);
 		}
 
@@ -666,7 +702,7 @@ public final class IPNet implements Comparable {
 		}
 		if (hostname == null) {
 			hostname = ip.getCanonicalHostName();
-			entry = new RevertDnsCacheEntry(hostname, date);
+			entry = new RevertDnsCacheEntry(ip, hostname, date);
 			_dnsRevertCache.put(ip, entry);
 		}
 		return hostname;
@@ -711,7 +747,7 @@ public final class IPNet implements Comparable {
 					}
 				}
 			}
-			entry = new RevertDnsCacheEntry(hostname, date);
+			entry = new RevertDnsCacheEntry(ip, hostname, date);
 			_dnsPtrCache.put(ip, entry);
 		}
 		return hostname;
@@ -902,6 +938,10 @@ public final class IPNet implements Comparable {
 		} catch (UnknownHostException ex) {
 			// should not happen
 		}
+
+		_collector.setName("CacheCollector");
+		_collector.setDaemon(true);
+		_collector.start();
 	}
 
 	/**

@@ -21,10 +21,12 @@ import java.net.InetAddress;
  */
 
 public class DnsCacheEntry {
+	protected String _hostname;
 	protected InetAddress _ips [];
 	protected long _date;
 
-	public DnsCacheEntry(InetAddress ips [], long date) {
+	public DnsCacheEntry(String hostname, InetAddress ips [], long date) {
+		_hostname = hostname;
 		_ips = ips;
 		_date = date;
 	}
@@ -36,5 +38,9 @@ public class DnsCacheEntry {
 	public InetAddress[] getIps() {
 		return _ips;
 	}
-	
+
+	public String getHostname() {
+		return _hostname;
+	}
+
 }
