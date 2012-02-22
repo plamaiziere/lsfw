@@ -15,6 +15,8 @@ package fr.univrennes1.cri.jtacl.shell;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Binding between lsfw and groovy scripts
@@ -25,6 +27,8 @@ public class LsfwBinding {
 
 	protected String _cArgs;
 	protected ArrayList<String> _args;
+	protected static Map<String, Object> _vars =
+		new ConcurrentHashMap<String, Object>();
 
 	public LsfwBinding(String cArgs) {
 		_cArgs = cArgs;
@@ -59,4 +63,14 @@ public class LsfwBinding {
 	public Monitor getMonitor() {
 		return _monitor;
 	}
+
+	/**
+	 * Returns variables, as a Map, available for scripts. This area can be
+	 * used by scripts to store values.
+	 * @return some variables, as a Map, available for scripts.
+	 */
+	public Map<String, Object> getVars() {
+		return _vars;
+	}
+
 }
