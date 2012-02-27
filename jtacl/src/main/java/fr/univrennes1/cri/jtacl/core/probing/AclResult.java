@@ -127,6 +127,14 @@ public class AclResult {
 		_result = result;
 	}
 
+	/**
+	 * Returns a new instance of this result.
+	 * @return a new instance of this result.
+	 */
+	public AclResult newInstance() {
+		return new AclResult(_result);
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
