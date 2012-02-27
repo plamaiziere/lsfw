@@ -17,6 +17,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import java.util.logging.Level;
 
 /**
  * This class describes a probe. A 'probe' is like an IP packet with several
@@ -115,10 +116,12 @@ public class Probe {
 	 * @param message informational message.
 	 */
 	protected void logNotification(String message) {
-		String s = uidToString();
-		if (!isNotProbing())
-			s += " on: " + getIncomingLink().getEquipmentName();
-		Log.notifier().finest(s + " " + message);
+		if (Log.notifier().isLoggable(Level.INFO)) {
+			String s = uidToString();
+			if (!isNotProbing())
+				s += " on: " + getIncomingLink().getEquipmentName();
+			Log.notifier().info(s + " " + message);
+		}
 	}
 
 	/**
