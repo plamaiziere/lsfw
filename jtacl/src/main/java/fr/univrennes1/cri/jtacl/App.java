@@ -50,11 +50,12 @@ public class App
 
 		ShortFormatter fmt = new ShortFormatter();
 
-		Logger l = Logger.getLogger("");
-		Handler [] hdler = l.getHandlers();
+		Logger l = Log.debug();
+		Handler [] hdler = l.getParent().getHandlers();
 		hdler[0].setFormatter(fmt);
 		l.setLevel(Level.ALL);
-		Log.notifier().setLevel(Level.ALL);
+		l.getParent().setLevel(Level.ALL);
+		Log.notifier().setLevel(Level.WARNING);
 		Log.debug().setLevel(Level.OFF);
 		Log.config().setLevel(Level.SEVERE);
 	}
