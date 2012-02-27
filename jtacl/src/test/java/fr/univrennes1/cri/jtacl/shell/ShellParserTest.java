@@ -251,6 +251,34 @@ public class ShellParserTest extends TestCase {
 		assertTrue(parser.getProbeOptMatching());
 		assertTrue(parser.getProbeOptLearn());
 
+		line = "p active learn on ON match verbose na expect EXPECT   qd   SOURCE DEST";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("EXPECT", parser.getProbeExpect());
+		assertEquals("ON", parser.getEquipments());
+		assertTrue(parser.getProbeOptNoAction());
+		assertTrue(parser.getProbeOptVerbose());
+		assertTrue(parser.getProbeOptActive());
+		assertTrue(parser.getProbeOptMatching());
+		assertTrue(parser.getProbeOptLearn());
+		assertTrue(parser.getProbeOptQuickDeny());
+
+		line = "p active learn on ON match verbose na expect EXPECT   quick-deny   SOURCE DEST";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("EXPECT", parser.getProbeExpect());
+		assertEquals("ON", parser.getEquipments());
+		assertTrue(parser.getProbeOptNoAction());
+		assertTrue(parser.getProbeOptVerbose());
+		assertTrue(parser.getProbeOptActive());
+		assertTrue(parser.getProbeOptMatching());
+		assertTrue(parser.getProbeOptLearn());
+		assertTrue(parser.getProbeOptQuickDeny());
+
 		line = "p   SOURCE     DEST   tcp";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());

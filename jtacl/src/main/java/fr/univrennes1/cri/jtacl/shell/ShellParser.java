@@ -42,6 +42,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected boolean _probeOptNoAction;
 	protected boolean _probeOptVerbose;
 	protected boolean _probeOptLearn;
+	protected boolean _probeOptQuickDeny;
 	protected String _subCommand;
 	protected StringsList _tcpFlags;
 	protected String _groovyDirectory;
@@ -68,6 +69,7 @@ public class ShellParser extends CommonRules<Object> {
 		_probeOptNoAction = false;
 		_probeOptVerbose = false;
 		_probeOptLearn = false;
+		_probeOptQuickDeny = false;
 		_probe6flag = false;
 		return true;
 	}
@@ -253,6 +255,15 @@ public class ShellParser extends CommonRules<Object> {
 
 	public boolean setProbeOptLearn(boolean probeOptLearn) {
 		_probeOptLearn = probeOptLearn;
+		return true;
+	}
+
+	public boolean getProbeOptQuickDeny() {
+		return _probeOptQuickDeny;
+	}
+
+	public boolean setProbeOptQuickDeny(boolean probeOptQuickDeny) {
+		_probeOptQuickDeny = probeOptQuickDeny;
 		return true;
 	}
 
@@ -552,7 +563,8 @@ public class ShellParser extends CommonRules<Object> {
 					OptVerbose(),
 					OptActive(),
 					OptMatching(),
-					OptLearn()
+					OptLearn(),
+					OptQuickDeny()
 				),
 				Optional(
 					ProbeOptions()
@@ -649,6 +661,21 @@ public class ShellParser extends CommonRules<Object> {
 				IgnoreCase("learn"),
 				WhiteSpaces(),
 				setProbeOptLearn(true)
+			);
+	}
+
+	/*
+	 * OptQuickDeny: quick-deny | qd
+	 */
+	public Rule OptQuickDeny() {
+		return
+			Sequence(
+				FirstOf (
+					IgnoreCase("quick-deny"),
+					IgnoreCase("qd")
+				),
+				WhiteSpaces(),
+				setProbeOptQuickDeny(true)
 			);
 	}
 
