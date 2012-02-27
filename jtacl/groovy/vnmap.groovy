@@ -29,12 +29,12 @@ class VirtualNmap {
 
 		first.upto(last) {
 			if (udp) {
-				if (shell.runCommand("probe expect ACCEPT $source $dest udp $sourcePort:$it")
+				if (shell.runCommand("probe quick-deny expect ACCEPT $source $dest udp $sourcePort:$it")
 						== App.EXIT_SUCCESS)
 				    println("udp; $source; $sourcePort; $dest; $it");
 			}
 			if (tcp) {
-				if (shell.runCommand("probe expect ACCEPT $source $dest tcp $sourcePort:$it flags Sa")
+				if (shell.runCommand("probe quick-deny expect ACCEPT $source $dest tcp $sourcePort:$it flags Sa")
 						== App.EXIT_SUCCESS)
 				    println("tcp; $source; $sourcePort; $dest; $it");
 			}
