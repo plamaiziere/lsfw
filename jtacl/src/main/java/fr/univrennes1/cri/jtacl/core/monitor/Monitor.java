@@ -23,6 +23,8 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
+import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.Topology;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
@@ -599,6 +601,22 @@ public class Monitor {
 			}
 			probe.killNoRoute("host not found: " + nextHop.toString("i::"));
 			return;
+		}
+
+		/*
+		 * quick deny: stop if the probe is denied
+		 */
+		if (probe.getRequest().getProbeOptions().hasQuickDeny()) {
+			ProbeResults results = probe.getResults();
+			AclResult in = results.getAclResultIn();
+			AclResult out = results.getAclResultOut();
+			boolean denied = in.hasDeny() && !in.hasMay() ||
+					out.hasDeny() && !out.hasMay();
+
+			if (denied) {
+				probe.destinationReached("quick denied");
+				return;
+			}
 		}
 
 		/*
