@@ -25,9 +25,9 @@ import java.util.logging.Logger;
  */
 public class Log {
 
-	protected static Logger _debug = Logger.getLogger("jtacl.debug");
-	protected static Logger _notifier = Logger.getLogger("jtacl.notifier");
-	protected static Logger _config = Logger.getLogger("jtacl.config");
+	protected static final Logger _debug = Logger.getLogger("jtacl.debug");
+	protected static final Logger _notifier = Logger.getLogger("jtacl.notifier");
+	protected static final Logger _config = Logger.getLogger("jtacl.config");
 
 	public static Logger debug() {
 		return _debug;
@@ -40,5 +40,5 @@ public class Log {
 	public static Logger config() {
 		return _config;
 	}
-	
+
 }
