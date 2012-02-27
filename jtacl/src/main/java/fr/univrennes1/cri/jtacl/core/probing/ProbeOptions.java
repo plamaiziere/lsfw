@@ -14,13 +14,19 @@
 package fr.univrennes1.cri.jtacl.core.probing;
 
 /**
- * Probe Options
+ * Probe Options.<br/>
+ * Options to use while probing:
+ * <li>NOACTION: Do not make any action on the probe (like routing or packet
+ * transformation).</li>
+ * <li>QUICKDENY: Stop probing if the probe is certainly denied.</li>
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ProbeOptions {
 	protected int _flags = 0;
-	
-	protected static final int NoAction = 1;
+
+	public static final int NOACTION = 1;
+	public static final int QUICKDENY = 2;
 
 	protected static final int _msk = 0xFF;
 
@@ -70,29 +76,29 @@ public class ProbeOptions {
 	}
 
 	/**
-	 * Returns true if the NoAction flag is set.
-	 * @return true if the NoAction flag is set.
+	 * Returns true if the NOACTION flag is set.
+	 * @return true if the NOACTION flag is set.
 	 */
 	public boolean hasNoAction() {
-		return (_flags & NoAction) != 0;
+		return (_flags & NOACTION) != 0;
 	}
 
 	/**
-	 * Sets the NoAction flag
+	 * Sets the NOACTION flag.
 	 */
 	public void setNoAction() {
-		_flags |= NoAction;
+		_flags |= NOACTION;
 	}
 
 	/**
-	 * Clears the NoAction flag
+	 * Clears the NOACTION flag.
 	 */
 	public void clearNoAction() {
-		_flags = (~NoAction & _flags) & _msk;
+		_flags = (~NOACTION & _flags) & _msk;
 	}
 
 	/**
-	 * Sets the NoAction flag according to the value in argument.
+	 * Sets the NOACTION flag according to the value in argument.
 	 * @param flag value to set.
 	 */
 	public void setNoAction(boolean flag) {
@@ -102,15 +108,54 @@ public class ProbeOptions {
 			clearNoAction();
 	}
 
+	/**
+	 * Returns true if the QUICKDENY flag is set.
+	 * @return true if the QUICKDENY flag is set.
+	 */
+	public boolean hasQuickDeny() {
+		return (_flags & QUICKDENY) != 0;
+	}
+
+	/**
+	 * Sets the QUICKDENY flag.
+	 */
+	public void setQuickDeny() {
+		_flags |= QUICKDENY;
+	}
+
+	/**
+	 * Clears the QUICKDENY flag.
+	 */
+	public void clearQuickDeny() {
+		_flags = (~QUICKDENY & _flags) & _msk;
+	}
+
+	/**
+	 * Sets the QUICKDENY flag according to the value in argument.
+	 * @param flag value to set.
+	 */
+	public void setQuickDeny(boolean flag) {
+		if (flag)
+			setQuickDeny();
+		else
+			clearQuickDeny();
+	}
+
 	@Override
 	public String toString() {
 		String r = "";
 
 		if (hasNoAction())
-			r += "NoAction";
+			r += "NOACTION";
+
+		if (hasQuickDeny()) {
+			if (!r.isEmpty())
+				r += ", ";
+			r += "QUICKDENY";
+		}
 
 		return r;
 	}
-	
-	
+
+
 }

@@ -30,6 +30,7 @@ import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLinks;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeOptions;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.core.topology.Topology;
@@ -722,7 +723,9 @@ public class Shell {
 		/*
 		 * probe options
 		 */
-		request.getProbeOptions().setNoAction(command.getProbeOptNoAction());
+		ProbeOptions options = request.getProbeOptions();
+		options.setNoAction(command.getProbeOptNoAction());
+		options.setQuickDeny(command.getProbeOptQuickDeny());
 
 		/*
 		 * probe
