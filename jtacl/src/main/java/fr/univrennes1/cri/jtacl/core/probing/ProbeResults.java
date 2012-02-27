@@ -109,6 +109,10 @@ public class ProbeResults {
 			addActiveAclOut(aclString, result);
 	}
 
+	public AclResult getAclResultIn() {
+		return _resultIn;
+	}
+
 	public void setAclResultIn(AclResult result) {
 		_resultIn = result;
 	}
@@ -156,19 +160,30 @@ public class ProbeResults {
 	public AclResult getAclResult() {
 
 		AclResult result = new AclResult();
-		/*
-		 * may
-		 */
-		if (_resultIn.hasMay() || _resultOut.hasMay()) {
-			result.addResult(AclResult.MAY);
-		}
 
 		/*
 		 * deny
 		 */
+		if (_resultIn.hasDeny() && !_resultIn.hasMay()) {
+			return new AclResult(AclResult.DENY);
+		}
+
+		if (_resultOut.hasDeny() && !_resultOut.hasMay()) {
+			return new AclResult(AclResult.DENY);
+		}
+
+		/*
+		 * may deny
+		 */
 		if (_resultIn.hasDeny() || _resultOut.hasDeny()) {
-			result.addResult(AclResult.DENY);
-			return result;
+			return new AclResult(AclResult.MAY | AclResult.DENY);
+		}
+
+		/*
+		 * may (accept)
+		 */
+		if (_resultIn.hasMay() || _resultOut.hasMay()) {
+			result.addResult(AclResult.MAY);
 		}
 
 		/*
