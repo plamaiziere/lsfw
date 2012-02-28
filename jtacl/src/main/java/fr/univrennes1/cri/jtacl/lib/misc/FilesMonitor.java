@@ -49,5 +49,9 @@ public class FilesMonitor {
 
 		return files;
 	}
+	
+	public Map<String, Long> getFiles() {
+		return _filesMap;
+	}
 
 }
