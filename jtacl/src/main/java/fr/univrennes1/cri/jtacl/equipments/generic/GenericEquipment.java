@@ -389,7 +389,7 @@ public class GenericEquipment extends NetworkEquipment {
 	protected void famAdd(String fileName) {
 		_fam.addFile(fileName);
 	}
-
+	
 	/**
 	 * Create a new {@link GenericEquipment} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -444,6 +444,14 @@ public class GenericEquipment extends NetworkEquipment {
 		_shells.add(shell);
 	}
 
+	/**
+	 * Returns the file alteration monitor of this equipment.
+	 * @return the file alteration monitor of this equipment.
+	 */
+	public FilesMonitor getFam() {
+		return _fam;
+	}
+	
 	@Override
 	public boolean hasChanged() {
 		List<String> files = _fam.checkFiles();
