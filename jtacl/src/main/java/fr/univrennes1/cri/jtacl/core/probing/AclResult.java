@@ -156,10 +156,10 @@ public class AclResult {
 	/**
 	 * Concats an AclResult with this result. The concatenation is defined by
 	 * the first following rules (in order):
-	 * <li>this.DENY && !this.MAY || other.DENY && !other.MAY returns DENY</li>
-	 * <li>this.DENY || other.DENY returns MAY DENY</li>
-	 * <li>this.MAY || other.MAY returns MAY ACCEPT</li>
-	 * <li>this.ACCEPT && other.ACCEPT returns ACCEPT</li>
+	 * <li>this.isCertainlyDeny || other.isCertainlyDeny returns DENY</li>
+	 * <li>this.isCertainlyAccept && other.isCertainlyAccept returns ACCEPT</li>	 *
+	 * <li>this.hasDeny || other.hasDeny returns MAY DENY</li>
+	 * <li>this.hasAccept || other.hasAccept returns MAY ACCEPT</li>
 	 * @param other AclResult to concat.
 	 * @return the result of the concatenation.
 	 */
@@ -172,8 +172,11 @@ public class AclResult {
 			return new AclResult(AclResult.DENY);
 		}
 
-		if (other.hasDeny() && !other.hasMay()) {
-			return new AclResult(AclResult.DENY);
+		/*
+		 * accept
+		 */
+		if (isCertainlyAccept() && other.isCertainlyAccept()) {
+			return new AclResult(AclResult.ACCEPT);
 		}
 
 		/*
@@ -183,29 +186,53 @@ public class AclResult {
 			return new AclResult(AclResult.MAY | AclResult.DENY);
 		}
 
-		AclResult result = new AclResult();
 		/*
-		 * may (accept)
+		 * may accept
 		 */
-		if (hasMay() || other.hasMay()) {
-			result.addResult(AclResult.MAY);
+		if (hasAccept() || other.hasAccept()) {
+			return new AclResult(AclResult.MAY | AclResult.ACCEPT);
+		}
+
+		return null;
+	}
+
+	/* SumPath of an AclResult with this result. The sumPath is defined by
+	 * the first following rules (in order):
+	 * <li>this.isCertainlyDeny && other.isCertainlyDeny returns DENY</li>
+	 * <li>this.isCertainlyAccept && other.isCertainlyAccept returns ACCEPT</li>
+	 * <li>this.hasDeny || other.hasDeny returns MAY DENY</li>
+	 * <li>this.hasAccept || other.hasAccept returns MAY ACCEPT</li>
+	 * @param other AclResult to sumPath.
+	 * @return the result of the sumPath.
+	 */
+	public AclResult sumPath(AclResult other) {
+
+		/*
+		 * deny
+		 */
+		if (isCertainlyDeny() && other.isCertainlyDeny()) {
+			return new AclResult(AclResult.DENY);
 		}
 
 		/*
 		 * accept
 		 */
-		if (hasAccept() && other.hasAccept()) {
-			result.addResult(AclResult.ACCEPT);
-			return result;
+		if (isCertainlyAccept() && other.isCertainlyAccept()) {
+			return new AclResult(AclResult.ACCEPT);
 		}
 
 		/*
-		 * match
-		 * XXX: can happen?
+		 * may deny
 		 */
-		if (hasMatch() || other.hasMatch()) {
-			result.addResult(AclResult.MATCH);
-			return result;
+		if (hasDeny() || other.hasDeny()) {
+			return new AclResult(AclResult.MAY | AclResult.DENY);
+		}
+
+		/*
+		 * may accept
+		 */
+		if (hasAccept() || other.hasAccept()) {
+			return new AclResult(AclResult.MAY | AclResult.ACCEPT);
 		}
 
 		return null;
@@ -220,12 +247,16 @@ public class AclResult {
 			return false;
 		}
 		final AclResult other = (AclResult) obj;
+		if (this._result != other._result) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		int hash = 5;
+		int hash = 3;
+		hash = 23 * hash + this._result;
 		return hash;
 	}
 
