@@ -158,52 +158,7 @@ public class ProbeResults {
 	}
 
 	public AclResult getAclResult() {
-
-		AclResult result = new AclResult();
-
-		/*
-		 * deny
-		 */
-		if (_resultIn.hasDeny() && !_resultIn.hasMay()) {
-			return new AclResult(AclResult.DENY);
-		}
-
-		if (_resultOut.hasDeny() && !_resultOut.hasMay()) {
-			return new AclResult(AclResult.DENY);
-		}
-
-		/*
-		 * may deny
-		 */
-		if (_resultIn.hasDeny() || _resultOut.hasDeny()) {
-			return new AclResult(AclResult.MAY | AclResult.DENY);
-		}
-
-		/*
-		 * may (accept)
-		 */
-		if (_resultIn.hasMay() || _resultOut.hasMay()) {
-			result.addResult(AclResult.MAY);
-		}
-
-		/*
-		 * accept
-		 */
-		if (_resultIn.hasAccept() && _resultOut.hasAccept()) {
-			result.addResult(AclResult.ACCEPT);
-			return result;
-		}
-
-		/*
-		 * match
-		 * XXX: can happen?
-		 */
-		if (_resultIn.hasMatch() || _resultOut.hasMatch()) {
-			result.addResult(AclResult.MATCH);
-			return result;
-		}
-
-		return null;
+		return _resultIn.concat(_resultOut);
 	}
 
 	public RoutingResult getRoutingResult() {
