@@ -15,7 +15,9 @@ package fr.univrennes1.cri.jtacl.core.probing;
 
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class is reponsible of tracking probes over our virtual network.
@@ -205,7 +207,7 @@ public class ProbesTracker {
 	public ProbesByUid getProbes() {
 		return _probes;
 	}
-	
+
 
 	/**
 	 * Checks if the path taken by of all final probes is unique.
@@ -255,40 +257,40 @@ public class ProbesTracker {
 	 */
 	public AclResult getAclResult() {
 
-		AclResult result = new AclResult();
+		/*
+		 * AclResults on each path.
+		 */
+		List<AclResult> pathResults = new ArrayList<AclResult>();
+
+		/*
+		 * each path
+		 */
+		for (Probe finalProbe: _finalProbes.values()) {
+			/*
+			 * each probe on the path
+			 */
+			ProbesList probes = finalProbe.getParentProbes();
+			probes.add(finalProbe);
+			AclResult pathResult = new AclResult(AclResult.ACCEPT);
+			for (Probe probe : probes) {
+				AclResult probeResult = probe.getResults().getAclResult();
+				pathResult = pathResult.concat(probeResult);
+			}
+			pathResults.add(pathResult);
+		}
+
+		AclResult result = new AclResult(AclResult.ACCEPT);
+
+		/*
+		 * result for all pathes
+		 */
+		for (AclResult probeResult: pathResults) {
+			result = result.sumPath(probeResult);
+		}
 
 		if (getRoutingResult() != RoutingResult.ROUTED)
 			result.addResult(AclResult.MAY);
 
-		int accept = 0;
-		int deny = 0;
-		int match = 0;
-		int may = 0;
-
-		for (Probe finalProbe: _finalProbes.values()) {
-			ProbesList probes = finalProbe.getParentProbes();
-			probes.add(finalProbe);
-			for (Probe probe : probes) {
-				AclResult probeResult = probe.getResults().getAclResult();
-				if (probeResult.hasAccept())
-					accept++;
-				if (probeResult.hasDeny())
-					deny++;
-				if (probeResult.hasMatch())
-					match++;
-				if (probeResult.hasMay())
-					may++;
-			}
-		}
-		if (may > 0)
-			result.addResult(AclResult.MAY);
-		if (match == 0 && accept > 0 && deny == 0)
-			result.addResult(AclResult.ACCEPT);
-		if (match == 0 && deny > 0)
-			result.addResult(AclResult.DENY);
-		if (match > 0) {
-			result.addResult(AclResult.MATCH);
-		}
 		return result;
 	}
 
