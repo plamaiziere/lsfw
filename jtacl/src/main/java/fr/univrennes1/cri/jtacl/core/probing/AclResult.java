@@ -135,6 +135,64 @@ public class AclResult {
 		return new AclResult(_result);
 	}
 
+	/**
+	 * Concats an AclResult with this result. The concatenation is defined by
+	 * the first following rules (in order):
+	 * <li>this.DENY && !this.MAY || other.DENY && !other.MAY returns DENY</li>
+	 * <li>this.DENY || other.DENY returns MAY DENY</li>
+	 * <li>this.MAY || other.MAY returns MAY ACCEPT</li>
+	 * <li>this.ACCEPT && other.ACCEPT returns ACCEPT</li>
+	 * @param other AclResult to concat.
+	 * @return the result of the concatenation.
+	 */
+	public AclResult concat(AclResult other) {
+
+		/*
+		 * deny
+		 */
+		if (hasDeny() && !hasMay()) {
+			return new AclResult(AclResult.DENY);
+		}
+
+		if (other.hasDeny() && !other.hasMay()) {
+			return new AclResult(AclResult.DENY);
+		}
+
+		/*
+		 * may deny
+		 */
+		if (hasDeny() || other.hasDeny()) {
+			return new AclResult(AclResult.MAY | AclResult.DENY);
+		}
+
+		AclResult result = new AclResult();
+		/*
+		 * may (accept)
+		 */
+		if (hasMay() || other.hasMay()) {
+			result.addResult(AclResult.MAY);
+		}
+
+		/*
+		 * accept
+		 */
+		if (hasAccept() && other.hasAccept()) {
+			result.addResult(AclResult.ACCEPT);
+			return result;
+		}
+
+		/*
+		 * match
+		 * XXX: can happen?
+		 */
+		if (hasMatch() || other.hasMatch()) {
+			result.addResult(AclResult.MATCH);
+			return result;
+		}
+
+		return null;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
