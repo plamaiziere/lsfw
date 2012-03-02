@@ -193,7 +193,7 @@ public class AclResult {
 			return new AclResult(AclResult.MAY | AclResult.ACCEPT);
 		}
 
-		return null;
+		return new AclResult();
 	}
 
 	/* SumPath of an AclResult with this result. The sumPath is defined by
@@ -235,7 +235,7 @@ public class AclResult {
 			return new AclResult(AclResult.MAY | AclResult.ACCEPT);
 		}
 
-		return null;
+		return new AclResult();
 	}
 
 	@Override
