@@ -136,6 +136,24 @@ public class AclResult {
 	}
 
 	/**
+	 * Returns true if this result is certainly DENY. IE flag DENY is set and
+	 * flag MAY is unset.
+	 * @return true if this result is certainly DENY
+	 */
+	public boolean isCertainlyDeny() {
+		return hasDeny() && !hasMay();
+	}
+
+	/**
+	 * Returns true if this result is certainly ACCEPT. IE flag ACCEPT is set
+	 * and flag MAY is unset.
+	 * @return true if this result is certainly ACCEPT
+	 */
+	public boolean isCertainlyAccept() {
+		return hasAccept() && !hasMay();
+	}
+
+	/**
 	 * Concats an AclResult with this result. The concatenation is defined by
 	 * the first following rules (in order):
 	 * <li>this.DENY && !this.MAY || other.DENY && !other.MAY returns DENY</li>
@@ -150,7 +168,7 @@ public class AclResult {
 		/*
 		 * deny
 		 */
-		if (hasDeny() && !hasMay()) {
+		if (isCertainlyDeny() || other.isCertainlyDeny()) {
 			return new AclResult(AclResult.DENY);
 		}
 
