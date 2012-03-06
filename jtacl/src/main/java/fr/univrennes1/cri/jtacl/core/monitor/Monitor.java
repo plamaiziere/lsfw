@@ -475,8 +475,6 @@ public class Monitor {
 	 * Reload the monitor
 	 */
 	public void reload() {
-		_options = new Options();
-		_defines = new HashMap<String, String>();
 		_equipments = new NetworkEquipmentsByName();
 		_topology = new Topology();
 		_probing = new Probing();
