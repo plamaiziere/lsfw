@@ -279,13 +279,16 @@ public class ProbesTracker {
 			pathResults.add(pathResult);
 		}
 
-		AclResult result = new AclResult(AclResult.ACCEPT);
+		AclResult result = null;
 
 		/*
 		 * result for all pathes
 		 */
 		for (AclResult probeResult: pathResults) {
-			result = result.sumPath(probeResult);
+			if (result == null)
+				result = probeResult;
+			else
+				result = result.sumPath(probeResult);
 		}
 
 		if (getRoutingResult() != RoutingResult.ROUTED)
