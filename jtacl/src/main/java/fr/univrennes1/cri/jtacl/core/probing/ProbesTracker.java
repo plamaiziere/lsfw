@@ -291,6 +291,9 @@ public class ProbesTracker {
 				result = result.sumPath(probeResult);
 		}
 
+		if (result == null)
+			result = new AclResult(AclResult.DENY | AclResult.MAY);
+
 		if (getRoutingResult() != RoutingResult.ROUTED)
 			result.addResult(AclResult.MAY);
 
