@@ -64,14 +64,17 @@ public class EnhancedServiceObjectGroupItem extends ObjectGroupItem {
 	 * @return true if this item matches any of the protocols value in argument.
 	 */
 	public boolean matches(List<Integer> protocols) {
-
-		return ProtocolComparator.matches(protocols, _serviceObject.getProtocol());
+		for (Integer proto: _serviceObject.getProtocols()) {
+			if (ProtocolComparator.matches(protocols, proto)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 
 	/**
-	 * Checks if at least one item of this group matches the service
-	 *  in argument and if this group matches the protocol sin argument.
+	 * Checks if this item matches the protocols and service in argument.
 	 * @param protocols protocols value to check.
 	 * @param port {@link PortSpec} port spec value to check.
 	 * @return a {@link MatchResult} between this group and the port spec in
@@ -80,7 +83,7 @@ public class EnhancedServiceObjectGroupItem extends ObjectGroupItem {
 	public MatchResult matches(List<Integer> protocols, PortSpec port) {
 		PortObject pobject = _serviceObject.getPortObject();
 
-		if (!ProtocolComparator.matches(protocols, _serviceObject.getProtocol()))
+		if (!matches(protocols))
 			return MatchResult.NOT;
 		if (pobject != null)
 			return (pobject.matches(port));

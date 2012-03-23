@@ -33,6 +33,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -698,8 +699,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 */
 			case ENHANCED:
 				protocol = parser.getProtocol();
-				proto = parseProtocol(protocol);
-
+				List<Integer> protos = new ArrayList<Integer>();
+				if (protocol.equalsIgnoreCase("tcp-udp")) {
+					protos.add(_ipProtocols.UDP());
+					protos.add(_ipProtocols.TCP());
+				} else {
+					protos.add(parseProtocol(protocol));
+				}
 				operator = parser.getPortOperator();
 				portObject = null;
 				if (operator != null) {
@@ -712,7 +718,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 					}
 				}
 
-				ServiceObject servObject = new ServiceObject(proto, portObject);
+				ServiceObject servObject = new ServiceObject(protos, portObject);
 
 				EnhancedServiceObjectGroupItem eobject =
 					new EnhancedServiceObjectGroupItem(_lastGroup,

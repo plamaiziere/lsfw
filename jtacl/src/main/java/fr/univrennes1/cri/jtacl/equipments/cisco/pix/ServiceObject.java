@@ -13,8 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Describes a service object.
@@ -24,17 +24,17 @@ import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 public class ServiceObject {
 
 	/**
-	 * protocol of this object
+	 * protocols of this object
 	 */
-	protected int _protocol;
+	protected List<Integer> _protocols = new ArrayList<Integer>();
 
 	/**
 	 * port object associated to this item (may be null)
 	 */
 	protected PortObject _portObject;
-	
-	public ServiceObject(int protocol, PortObject portObject) {
-		_protocol = protocol;
+
+	public ServiceObject(List<Integer> protocols, PortObject portObject) {
+		_protocols.addAll(protocols);
 		_portObject = portObject;
 	}
 
@@ -42,16 +42,8 @@ public class ServiceObject {
 		return _portObject;
 	}
 
-	public int getProtocol() {
-		return _protocol;
-	}
-
-	public MatchResult matches(int protocol, PortSpec port) {
-		if (protocol == _protocol) {
-			if (_portObject != null)
-				return _portObject.matches(port);
-		}
-		return MatchResult.NOT;
+	public List<Integer> getProtocols() {
+		return _protocols;
 	}
 
 }
