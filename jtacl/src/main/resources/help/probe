@@ -99,7 +99,7 @@ udp/tcp
   If the protocol is udp or tcp, port source and port destination can be specified
 using the form [portsource:][portdest]
 
-  Port can be a number, the name of a service or one of the keywords "any,
+  Port can be a range, a number, the name of a service or one of the keywords "any,
   none, known, reg, dyn". Services are resolved using an internal services database.
 
   The following keywords can be used instead of a service name:
@@ -108,6 +108,10 @@ using the form [portsource:][portdest]
     known: a "well known" port between 0..1023.
     reg  : a "registered" port between 1024..49151.
     dyn  : a "dynamic" port between 49152..65535.
+
+  A range of ports can be specified using the first port and the last port of the
+  range between parenthesis: (first,last). Spaces are not allowed in this
+  notation.
 
 tcp
 ---
@@ -159,6 +163,10 @@ Examples:
 
   Port source and port dest, using a dynamic port for the source port
   lsfw> probe 192.168.1.2/24 www.google.com tcp dyn:http
+
+  Port source and port dest, using a dynamic port for the source port and a
+  destination port between 80 and 443.
+  lsfw> probe 192.168.1.2/24 www.google.com tcp dyn:(http,https)
 
   Icmp echo
   lsfw> probe 192.168.1.2/24 1.2.3.4 icmp echo
