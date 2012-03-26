@@ -208,23 +208,67 @@ public class Shell {
 		return r;
 	}
 
-	protected PortSpec portToPortSpec(String port) {
-		if (port.equalsIgnoreCase("none"))
+	protected Integer parseService(String service, String protocol) {
+		IPServices ipServices = IPServices.getInstance();
+
+		Integer	port = ipServices.serviceLookup(service, protocol);
+		if (port.intValue() == -1) {
+			_outStream.println("unknown service: " + service);
+			return null;
+		}
+		return port;
+	}
+
+	protected PortSpec parsePortSpec(String sportSpec, String sprotocol) {
+
+		/*
+		 * predefined intervals
+		 */
+		sportSpec = sportSpec.toLowerCase();
+		if (sportSpec.equals("none"))
 			return PortSpec.NONE;
 
-		if (port.equalsIgnoreCase("any"))
+		if (sportSpec.equals("any"))
 			return PortSpec.ANY;
 
-		if (port.equalsIgnoreCase("reg"))
+		if (sportSpec.equals("reg"))
 			return PortSpec.REGISTERED;
 
-		if (port.equalsIgnoreCase("dyn"))
+		if (sportSpec.equals("dyn"))
 			return PortSpec.DYNAMIC;
 
-		if (port.equalsIgnoreCase("known"))
+		if (sportSpec.equals("known"))
 			return PortSpec.WELLKNOWN;
 
-		return null;
+		/*
+		 * interval
+		 */
+		if (sportSpec.startsWith("(") && sportSpec.endsWith(")")) {
+			String sports = sportSpec.substring(1, sportSpec.length() - 1);
+			String [] ports = sports.split(",");
+			if (ports.length != 2) {
+				_outStream.println("invalid services range: " + sportSpec);
+				return null;
+			}
+			Integer portFirst = parseService(ports[0], sprotocol);
+			if (portFirst == null)
+				return null;
+			Integer portLast = parseService(ports[1], sprotocol);
+			if (portLast == null)
+				return null;
+			PortSpec spec = new PortSpec(PortOperator.RANGE, portFirst, portLast);
+			return spec;
+		}
+
+		/*
+		 * service
+		 */
+		Integer port = parseService(sportSpec, sprotocol);
+		if (port == null)
+			return null;
+
+		PortSpec spec = new PortSpec(PortOperator.EQ, port);
+		return spec;
 	}
 
 	protected void autoReload() {
@@ -587,11 +631,7 @@ public class Shell {
 		String sportDest = command.getPortDest();
 
 		IPProtocols ipProtocols = IPProtocols.getInstance();
-		IPServices ipServices = IPServices.getInstance();
-
 		Integer protocol;
-		Integer portSource;
-		Integer portDest;
 
 		ProbeRequest request = new ProbeRequest();
 		if (sprotocol != null) {
@@ -622,33 +662,17 @@ public class Shell {
 				 */
 				if (sportSource == null)
 					sportSource = "any";
-				String port = sportSource.toLowerCase();
-				if (!_specialPorts.contains(port)) {
-					portSource = ipServices.serviceLookup(sportSource, sprotocol);
-					if (portSource.intValue() == -1) {
-						_outStream.println("unknown service: " + sportSource);
-						return false;
-					}
-					request.setSourcePort(new PortSpec(PortOperator.EQ, portSource));
-				} else {
-					PortSpec pSpec = portToPortSpec(port);
-					request.setSourcePort(pSpec);
-				}
+				PortSpec sourceSpec = parsePortSpec(sportSource, sprotocol);
+				if (sourceSpec == null)
+					return false;
+				request.setSourcePort(sourceSpec);
 
 				if (sportDest == null)
 					sportDest = "any";
-				port = sportDest.toLowerCase();
-				if (!_specialPorts.contains(port)) {
-					portDest = ipServices.serviceLookup(sportDest, sprotocol);
-					if (portDest.intValue() == -1) {
-						_outStream.println("unknown service: " + sportDest);
-						return false;
-					}
-					request.setDestinationPort(new PortSpec(PortOperator.EQ, portDest));
-				} else {
-					PortSpec pSpec = portToPortSpec(port);
-					request.setDestinationPort(pSpec);
-				}
+				PortSpec destSpec = parsePortSpec(sportDest, sprotocol);
+				if (destSpec == null)
+					return false;
+				request.setDestinationPort(destSpec);
 
 				/*
 				 * tcp flags

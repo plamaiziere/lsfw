@@ -329,6 +329,33 @@ public class ShellParserTest extends TestCase {
 		assertEquals("PORT1", parser.getPortSource());
 		assertEquals("PORT2", parser.getPortDest());
 
+		line = "p   SOURCE     DEST   udp    (PORT1,PORT1)";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("udp", parser.getProtoSpecification());
+		assertEquals(null, parser.getPortSource());
+		assertEquals("(PORT1,PORT1)", parser.getPortDest());
+
+		line = "p   SOURCE     DEST   udp    (PORT1,PORT1):PORT2";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("udp", parser.getProtoSpecification());
+		assertEquals("(PORT1,PORT1)", parser.getPortSource());
+		assertEquals("PORT2", parser.getPortDest());
+
+		line = "p   SOURCE     DEST   udp   (PORT1,PORT1):(PORT2,PORT2)";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("udp", parser.getProtoSpecification());
+		assertEquals("(PORT1,PORT1)", parser.getPortSource());
+		assertEquals("(PORT2,PORT2)", parser.getPortDest());
+
 		line = "p   SOURCE     DEST   tcp    flags S SA";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
@@ -352,6 +379,19 @@ public class ShellParserTest extends TestCase {
 		assertEquals(2, parser.getTcpFlags().size());
 		assertEquals("S", parser.getTcpFlags().get(0));
 		assertEquals("SA", parser.getTcpFlags().get(1));
+
+		line = "p   SOURCE     DEST   tcp  (PORT1,PORT1)  flags S SA";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getCommand());
+		assertEquals("SOURCE", parser.getSrcAddress());
+		assertEquals("DEST", parser.getDestAddress());
+		assertEquals("tcp", parser.getProtoSpecification());
+		assertEquals(null, parser.getPortSource());
+		assertEquals("(PORT1,PORT1)", parser.getPortDest());
+		assertEquals(2, parser.getTcpFlags().size());
+		assertEquals("S", parser.getTcpFlags().get(0));
+		assertEquals("SA", parser.getTcpFlags().get(1));
+
 	}
 
 	public void testReload() {

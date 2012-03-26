@@ -466,7 +466,7 @@ public class ShellParser extends CommonRules<Object> {
 	}
 
 	public Rule Special() {
-		return AnyOf("=,:");
+		return AnyOf("=,:()");
 	}
 
 	/*
@@ -719,7 +719,7 @@ public class ShellParser extends CommonRules<Object> {
 					Optional(
 						Sequence(
 							WhiteSpaces(),
-							Identifier(),
+							PortSpec(),
 							setPortSource(match())
 						)
 					)
@@ -735,22 +735,39 @@ public class ShellParser extends CommonRules<Object> {
 			FirstOf(
 				Sequence(
 					TestNot(IgnoreCase("flags")),
-					Identifier(),
+					PortSpec(),
 					setPortSource(match()),
 					setPortDest(null),
 					String(":"),
 					Optional(
 						Sequence(
-							Identifier(),
+							PortSpec(),
 							setPortDest(match())
 						)
 					)
 				),
 				Sequence(
 					TestNot(IgnoreCase("flags")),
-					Identifier(),
+					PortSpec(),
 					setPortDest(match()),
 					setPortSource(null)
+				)
+			);
+	}
+
+	/*
+	 * portspec : identifier | '(' identifier ',' identifier ')'
+	 */
+	public Rule PortSpec() {
+		return
+			FirstOf(
+				Identifier(),
+				Sequence(
+					Ch('('),
+					Identifier(),
+					Ch(','),
+					Identifier(),
+					Ch(')')
 				)
 			);
 	}
