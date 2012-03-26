@@ -24,19 +24,123 @@ import fr.univrennes1.cri.jtacl.App;
 
 class VirtualNmap {
 
-	static void nmap(Shell shell, String source, String sourcePort, String dest,
+	boolean _debug = false;
+	int MIN_CHUNK = 256;
+
+	Shell _shell;
+	String _source;
+	String _sourcePort;
+	String _dest;
+	int _first;
+	int _last;
+	boolean _tcp;
+	boolean _udp;
+	List<List<Integer>> _udpRangesToTest = new ArrayList<List<Integer>>();
+	List<List<Integer>> _tcpRangesToTest = new ArrayList<List<Integer>>();
+	int _tcpRangeTest = 0;
+	int _udpRangeTest = 0;
+
+	VirtualNmap(Shell shell, String source, String sourcePort, String dest,
 		boolean udp, boolean tcp, int first, int last) {
 
-		first.upto(last) {
-			if (udp) {
-				if (shell.runCommand("probe quick-deny expect ACCEPT $source $dest udp $sourcePort:$it")
-						== App.EXIT_SUCCESS)
-				    println("udp; $source; $sourcePort; $dest; $it");
+		_shell = shell;
+		_source = source;
+		_sourcePort = sourcePort;
+		_dest = dest;
+		_udp = udp;
+		_tcp = tcp;
+		_first = first;
+		_last = last;
+	}
+
+	boolean isDeniedRange(boolean udp, int first, int last) {
+
+		if (udp) {
+			_udpRangeTest++;
+			int ret = _shell.runCommand("probe quick-deny expect DENY $_source $_dest udp $_sourcePort:($first,$last)");
+			return ret == App.EXIT_SUCCESS;
+		}
+
+		_tcpRangeTest++;
+		int ret = _shell.runCommand("probe quick-deny expect DENY $_source $_dest tcp $_sourcePort:($first,$last) flags Sa");
+		return ret == App.EXIT_SUCCESS;
+	}
+
+	/*
+	 * We do a dichotomic search on the range of ports to test. If a range is denied, there is
+	 * no need to probe for accept. If the range is not denied, we split it in two parts and
+	 * repeat the processus until the range is smallest than MIN_CHUNK.
+	 * This greatly improves the speed.
+	 */
+	void getRangesToTest(boolean udp, int first, int last, List<List<Integer>> rangesToTest) {
+
+		boolean denied = isDeniedRange(udp, first, last);
+		if (denied)
+			return;
+		int range = last - first;
+		if (range <= MIN_CHUNK) {
+			List<Integer> ports = new ArrayList<Integer>();
+			ports.add(first);
+			ports.add(last);
+			rangesToTest.add(ports);
+			return;
+		}
+
+		int pf1 = first;
+		int pl1 = first + (range / 2);
+		int pf2 = pl1 + 1;
+		int pl2 = last;
+
+		if (pf1 <= pl1) {
+			getRangesToTest(udp, pf1, pl1, rangesToTest);
+		}
+
+		if (pf2 <= pl2) {
+			getRangesToTest(udp, pf2, pl2, rangesToTest);
+		}
+	}
+
+	void nmap() {
+
+		_udpRangesToTest.clear();
+		_tcpRangesToTest.clear();
+
+		if (_udp)
+			getRangesToTest(true, _first, _last, _udpRangesToTest);
+
+		if (_tcp)
+			getRangesToTest(false, _first, _last, _tcpRangesToTest);
+
+		if (_debug)
+			println("Range test udp=$_udpRangeTest tcp=$_tcpRangeTest");
+
+		_udpRangesToTest.each() {
+			ports ->
+			int f = ports[0];
+			int l = ports[1];
+
+			if (_debug)
+				println("range udp : $f, $l");
+
+			f.upto(l) {
+				int res = _shell.runCommand("probe quick-deny expect ACCEPT $_source $_dest udp $_sourcePort:$it")
+				if (res == App.EXIT_SUCCESS)
+				    println("udp; $_source; $_sourcePort; $_dest; $it");
 			}
-			if (tcp) {
-				if (shell.runCommand("probe quick-deny expect ACCEPT $source $dest tcp $sourcePort:$it flags Sa")
-						== App.EXIT_SUCCESS)
-				    println("tcp; $source; $sourcePort; $dest; $it");
+		}
+
+		_tcpRangesToTest.each() {
+			ports ->
+			int f = ports[0];
+			int l = ports[1];
+
+			if (_debug)
+				println("range tcp : $f, $l");
+
+			f.upto(l) {
+				int res = _shell.runCommand("probe quick-deny expect ACCEPT $_source $_dest tcp $_sourcePort:$it flags Sa")
+				if (res == App.EXIT_SUCCESS)
+				    println("tcp; $_source; $_sourcePort; $_dest; $it");
 			}
 		}
 	}
@@ -86,4 +190,7 @@ if (!tcp && !udp) {
 
 def shell = new Shell();
 shell.setOutputStream(DevNull.out);
-VirtualNmap.nmap(shell, source, sourceport, dest, udp, tcp, first, last);
+
+def vn = new VirtualNmap(shell, source, sourceport, dest, udp, tcp, first, last);
+vn.nmap();
+
