@@ -703,6 +703,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				if (protocol.equalsIgnoreCase("tcp-udp")) {
 					protos.add(_ipProtocols.UDP());
 					protos.add(_ipProtocols.TCP());
+					protocol = "tcp";
 				} else {
 					protos.add(parseProtocol(protocol));
 				}
