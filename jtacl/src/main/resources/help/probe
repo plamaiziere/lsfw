@@ -17,9 +17,9 @@ ProbeOptions
  expect expected-result: specify the expected result of the probing.
  learn                 : display a short summary of the result of the probing.
  no-action | na        : do not make any probe transformation or action while
+                            probing.
  match                 : display matching access lists. This is the default.
  on equipment-spec     : specification of the equipment to start the probing.
-                            probing.
  quick-deny | qd       : stop the probing if the probe is certainly denied.
  verbose               : verbose reports.
 
