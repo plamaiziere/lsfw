@@ -269,10 +269,6 @@ public class CiscoRouter extends GenericEquipment {
 	protected List<IPNet> parseRouterIp(String sIP, String sNetmask) {
 		List<IPNet> iplist = new ArrayList<IPNet>();
 		
-		if (sIP.equals("129.20.0.0")) {
-			System.out.println("oooo");
-		}
-
 		if (sIP.equals("any"))
 			return iplist;
 
