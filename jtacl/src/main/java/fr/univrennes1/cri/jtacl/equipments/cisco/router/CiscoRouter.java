@@ -268,6 +268,10 @@ public class CiscoRouter extends GenericEquipment {
 
 	protected List<IPNet> parseRouterIp(String sIP, String sNetmask) {
 		List<IPNet> iplist = new ArrayList<IPNet>();
+		
+		if (sIP.equals("129.20.0.0")) {
+			System.out.println("oooo");
+		}
 
 		if (sIP.equals("any"))
 			return iplist;
@@ -293,7 +297,6 @@ public class CiscoRouter extends GenericEquipment {
 			boolean notANetwork = false;
 			try {
 				ip = new IPNet(sIpNetmask);
-				iplist.add(ip);
 			} catch (UnknownHostException ex) {
 				notANetwork = true;
 				Log.config().warning(_parseContext.toString() +
