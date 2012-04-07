@@ -86,6 +86,11 @@ public class Probe {
 	protected ProbesByUid _children;
 
 	/**
+	 * extension of this probe.
+	 */
+	protected ProbeExtension _extension;
+
+	/**
 	 * Generates and returns a new unique identifier.
 	 */
 	synchronized protected void newUid() {
@@ -369,6 +374,22 @@ public class Probe {
 	}
 
 	/**
+	 * Returns the extension of this probe. Can be null.
+	 * @return the extension of this probe. Can be null.
+	 */
+	public ProbeExtension getExtension() {
+		return _extension;
+	}
+
+	/**
+	 * Sets the extension of this probe. Can be null.
+	 * @param extension extension to set.
+	 */
+	public void setExtension(ProbeExtension extension) {
+		_extension = extension;
+	}
+
+	/**
 	 * Creates a new {@link Probe}] probe, child of this probe.
 	 * The tracker and the position are not shared and the newly created probe
 	 * is added to the list of the children of this probe.
@@ -382,6 +403,8 @@ public class Probe {
 		child._destinationAddress = _destinationAddress;
 		child._request = _request.newInstance();
 		child._timeToLive = _timeToLive;
+		if (_extension != null)
+			child._extension = _extension.newInstance();
 		_children.put(child);
 		// track the newly probe
 		_probesTracker.trackProbe(child);
@@ -408,6 +431,9 @@ public class Probe {
 		probe._children.putAll(_children);
 		// copy the result
 		probe._probeResult = _probeResult.newInstance();
+		// copy extension
+		if (_extension != null)
+			probe._extension = _extension.newInstance();
 		// track the newly probe
 		_probesTracker.trackProbe(probe);
 

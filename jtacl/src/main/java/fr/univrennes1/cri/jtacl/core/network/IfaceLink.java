@@ -146,6 +146,7 @@ public class IfaceLink {
 	 * @param probe the {@link Probe} received
 	 */
 	public void incoming(Probe probe) {
+		probe.setExtension(null);
 		_iface.incoming(this, probe);
 	}
 
@@ -156,6 +157,7 @@ public class IfaceLink {
 	 * @param nextHop the {@link IPNet} IP address of the next hop.
 	 */
 	public void outgoing(Probe probe, IPNet nextHop) {
+		probe.setExtension(null);
 		_monitor.receiveProbe(this, probe, nextHop);
 	}
 
