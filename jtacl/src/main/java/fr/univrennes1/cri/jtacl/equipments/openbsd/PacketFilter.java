@@ -1416,6 +1416,25 @@ public class PacketFilter extends GenericEquipment {
 				PfRouteOpts routeOpts = parseRouteOpts(rot);
 				rule.SetRouteOpts(routeOpts);
 			}
+
+			/*
+			 * tag option
+			 */
+			String tag = opts.getTag();
+			if (tag != null) {
+				PfTagOpt tagopt = new PfTagOpt(tag);
+				rule.setTagOpt(tagopt);
+			}
+
+			/*
+			 * tagged option
+			 */
+			tag = opts.getMatchTag();
+			if (tag != null) {
+				PfTaggedOpt taggedOpt =
+						new PfTaggedOpt(opts.isMatchTagNot(), tag);
+				rule.setTaggedOpt(taggedOpt);
+			}
 		}
 
 		/*
@@ -2086,6 +2105,12 @@ public class PacketFilter extends GenericEquipment {
 		}
 
 		/*
+		 * PF probe extension
+		 */
+		PfProbeExtension pext = new PfProbeExtension();
+		probe.setExtension(pext);
+
+		/*
 		 * reset route-to Engine
 		 */
 		_routeToEngine = null;
@@ -2547,6 +2572,20 @@ public class PacketFilter extends GenericEquipment {
 				return MatchResult.NOT;
 		}
 
+		/*
+		 * check tagged
+		 */
+		PfTaggedOpt taggedOpt = rule.getTaggedOpt();
+		if (taggedOpt != null) {
+			String tagged = taggedOpt.getTag();
+			PfProbeExtension pext = (PfProbeExtension) probe.getExtension();
+			String currentTag = pext.getTag();
+			if (currentTag == null && !taggedOpt.isNot())
+				return MatchResult.NOT;
+			if (currentTag.equals(tagged) && !taggedOpt.isNot())
+				return MatchResult.NOT;
+		}
+
 		MatchResult mResult = MatchResult.MATCH;
 
 		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
@@ -2558,6 +2597,19 @@ public class PacketFilter extends GenericEquipment {
 
 		if (_filteringDone)
 			return mResult;
+
+		/*
+		 * actions
+		 */
+
+		/*
+		 * tag
+		 */
+		PfTagOpt tagOpt = rule.getTagOpt();
+		if (tagOpt != null) {
+			PfProbeExtension pext = (PfProbeExtension) probe.getExtension();
+			pext.setTag(tagOpt.getTag());
+		}
 
 		/*
 		 * route-to

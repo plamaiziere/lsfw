@@ -114,11 +114,21 @@ public class PfRule extends PfGenericRule {
 	 * filter action (no-state, keep-state...)
 	 */
 	protected String _filterAction;
-	
+
 	/**
 	 * route options (route-to, dup-to, ...)
 	 */
 	protected PfRouteOpts _routeOpts;
+
+	/**
+	 * tag option (tag)
+	 */
+	protected PfTagOpt _tagOpt;
+
+	/**
+	 * Tagged option (tagged)
+	 */
+	protected PfTaggedOpt _taggedOpt;
 
 	/**
 	 * Returns the action of this rule (pass, match, block).
@@ -342,5 +352,38 @@ public class PfRule extends PfGenericRule {
 	 */
 	public void SetRouteOpts(PfRouteOpts routeOpts) {
 		_routeOpts = routeOpts;
-	}	
+	}
+
+	/**
+	 * Returns the tag option of this rule (null = none).
+	 * @return the tag option of this rule (null = none).
+	 */
+	public PfTagOpt getTagOpt() {
+		return _tagOpt;
+	}
+
+	/**
+	 * Sets the tag option of this rule (null = none).
+	 * @param tagOpt tag option to set.
+	 */
+	public void setTagOpt(PfTagOpt tagOpt) {
+		_tagOpt = tagOpt;
+	}
+
+	/**
+	 * Returns the tagged option of this rule (null = none).
+	 * @return the tagged option of this rule (null = none).
+	 */
+	public PfTaggedOpt getTaggedOpt() {
+		return _taggedOpt;
+	}
+
+	/**
+	 * Sets the tagged option of this rule (null = none).
+	 * @param taggedOpt tagged option to set.
+	 */
+	public void setTaggedOpt(PfTaggedOpt taggedOpt) {
+		_taggedOpt = taggedOpt;
+	}
+
 }
