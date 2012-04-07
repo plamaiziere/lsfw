@@ -2582,7 +2582,7 @@ public class PacketFilter extends GenericEquipment {
 			String currentTag = pext.getTag();
 			if (currentTag == null && !taggedOpt.isNot())
 				return MatchResult.NOT;
-			if (currentTag.equals(tagged) && !taggedOpt.isNot())
+			if (!currentTag.equals(tagged) && !taggedOpt.isNot())
 				return MatchResult.NOT;
 		}
 
@@ -2606,7 +2606,7 @@ public class PacketFilter extends GenericEquipment {
 		 * tag
 		 */
 		PfTagOpt tagOpt = rule.getTagOpt();
-		if (tagOpt != null) {
+		if (tagOpt != null && !request.getProbeOptions().hasNoAction()) {
 			PfProbeExtension pext = (PfProbeExtension) probe.getExtension();
 			pext.setTag(tagOpt.getTag());
 		}
