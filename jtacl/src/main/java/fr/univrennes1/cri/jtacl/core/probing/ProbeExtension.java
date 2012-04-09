@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Universite de Rennes 1
+ * Copyright (c) 2012, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
