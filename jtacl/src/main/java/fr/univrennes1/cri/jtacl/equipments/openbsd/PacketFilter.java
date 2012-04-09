@@ -1542,7 +1542,9 @@ public class PacketFilter extends GenericEquipment {
 					"\nfAction " + rule.getFilterAction() +
 					"\nflags " + rule.getFlags() +
 					"\nflagset " + rule.getFlagset() +
-					"\nrouteOpts " + rule.getRouteOpts();
+					"\nrouteOpts " + rule.getRouteOpts() +
+					"\nTagOpts " + rule.getTagOpt() +
+					"\nTaggedOpts " + rule.getTaggedOpt();
 			Log.debug().info(s);
 		}
 

@@ -34,4 +34,13 @@ public class PfTaggedOpt {
 	public boolean isNot() {
 		return _not;
 	}
+
+	@Override
+	public String toString() {
+		String s = "";
+		if (_not)
+			s += "! ";
+		s += _tag;
+		return s;
+	}
 }

@@ -28,4 +28,9 @@ public class PfTagOpt {
 	public String getTag() {
 		return _tag;
 	}
+
+	@Override
+	public String toString() {
+		return _tag;
+	}
 }
