@@ -211,6 +211,14 @@ public class GenericEquipment extends NetworkEquipment {
 			throw new JtaclConfigurationException("Invalid route prefix: " + s);
 		}
 
+		/*
+		 * null route 
+		 */
+		if (snexthop.equalsIgnoreCase("null")) {
+			Route<IfaceLink> route = new Route<IfaceLink>(prefix);
+			return route;
+		}
+		
 		IPNet nexthop;
 		try {
 			nexthop = new IPNet(snexthop);
