@@ -214,7 +214,7 @@ public class GenericEquipment extends NetworkEquipment {
 		/*
 		 * null route 
 		 */
-		if (snexthop.equalsIgnoreCase("null")) {
+		if (snexthop.equalsIgnoreCase("null-route")) {
 			Route<IfaceLink> route = new Route<IfaceLink>(prefix);
 			return route;
 		}
