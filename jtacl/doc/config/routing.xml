@@ -14,7 +14,7 @@
 <route prefix="network" nexthop="nexthop-address" link="link-address" metric="number" />
 
 network			: the prefix of the route.
-nexthop-address	: the IP address of the next-hop.
+nexthop-address	: the IP address of the next-hop or 'null-route'.
 link-address	: the ip address of the link to reach the next-hop. If the next-hop is not on a directly connected network, link can be used to specify the ip address of the interface to reach the next-hop.
 metric			: a number to indicate the metric (not used at the moment) of the route.
 
@@ -30,7 +30,7 @@ The attributes link and metric are optional.
 <source-route prefix="network" nexthop="nexthop-address" link="link-address" metric="number" />
 
 network			: the prefix of the route.
-nexthop-address	: the IP address of the next-hop.
+nexthop-address	: the IP address of the next-hop or 'null-route'.
 link-address	: the ip address of the link to reach the next-hop. If the next-hop is not on a directly connected network, link can be used to specify the ip address of the interface to reach the next-hop.
 metric			: a number to indicate the metric (not used at the moment) of the route.
 
