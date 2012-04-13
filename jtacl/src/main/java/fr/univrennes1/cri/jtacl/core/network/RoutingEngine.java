@@ -123,16 +123,18 @@ public class RoutingEngine implements ShowableRoutes {
 					 * If the link is null for a route, use the route matching
 					 * the nexthop. TODO: control infinite recursion.
 					 */
-					if (route.getLink() == null) {
-						IPNet nexthop = route.getNextHop();
-						/*
-						 * XXX: nexthop is a destination
-						 */
-						Routes resolv = getRoutes(nexthop);
-						if (resolv != null)
-							routes.addAll(resolv);
-					} else
-						routes.add(route);
+					if (!route.isNullRoute()) {
+						if (route.getLink() == null) {
+							IPNet nexthop = route.getNextHop();
+							/*
+							 * XXX: nexthop is a destination
+							 */
+							Routes resolv = getRoutes(nexthop);
+							if (resolv != null)
+								routes.addAll(resolv);
+						} else
+							routes.add(route);
+					}
 				}
 				/*
 				 * Check if we have several routes with the same nexthop.

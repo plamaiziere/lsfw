@@ -75,6 +75,28 @@ public class Route<T> {
 	}
 
 	/**
+	 * Creates a new {@link Route} null route.
+	 * @param prefix the {@link IPNet} prefix of the route.
+	 */
+	public Route(IPNet prefix) {
+		try {
+			/*
+			 * we assert that prefix is really a network prefix.
+			 */
+			if (!prefix.networkAddress().equals(prefix)) {
+				throw new JtaclRoutingException("route with not a network address prefix");
+			}
+		} catch (UnknownHostException ex) {
+				throw new JtaclRoutingException("route with invalid prefix: " +
+					ex.getMessage());
+		}
+		_prefix = prefix;
+		_nextHop = null;
+		_metric = 0;
+		_link = null;
+	}
+
+	/**
 	 * Retuns the metric of this route.
 	 * @return the metric of this route.
 	 */
@@ -83,7 +105,7 @@ public class Route<T> {
 	}
 
 	/**
-	 * Returns the {@link IPNet} IP address of this route.
+	 * Returns the {@link IPNet} IP address of this route. Could be null;
 	 * @return the {@link IPNet} IP address of this route.
 	 */
 	public IPNet getNextHop() {
@@ -106,8 +128,19 @@ public class Route<T> {
 		return _link;
 	}
 
+	/**
+	 * Returns true if this route is a null route.
+	 * @return true if this route is a null route.
+	 */
+	public boolean isNullRoute() {
+		return _link == null && _nextHop == null;
+	}
+	
 	@Override
 	public String toString() {
+		if (isNullRoute())
+			return _prefix.toString("::") + " -> null-route";
+
 		String slink = (_link == null) ? "none": _link.toString();
 		return _prefix.toString("::") + " -> " + _nextHop.toString("i::") +
 				" (" + _metric + ") link: " + slink;

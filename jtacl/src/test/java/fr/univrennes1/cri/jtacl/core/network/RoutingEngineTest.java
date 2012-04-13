@@ -97,6 +97,14 @@ public class RoutingEngineTest extends TestCase {
 		destination = new IPNet("192.168.0.0/24");
 		result = rn.getRoutes(destination);
 		assertTrue(result.size() == 2);
+
+		prefix = new IPNet("127.0.0.1");
+		route = new Route(prefix);
+		rn.addRoute(route);
+		destination = new IPNet("127.0.0.1");		
+		result = rn.getRoutes(destination);
+		assertTrue(result.size() == 0);
+		
 	}
 
 	/**
