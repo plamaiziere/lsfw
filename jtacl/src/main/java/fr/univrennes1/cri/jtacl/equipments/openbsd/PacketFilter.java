@@ -481,7 +481,8 @@ public class PacketFilter extends GenericEquipment {
 			if (sroute.isEmpty() || sroute.startsWith("#"))
 				continue;
 			String[] sparams = sroute.split("\\s+");
-			if (sparams.length != 4)
+			int nbargs = sparams.length;
+			if (nbargs < 4 || nbargs > 5)
 				continue;
 			if (!sparams[0].equals("route") || !sparams[1].equals("add"))
 				continue;
@@ -502,39 +503,49 @@ public class PacketFilter extends GenericEquipment {
 				throw new JtaclConfigurationException("Invalid route nexthop: "
 					+ sroute);
 			}
-			Iface iface = null;
-			IfaceLink link = null;
-
+			
+			Route<IfaceLink> route;
+			
 			/*
-			 * use the directly connected network containing nextHop
+			 * null route
 			 */
-			try {
-				iface = getIfaceConnectedTo(nexthop);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid route " +
-						sroute + " " + ex.getMessage());
-			}
-			if (iface == null) {
-				Log.config().severe("Invalid route, nexthop" +
-						" is not on a subnet of this equipment: " + _name +
-						": " + sroute);
-				continue;
-			}
-			try {
-				link = iface.getLinkConnectedTo(nexthop);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid route " +
-						sroute + " " + ex.getMessage());
-			}
+			if (nbargs == 5 && sparams[4].equals("-blackhole")) {
+				route = new Route<IfaceLink>(prefix);
+			} else {
+				Iface iface = null;
+				IfaceLink link = null;
 
-			/*
-			 * add the route.
-			 */
-			if (link == null)
-				throw new JtaclConfigurationException("Invalid route: cannot find link " +
-					sroute);
+				/*
+				 * use the directly connected network containing nextHop
+				 */
+				try {
+					iface = getIfaceConnectedTo(nexthop);
+				} catch (UnknownHostException ex) {
+					throw new JtaclConfigurationException("Invalid route " +
+							sroute + " " + ex.getMessage());
+				}
+				if (iface == null) {
+					Log.config().severe("Invalid route, nexthop" +
+							" is not on a subnet of this equipment: " + _name +
+							": " + sroute);
+					continue;
+				}
+				try {
+					link = iface.getLinkConnectedTo(nexthop);
+				} catch (UnknownHostException ex) {
+					throw new JtaclConfigurationException("Invalid route " +
+							sroute + " " + ex.getMessage());
+				}
 
-			Route<IfaceLink> route = new Route<IfaceLink>(prefix, nexthop, 1, link);
+				/*
+				 * add the route.
+				 */
+				if (link == null)
+					throw new JtaclConfigurationException(
+							"Invalid route: cannot find link " + sroute);
+
+				route = new Route<IfaceLink>(prefix, nexthop, 1, link);
+			}
 			Log.debug().info(_name + " add route: " + route.toString());
 			_routingEngine.addRoute(route);
 
