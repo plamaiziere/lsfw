@@ -505,11 +505,6 @@ public class CiscoRouter extends GenericEquipment {
 		String routeIPAddress = parser.getIpAddress();
 		String routeIPNetmask = parser.getIpNetmask();
 		String routeNexthop = parser.getNexthop();
-		/*
-		 * null route
-		 */
-		if (routeNexthop == null || routeNexthop.equalsIgnoreCase("null0"))
-			return;
 
 		try {
 			IPNet prefix= null;
@@ -520,18 +515,28 @@ public class CiscoRouter extends GenericEquipment {
 			if (rule.equals("ipv6 route"))
 				prefix = new IPNet(routeIPAddress);
 
+			Route<IfaceLink> route;
+			
 			/*
-			 * Retrieve the link associated to the nexthop (may be null)
+			 * null route
 			 */
-			IPNet nexthop = new IPNet(routeNexthop);
-			Iface iface = getIfaceConnectedTo(nexthop);
-			IfaceLink link = null;
-			if (iface != null)
-				link = iface.getLinkConnectedTo(nexthop);
+			if (routeNexthop == null ||
+					routeNexthop.equalsIgnoreCase("null0")) {
+				route = new Route<IfaceLink>(prefix);
+			} else {
+				/*
+				 * Retrieve the link associated to the nexthop (may be null)
+				 */
+				IPNet nexthop = new IPNet(routeNexthop);
+				Iface iface = getIfaceConnectedTo(nexthop);
+				IfaceLink link = null;
+				if (iface != null)
+					link = iface.getLinkConnectedTo(nexthop);
+				route = new Route<IfaceLink>(prefix, nexthop, 1, link);
+			}	
 			/*
 			 * Add the route.
 			 */
-			Route<IfaceLink> route = new Route<IfaceLink>(prefix, nexthop, 1, link);
 			Log.debug().info(_name + " add route: " + route.toString());
 			_routingEngine.addRoute(route);
 
