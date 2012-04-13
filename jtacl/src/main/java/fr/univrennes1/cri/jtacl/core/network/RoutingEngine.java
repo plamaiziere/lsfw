@@ -69,9 +69,13 @@ public class RoutingEngine implements ShowableRoutes {
 
 	private void showRoute(PrintWriter writer, Route route) {
 		writer.print(route.getPrefix().toString("") + " ");
-		writer.print(route.getNextHop().toString("i") + " ");
-		writer.print(route.getMetric());
-		writer.print(" link = " + route.getLink());
+		if (route.isNullRoute()) {
+			writer.print("null-route");
+		} else {
+			writer.print(route.getNextHop().toString("i") + " ");
+			writer.print(route.getMetric());
+			writer.print(" link = " + route.getLink());
+		}
 		writer.println();
 	}
 
