@@ -2597,6 +2597,8 @@ public class PacketFilter extends GenericEquipment {
 				return MatchResult.NOT;
 			if (!currentTag.equals(tagged) && !taggedOpt.isNot())
 				return MatchResult.NOT;
+			if (currentTag.equals(tagged) && taggedOpt.isNot())
+				return MatchResult.NOT;
 		}
 
 		MatchResult mResult = MatchResult.MATCH;
