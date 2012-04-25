@@ -87,6 +87,9 @@ public class Shell {
 	static protected final List<String> _specialPorts = Arrays.asList(
 		"none", "any", "known", "reg", "dyn");
 
+	static protected final List<String> _expectStrings = Arrays.asList(
+		"ROUTED", "NONE-ROUTED", "UNKNOWN", "ACCEPT", "DENY", "MAY");
+
 	/**
 	 * Returns all the {@link IfaceLink} links matching an 'equipment specification'
 	 * string.
@@ -897,24 +900,31 @@ public class Shell {
 		if (notExpect && expect.length() > 1)
 			expect = expect.substring(1);
 
-		if (expect.equalsIgnoreCase("ROUTED") &&
+		expect = expect.toUpperCase();
+		
+		if (!_expectStrings.contains(expect)) {
+			_outStream.println("invalid expect: " + expect);
+			return false;
+		}
+
+		if (expect.equals("ROUTED") &&
 				routingResult == RoutingResult.ROUTED)
 			testExpect = true;
-		if (expect.equalsIgnoreCase("NONE-ROUTED") &&
+		if (expect.equals("NONE-ROUTED") &&
 				routingResult == RoutingResult.NOTROUTED)
 			testExpect = true;
-		if (expect.equalsIgnoreCase("UNKNOWN") &&
+		if (expect.equals("UNKNOWN") &&
 				routingResult == RoutingResult.UNKNOWN)
 			testExpect = true;
 
-		if (expect.equalsIgnoreCase("ACCEPT") &&
+		if (expect.equals("ACCEPT") &&
 				aclResult.hasAccept() && !aclResult.hasMay())
 			testExpect = true;
-		if (expect.equalsIgnoreCase("DENY") &&
+		if (expect.equals("DENY") &&
 				aclResult.hasDeny() && !aclResult.hasMay())
 			testExpect = true;
 
-		if (expect.equalsIgnoreCase("MAY") &&
+		if (expect.equals("MAY") &&
 				aclResult.hasMay())
 				testExpect = true;
 
