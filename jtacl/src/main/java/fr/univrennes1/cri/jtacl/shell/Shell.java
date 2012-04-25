@@ -88,7 +88,8 @@ public class Shell {
 		"none", "any", "known", "reg", "dyn");
 
 	static protected final List<String> _expectStrings = Arrays.asList(
-		"ROUTED", "NONE-ROUTED", "UNKNOWN", "ACCEPT", "DENY", "MAY");
+		"ROUTED", "NONE-ROUTED", "UNKNOWN", "ACCEPT", "DENY", "MAY",
+		"UNACCEPTED");
 
 	/**
 	 * Returns all the {@link IfaceLink} links matching an 'equipment specification'
@@ -902,7 +903,7 @@ public class Shell {
 
 		expect = expect.toUpperCase();
 		
-		if (!_expectStrings.contains(expect)) {
+		if (!expect.isEmpty() && !_expectStrings.contains(expect)) {
 			_outStream.println("invalid expect: " + expect);
 			return false;
 		}
@@ -913,6 +914,10 @@ public class Shell {
 		if (expect.equals("NONE-ROUTED") &&
 				routingResult == RoutingResult.NOTROUTED)
 			testExpect = true;
+		if (expect.equals("UNACCEPTED") && 
+				(routingResult == RoutingResult.NOTROUTED || 
+				(aclResult.hasDeny() && !aclResult.hasMay())))	
+			testExpect = true;		
 		if (expect.equals("UNKNOWN") &&
 				routingResult == RoutingResult.UNKNOWN)
 			testExpect = true;

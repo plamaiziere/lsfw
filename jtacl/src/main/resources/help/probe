@@ -64,6 +64,9 @@ True if all the probes are accepted by filtering rule, implies 'routed'.
  deny
 True if all the probes are denied by filtering rule, implies 'routed'.
 
+ unaccepted
+Same as none-routed OR deny
+
  may
 True if some probes are not routed to their destination, or if some filtering
 rules are ambiguous.
