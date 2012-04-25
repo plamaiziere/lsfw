@@ -57,12 +57,12 @@ class VirtualNmap {
 
 		if (udp) {
 			_udpRangeTest++;
-			int ret = _shell.runCommand("probe quick-deny expect DENY $_source $_dest udp $_sourcePort:($first,$last)");
+			int ret = _shell.runCommand("probe quick-deny expect UNACCEPTED $_source $_dest udp $_sourcePort:($first,$last)");
 			return ret == App.EXIT_SUCCESS;
 		}
 
 		_tcpRangeTest++;
-		int ret = _shell.runCommand("probe quick-deny expect DENY $_source $_dest tcp $_sourcePort:($first,$last) flags Sa");
+		int ret = _shell.runCommand("probe quick-deny expect UNACCEPTED $_source $_dest tcp $_sourcePort:($first,$last) flags Sa");
 		return ret == App.EXIT_SUCCESS;
 	}
 
