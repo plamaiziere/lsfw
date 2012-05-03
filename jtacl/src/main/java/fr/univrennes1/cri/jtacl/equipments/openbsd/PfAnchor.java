@@ -32,6 +32,7 @@ public class PfAnchor {
 	 */
 	static class AnchorComparator implements Comparator<PfAnchor> {
 
+		@Override
 		public int compare(PfAnchor anchor1, PfAnchor anchor2) {
 			return anchor1.getName().compareTo(anchor2.getName());
 		}
