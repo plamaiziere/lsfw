@@ -288,7 +288,7 @@ public class CiscoRouter extends GenericEquipment {
 			/*
 			 * warn if "ip/netmask" is not a network.
 			 */
-			IPNet ip = null;
+			IPNet ip;
 			String sIpNetmask = sIP + "/" + sNetmask;
 			boolean notANetwork = false;
 			try {
@@ -954,8 +954,7 @@ public class CiscoRouter extends GenericEquipment {
 		/*
 		 * Route the probe.
 		 */
-		Routes routes = null;
-		routes = _routingEngine.getRoutes(probe);
+		Routes routes = _routingEngine.getRoutes(probe);
 		if (routes.isEmpty()) {
 			probe.killNoRoute("No route to " + probe.getDestinationAddress());
 			return;
@@ -1271,7 +1270,7 @@ public class CiscoRouter extends GenericEquipment {
 			/*
 			 * check each access list element
 			 */
-			MatchResult match = MatchResult.NOT;
+			MatchResult match;
 			for (AccessListElement ace: acl) {
 				try {
 					match = probeFilter(probe, ace, direction);
