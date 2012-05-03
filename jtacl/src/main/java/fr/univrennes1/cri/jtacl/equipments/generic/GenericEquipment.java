@@ -149,7 +149,7 @@ public class GenericEquipment extends NetworkEquipment {
 		 */
 		if (_dumpConfigurationWriter == null) {
 			if (_options.containsKey(GenericEquipment.OPT_DUMPCONFIG)) {
-				FileWriter writer = null;
+				FileWriter writer;
 				String fileName = _options.get(GenericEquipment.OPT_DUMPCONFIG).getValue();
 				try {
 					writer = new FileWriter(fileName);
