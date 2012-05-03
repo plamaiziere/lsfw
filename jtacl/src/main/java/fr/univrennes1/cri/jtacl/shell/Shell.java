@@ -562,7 +562,7 @@ public class Shell {
 		/*
 		 * We can specify where we want to inject the probes.
 		 */
-		IfaceLinks ilinks = null;
+		IfaceLinks ilinks;
 		if (command.getEquipments() != null) {
 			ilinks = getIfaceLinksByEquipmentSpec(sourceAddress, command.getEquipments());
 			// error
