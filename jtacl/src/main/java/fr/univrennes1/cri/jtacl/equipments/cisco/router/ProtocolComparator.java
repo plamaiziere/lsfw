@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
-import fr.univrennes1.cri.jtacl.equipments.cisco.pix.*;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import java.util.List;
 
