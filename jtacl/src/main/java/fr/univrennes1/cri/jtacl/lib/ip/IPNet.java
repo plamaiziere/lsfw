@@ -179,8 +179,8 @@ public final class IPNet implements Comparable {
 		 *		=> rightItems = 417A
 		 */
 
-		String left = null;
-		String right = null;
+		String left;
+		String right;
 		String[] saddr = addr.split("::");
 		int count = saddr.length;
 
@@ -1055,6 +1055,7 @@ public final class IPNet implements Comparable {
 		return result;
 	}
 
+	@Override
 	public final int compareTo(Object o) {
 		IPNet obj = (IPNet) o;
 		if (equals(obj))
