@@ -60,10 +60,11 @@ public class PixShell implements GenericEquipmentShell {
 		}
 	}
 
+	@Override
 	public void shellHelp(PrintStream output) {
 		_outStream = output;
 		try {
-			InputStream stream = null;
+			InputStream stream;
 			stream = this.getClass().getResourceAsStream("/help/pix");
 			if (stream == null) {
 				_outStream.println("cannot print help");
@@ -173,6 +174,7 @@ public class PixShell implements GenericEquipmentShell {
 		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
 	}
 
+	@Override
 	public boolean shellCommand(String command, PrintStream output) {
 		_outStream = output;
 		_parseRunner.getParseErrors().clear();
