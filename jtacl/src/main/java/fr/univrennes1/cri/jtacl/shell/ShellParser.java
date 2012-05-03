@@ -492,17 +492,17 @@ public class ShellParser extends CommonRules<Object> {
 	 * reload [atom]
 	 */
 	public Rule CommandReload() {
-		return (Rule) Sequence(
-			IgnoreCase("reload"),
-			Optional(
-				Sequence(
-					WhiteSpaces(),
-					StringAtom(),
-					setEquipments(match())
-				)
-			),
-			EOI,
-			setCommand("reload")
+		return Sequence(
+				IgnoreCase("reload"),
+				Optional(
+					Sequence(
+						WhiteSpaces(),
+						StringAtom(),
+						setEquipments(match())
+					)
+				),
+				EOI,
+				setCommand("reload")
 		);
 	}
 
