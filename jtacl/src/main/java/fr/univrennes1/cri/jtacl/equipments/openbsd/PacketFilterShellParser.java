@@ -22,6 +22,7 @@ import org.parboiled.Rule;
  */
 public class PacketFilterShellParser extends GenericEquipmentShellParser {
 
+	@Override
 	protected boolean clear() {
 		return super.clear();
 	}
