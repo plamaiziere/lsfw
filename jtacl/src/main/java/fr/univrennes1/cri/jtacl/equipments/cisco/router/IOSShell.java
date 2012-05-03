@@ -39,10 +39,11 @@ public class IOSShell implements GenericEquipmentShell {
 	protected ReportingParseRunner _parseRunner;
 	protected PrintStream _outStream;
 
+	@Override
 	public void shellHelp(PrintStream output) {
 		_outStream = output;
 		try {
-			InputStream stream = null;
+			InputStream stream;
 			stream = this.getClass().getResourceAsStream("/help/ios");
 			if (stream == null) {
 				_outStream.println("cannot print help");
@@ -134,6 +135,7 @@ public class IOSShell implements GenericEquipmentShell {
 		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
 	}
 
+	@Override
 	public boolean shellCommand(String command, PrintStream output) {
 		_outStream = output;
 		_parseRunner.getParseErrors().clear();
