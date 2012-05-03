@@ -211,8 +211,7 @@ public class SimpleRouter extends GenericEquipment {
 		/*
 		 * Route the probe.
 		 */
-		Routes routes = null;
-		routes = _routingEngine.getRoutes(probe);
+		Routes routes = _routingEngine.getRoutes(probe);
 		if (routes.isEmpty()) {
 			probe.killNoRoute("No route to " + probe.getDestinationAddress());
 			return;
