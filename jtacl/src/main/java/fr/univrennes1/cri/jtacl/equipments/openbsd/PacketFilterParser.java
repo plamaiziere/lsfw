@@ -38,10 +38,8 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	protected String _value;
 	protected char _quotec;
 	protected boolean _quoted;
-	protected char _previousChar;
 	protected String _lastString;
 	protected String _pfString;
-	protected boolean _pfStringEnd;
 	protected String _ifItem;
 	protected boolean _pfnot;
 	protected Xhost _pfXhost;
@@ -193,43 +191,6 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	protected boolean newPoolOpts() {
 		_poolOpts = new PoolOptsTemplate();
 		return true;
-	}
-
-	protected boolean quotedStringStart(String string) {
-		_quotec = string.charAt(0);
-		_lastString = "";
-		_previousChar = '\0';
-		_pfStringEnd = false;
-		return true;
-	}
-
-	protected boolean quotedStringContinue() {
-		return !_pfStringEnd;
-	}
-
-	protected boolean quotedString(String string) {
-		char c = string.charAt(0);
-		/*
-		 * escaped character.
-		 */
-		if (_previousChar == '\\') {
-			if (c != '\n')
-				_lastString += c;
-			_previousChar = '\0';
-			return true;
-		} else {
-			if (c == '\\') {
-				_previousChar = c;
-				return true;
-			}
-			if (c != _quotec && c != '\n') {
-				_previousChar = c;
-				_lastString += c;
-			}
-			if (c == _quotec)
-				_pfStringEnd = true;
-			return true;
-		}
 	}
 
 	public String getFlags() {
@@ -3767,7 +3728,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 		return FirstOf(
 			Sequence(
 				PfQuotedString(),
-				setPfString(_lastString)
+				setPfString(getLastQuotedString())
 			),
 			Sequence(
 				TestNot(
@@ -3784,18 +3745,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	 * @return a Rule
 	 */
 	public Rule PfQuotedString() {
-		return
-		Sequence(
-			AnyOf("'\""),
-			quotedStringStart(match()),
-			OneOrMore(
-				Sequence(
-					quotedStringContinue(),
-					ANY,
-					quotedString(match())
-				)
-			)
-		);
+		return QuotedString();
 	}
 
 }

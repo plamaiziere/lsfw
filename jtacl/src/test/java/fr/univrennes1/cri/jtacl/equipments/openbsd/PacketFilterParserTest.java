@@ -146,7 +146,7 @@ public class PacketFilterParserTest extends TestCase {
 		result = parseRunner.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
-			assertEquals("abcde", parser.getLastString());
+			assertEquals("abcde", parser.getLastQuotedString());
 		}
 
 		line = "'abcde'";
@@ -154,7 +154,7 @@ public class PacketFilterParserTest extends TestCase {
 		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
-			assertEquals("abcde", parser.getLastString());
+			assertEquals("abcde", parser.getLastQuotedString());
 		}
 
 		line = "'abc\"de'";
@@ -162,7 +162,7 @@ public class PacketFilterParserTest extends TestCase {
 		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
-			assertEquals("abc\"de", parser.getLastString());
+			assertEquals("abc\"de", parser.getLastQuotedString());
 		}
 
 		line = "'abc\\'de'";
@@ -170,7 +170,7 @@ public class PacketFilterParserTest extends TestCase {
 		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
-			assertEquals("abc'de", parser.getLastString());
+			assertEquals("abc'de", parser.getLastQuotedString());
 		}
 
 		line = "'abc\\ de'";
@@ -178,7 +178,7 @@ public class PacketFilterParserTest extends TestCase {
 		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
-			assertEquals("abc de", parser.getLastString());
+			assertEquals("abc de", parser.getLastQuotedString());
 		}
 
 		line = "'abc\\de'";
@@ -186,7 +186,7 @@ public class PacketFilterParserTest extends TestCase {
 		 result = parseRunner.run(line);
 		 assertTrue(result.matched);
 		if (result.matched) {
-			assertEquals("abcde", parser.getLastString());
+			assertEquals("abcde", parser.getLastQuotedString());
 		}
 	}
 

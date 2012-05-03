@@ -21,7 +21,11 @@ import org.parboiled.Rule;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CommonRules<T> extends BaseParser<T> {
-
+	
+	private char _quotec;
+	private String _lastqtString;
+	private char _previousChar;
+	private boolean _qtStringEnd = false;
 
 	/**
 	 * Strip dupplicate white spaces from the string in argument.
@@ -141,4 +145,69 @@ public class CommonRules<T> extends BaseParser<T> {
 				EOI
 			);
 	}
+
+	public boolean quotedStringStart(String string) {
+		_quotec = string.charAt(0);
+		_lastqtString = "";
+		_previousChar = '\0';
+		_qtStringEnd = false;
+		return true;
+	}
+
+	public boolean quotedStringContinue() {
+		return !_qtStringEnd;
+	}
+
+	public boolean quotedString(String string) {
+		char c = string.charAt(0);
+		/*
+		 * escaped character.
+		 */
+		if (_previousChar == '\\') {
+			if (c != '\n')
+				_lastqtString += c;
+			_previousChar = '\0';
+			return true;
+		} else {
+			if (c == '\\') {
+				_previousChar = c;
+				return true;
+			}
+			if (c != _quotec && c != '\n') {
+				_previousChar = c;
+				_lastqtString += c;
+			}
+			if (c == _quotec)
+				_qtStringEnd = true;
+			return true;
+		}
+	}
+	
+	/**
+	 * Returns the last quoted string that matches the rule QuotedString.
+	 * @return he last quoted string that matches the rule QuotedString.
+	 */
+	public String getLastQuotedString() {
+		return _lastqtString;
+	}
+	
+	/**
+	 * Matches a quoted string.
+	 * @return a Rule; result in getLastQuotedString()
+	 */
+	public Rule QuotedString() {
+		return
+		Sequence(
+			AnyOf("'\""),
+			quotedStringStart(match()),
+			OneOrMore(
+				Sequence(
+					quotedStringContinue(),
+					ANY,
+					quotedString(match())
+				)
+			)
+		);
+	}
+
 }
