@@ -190,6 +190,7 @@ public class NetworkLink implements Comparable {
 	return net + " {" + r + "}";
 	}
 
+	@Override
 	public int compareTo(Object o) {
 		NetworkLink obj = (NetworkLink) o;
 		if (equals(obj))
