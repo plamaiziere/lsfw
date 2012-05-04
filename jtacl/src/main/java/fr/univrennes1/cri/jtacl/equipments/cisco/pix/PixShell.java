@@ -17,10 +17,6 @@ import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -34,7 +30,7 @@ import org.parboiled.support.ParsingResult;
  * PIX Jtacl sub shell command
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PixShell implements GenericEquipmentShell {
+public class PixShell extends GenericEquipmentShell {
 
 	protected Pix _pix;
 	protected PixShellParser _shellParser;
@@ -62,27 +58,7 @@ public class PixShell implements GenericEquipmentShell {
 
 	@Override
 	public void shellHelp(PrintStream output) {
-		_outStream = output;
-		try {
-			InputStream stream;
-			stream = this.getClass().getResourceAsStream("/help/pix");
-			if (stream == null) {
-				_outStream.println("cannot print help");
-				return;
-			}
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			for (;;) {
-				String line = reader.readLine();
-				if (line == null) {
-					break;
-				}
-				_outStream.println(line);
-			}
-			reader.close();
-		} catch (IOException ex) {
-			_outStream.println("cannot print help");
-		}
-
+		printHelp(output, "/help/pix");
 	}
 
 	protected void outputGroups(HashMap<String, ObjectGroup> groups, String using) {

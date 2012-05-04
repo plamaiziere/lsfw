@@ -13,19 +13,19 @@
 
 package fr.univrennes1.cri.jtacl.equipments.generic;
 
-import java.io.PrintStream;
+import java.io.*;
 
 /**
- * Equipment sub shell generic interface.
+ * Equipment sub shell generic.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public interface GenericEquipmentShell {
+public abstract class GenericEquipmentShell {
 
 	/**
 	 * Displays the help of this shell
 	 * @param output Stream to output.
 	 */
-	void shellHelp(PrintStream output);
+	abstract public void shellHelp(PrintStream output);
 
 	/**
 	 * Runs the specified shell command in argument.
@@ -33,6 +33,33 @@ public interface GenericEquipmentShell {
 	 * @param output Stream to output.
 	 * @return true if the command is part of this shell, false otherwise.
 	 */
-	boolean shellCommand(String command, PrintStream output);
+	abstract public boolean shellCommand(String command, PrintStream output);
+	
+	/**
+	 * Print the help ressource
+	 * @param output output stream
+	 * @param ressource ressource to print 
+	 */
+	public void printHelp(PrintStream output, String ressource) {
+		try {
+			InputStream stream;
+			stream = this.getClass().getResourceAsStream(ressource);
+			if (stream == null) {
+				output.println("cannot print help");
+				return;
+			}
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			for (;;) {
+				String line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+				output.println(line);
+			}
+			reader.close();
+		} catch (IOException ex) {
+			output.println("cannot print help");
+		}
+	}
 
 }
