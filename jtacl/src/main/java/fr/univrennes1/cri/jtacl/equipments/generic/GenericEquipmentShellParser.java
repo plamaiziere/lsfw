@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.generic;
 
 import fr.univrennes1.cri.jtacl.parsers.CommonRules;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.parboiled.Rule;
 
@@ -28,6 +29,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	protected List<String> _param = null;
 	protected String _xrefObject = null;
 	protected String _xrefFormat = null;
+	protected String _xrefFmt = null;
 	protected String _xrefIp = null;
 	protected String _xrefHost = null;
 
@@ -36,6 +38,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		_param = new ArrayList<String>();
 		_xrefObject = null;
 		_xrefFormat = null;
+		_xrefFmt = null;
 		_xrefIp = null;
 		_xrefHost = null;
 		return true;
@@ -66,12 +69,21 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	public String getXrefFormat() {
 		return _xrefFormat;
 	}
-
+	
 	public boolean setXrefFormat(String xrefFormat) {
 		_xrefFormat = xrefFormat;
 		return true;
 	}
+	
+	public String getXrefFmt() {
+		return _xrefFmt;
+	}
 
+	public boolean setXrefFmt(String xrefFmt) {
+		_xrefFmt = xrefFmt;
+		return true;
+	}
+	
 	public String getXrefIp() {
 		return _xrefIp;
 	}
@@ -89,6 +101,32 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		_xrefHost = xrefHost;
 		return true;
 	}
+	
+	public List<String> expandFormat(String format) {
+		LinkedList<String> fmtList = new LinkedList<String>();
+		String fmt = format;
+		
+		String cfmt = "";
+		while (!fmt.isEmpty()) {
+			char c = fmt.charAt(0);
+			if (c != '%')
+				cfmt += c;
+			fmt = fmt.substring(1);
+			if (c == '%') {
+				if (!cfmt.isEmpty()) {
+					fmtList.add(cfmt);
+					cfmt = "";
+				}
+				if (!fmt.isEmpty()) {
+					c = fmt.charAt(0);
+					fmtList.add("%" + c);
+					fmt = fmt.substring(1);
+				} 
+			}
+		}
+
+		return fmtList;
+	}
 
 	public Rule CommandHelp() {
 		return Sequence(
@@ -99,7 +137,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	}
 
 	/**
-	 * xref [ip [long|short] [host] [IPaddress]]
+	 * xref [ip [format STRING|fmt STRING] [host] [IPaddress]]
 	 */
 	public Rule CommandXref() {
 		return Sequence(
@@ -118,6 +156,15 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 							setXrefFormat(match().toLowerCase())
 						)
 					),
+					Optional(
+						Sequence(
+							WhiteSpaces(),
+							IgnoreCase("fmt"),
+							WhiteSpaces(),
+							QuotedString(),
+							setXrefFmt(getLastQuotedString())
+						)
+					),					
 					Optional(
 						Sequence(
 							WhiteSpaces(),
