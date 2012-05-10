@@ -1,6 +1,6 @@
 --- Xref Help ---
 
-xref ip [format formatstring] [host] [IpAddress]: Outputs the cross-reference
+xref ip [(format formatstring)|(fmt formatstring)] [host] [IpAddress]: Outputs the cross-reference
   of IP addresses on an equipment.
 
 IPAddress specifies the IP to output. Any IP overlapping this IPAddress are
@@ -17,6 +17,18 @@ format formatstring allows to specify the output format by a combinaison
   l: (long) ouptuts all the lines of configuration.
   s: (short) outputs only the first line of configuration.
 
+fmt formatstring allows to specify the output using format tags. The formatstring
+should be quoted by " :
+
+  %c Context name
+  %C Context comment
+  %e Equipment name
+  %h hostname (using PTR like 'p')
+  %H hostname (using DNS resolver like 'h')
+  %i address ip (in short form as ::1)
+  %I address ip (in long form)
+  %l line short (first line of configuration)
+  %L line long (all the lines of configuration)
 
 examples:
 ---------
@@ -24,6 +36,7 @@ examples:
 xref ip
 xref ip format s
 xref ip format sh host 192.168.1.0/24
+xref ip fmt "%i; %h; %l" host 192.168.1.0/24
 
 Note:
 -----
