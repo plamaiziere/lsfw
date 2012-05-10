@@ -33,7 +33,6 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -647,7 +646,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			case NETWORK:
 				String sipAddress = nameLookup(parser.getIpAddress());
 				String sipNetmask = nameLookup(parser.getIpNetmask());
-				IPNet ip = null;
+				IPNet ip;
 				if (sipNetmask == null)
 					ip = parseIp(sipAddress);
 				else
@@ -1020,6 +1019,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 * is ambiguous without the group type. Is group1 the source service group
 	 * or the destination network group?
 	 */
+	@Override
 	public ObjectGroupType getGroupType(String groupId) {
 		if (_networkGroups.containsKey(groupId))
 			return ObjectGroupType.NETWORK;
@@ -1313,7 +1313,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * Route the probe.
 		 */
-		Routes routes = null;
+		Routes routes;
 		routes = _routingEngine.getRoutes(probe);
 		if (routes.isEmpty()) {
 			probe.killNoRoute("No route to " + probe.getDestinationAddress());
@@ -1601,7 +1601,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 */
 			for (AccessList acl: acg) {
 				if (!acl.isRemark()) {
-					MatchResult match = MatchResult.NOT;
+					MatchResult match;
 					try {
 						match = probeFilter(probe, acl, direction);
 						if (match != MatchResult.NOT) {
