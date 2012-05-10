@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import java.io.PrintStream;
 import org.parboiled.Parboiled;
@@ -65,4 +66,10 @@ public class PacketFilterShell extends GenericEquipmentShell {
 
 		return false;
 	}
+
+	@Override
+	public NetworkEquipment getEquipment() {
+		return _pf;
+	}
+
 }

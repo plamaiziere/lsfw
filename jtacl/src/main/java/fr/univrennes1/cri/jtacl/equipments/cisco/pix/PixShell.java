@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -143,4 +144,10 @@ public class PixShell extends GenericEquipmentShell {
 
 		return false;
 	}
+
+	@Override
+	public NetworkEquipment getEquipment() {
+		return _pix;
+	}
+
 }
