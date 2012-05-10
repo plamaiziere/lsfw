@@ -102,7 +102,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		return true;
 	}
 	
-	public List<String> expandFormat(String format) {
+	public static List<String> expandFormat(String format) {
 		LinkedList<String> fmtList = new LinkedList<String>();
 		String fmt = format;
 		
