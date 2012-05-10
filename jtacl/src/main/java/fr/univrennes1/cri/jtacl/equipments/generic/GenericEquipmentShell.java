@@ -19,6 +19,7 @@ import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.io.*;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -47,11 +48,11 @@ public abstract class GenericEquipmentShell {
 	 * @return true if the command is part of this shell, false otherwise.
 	 */
 	abstract public boolean shellCommand(String command, PrintStream output);
-	
+
 	/**
 	 * Print the help ressource
 	 * @param output output stream
-	 * @param ressource ressource to print 
+	 * @param ressource ressource to print
 	 */
 	public void printHelp(PrintStream output, String ressource) {
 		try {
@@ -75,6 +76,80 @@ public abstract class GenericEquipmentShell {
 		}
 	}
 
+	protected void printContext(PrintStream output, IPNet ip,
+		CrossRefContext ctx, String format) {
+
+		List<String> fmts = GenericEquipmentShellParser.expandFormat(format);
+		for (String fmt: fmts) {
+			if (!fmt.startsWith("%"))
+				output.print(fmt);
+			else {
+				// context name
+				if (fmt.equals("%c")) {
+					output.print(ctx.getContextName());
+					continue;
+				}
+				// context comnent
+				if (fmt.equals("%C")) {
+					output.print(ctx.getComment());
+					continue;
+				}
+				// equipment name
+				if (fmt.equals("%e")) {
+					output.print(getEquipment().getName());
+					continue;
+				}
+				// host using ptr
+				if (fmt.equals("%h")) {
+					try {
+						String hostname = ip.getHostname();
+						output.print(hostname);
+					} catch (UnknownHostException ex) {
+						output.print("nohost");
+					}
+					continue;
+				}
+				// host using java resolver
+				if (fmt.equals("%H")) {
+					try {
+						String hostname = ip.getCannonicalHostname();
+						output.print(hostname);
+					} catch (UnknownHostException ex) {
+						output.print("nohost");
+					}
+					continue;
+				}
+				// ip short
+				if (fmt.equals("%i")) {
+					output.print(ip.toString("::i"));
+					continue;
+				}
+				// ip long
+				if (fmt.equals("%I")) {
+					output.print(ip.toString("i"));
+					continue;
+				}
+				// line short
+				if (fmt.equals("%l")) {
+					String line = ctx.getParseContext().getLine().trim();
+					Scanner sc = new Scanner(line);
+					if (sc.hasNextLine())
+						output.println(sc.nextLine());
+					else
+						output.println(line);
+					continue;
+				}
+				// line long
+				if (fmt.equals("%L")) {
+					String line = ctx.getParseContext().getLine().trim();
+					output.print(line);
+					continue;
+				}
+			}
+		}
+		output.println();
+	}
+
 	/**
 	 * Print IP cross references
 	 * @param output output stream.
@@ -96,13 +171,20 @@ public abstract class GenericEquipmentShell {
 		}
 
 		String format = parser.getXrefFormat();
-		if (format != null)
+		String fmt = parser.getXrefFmt();
+		if (format != null) {
 			format = format.toLowerCase();
-		boolean fshort = format != null && format.contains("s");
-		boolean flong = format != null && format.contains("l");
-		boolean fhost = format != null && format.contains("h");
-		boolean fptr = format != null && format.contains("p");
-
+			fmt = "%i";
+			if (format.contains("h"))
+				fmt += "; %H";
+			if (format.contains("p"))
+				fmt += "; %h";
+			fmt += "; %c; %C";
+			if (format.contains("s"))
+				fmt += "; %l";
+			if (format.contains("l"))
+				fmt += "; %L";
+		}
 		for (IPNet ip: netCrossRef.keySet()) {
 			IPNetCrossRef crossref = netCrossRef.get(ip);
 			try {
@@ -116,34 +198,7 @@ public abstract class GenericEquipmentShell {
 				return;
 			}
 			for (CrossRefContext ctx: crossref.getContexts()) {
-				output.print(ip.toString("::i"));
-				if (fhost || fptr) {
-					try {
-						String hostname = fhost ? ip.getCannonicalHostname() :
-							ip.getHostname();
-						output.print("; " + hostname);
-					} catch (UnknownHostException ex) {
-						output.print("; nohost");
-					}
-				}
-				output.print("; " + ctx.getContextName());
-				output.print("; " + ctx.getComment());
-				String line = ctx.getParseContext().getLine().trim();
-				if (fshort) {
-					output.print("; ");
-					Scanner sc = new Scanner(line);
-					if (sc.hasNextLine())
-						output.println(sc.nextLine());
-					else
-						output.println(line);
-				} else {
-					if (flong) {
-						output.print("; ");
-						output.println(line);
-					} else {
-						output.println();
-					}
-				}
+				printContext(output, ip, ctx, fmt);
 			}
 		}
 	}
