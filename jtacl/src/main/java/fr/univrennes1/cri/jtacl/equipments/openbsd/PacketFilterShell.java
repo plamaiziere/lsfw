@@ -13,13 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
-import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
-import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.io.PrintStream;
-import java.net.UnknownHostException;
-import java.util.Scanner;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
@@ -38,71 +33,6 @@ public class PacketFilterShell extends GenericEquipmentShell {
 	@Override
 	public void shellHelp(PrintStream output) {
 		printHelp(output, "/help/pf");
-	}
-
-	protected void commandXrefIp(PacketFilterShellParser parser) {
-
-		IPNet ipreq = null;
-		if (parser.getXrefIp() != null) {
-			try {
-				ipreq = new IPNet(parser.getXrefIp());
-			} catch (UnknownHostException ex) {
-				_outStream.println("Error: " + ex.getMessage());
-				return;
-			}
-		}
-
-		String format = parser.getXrefFormat();
-		if (format != null)
-			format = format.toLowerCase();
-		boolean fshort = format != null && format.contains("s");
-		boolean flong = format != null && format.contains("l");
-		boolean fhost = format != null && format.contains("h");
-		boolean fptr = format != null && format.contains("p");
-
-		for (IPNet ip: _pf.getNetCrossRef().keySet()) {
-			IPNetCrossRef crossref = _pf.getNetCrossRef().get(ip);
-			try {
-				if (ipreq != null && !ipreq.overlaps(ip))
-					continue;
-				if (parser.getXrefHost() != null && !ip.isHost())
-					continue;
-			}
-			catch (UnknownHostException ex) {
-				_outStream.println("Error " + ex.getMessage());
-				return;
-			}
-			for (CrossRefContext ctx: crossref.getContexts()) {
-				_outStream.print(ip.toString("::i"));
-				if (fhost || fptr) {
-					try {
-						String hostname = fhost ? ip.getCannonicalHostname() :
-							ip.getHostname();
-						_outStream.print("; " + hostname);
-					} catch (UnknownHostException ex) {
-						_outStream.print("; nohost");
-					}
-				}
-				_outStream.print("; " + ctx.getContextName());
-				_outStream.print("; " + ctx.getComment());
-				String line = ctx.getParseContext().getLine().trim();
-				if (fshort) {
-					_outStream.print("; ");
-					Scanner sc = new Scanner(line);
-					if (sc.hasNextLine())
-						_outStream.println(sc.nextLine());
-					else
-						_outStream.println(line);
-				} else {
-					if (flong) {
-						_outStream.print("; ");
-						_outStream.println(line);
-					} else {
-						_outStream.println();
-					}
-				}
-			}
-		}
 	}
 
 	public PacketFilterShell(PacketFilter pf) {
@@ -129,7 +59,7 @@ public class PacketFilterShell extends GenericEquipmentShell {
 		}
 
 		if (shellCmd.equals("xref")) {
-			commandXrefIp(_shellParser);
+			printXrefIp(_outStream, _pf.getNetCrossRef(), _shellParser);
 			return true;
 		}
 
