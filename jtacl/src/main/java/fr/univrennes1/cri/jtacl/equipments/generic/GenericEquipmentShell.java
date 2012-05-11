@@ -99,6 +99,17 @@ public abstract class GenericEquipmentShell {
 					output.print(getEquipment().getName());
 					continue;
 				}
+				// filename without path
+				if (fmt.equals("%f")) {
+					File f = new File(ctx.getFilename());
+					output.print(f.getName());
+					continue;
+				}
+				// filename with path
+				if (fmt.equals("%F")) {
+					output.print(ctx.getFilename());
+					continue;
+				}
 				// host using ptr
 				if (fmt.equals("%h")) {
 					try {
@@ -145,6 +156,11 @@ public abstract class GenericEquipmentShell {
 					output.print(line);
 					continue;
 				}
+				// line number
+				if (fmt.equals("%N")) {
+					output.print(ctx.getLinenumber());
+					continue;
+				}
 			}
 		}
 		output.println();
@@ -179,7 +195,7 @@ public abstract class GenericEquipmentShell {
 				fmt += "; %H";
 			if (format.contains("p"))
 				fmt += "; %h";
-			fmt += "; %c; %C";
+			fmt += "; %c; %C; %F #%N";
 			if (format.contains("s"))
 				fmt += "; %l";
 			if (format.contains("l"))

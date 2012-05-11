@@ -20,15 +20,18 @@ format formatstring allows to specify the output format by a combinaison
 fmt formatstring allows to specify the output using format tags. The formatstring
 should be quoted by " :
 
-  %c Context name
-  %C Context comment
-  %e Equipment name
-  %h hostname (using PTR like 'p')
-  %H hostname (using DNS resolver like 'h')
-  %i address ip (in short form as ::1)
-  %I address ip (in long form)
-  %l line short (first line of configuration)
-  %L line long (all the lines of configuration)
+  %c context name.
+  %C context comment.
+  %e equipment name.
+  %f filename of the context (without path).
+  %F filename of the context (with path).
+  %h hostname (using PTR like 'p').
+  %H hostname (using DNS resolver like 'h').
+  %i address ip (in short form as ::1).
+  %I address ip (in long form).
+  %l line short (first line of configuration).
+  %L line long (all the lines of configuration).
+  %N line number of the context.
 
 examples:
 ---------
