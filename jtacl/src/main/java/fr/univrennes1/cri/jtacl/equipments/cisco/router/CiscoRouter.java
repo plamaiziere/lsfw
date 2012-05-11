@@ -268,7 +268,7 @@ public class CiscoRouter extends GenericEquipment {
 
 	protected List<IPNet> parseRouterIp(String sIP, String sNetmask) {
 		List<IPNet> iplist = new ArrayList<IPNet>();
-		
+
 		if (sIP.equals("any"))
 			return iplist;
 
@@ -516,7 +516,7 @@ public class CiscoRouter extends GenericEquipment {
 				prefix = new IPNet(routeIPAddress);
 
 			Route<IfaceLink> route;
-			
+
 			/*
 			 * null route
 			 */
@@ -533,7 +533,7 @@ public class CiscoRouter extends GenericEquipment {
 				if (iface != null)
 					link = iface.getLinkConnectedTo(nexthop);
 				route = new Route<IfaceLink>(prefix, nexthop, 1, link);
-			}	
+			}
 			/*
 			 * Add the route.
 			 */
@@ -887,7 +887,9 @@ public class CiscoRouter extends GenericEquipment {
 	protected void crossRefAccessList(AccessListElement ace) {
 		ParseContext context = ace.getParseContext();
 		CrossRefContext refContext = new CrossRefContext(context, "ace",
-				"[" + ace.getAction() + "]; " + context.getFileNameAndLine());
+			ace.getAction(),
+			context.getFileName(),
+			context.getLineNumber());
 
 		IPNet ip = ace.getSourceIp();
 		if (ip != null) {

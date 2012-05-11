@@ -23,24 +23,39 @@ public class CrossRefContext {
 	protected ParseContext _parseContext;
 	protected String _contextName;
 	protected String _comment;
+	protected String _filename;
+	protected int _linenumber;
 
-	public CrossRefContext(ParseContext parseContext, String contextName,
-			String comment) {
+	public CrossRefContext(ParseContext parseContext,
+			String contextName,
+			String comment,
+			String filename,
+			int linenumber) {
 		_parseContext = parseContext;
 		_contextName = contextName;
 		_comment = comment;
+		_filename = filename;
+		_linenumber = linenumber;
 	}
 
 	public String getComment() {
 		return _comment;
 	}
-	
+
 	public String getContextName() {
 		return _contextName;
 	}
 
 	public ParseContext getParseContext() {
 		return _parseContext;
+	}
+
+	public String getFilename() {
+		return _filename;
+	}
+
+	public int getLinenumber() {
+		return _linenumber;
 	}
 
 }

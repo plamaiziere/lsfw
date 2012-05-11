@@ -503,9 +503,9 @@ public class PacketFilter extends GenericEquipment {
 				throw new JtaclConfigurationException("Invalid route nexthop: "
 					+ sroute);
 			}
-			
+
 			Route<IfaceLink> route;
-			
+
 			/*
 			 * null route
 			 */
@@ -1763,7 +1763,8 @@ public class PacketFilter extends GenericEquipment {
 			}
 			if (ipnet != null) {
 				CrossRefContext refContext = new CrossRefContext(_parseContext,
-					"macro", name + "; " + _parseContext.getFileNameAndLine());
+					"macro", name, _parseContext.getFileName(),
+					_parseContext.getLineNumber());
 				IPNetCrossRef ipNetRef = getIPNetCrossRef(ipnet);
 				ipNetRef.addContext(refContext);
 			}
@@ -2067,7 +2068,7 @@ public class PacketFilter extends GenericEquipment {
 	protected void crossRefRule(PfRule rule) {
 		ParseContext context = rule.getParseContext();
 		CrossRefContext refContext = new CrossRefContext(context, "rule",
-				"[" + rule.getAction() + "]; " + context.getFileNameAndLine());
+				rule.getAction(), context.getFileName(), context.getLineNumber());
 
 		if (rule.getFromIpSpec() != null)
 			crossRefIpSpec(rule.getOwnerAnchor(), rule.getFromIpSpec(), refContext);
@@ -2092,8 +2093,9 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		for (PfTable table: _refTables) {
 			CrossRefContext refContext = new CrossRefContext(table.getParseContext(),
-				"table", "<" + table.getName() + ">; " +
-				table.getParseContext().getFileNameAndLine());
+				"table", "<" + table.getName() + ">",
+				table.getParseContext().getFileName(),
+				table.getParseContext().getLineNumber());
 			crossRefIpSpec(table.getOwnerAnchor(), table.getIpspec(), refContext);
 		}
 
