@@ -145,9 +145,9 @@ public abstract class GenericEquipmentShell {
 					String line = ctx.getParseContext().getLine().trim();
 					Scanner sc = new Scanner(line);
 					if (sc.hasNextLine())
-						output.println(sc.nextLine());
+						output.print(sc.nextLine());
 					else
-						output.println(line);
+						output.print(line);
 					continue;
 				}
 				// line long
