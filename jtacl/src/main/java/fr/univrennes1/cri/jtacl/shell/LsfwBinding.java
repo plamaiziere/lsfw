@@ -30,6 +30,10 @@ public class LsfwBinding {
 	protected static Map<String, Object> _vars =
 		new ConcurrentHashMap<String, Object>();
 
+	/**
+	 * Constructs a new binding with the arguments in cArgs.
+	 * @param cArgs arguments
+	 */
 	public LsfwBinding(String cArgs) {
 		_cArgs = cArgs;
 		_args = new ArrayList<String>();
