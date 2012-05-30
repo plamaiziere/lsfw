@@ -69,12 +69,12 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	public String getXrefFormat() {
 		return _xrefFormat;
 	}
-	
+
 	public boolean setXrefFormat(String xrefFormat) {
 		_xrefFormat = xrefFormat;
 		return true;
 	}
-	
+
 	public String getXrefFmt() {
 		return _xrefFmt;
 	}
@@ -83,7 +83,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		_xrefFmt = xrefFmt;
 		return true;
 	}
-	
+
 	public String getXrefIp() {
 		return _xrefIp;
 	}
@@ -101,11 +101,11 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		_xrefHost = xrefHost;
 		return true;
 	}
-	
+
 	public static List<String> expandFormat(String format) {
 		LinkedList<String> fmtList = new LinkedList<String>();
 		String fmt = format;
-		
+
 		String cfmt = "";
 		while (!fmt.isEmpty()) {
 			char c = fmt.charAt(0);
@@ -121,8 +121,11 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 					c = fmt.charAt(0);
 					fmtList.add("%" + c);
 					fmt = fmt.substring(1);
-				} 
+				}
 			}
+		}
+		if (!cfmt.isEmpty()) {
+			fmtList.add(cfmt);
 		}
 
 		return fmtList;
@@ -164,7 +167,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 							QuotedString(),
 							setXrefFmt(getLastQuotedString())
 						)
-					),					
+					),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
