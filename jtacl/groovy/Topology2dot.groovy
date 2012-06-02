@@ -48,7 +48,7 @@ class SimpleLink {
 class Topo2dot {
 
 	static List<SimpleLink> nlinksToSlinks(NetworkLink nlink) {
-		
+
 		def listeq = []
 		NetworkEquipmentsByName equipments = nlink.getEquipments()
 		equipments.each() {
@@ -67,7 +67,7 @@ class Topo2dot {
 			}
 		}
 		return slinks
-	}				 
+	}
 
 	static void toDot(Topology topology, String output) {
 
@@ -134,7 +134,7 @@ if (args.size() != 1) {
 	return
 }
 
-String output = args[0].toLowerCase()
+String output = args[0]
 
 Topology topology = lsfw.getMonitor().getTopology()
 
