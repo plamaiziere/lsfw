@@ -5,8 +5,21 @@
 	<artifactId>lsfw</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>jtacl</name>
-	<url>http://maven.apache.org</url>
+	<name>lsfw</name>
+	<url>https://groupes.renater.fr/wiki/jtacl/index</url>
+	<organization>
+		<name>Universite de Rennes 1</name>
+		<url>http://www.univ-rennes1.fr</url>
+	</organization>
+	<developers>
+		<developer>
+			<id>plamaizi</id>
+			<name>Patrick Lamaiziere</name>
+			<email>patrick.lamaiziere@univ-rennes1.fr</email>
+			<organization>Universite de Rennes 1</organization>
+			<organizationUrl>http://www.univ-rennes1.fr</organizationUrl>
+		</developer>
+	</developers>
 	<repositories>
 		<repository>
 			<id>scala-tools</id>
@@ -69,18 +82,17 @@
 				<configuration>
 					<source>1.6</source>
 					<aggregate>true</aggregate>
-					<doclet>gr.spinellis.umlgraph.doclet.UmlGraphDoc</doclet>
+					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
 					<docletArtifact>
-						<groupId>gr.spinellis</groupId>
-						<artifactId>UmlGraph</artifactId>
-						<version>4.6</version>
+						<groupId>org.umlgraph</groupId>
+						<artifactId>doclet</artifactId>
+						<version>5.1</version>
 					</docletArtifact>
 					<additionalparam>
 						-inferrel
 						-inferdepvis
 						-quiet
 						-constructors
-						-types
 						-visibility
 						-postfixpackage
 						-nodefontsize 9
