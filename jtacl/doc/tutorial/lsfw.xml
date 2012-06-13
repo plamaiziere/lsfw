@@ -57,5 +57,7 @@
 	<!-- names databases override -->
 	<databases>
 	</databases>
+	<define name="DFLTEQUIPMENT" value ="R1|FastEthernet1/0" />
+	<define name="checkipports" value ="g /home/patrick/devel/jtacl/checkacl Checkportsip.groovy" />
 
 </jtacl>
