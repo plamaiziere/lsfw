@@ -94,9 +94,6 @@ class Xhosts extends ArrayList<Xhost> {
 		return output
 	}
 
-
-xhosts = xhosts.filterIpDnsPing(networks, false, false)
-
 	Xhosts filterEq(String equipment) {
 
 		Xhosts output = new Xhosts()
