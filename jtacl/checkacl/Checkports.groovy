@@ -17,7 +17,7 @@
  */
 import fr.univrennes1.cri.jtacl.lib.ip.*;
 
-def static void main(String input, String output, List<IPNet> networks, int ncpu, boolean debug) {
+def static void main(String input, String output, List<IPNet> networks, List<IPNet> excludeNetworks, int ncpu, boolean debug) {
 
 	 // crossref from file
 	XrefsIP xrefs = new XrefsIP()
@@ -26,6 +26,8 @@ def static void main(String input, String output, List<IPNet> networks, int ncpu
 	// filter by ip
 	Xhosts xhosts = xrefs.toXhosts()
 	xhosts = xhosts.filterIpDnsPing(networks, false, false)
+	xhosts = xhosts.filterExcludeIp(excludeNetworks)
+
 
 	// one test file per ncpu
 	println("Generating tests: ip= " + xhosts.size())
@@ -109,7 +111,7 @@ def filename = argss[0]
 def out = argss[1]
 def ncpu = Integer.valueOf(argss[2])
 def testNetworks = []
-
+def excludeNetworks = []
 
 // networks to test
 for (i = 3; i < argss.size(); i ++) {
@@ -117,5 +119,5 @@ for (i = 3; i < argss.size(); i ++) {
 	testNetworks.add(ip)
 }
 
-main(filename, out, testNetworks, ncpu, true)
+main(filename, out, testNetworks, excludeNetworks, ncpu, true)
 

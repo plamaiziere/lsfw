@@ -33,6 +33,13 @@ class Config {
 	];
 
 	/*
+	 * networks to exclude for port check
+	 */
+	def static networksToExclude = [
+		'127.0.0.1'
+	]
+
+	/*
 	 * reports to produce
 	 */
 	def static reportsNetworks = [

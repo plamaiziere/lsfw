@@ -74,6 +74,29 @@ class Xhosts extends ArrayList<Xhost> {
 		return output
 	}
 
+	Xhosts filterExcludeIp(List<IPNet> excludeNetworks) {
+
+		Xhosts output = new Xhosts()
+
+		this.each() {
+			xhost ->
+
+			boolean itest = true
+			for (IPNet network: excludeNetworks) {
+				if (network.networkContains(xhost.ip)) {
+					itest = false
+					break
+				}
+			}
+			if (itest)
+				output.add(xhost)
+		}
+		return output
+	}
+
+
+xhosts = xhosts.filterIpDnsPing(networks, false, false)
+
 	Xhosts filterEq(String equipment) {
 
 		Xhosts output = new Xhosts()

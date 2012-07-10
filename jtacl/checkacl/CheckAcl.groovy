@@ -68,6 +68,16 @@ def void main(boolean test) {
 	}
 
 	/*
+	 * networks to exclude for check
+	 */
+	def networksToExclude = []
+	Config.networksToExclude.each() {
+		network ->
+		IPNet net = new IPNet(network)
+		networksToExclude.add(net)
+	}
+
+	/*
 	 * reports to produce
 	 */
 	def reportsNetworks = []
@@ -88,7 +98,7 @@ def void main(boolean test) {
 		Checkxrefs.main(fxrefs, fxrefsckd, debug)
 
 		println('Checking open ports')
-		Checkports.main(fxrefsckd, fports, networksToCheck, Config.CHECKPROC, debug)
+		Checkports.main(fxrefsckd, fports, networksToCheck, networksToExclude, Config.CHECKPROC, debug)
 	}
 
 	index.add('Topology; topology.png')
