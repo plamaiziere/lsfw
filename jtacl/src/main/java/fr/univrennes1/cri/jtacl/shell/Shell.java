@@ -57,10 +57,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
@@ -318,6 +315,24 @@ public class Shell {
 				_outStream.println(line);
 			}
 			reader.close();
+			/*
+			 * system informations
+			 */
+			if (topic.equals("help")) {
+				_outStream.println();
+				_outStream.println("--- System informations ---");
+				_outStream.println("Java runtime: " +
+					System.getProperty("java.runtime.name") + " (" +
+					System.getProperty("java.runtime.version") + ")");
+				_outStream.println("Java VM: " +
+					System.getProperty("java.vm.name") + " (" +
+					System.getProperty("java.vm.version") + ")");
+
+				_outStream.println("OS: " +
+					System.getProperty("os.name") + " " +
+					System.getProperty("os.version") + "/" +
+					System.getProperty("os.arch"));
+			}
 		} catch (IOException ex) {
 			_outStream.println("cannot print help");
 		}
@@ -902,7 +917,7 @@ public class Shell {
 			expect = expect.substring(1);
 
 		expect = expect.toUpperCase();
-		
+
 		if (!expect.isEmpty() && !_expectStrings.contains(expect)) {
 			_outStream.println("invalid expect: " + expect);
 			return false;
@@ -914,10 +929,10 @@ public class Shell {
 		if (expect.equals("NONE-ROUTED") &&
 				routingResult == RoutingResult.NOTROUTED)
 			testExpect = true;
-		if (expect.equals("UNACCEPTED") && 
-				(routingResult == RoutingResult.NOTROUTED || 
-				(aclResult.hasDeny() && !aclResult.hasMay())))	
-			testExpect = true;		
+		if (expect.equals("UNACCEPTED") &&
+				(routingResult == RoutingResult.NOTROUTED ||
+				(aclResult.hasDeny() && !aclResult.hasMay())))
+			testExpect = true;
 		if (expect.equals("UNKNOWN") &&
 				routingResult == RoutingResult.UNKNOWN)
 			testExpect = true;
