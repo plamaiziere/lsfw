@@ -386,13 +386,7 @@ public class ShellParser extends CommonRules<Object> {
 					)
 				),
 				EOI,
-				FirstOf(
-					Sequence(
-						_probeCmdTemplate.getProbe6flag(),
-						setCommand("probe6")
-					),
-					setCommand("probe")
-				)
+				setCommand("probe")
 		);
 	}
 

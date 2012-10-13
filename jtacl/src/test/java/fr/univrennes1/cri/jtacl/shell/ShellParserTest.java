@@ -142,19 +142,22 @@ public class ShellParserTest extends TestCase {
 
 		line = "probe6       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe6", parser.getCommand());
+		assertEquals("probe", parser.getCommand());
+		assertTrue(parser.getProbeCmdTemplate().getProbe6flag());
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 
 		line = "p6       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe6", parser.getCommand());
+		assertEquals("probe", parser.getCommand());
+		assertTrue(parser.getProbeCmdTemplate().getProbe6flag());		
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 
 		line = "p     expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
+		assertFalse(parser.getProbeCmdTemplate().getProbe6flag());				
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
