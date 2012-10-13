@@ -22,6 +22,7 @@ import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
 import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.ExpectedProbing;
 import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.probing.Probing;
 import fr.univrennes1.cri.jtacl.core.probing.RoutingResult;
@@ -62,10 +63,6 @@ public class Shell {
 	protected Probing _lastProbing;
 	protected boolean _testResult;
 	protected PrintStream _outStream = System.out;
-
-	static protected final List<String> _expectStrings = Arrays.asList(
-		"ROUTED", "NONE-ROUTED", "UNKNOWN", "ACCEPT", "DENY", "MAY",
-		"UNACCEPTED");
 
 	public Shell() {
 		_interactive = false;
@@ -389,48 +386,15 @@ public class Shell {
 			_outStream.println();
 		}
 
-		/*
-		 * XXX we need a better logic here.
-		 */
-		boolean testExpect = false;
-		boolean notExpect = expect.startsWith("!");
-		if (notExpect && expect.length() > 1)
-			expect = expect.substring(1);
-
-		expect = expect.toUpperCase();
-
-		if (!expect.isEmpty() && !_expectStrings.contains(expect)) {
-			_outStream.println("invalid expect: " + expect);
+		ExpectedProbing ep = null;
+		try {
+			ep = ShellUtils.parseExpectedProbing(expect);
+		} catch (JtaclParameterException ex) {
+			_outStream.println(ex.getMessage());
 			return false;
 		}
-
-		if (expect.equals("ROUTED") &&
-				routingResult == RoutingResult.ROUTED)
-			testExpect = true;
-		if (expect.equals("NONE-ROUTED") &&
-				routingResult == RoutingResult.NOTROUTED)
-			testExpect = true;
-		if (expect.equals("UNACCEPTED") &&
-				(routingResult == RoutingResult.NOTROUTED ||
-				(aclResult.hasDeny() && !aclResult.hasMay())))
-			testExpect = true;
-		if (expect.equals("UNKNOWN") &&
-				routingResult == RoutingResult.UNKNOWN)
-			testExpect = true;
-
-		if (expect.equals("ACCEPT") &&
-				aclResult.hasAccept() && !aclResult.hasMay())
-			testExpect = true;
-		if (expect.equals("DENY") &&
-				aclResult.hasDeny() && !aclResult.hasMay())
-			testExpect = true;
-
-		if (expect.equals("MAY") &&
-				aclResult.hasMay())
-				testExpect = true;
-
-		if (notExpect)
-			testExpect = !testExpect;
+		
+		boolean testExpect = _lastProbing.checkExpectedResult(ep);
 
 		if (testMode) {
 			if (!testExpect) {

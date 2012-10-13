@@ -148,4 +148,43 @@ public class Probing extends ArrayList<ProbesTracker> {
 		return routingResult;
 	}
 
+	public boolean checkExpectedResult(ExpectedProbing expect) {
+		/*
+		 * XXX we need a better logic here.
+		 */
+		boolean testExpect = false;
+		RoutingResult routingResult = getRoutingResult();
+		AclResult aclResult = getAclResult();
+		
+		if (expect.isRouted() &&
+				routingResult == RoutingResult.ROUTED)
+			testExpect = true;
+		if (expect.isNoneRouted() &&
+				routingResult == RoutingResult.NOTROUTED)
+			testExpect = true;
+		if (expect.isUnaccepted() &&
+				(routingResult == RoutingResult.NOTROUTED ||
+				(aclResult.hasDeny() && !aclResult.hasMay())))
+			testExpect = true;
+		if (expect.isUnknown() &&
+				routingResult == RoutingResult.UNKNOWN)
+			testExpect = true;
+
+		if (expect.isAccept() &&
+				aclResult.hasAccept() && !aclResult.hasMay())
+			testExpect = true;
+		if (expect.isDeny() &&
+				aclResult.hasDeny() && !aclResult.hasMay())
+			testExpect = true;
+
+		if (expect.isMay() &&
+				aclResult.hasMay())
+				testExpect = true;
+
+		if (expect.isNot())
+			testExpect = !testExpect;
+		
+		return testExpect;
+	}
+
 }

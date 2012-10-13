@@ -20,6 +20,7 @@ import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLinks;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
+import fr.univrennes1.cri.jtacl.core.probing.ExpectedProbing;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
@@ -232,4 +233,20 @@ public class ShellUtils {
 		return resLinks;
 	}
 
+	public static ExpectedProbing parseExpectedProbing(String expect) {
+
+		boolean notExpect = expect.startsWith("!");
+		if (notExpect && expect.length() > 1)
+				expect = expect.substring(1);
+
+		ExpectedProbing ep = null;
+		try {
+			ep = new ExpectedProbing(notExpect, expect);
+		} catch (JtaclInternalException ex) {
+			throw new JtaclParameterException("invalid expect: " + expect);
+		}
+		
+		return ep;
+	}
+	
 }
