@@ -780,20 +780,6 @@ public class Shell {
 		/*
 		 * results
 		 */
-		/*
-		 * acl counters
-		 */
-		int accepted = 0;
-		int denied = 0;
-		int may = 0;
-		int match = 0;
-
-		/*
-		 * routing counters
-		 */
-		int routed = 0;
-		int notrouted = 0;
-		int routeunknown =0;
 
 		boolean verbose = command.getProbeOptVerbose();
 		boolean active = command.getProbeOptActive();
@@ -815,92 +801,17 @@ public class Shell {
 					matching);
 				_outStream.print(report.showResults());
 			}
-			AclResult aclResult = tracker.getAclResult();
-			if (aclResult.hasAccept())
-				accepted++;
-			if (aclResult.hasDeny())
-				denied++;
-			if (aclResult.hasMay())
-				may++;
-			if (aclResult.hasMatch())
-				match++;
-
-			switch (tracker.getRoutingResult()) {
-				case ROUTED:	routed++;
-								break;
-				case NOTROUTED:	notrouted++;
-								break;
-				default:
-								routeunknown++;
-			}
 		}
 
 		/*
 		 * Global ACL result
 		 */
-		AclResult aclResult = new AclResult();
-		/*
-		 * one result was MAY
-		 */
-		if (may > 0 || match > 0)
-			aclResult.addResult(AclResult.MAY);
-
-		/*
-		 * some probes were accepted and some were denied => MAY
-		 */
-		if (match == 0 && accepted > 0 && denied > 0)
-			aclResult.addResult(AclResult.MAY);
-
-		/*
-		 * all probes were accepted => ACCEPT
-		 */
-		if (match == 0 && accepted > 0 && denied == 0)
-			aclResult.addResult(AclResult.ACCEPT);
-
-		/*
-		 * all probes were denied => DENY
-		 */
-		if (match == 0 && denied > 0 && accepted == 0) {
-			aclResult.addResult(AclResult.DENY);
-		}
-
-		/*
-		 * some probes were matching => MATCH
-		 */
-		if (match > 0) {
-			aclResult.setResult(AclResult.MATCH);
-		}
+		AclResult aclResult = _lastProbing.getAclResult();
 
 		/*
 		 * Global routing result
 		 */
-		RoutingResult routingResult = RoutingResult.UNKNOWN;
-		/*
-		 * one result was UNKNOWN.
-		 */
-		if (routeunknown > 0) {
-			routingResult = RoutingResult.UNKNOWN;
-		} else {
-			/*
-			 * some probes were routed, and some not => UNKNOWN
-			 */
-			if (routed > 0 && notrouted > 0) {
-				routingResult = RoutingResult.UNKNOWN;
-			} else {
-				/*
-				 * all probes were routed => ROUTED
-				 */
-				if (routed > 0) {
-					routingResult = RoutingResult.ROUTED;
-				}
-				/*
-				 * all probes were not routed => NOTROUTED
-				 */
-				if (notrouted > 0) {
-					routingResult = RoutingResult.NOTROUTED;
-				}
-			}
-		}
+		RoutingResult routingResult = _lastProbing.getRoutingResult();
 
 		if (!silent) {
 			_outStream.println("Global ACL result is: " + aclResult);
