@@ -24,53 +24,26 @@ import org.parboiled.Rule;
 public class ShellParser extends CommonRules<Object> {
 
 	protected String _command = "";
-	protected String _srcAddress;
-	protected String _destAddress;
 	protected String _equipments;
-	protected String _protoSpecification;
-	protected String _portSource;
-	protected String _portDest;
-
+	protected ProbeCommandTemplate _probeCmdTemplate;
 	protected String _setValueName;
 	protected String _setValueValue;
 	protected String _helpTopic;
 	protected String _topologyOption;
-	protected String _probeExpect;
-	protected boolean _probe6flag;
-	protected boolean _probeOptActive;
-	protected boolean _probeOptMatching;
-	protected boolean _probeOptNoAction;
-	protected boolean _probeOptVerbose;
-	protected boolean _probeOptLearn;
-	protected boolean _probeOptQuickDeny;
 	protected String _subCommand;
-	protected StringsList _tcpFlags;
 	protected String _groovyDirectory;
 	protected String _groovyScript;
 	protected String _groovyArgs;
 
 	protected boolean clear() {
 		_command = "";
-		_srcAddress = null;
-		_destAddress = null;
+		_probeCmdTemplate = new ProbeCommandTemplate();
 		_equipments = null;
-		_protoSpecification = null;
-		_portSource = null;
-		_portDest = null;
 		_setValueName = null;
 		_setValueValue = null;
 		_helpTopic = null;
 		_topologyOption = null;
-		_probeExpect = null;
 		_subCommand = null;
-		_tcpFlags = null;
-		_probeOptActive = false;
-		_probeOptMatching = false;
-		_probeOptNoAction = false;
-		_probeOptVerbose = false;
-		_probeOptLearn = false;
-		_probeOptQuickDeny = false;
-		_probe6flag = false;
 		return true;
 	}
 
@@ -83,57 +56,12 @@ public class ShellParser extends CommonRules<Object> {
 		return true;
 	}
 
-	public String getDestAddress() {
-		return _destAddress;
-	}
-
-	public boolean setDestAddress(String destAddress) {
-		_destAddress = destAddress;
-		return true;
-	}
-
-	public String getSrcAddress() {
-		return _srcAddress;
-	}
-
-	public boolean setSrcAddress(String srcAddress) {
-		_srcAddress = srcAddress;
-		return true;
-	}
-
 	public String getEquipments() {
 		return _equipments;
 	}
 
 	public boolean setEquipments(String equipments) {
 		_equipments = equipments;
-		return true;
-	}
-
-	public String getProtoSpecification() {
-		return _protoSpecification;
-	}
-
-	public boolean setProtoSpecification(String protoSpecification) {
-		_protoSpecification = protoSpecification;
-		return true;
-	}
-
-	public String getPortDest() {
-		return _portDest;
-	}
-
-	public boolean setPortDest(String portDest) {
-		_portDest = portDest;
-		return true;
-	}
-
-	public String getPortSource() {
-		return _portSource;
-	}
-
-	public boolean setPortSource(String portSource) {
-		_portSource = portSource;
 		return true;
 	}
 
@@ -173,97 +101,12 @@ public class ShellParser extends CommonRules<Object> {
 		return true;
 	}
 
-	public String getProbeExpect() {
-		return _probeExpect;
-	}
-
-	public boolean setProbeExpect(String probeExpect) {
-		_probeExpect = probeExpect;
-		return true;
-	}
-
 	public String getSubCommand() {
 		return _subCommand;
 	}
 
 	public boolean setSubCommand(String subCommand) {
 		_subCommand = subCommand;
-		return true;
-	}
-
-	public StringsList getTcpFlags() {
-		return _tcpFlags;
-	}
-
-	public boolean setTcpFlags(StringsList tcpFlags) {
-		_tcpFlags = tcpFlags;
-		return true;
-	}
-
-	public boolean addTcpFlag(String tcpFlag) {
-		return _tcpFlags.add(tcpFlag);
-	}
-
-	public boolean getProbe6flag() {
-		return _probe6flag;
-	}
-
-	public boolean setProbe6flag(boolean probe6flag) {
-		_probe6flag = probe6flag;
-		return true;
-	}
-
-	public boolean setProbeOptNoAction(boolean probeOptNoAction) {
-		_probeOptNoAction = probeOptNoAction;
-		return true;
-	}
-
-	public boolean getProbeOptNoAction() {
-		return _probeOptNoAction;
-	}
-
-	public boolean setProbeOptVerbose(boolean probeOptVerbose) {
-		_probeOptVerbose = probeOptVerbose;
-		return true;
-	}
-
-	public boolean getProbeOptVerbose() {
-		return _probeOptVerbose;
-	}
-
-	public boolean getProbeOptActive() {
-		return _probeOptActive;
-	}
-
-	public boolean setProbeOptActive(boolean probeOptActive) {
-		_probeOptActive = probeOptActive;
-		return true;
-	}
-
-	public boolean getProbeOptMatching() {
-		return _probeOptMatching;
-	}
-
-	public boolean setProbeOptMatching(boolean probeOptMatching) {
-		_probeOptMatching = probeOptMatching;
-		return true;
-	}
-
-	public boolean getProbeOptLearn() {
-		return _probeOptLearn;
-	}
-
-	public boolean setProbeOptLearn(boolean probeOptLearn) {
-		_probeOptLearn = probeOptLearn;
-		return true;
-	}
-
-	public boolean getProbeOptQuickDeny() {
-		return _probeOptQuickDeny;
-	}
-
-	public boolean setProbeOptQuickDeny(boolean probeOptQuickDeny) {
-		_probeOptQuickDeny = probeOptQuickDeny;
 		return true;
 	}
 
@@ -292,6 +135,10 @@ public class ShellParser extends CommonRules<Object> {
 	public boolean setGroovyArgs(String groovyArgs) {
 		_groovyArgs = groovyArgs;
 		return true;
+	}
+
+	public ProbeCommandTemplate getProbeCmdTemplate() {
+		return _probeCmdTemplate;
 	}
 
 	public Rule CommandLine() {
@@ -512,15 +359,15 @@ public class ShellParser extends CommonRules<Object> {
 	 */
 	public Rule CommandProbe() {
 		return Sequence(
-				setProbe6flag(false),
+				_probeCmdTemplate.setProbe6flag(false),
 				FirstOf(
 					Sequence(
 						IgnoreCase("probe6"),
-						setProbe6flag(true)
+						_probeCmdTemplate.setProbe6flag(true)
 					),
 					Sequence(
 						IgnoreCase("p6"),
-						setProbe6flag(true)
+						_probeCmdTemplate.setProbe6flag(true)
 					),
 					IgnoreCase("probe"),
 					IgnoreCase("p")
@@ -528,10 +375,10 @@ public class ShellParser extends CommonRules<Object> {
 				WhiteSpaces(),
 				Optional(ProbeOptions()),
 				SourceSpecification(),
-				setSrcAddress(match()),
+				_probeCmdTemplate.setSrcAddress(match()),
 				WhiteSpaces(),
 				DestinationSpecification(),
-				setDestAddress(match()),
+				_probeCmdTemplate.setDestAddress(match()),
 				Optional(
 					Sequence(
 						WhiteSpaces(),
@@ -541,7 +388,7 @@ public class ShellParser extends CommonRules<Object> {
 				EOI,
 				FirstOf(
 					Sequence(
-						getProbe6flag(),
+						_probeCmdTemplate.getProbe6flag(),
 						setCommand("probe6")
 					),
 					setCommand("probe")
@@ -580,7 +427,7 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("expect"),
 					WhiteSpaces(),
 					StringAtom(),
-					setProbeExpect(match()),
+					_probeCmdTemplate.setProbeExpect(match()),
 					WhiteSpaces()
 			);
 	}
@@ -593,7 +440,7 @@ public class ShellParser extends CommonRules<Object> {
 			IgnoreCase("on"),
 			WhiteSpaces(),
 			StringAtom(),
-			setEquipments(match()),
+			_probeCmdTemplate.setEquipments(match()),
 			WhiteSpaces()
 		);
 	}
@@ -609,7 +456,7 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("na")
 				),
 				WhiteSpaces(),
-				setProbeOptNoAction(true)
+				_probeCmdTemplate.setProbeOptNoAction(true)
 			);
 	}
 
@@ -621,7 +468,7 @@ public class ShellParser extends CommonRules<Object> {
 			Sequence(
 				IgnoreCase("verbose"),
 				WhiteSpaces(),
-				setProbeOptVerbose(true)
+				_probeCmdTemplate.setProbeOptVerbose(true)
 			);
 	}
 
@@ -636,7 +483,7 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("act")
 				),
 				WhiteSpaces(),
-				setProbeOptActive(true)
+				_probeCmdTemplate.setProbeOptActive(true)
 			);
 	}
 
@@ -648,7 +495,7 @@ public class ShellParser extends CommonRules<Object> {
 			Sequence(
 				IgnoreCase("match"),
 				WhiteSpaces(),
-				setProbeOptMatching(true)
+				_probeCmdTemplate.setProbeOptMatching(true)
 			);
 	}
 
@@ -660,7 +507,7 @@ public class ShellParser extends CommonRules<Object> {
 			Sequence(
 				IgnoreCase("learn"),
 				WhiteSpaces(),
-				setProbeOptLearn(true)
+				_probeCmdTemplate.setProbeOptLearn(true)
 			);
 	}
 
@@ -675,7 +522,7 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("qd")
 				),
 				WhiteSpaces(),
-				setProbeOptQuickDeny(true)
+				_probeCmdTemplate.setProbeOptQuickDeny(true)
 			);
 	}
 
@@ -699,7 +546,7 @@ public class ShellParser extends CommonRules<Object> {
 						String("udp"),
 						String("tcp")
 					),
-					setProtoSpecification(match()),
+					_probeCmdTemplate.setProtoSpecification(match()),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
@@ -715,12 +562,12 @@ public class ShellParser extends CommonRules<Object> {
 				),
 				Sequence(
 					StringAtom(),
-					setProtoSpecification(match()),
+					_probeCmdTemplate.setProtoSpecification(match()),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
 							PortSpec(),
-							setPortSource(match())
+							_probeCmdTemplate.setPortSource(match())
 						)
 					)
 				)
@@ -736,21 +583,21 @@ public class ShellParser extends CommonRules<Object> {
 				Sequence(
 					TestNot(IgnoreCase("flags")),
 					PortSpec(),
-					setPortSource(match()),
-					setPortDest(null),
+					_probeCmdTemplate.setPortSource(match()),
+					_probeCmdTemplate.setPortDest(null),
 					String(":"),
 					Optional(
 						Sequence(
 							PortSpec(),
-							setPortDest(match())
+							_probeCmdTemplate.setPortDest(match())
 						)
 					)
 				),
 				Sequence(
 					TestNot(IgnoreCase("flags")),
 					PortSpec(),
-					setPortDest(match()),
-					setPortSource(null)
+					_probeCmdTemplate.setPortDest(match()),
+					_probeCmdTemplate.setPortSource(null)
 				)
 			);
 	}
@@ -780,7 +627,7 @@ public class ShellParser extends CommonRules<Object> {
 			Sequence(
 				IgnoreCase("flags"),
 				WhiteSpaces(),
-				setTcpFlags(new StringsList()),
+				_probeCmdTemplate.setTcpFlags(new StringsList()),
 				OneOrMore(
 					Sequence(
 						TcpFlagSpec(),
@@ -837,7 +684,7 @@ public class ShellParser extends CommonRules<Object> {
 		return
 			Sequence(
 				StringAtom(),
-				addTcpFlag(match())
+				_probeCmdTemplate.addTcpFlag(match())
 			);
 	}
 }

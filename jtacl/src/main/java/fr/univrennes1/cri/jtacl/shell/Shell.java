@@ -512,8 +512,9 @@ public class Shell {
 
 	public boolean probeCommand(String commandLine, ShellParser command) {
 
-		boolean testMode = command.getProbeExpect() != null;
-		boolean learnMode = command.getProbeOptLearn();
+		ProbeCommandTemplate probeCmd = command.getProbeCmdTemplate();
+		boolean testMode = probeCmd.getProbeExpect() != null;
+		boolean learnMode = probeCmd.getProbeOptLearn();
 		boolean silent = testMode || learnMode;
 
 		IPversion ipVersion;
@@ -522,7 +523,7 @@ public class Shell {
 		else
 			ipVersion = IPversion.IPV4;
 
-		String sSourceAddress = command.getSrcAddress();
+		String sSourceAddress = probeCmd.getSrcAddress();
 		/*
 		 * =host or =addresse in source addresse
 		 */
@@ -551,13 +552,13 @@ public class Shell {
 		}
 		IPNet destinationAdress;
 		try {
-			destinationAdress = new IPNet(command.getDestAddress());
+			destinationAdress = new IPNet(probeCmd.getDestAddress());
 		} catch (UnknownHostException ex) {
 			try {
 				// not an IP try to resolve as a host.
-				destinationAdress = IPNet.getByName(command.getDestAddress(), ipVersion);
+				destinationAdress = IPNet.getByName(probeCmd.getDestAddress(), ipVersion);
 				if (!silent)
-					_outStream.println(command.getDestAddress() + " => " +
+					_outStream.println(probeCmd.getDestAddress() + " => " +
 						destinationAdress.toString("::i"));
 			} catch (UnknownHostException ex1) {
 				_outStream.println("Error: " + ex1.getMessage());
@@ -636,7 +637,7 @@ public class Shell {
 			return false;
 		}
 
-		String expect = command.getProbeExpect();
+		String expect = probeCmd.getProbeExpect();
 		if (expect == null)
 			expect = "";
 
@@ -645,9 +646,9 @@ public class Shell {
 		/*
 		 * build the probe request
 		 */
-		String sprotocol = command.getProtoSpecification();
-		String sportSource = command.getPortSource();
-		String sportDest = command.getPortDest();
+		String sprotocol = probeCmd.getProtoSpecification();
+		String sportSource = probeCmd.getPortSource();
+		String sportDest = probeCmd.getPortDest();
 
 		IPProtocols ipProtocols = IPProtocols.getInstance();
 		Integer protocol;
@@ -696,7 +697,7 @@ public class Shell {
 				/*
 				 * tcp flags
 				 */
-				StringsList tcpFlags = command.getTcpFlags();
+				StringsList tcpFlags = probeCmd.getTcpFlags();
 				if (tcpFlags != null) {
 					if (sprotocol.equalsIgnoreCase("udp")) {
 						_outStream.println("TCP flags not allowed for UDP!");
@@ -767,8 +768,8 @@ public class Shell {
 		 * probe options
 		 */
 		ProbeOptions options = request.getProbeOptions();
-		options.setNoAction(command.getProbeOptNoAction());
-		options.setQuickDeny(command.getProbeOptQuickDeny());
+		options.setNoAction(probeCmd.getProbeOptNoAction());
+		options.setQuickDeny(probeCmd.getProbeOptQuickDeny());
 
 		/*
 		 * probe
@@ -781,9 +782,9 @@ public class Shell {
 		 * results
 		 */
 
-		boolean verbose = command.getProbeOptVerbose();
-		boolean active = command.getProbeOptActive();
-		boolean matching = command.getProbeOptMatching();
+		boolean verbose = probeCmd.getProbeOptVerbose();
+		boolean active = probeCmd.getProbeOptActive();
+		boolean matching = probeCmd.getProbeOptMatching();
 
 		if (verbose) {
 			active = true;
@@ -980,7 +981,7 @@ public class Shell {
 		if (_parser.getCommand().equals("probe") ||
 			  _parser.getCommand().equals("probe6")) {
 			boolean test = probeCommand(commandLine, _parser);
-			if (_parser.getProbeExpect() != null) {
+			if (_parser.getProbeCmdTemplate().getProbeExpect() != null) {
 				if (!test)
 					_testResult = false;
 			}
