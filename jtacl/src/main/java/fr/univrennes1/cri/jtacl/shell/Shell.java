@@ -15,37 +15,19 @@ package fr.univrennes1.cri.jtacl.shell;
 
 import fr.univrennes1.cri.jtacl.App;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclParameterException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
+import fr.univrennes1.cri.jtacl.core.probing.AclResult;
 import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.probing.Probing;
 import fr.univrennes1.cri.jtacl.core.probing.RoutingResult;
-import fr.univrennes1.cri.jtacl.core.network.Iface;
-import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
-import fr.univrennes1.cri.jtacl.core.network.IfaceLinks;
-import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
-import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeOptions;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
-import fr.univrennes1.cri.jtacl.core.topology.Topology;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
-import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
-import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
-import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
-import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
-import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import groovy.lang.Binding;
 import groovy.ui.Console;
 import groovy.util.GroovyScriptEngine;
@@ -88,110 +70,6 @@ public class Shell {
 		"ROUTED", "NONE-ROUTED", "UNKNOWN", "ACCEPT", "DENY", "MAY",
 		"UNACCEPTED");
 
-	/**
-	 * Returns all the {@link IfaceLink} links matching an 'equipment specification'
-	 * string.
-	 *
-	 * The format of the 'equipment specification' string is:
-	 * equipment-name'|'[iface-name|IPaddress]
-	 *
-	 * @param EquipmentSpecification Equipment specification used to filter.
-	 * @return a {@link IfaceLinks} list containing the links.
-	 */
-	protected IfaceLinks getIfaceLinksByEquipmentSpec(IPNet sourceIP,
-			String EquipmentSpecification) {
-
-		IfaceLinks resLinks = new IfaceLinks();
-
-		String [] specSplit = EquipmentSpecification.split("\\|");
-		String equipmentName = specSplit[0];
-		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
-		if (equipment == null) {
-			_outStream.println("No such equipment: " + equipmentName);
-			return null;
-		}
-		IPNet ipaddress = null;
-		Iface iface = null;
-		String ifaceName = null;
-
-		if (specSplit.length ==2) {
-			try {
-				/*
-				 * we can use either an IP address or the name of an interface
-				 * try with IP address first.
-				 */
-				ipaddress = new IPNet(specSplit[1]);
-			} catch (UnknownHostException ex) {
-				//do nothing (not an IP address)
-			}
-			if (ipaddress == null) {
-				/*
-				 * try with an interface
-				 */
-				ifaceName = specSplit[1];
-				iface = equipment.getIface(ifaceName);
-				if (iface == null) {
-					_outStream.println("No such interface: " + ifaceName);
-					return null;
-				}
-			}
-		}
-		/*
-		 * filter the iface links
-		 */
-		IfaceLinks links = equipment.getIfaceLinks();
-		for (IfaceLink link: links) {
-			/*
-			 * by interface name
-			 */
-			if (iface != null) {
-				if (link.getIfaceName().equals(ifaceName)) {
-					/*
-					 * pick up the first link
-					 */
-					resLinks.add(link);
-					break;
-				}
-				continue;
-			}
-			/*
-			 * by IP address
-			 */
-			if (ipaddress  != null) {
-				if (link.getIp().equals(ipaddress)) {
-					resLinks.add(link);
-				}
-				continue;
-			}
-			if (sourceIP != null) {
-				/*
-				 * by source IP address
-				 */
-				try {
-					if (link.getIp().equals(sourceIP) ||
-							link.getNetwork().networkContains(sourceIP))
-						resLinks.add(link);
-
-					} catch (UnknownHostException ex) {
-						// should not happen, just in case.
-						throw new JtaclInternalException("Invalid network in " +
-							link.getNetwork().toString());
-					}
-				continue;
-			}
-		}
-		return resLinks;
-	}
-
-	protected boolean checkTcpFlags(String flags) {
-
-		for (int i = 0; i < flags.length(); i++) {
-			if (!TcpFlags.isFlag(flags.charAt(i)))
-				return false;
-		}
-		return true;
-	}
-
 	public Shell() {
 		_interactive = false;
 	}
@@ -207,69 +85,6 @@ public class Shell {
 			r = r.replace("$" + s, _monitor.getDefines().get(s));
 		}
 		return r;
-	}
-
-	protected Integer parseService(String service, String protocol) {
-		IPServices ipServices = IPServices.getInstance();
-
-		Integer	port = ipServices.serviceLookup(service, protocol);
-		if (port.intValue() == -1) {
-			_outStream.println("unknown service: " + service);
-			return null;
-		}
-		return port;
-	}
-
-	protected PortSpec parsePortSpec(String sportSpec, String sprotocol) {
-
-		/*
-		 * predefined intervals
-		 */
-		sportSpec = sportSpec.toLowerCase();
-		if (sportSpec.equals("none"))
-			return PortSpec.NONE;
-
-		if (sportSpec.equals("any"))
-			return PortSpec.ANY;
-
-		if (sportSpec.equals("reg"))
-			return PortSpec.REGISTERED;
-
-		if (sportSpec.equals("dyn"))
-			return PortSpec.DYNAMIC;
-
-		if (sportSpec.equals("known"))
-			return PortSpec.WELLKNOWN;
-
-		/*
-		 * interval
-		 */
-		if (sportSpec.startsWith("(") && sportSpec.endsWith(")")) {
-			String sports = sportSpec.substring(1, sportSpec.length() - 1);
-			String [] ports = sports.split(",");
-			if (ports.length != 2) {
-				_outStream.println("invalid services range: " + sportSpec);
-				return null;
-			}
-			Integer portFirst = parseService(ports[0], sprotocol);
-			if (portFirst == null)
-				return null;
-			Integer portLast = parseService(ports[1], sprotocol);
-			if (portLast == null)
-				return null;
-			PortSpec spec = new PortSpec(PortOperator.RANGE, portFirst, portLast);
-			return spec;
-		}
-
-		/*
-		 * service
-		 */
-		Integer port = parseService(sportSpec, sprotocol);
-		if (port == null)
-			return null;
-
-		PortSpec spec = new PortSpec(PortOperator.EQ, port);
-		return spec;
 	}
 
 	protected void autoReload() {
@@ -517,123 +332,11 @@ public class Shell {
 		boolean learnMode = probeCmd.getProbeOptLearn();
 		boolean silent = testMode || learnMode;
 
-		IPversion ipVersion;
-		if (command.getCommand().equals("probe6"))
-			ipVersion = IPversion.IPV6;
-		else
-			ipVersion = IPversion.IPV4;
-
-		String sSourceAddress = probeCmd.getSrcAddress();
-		/*
-		 * =host or =addresse in source addresse
-		 */
-		boolean equalSourceAddress;
-		if (sSourceAddress.startsWith("=")) {
-			equalSourceAddress = true;
-			sSourceAddress = sSourceAddress.substring(1);
-		} else {
-			equalSourceAddress = false;
-		}
-
-		IPNet sourceAddress;
+		ProbeCommand cmd = new ProbeCommand();
 		try {
-			sourceAddress = new IPNet(sSourceAddress);
-		} catch (UnknownHostException ex) {
-			try {
-				// not an IP try to resolve as a host.
-				sourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
-				if (!silent)
-					_outStream.println(sSourceAddress + " => " +
-						sourceAddress.toString("::i"));
-			} catch (UnknownHostException ex1) {
-				_outStream.println("Error: " + ex1.getMessage());
-				return false;
-			}
-		}
-		IPNet destinationAdress;
-		try {
-			destinationAdress = new IPNet(probeCmd.getDestAddress());
-		} catch (UnknownHostException ex) {
-			try {
-				// not an IP try to resolve as a host.
-				destinationAdress = IPNet.getByName(probeCmd.getDestAddress(), ipVersion);
-				if (!silent)
-					_outStream.println(probeCmd.getDestAddress() + " => " +
-						destinationAdress.toString("::i"));
-			} catch (UnknownHostException ex1) {
-				_outStream.println("Error: " + ex1.getMessage());
-				return false;
-			}
-		}
-
-		/*
-		 * Check address family
-		 */
-		if (!sourceAddress.sameIPVersion(destinationAdress)) {
-			_outStream.println("Error: source address and destination address" +
-					" must have the same address family");
-			return false;
-		}
-
-		/*
-		 * We can specify where we want to inject the probes.
-		 */
-		IfaceLinks ilinks;
-		if (command.getEquipments() != null) {
-			ilinks = getIfaceLinksByEquipmentSpec(sourceAddress, command.getEquipments());
-			// error
-			if (ilinks == null)
-				return false;
-		} else {
-			/*
-			 * try to find a network link that matches the source IP address.
-			 */
-			NetworkLinks nlinks;
-			Topology topology = _monitor.getTopology();
-			if (!equalSourceAddress) {
-				nlinks = topology.getNetworkLinksByIP(sourceAddress);
-			} else {
-				try {
-					nlinks = topology.getNetworkLinksByIP(sourceAddress.hostAddress());
-				}  catch (UnknownHostException ex1) {
-					_outStream.println("Error: " + ex1.getMessage());
-					return false;
-				}
-			}
-			if (nlinks.isEmpty()) {
-				/*
-				 * use the DFLTEQUIPMENT variable if defined.
-				 */
-				String defaultEquipment;
-				if (sourceAddress.isIPv4())
-					 defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT");
-				else
-					defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT6");
-				if (defaultEquipment != null) {
-					ilinks = getIfaceLinksByEquipmentSpec(sourceAddress, defaultEquipment);
-					// error
-					if (ilinks == null)
-						return false;
-				} else {
-					_outStream.println("No network matches");
-					return false;
-				}
-			} else {
-				if (nlinks.size() > 1) {
-					_outStream.println("Too many networks match this source IP address");
-					return false;
-				}
-				ilinks = nlinks.get(0).getIfaceLinks();
-			}
-		}
-
-		if (ilinks.isEmpty()) {
-			_outStream.println("No link found");
-			return false;
-		}
-
-		if (ilinks.size() > 1) {
-			_outStream.println("Too many links");
+			cmd.buildRequest(probeCmd);
+		} catch (JtaclParameterException ex) {
+			_outStream.println(ex.getMessage());
 			return false;
 		}
 
@@ -641,142 +344,11 @@ public class Shell {
 		if (expect == null)
 			expect = "";
 
-		IfaceLink ilink = ilinks.get(0);
-
-		/*
-		 * build the probe request
-		 */
-		String sprotocol = probeCmd.getProtoSpecification();
-		String sportSource = probeCmd.getPortSource();
-		String sportDest = probeCmd.getPortDest();
-
-		IPProtocols ipProtocols = IPProtocols.getInstance();
-		Integer protocol;
-
-		ProbeRequest request = new ProbeRequest();
-		if (sprotocol != null) {
-			protocol = ipProtocols.protocolLookup(sprotocol);
-			if (protocol.intValue() == -1)  {
-				_outStream.println("unknown protocol: " + sprotocol);
-				return false;
-			}
-			List<Integer> protocols = new ArrayList<Integer>();
-			request.setProtocols(protocols);
-			protocols.add(protocol);
-
-			/*
-			 * tcp or udp with port source/port destination
-			 */
-			if (sprotocol.equalsIgnoreCase("tcp") ||
-					sprotocol.equalsIgnoreCase("udp")) {
-				/*
-				 * if tcp or udp we want to match ip too.
-				 */
-				if (sourceAddress.isIPv4())
-					protocols.add(ipProtocols.IP());
-				else
-					protocols.add(ipProtocols.IPV6());
-
-				/*
-				 * services lookup, by default "any"
-				 */
-				if (sportSource == null)
-					sportSource = "any";
-				PortSpec sourceSpec = parsePortSpec(sportSource, sprotocol);
-				if (sourceSpec == null)
-					return false;
-				request.setSourcePort(sourceSpec);
-
-				if (sportDest == null)
-					sportDest = "any";
-				PortSpec destSpec = parsePortSpec(sportDest, sprotocol);
-				if (destSpec == null)
-					return false;
-				request.setDestinationPort(destSpec);
-
-				/*
-				 * tcp flags
-				 */
-				StringsList tcpFlags = probeCmd.getTcpFlags();
-				if (tcpFlags != null) {
-					if (sprotocol.equalsIgnoreCase("udp")) {
-						_outStream.println("TCP flags not allowed for UDP!");
-						return false;
-					}
-
-					ProbeTcpFlags probeTcpFlags = new ProbeTcpFlags();
-
-					/*
-					 * check and add each flags spec
-					 */
-					for (String flag: tcpFlags) {
-						if (flag.equalsIgnoreCase("any")) {
-							probeTcpFlags = null;
-							break;
-						}
-						if (flag.equalsIgnoreCase("none")) {
-							probeTcpFlags.add(new TcpFlags());
-							continue;
-						}
-						if (!checkTcpFlags(flag)) {
-							_outStream.println("invalid TCP flags: " + flag);
-							return false;
-						}
-						TcpFlags tf = new TcpFlags(flag);
-						probeTcpFlags.add(tf);
-					}
-					request.setTcpFlags(probeTcpFlags);
-				}
-			}
-
-			/*
-			 * if ip we want to match tcp, udp, icmp too
-			 */
-			if (sprotocol.equalsIgnoreCase("ip") ||
-					sprotocol.equalsIgnoreCase("ipv6")) {
-				protocols.add(ipProtocols.TCP());
-				protocols.add(ipProtocols.UDP());
-				protocols.add(ipProtocols.ICMP());
-				protocols.add(ipProtocols.ICMP6());
-			}
-
-			/*
-			 * icmp with icmp-type
-			 */
-			if (sprotocol.equalsIgnoreCase("icmp") ||
-					sprotocol.equalsIgnoreCase("icmp6")) {
-				IPIcmp ipIcmp;
-				if (sprotocol.equalsIgnoreCase("icmp"))
-					ipIcmp = IPIcmp4.getInstance();
-				else
-					ipIcmp = IPIcmp6.getInstance();
-
-				if (sportSource != null) {
-					IPIcmpEnt icmpEnt = ipIcmp.icmpLookup(sportSource);
-					if (icmpEnt == null) {
-						_outStream.println("unknown icmp-type or message: "
-							+ sportSource);
-						return false;
-					}
-					request.setSubType(icmpEnt.getIcmp());
-					request.setCode(icmpEnt.getCode());
-				}
-			}
-		}
-
-		/*
-		 * probe options
-		 */
-		ProbeOptions options = request.getProbeOptions();
-		options.setNoAction(probeCmd.getProbeOptNoAction());
-		options.setQuickDeny(probeCmd.getProbeOptQuickDeny());
-
 		/*
 		 * probe
 		 */
-		_monitor.resetProbing();
-		_monitor.newProbing(ilink, sourceAddress, destinationAdress, request);
-		_lastProbing = _monitor.startProbing();
+		cmd.runCommand();
+		_lastProbing = cmd.getProbing();
 
 		/*
 		 * results
