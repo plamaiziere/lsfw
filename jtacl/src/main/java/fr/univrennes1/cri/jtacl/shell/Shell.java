@@ -63,9 +63,6 @@ public class Shell {
 	protected boolean _testResult;
 	protected PrintStream _outStream = System.out;
 
-	static protected final List<String> _specialPorts = Arrays.asList(
-		"none", "any", "known", "reg", "dyn");
-
 	static protected final List<String> _expectStrings = Arrays.asList(
 		"ROUTED", "NONE-ROUTED", "UNKNOWN", "ACCEPT", "DENY", "MAY",
 		"UNACCEPTED");
