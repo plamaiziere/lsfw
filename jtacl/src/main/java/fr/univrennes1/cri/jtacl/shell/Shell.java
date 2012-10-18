@@ -334,10 +334,6 @@ public class Shell {
 			return false;
 		}
 
-		String expect = probeCmd.getProbeExpect();
-		if (expect == null)
-			expect = "";
-
 		/*
 		 * probe
 		 */
@@ -384,6 +380,14 @@ public class Shell {
 			_outStream.println("Global ACL result is: " + aclResult);
 			_outStream.println("Global routing result is: " + routingResult);
 			_outStream.println();
+		}
+
+		/*
+		 * expect
+		 */
+		String expect = probeCmd.getProbeExpect();
+		if (expect == null) {
+			return true;
 		}
 
 		ExpectedProbing ep = null;
