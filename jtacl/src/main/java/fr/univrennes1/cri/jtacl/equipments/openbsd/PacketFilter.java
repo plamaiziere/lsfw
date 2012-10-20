@@ -1473,12 +1473,15 @@ public class PacketFilter extends GenericEquipment {
 		 * filtering action
 		 */
 		String filterAction = opts.getAction();
+		boolean nostate = false;
 		if (filterAction == null && rule.isPass()) {
 			/* default keep state for pass rule*/
 			filterAction = "keep-state";
 		}
-		if (filterAction != null && filterAction.equals("no-state"))
+		if (filterAction != null && filterAction.equals("no-state")) {
 			filterAction = null;
+			nostate = true;
+		}
 
 		if (filterAction != null && !rule.isPass())
 			throwCfgException("state only allowed in pass rule: " + filterAction);
@@ -1498,8 +1501,8 @@ public class PacketFilter extends GenericEquipment {
 		String flags = opts.getFlags();
 		String flagset = opts.getFlagset();
 		if (flags == null && flagset == null && rule.isPass() &&
-				filterAction != null && acceptflags) {
-			/* default to S/SA for pass rules*/
+				filterAction != null && acceptflags && !nostate) {
+			/* default to S/SA for pass rules unless "no state" is specified */
 			flags = "S";
 			flagset = "SA";
 		}
