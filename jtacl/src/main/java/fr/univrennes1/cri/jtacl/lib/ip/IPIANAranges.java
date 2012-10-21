@@ -16,10 +16,10 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 import java.util.HashMap;
 
 /**
- *
+ * IANA IP ranges
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public final class IPranges extends HashMap<String, String> {
+public final class IPIANAranges extends HashMap<String, String> {
 
 	/**
 	 * Definition of the Ranges for IPv4 IPs
