@@ -29,6 +29,7 @@ import fr.univrennes1.cri.jtacl.core.probing.RoutingResult;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import groovy.lang.Binding;
 import groovy.ui.Console;
 import groovy.util.GroovyScriptEngine;
@@ -452,6 +453,25 @@ public class Shell {
 		Console console = new Console(binding);
 		console.run();
 	}
+	
+	public void hostCommand(ShellParser parser) {
+
+		IPversion ipversion;
+		if (parser.getCommand().equals("host6"))
+			ipversion = IPversion.IPV6;
+		else
+			ipversion = IPversion.IPV4;
+		
+		IPNet ip;
+		String hostname = parser.getAddressArg();
+		try {
+			ip = IPNet.getByName(hostname, ipversion);
+		} catch (UnknownHostException ex) {
+			_outStream.println("Cannot resolve " + hostname);
+			return;
+		}
+		_outStream.println(hostname + " has address " + ip.toString("::i"));
+	}
 
 	public void parseShellCommand(String commandLine) {
 
@@ -512,7 +532,8 @@ public class Shell {
 			}
 		}
 
-		if (_parser.getCommand().equals("quit")) {
+		String command = _parser.getCommand();
+		if (command.equals("quit")) {
 			if (_interactive)
 				_outStream.println("Goodbye!");
 			System.exit(0);
@@ -521,33 +542,34 @@ public class Shell {
 		if (_interactive && _monitor.getOptions().getAutoReload())
 			autoReload();
 
-		if (_parser.getCommand().equals("probe") ||
-			  _parser.getCommand().equals("probe6")) {
+		if (command.equals("probe") || command.equals("probe6")) {
 			boolean test = probeCommand(commandLine, _parser);
 			if (_parser.getProbeCmdTemplate().getProbeExpect() != null) {
 				if (!test)
 					_testResult = false;
 			}
 		}
-		if (_parser.getCommand().equals("option"))
+		if (command.equals("option"))
 			optionCommand(_parser);
-		if (_parser.getCommand().equals("topology"))
+		if (command.equals("topology"))
 			topologyCommand(_parser);
-		if (_parser.getCommand().equals("route"))
+		if (command.equals("route"))
 			routeCommand(_parser);
-		if (_parser.getCommand().equals("help"))
+		if (command.equals("help"))
 			helpCommand(_parser);
-		if (_parser.getCommand().equals("define"))
+		if (command.equals("define"))
 			defineCommand(_parser);
-		if (_parser.getCommand().equals("equipment"))
+		if (command.equals("equipment"))
 			equipmentCommand(_parser);
-		if (_parser.getCommand().equals("reload"))
+		if (command.equals("reload"))
 			reloadCommand(_parser);
-		if (_parser.getCommand().equals("groovy"))
+		if (command.equals("groovy"))
 			groovyCommand(_parser);
-		if (_parser.getCommand().equals("groovyconsole"))
+		if (command.equals("groovyconsole"))
 			groovyConsoleCommand(_parser);
-
+		if (command.equals("host") || command.equals("host6"))
+			hostCommand(_parser);
+	
 		/*
 		 * 'untee' stdout
 		 */
@@ -559,7 +581,7 @@ public class Shell {
 			}
 		}
 	}
-
+	
 	public int runCommand(String commandLine) {
 		_testResult = true;
 		parseShellCommand(commandLine.trim());

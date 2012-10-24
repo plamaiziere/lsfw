@@ -34,6 +34,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _groovyDirectory;
 	protected String _groovyScript;
 	protected String _groovyArgs;
+	protected String _addressArg;
 
 	protected boolean clear() {
 		_command = "";
@@ -44,6 +45,7 @@ public class ShellParser extends CommonRules<Object> {
 		_helpTopic = null;
 		_topologyOption = null;
 		_subCommand = null;
+		_addressArg = null;
 		return true;
 	}
 
@@ -140,6 +142,15 @@ public class ShellParser extends CommonRules<Object> {
 	public ProbeCommandTemplate getProbeCmdTemplate() {
 		return _probeCmdTemplate;
 	}
+	
+	public boolean setAddressArg(String addressArg) {
+		_addressArg = addressArg;
+		return true;
+	}
+
+	public String getAddressArg() {
+		return _addressArg;
+	}
 
 	public Rule CommandLine() {
 		return
@@ -156,7 +167,9 @@ public class ShellParser extends CommonRules<Object> {
 					CommandEquipment(),
 					CommandReload(),
 					CommandGroovy(),
-					CommandGroovyConsole()
+					CommandGroovyConsole(),
+					CommandHost(),
+					CommandHost6()
 				)
 			);
 	}
@@ -668,6 +681,28 @@ public class ShellParser extends CommonRules<Object> {
 				UntilEOI(),
 				setGroovyArgs(match()),
 				setCommand("groovyconsole")
+			);
+	}
+
+	public Rule CommandHost() {
+		return
+			Sequence(
+				IgnoreCase("host"),
+				WhiteSpaces(),
+				UntilEOI(),
+				setAddressArg(match()),
+				setCommand("host")
+			);
+	}
+
+	public Rule CommandHost6() {
+		return
+			Sequence(
+				IgnoreCase("host6"),
+				WhiteSpaces(),
+				UntilEOI(),
+				setAddressArg(match()),
+				setCommand("host6")
 			);
 	}
 

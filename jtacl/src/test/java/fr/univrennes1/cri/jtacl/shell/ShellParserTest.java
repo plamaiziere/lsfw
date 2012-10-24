@@ -448,4 +448,22 @@ public class ShellParserTest extends TestCase {
 		assertEquals("!connected", parser.getTopologyOption());
 	}
 
+	public void testHost() {
+		System.out.println("host");
+
+		String line = "host HOSTNAME HOSTNAME";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("host", parser.getCommand());
+		assertEquals("HOSTNAME HOSTNAME", parser.getAddressArg());
+	}
+
+	public void testHost6() {
+		System.out.println("host6");
+
+		String line = "host6 HOSTNAME HOSTNAME";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("host6", parser.getCommand());
+		assertEquals("HOSTNAME HOSTNAME", parser.getAddressArg());
+	}
+
 }
