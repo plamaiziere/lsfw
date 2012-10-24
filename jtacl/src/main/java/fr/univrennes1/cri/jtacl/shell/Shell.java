@@ -334,6 +334,12 @@ public class Shell {
 			return false;
 		}
 
+		if (!silent) { 
+			_outStream.println("probe from: " +
+				cmd.getSourceAddress().toString("::i") + 
+				" to: " + cmd.getDestinationAddress().toString("::i"));
+		}		
+
 		/*
 		 * probe
 		 */
