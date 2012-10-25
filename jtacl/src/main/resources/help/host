@@ -1,0 +1,14 @@
+--- host ---
+host | host6 hostname.
+
+  Display the IP address of hostname. If hostname has several IP addresses, only
+the first one is displayed. host6 allows IPv6 DNS lookup.
+
+examples:
+---------
+
+  lsfw> host google.com
+  google.com has address 74.125.230.78
+
+  lsfw> host6 google.com
+  google.com has address 2a00:1450:4007:800::1000

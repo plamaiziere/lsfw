@@ -6,6 +6,7 @@ exit         : exits lsfw.
 groovy       : runs groovy script.
 groovyconsole: runs the groovy console.
 help [topic] : displays the [topic] help.
+host         : hostname lookup utility.
 license      : license informations.
 option       : sets or displays option.
 probe|probe6 : probes the network from a source to a destination.
