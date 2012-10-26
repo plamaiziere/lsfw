@@ -397,7 +397,7 @@ public class Shell {
 			return true;
 		}
 
-		ExpectedProbing ep = null;
+		ExpectedProbing ep;
 		try {
 			ep = ShellUtils.parseExpectedProbing(expect);
 		} catch (JtaclParameterException ex) {
