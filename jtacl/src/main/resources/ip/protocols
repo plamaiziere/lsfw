@@ -58,7 +58,7 @@ gre	47	GRE		# Generic Routing Encapsulation
 dsr	48	DSR		# Dynamic Source Routing Protocol
 bna	49	BNA		# BNA
 esp	50	ESP		# encapsulating security payload
-ah	51	AH		# authentication header
+ah	51	AH	ahp	# authentication header
 i-nlsp	52	I-NLSP		# Integrated Net Layer Security TUBA
 swipe	53	SWIPE		# IP with Encryption
 narp	54	NARP		# NBMA Address Resolution Protocol
