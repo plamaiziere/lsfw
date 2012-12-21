@@ -653,8 +653,8 @@ public class IPNetTest extends TestCase {
 		hostname = ip.getHostname();
 		inet = InetAddress.getByName("127.0.0.1");
 		ihostname = inet.getCanonicalHostName();
-//FIXME
-//	assertTrue(hostname.contains(ihostname));
+		assertTrue(hostname.contains(ihostname) ||
+			hostname.equals("127.0.0.1"));
 	}
 	
 	public void testIsReachable() throws UnknownHostException {
