@@ -21,7 +21,7 @@ import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
- * PacketFilter Jtacl sub shell command
+ * Cisco router sub shell command
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IOSShell extends GenericEquipmentShell {
