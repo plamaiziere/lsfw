@@ -13,19 +13,19 @@
 
 package fr.univrennes1.cri.jtacl.equipments;
 
-import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.core.probing.AccessControlList;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
+import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.core.probing.AccessControlList;
+import fr.univrennes1.cri.jtacl.core.probing.AclResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
-import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
+import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.net.UnknownHostException;
