@@ -27,24 +27,26 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
-import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
+import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import org.parboiled.Parboiled;
+import org.parboiled.parserunners.BasicParseRunner;
+import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
  * Checkpoint Firewall
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class CPfw extends GenericEquipment {
+public class CpFw extends GenericEquipment {
 
 	protected class CPfwIface {
 		protected Iface _iface;
@@ -81,27 +83,9 @@ public class CPfw extends GenericEquipment {
 	}
 
 	/**
-	 * Configuration file, mapped into strings.
+	 * Parser
 	 */
-	protected class ConfigurationFile extends StringsList {
-
-		protected String _fileName;
-		public String getFileName() {
-			return _fileName;
-		}
-
-		@Override
-		public void readFromFile(String fileName)
-				throws FileNotFoundException, IOException {
-			super.readFromFile(fileName);
-			_fileName = fileName;
-		}
-	}
-
-	/**
-	 * the list of configuration files, mapped into strings.
-	 */
-	protected ArrayList<ConfigurationFile> _configurations;
+	protected CpParser _parser = Parboiled.createParser(CpParser.class);
 
 	/**
 	 * interfaces
@@ -127,40 +111,158 @@ public class CPfw extends GenericEquipment {
 	}
 
 	/**
-	 * Create a new {@link CiscoRouter} with this name and this comment.<br/>
+	 * Create a new {@link CpFw} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
 	 * @param name the name of the equipment.
 	 * @param comment a free comment for this equipment.
 	 * @param configurationFileName name of the configuration file to use (may be null).
 	 */
-	public CPfw(Monitor monitor, String name, String comment, String configurationFileName) {
+	public CpFw(Monitor monitor, String name, String comment, String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
-		CPfwShell shell = new CPfwShell(this);
+		CpFwShell shell = new CpFwShell(this);
 		registerShell(shell);
 	}
 
-	protected void loadConfiguration(Document doc) {
-		_configurations = new ArrayList<ConfigurationFile>();
+	protected CpPortItem parsePort(String sPorts) {
 
-		NodeList list = doc.getElementsByTagName("file");
-		for (int i = 0; i < list.getLength(); i++) {
-			Element e = (Element) list.item(i);
-			String filename = e.getAttribute("filename");
-			if (filename.isEmpty())
-				throw new JtaclConfigurationException("Missing file name");
-			ConfigurationFile cfg = new ConfigurationFile();
-			try {
-				cfg.readFromFile(filename);
-			} catch (FileNotFoundException ex) {
-				throw new JtaclConfigurationException("File not found:" + filename);
-			} catch (IOException ex) {
-				throw new JtaclConfigurationException("Cannot read file :" + filename);
-			}
-			famAdd(filename);
-			_configurations.add(cfg);
+		ParsingResult<?> result = new BasicParseRunner(
+			_parser.CpPortItem()).run(sPorts);
+		if (!result.matched)
+			throwCfgException("invalid port specification: " + sPorts);
+
+		PortItemTemplate port = _parser.getPortItem();
+
+		String sfirst = port.getFirstPort();
+		String slast = port.getLastPort();
+		int first = -1;
+		int last = -1;
+		try {
+			first = Integer.parseInt(sfirst);
+		} catch (NumberFormatException ex) {
+			throwCfgException("invalid port number: " + sfirst);
 		}
+		if (slast != null ) {
+			try {
+				last = Integer.parseInt(slast);
+			} catch (NumberFormatException ex) {
+				throwCfgException("invalid port number: " + slast);
+			}
+		}
+
+		String operator = port.getOperator();
+		if (operator == null)
+			operator = "=";
+
+		CpPortItem portItem;
+		if (last != -1) {
+			portItem = new CpPortItem(operator, first, last);
+		} else {
+			portItem = new CpPortItem(operator, first);
+		}
+		return portItem;
 	}
-	
+
+	protected CpService parseTcpUdpService(Element e) {
+
+		String sTagName = e.getTagName();
+		String sName = e.getAttribute("name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sType = XMLUtils.getTagValue(e, "type");
+		String sPorts = XMLUtils.getTagValue(e, "port");
+
+		/*
+		 * service type
+		 */
+		int type = 0;
+		if (sType.equalsIgnoreCase("tcp"))
+			type = CpService.TCP_SERVICE;
+		if (sType.equalsIgnoreCase("udp"))
+			type = CpService.UDP_SERVICE;
+
+		CpPortItem portItem = parsePort(sPorts);
+		CpService service = CpService.newTcpUdpService(sName, sTagName,
+				sComment, type,	portItem);
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("CpService: " + service.toString());
+		}
+		return service;
+	}
+
+	protected void loadServices(String filename) {
+		Document doc = XMLUtils.getXMLDocument(filename);
+		doc.getDocumentElement().normalize();
+
+		_parseContext = new ParseContext();
+		/*
+		 * tcp services
+		 */
+		NodeList list = doc.getElementsByTagName("tcp_service");
+		for (int i = 0; i < list.getLength(); i++) {
+			Node node = list.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element e = (Element) node;
+				_parseContext.set(filename, i,
+					StringTools.stripWhiteSpacesCrLf(node.getTextContent()));
+				CpService service = parseTcpUdpService(e);
+			}
+		}
+
+		/*
+		 * udp services
+		 */
+		list = doc.getElementsByTagName("udp_service");
+		for (int i = 0; i < list.getLength(); i++) {
+			Node node = list.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element e = (Element) node;
+				_parseContext.set(filename, i,
+					StringTools.stripWhiteSpacesCrLf(node.getTextContent()));
+				CpService service = parseTcpUdpService(e);
+			}
+		}
+
+	}
+
+	protected void loadConfiguration(Document doc) {
+
+		/* services */
+		NodeList list = doc.getElementsByTagName("services");
+		if (list.getLength() != 1) {
+			throw new JtaclConfigurationException("One services file must be specified");
+		}
+		Element e = (Element) list.item(0);
+		String filename = e.getAttribute("filename");
+		if (filename.isEmpty())
+			throw new JtaclConfigurationException("Missing services file name");
+		loadServices(filename);
+		famAdd(filename);
+
+		/* network_objects */
+		list = doc.getElementsByTagName("network_objects");
+		if (list.getLength() != 1) {
+			throw new JtaclConfigurationException("One network_object file must be specified");
+		}
+		e = (Element) list.item(0);
+		filename = e.getAttribute("filename");
+		if (filename.isEmpty())
+			throw new JtaclConfigurationException("Missing netork_objects file name");
+		/* TODO parse file */
+		famAdd(filename);
+
+		/* fwpolicies */
+		list = doc.getElementsByTagName("fwpolicies");
+		if (list.getLength() != 1) {
+			throw new JtaclConfigurationException("One fwpolicies file must be specified");
+		}
+		e = (Element) list.item(0);
+		filename = e.getAttribute("filename");
+		if (filename.isEmpty())
+			throw new JtaclConfigurationException("Missing fwpolicies file name");
+		/* TODO parse file */
+		famAdd(filename);
+	}
+
 	protected void loadIfaces(Document doc) {
 
 		NodeList list = doc.getElementsByTagName("iface");
