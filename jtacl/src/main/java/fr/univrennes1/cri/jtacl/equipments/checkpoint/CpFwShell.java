@@ -21,24 +21,24 @@ import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
- * CPfw sub shell command
+ * CpFw sub shell command
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class CPfwShell extends GenericEquipmentShell {
+public class CpFwShell extends GenericEquipmentShell {
 
-	protected CPfw _cpfw;
-	protected CPfwShellParser _shellParser;
+	protected CpFw _cpfw;
+	protected CpFwShellParser _shellParser;
 	protected ReportingParseRunner _parseRunner;
 	protected PrintStream _outStream;
 
 	@Override
 	public void shellHelp(PrintStream output) {
-		printHelp(output, "/help/ciscorouter");
+		printHelp(output, "/help/CpFw");
 	}
 
-	public CPfwShell(CPfw cpfw) {
+	public CpFwShell(CpFw cpfw) {
 		_cpfw = cpfw;
-		_shellParser = Parboiled.createParser(CPfwShellParser.class);
+		_shellParser = Parboiled.createParser(CpFwShellParser.class);
 		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
 	}
 
