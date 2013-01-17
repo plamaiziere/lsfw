@@ -36,5 +36,31 @@ public class StringTools {
 		return -1;
 	}
 
+	/**
+	 * Strip dupplicate white-spaces and CR/LF from the string in argument.
+	 * @param string String to strip.
+	 * @return the string striped.
+	 */
+	public static String stripWhiteSpacesCrLf(String string) {
+		boolean wp = false;
+		StringBuilder s = new StringBuilder("");
+
+		for (int i = 0; i < string.length(); i++) {
+			char c = string.charAt(i);
+			if (c == '\n' || c == '\r')
+				continue;
+			if (c == ' ' || c == '\t') {
+				if (!wp) {
+					s.append(c);
+					wp = true;
+				}
+			} else {
+				s.append(c);
+				wp = false;
+			}
+		}
+		return s.toString();
+	}
+
 
 }
