@@ -17,10 +17,10 @@ import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
 import org.parboiled.Rule;
 
 /**
- * CPfw sub shell parser
+ * CpFw sub shell parser
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class CPfwShellParser extends GenericEquipmentShellParser {
+public class CpFwShellParser extends GenericEquipmentShellParser {
 
 	@Override
 	protected boolean clear() {
