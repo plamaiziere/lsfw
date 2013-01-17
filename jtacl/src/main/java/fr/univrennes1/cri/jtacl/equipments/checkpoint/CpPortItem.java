@@ -32,19 +32,9 @@ public class CpPortItem {
 	public static final String EQ = "=";
 
 	/**
-	 * Operator not equal
-	 */
-	public static final String NEQ = "!=";
-
-	/**
 	 * Operator less than
 	 */
 	public static final String LT = "<";
-
-	/**
-	 * Operator less than or equal
-	 */
-	public static final String LTE = "<=";
 
 	/**
 	 * Operator greater than
@@ -52,24 +42,9 @@ public class CpPortItem {
 	public static final String GT = ">";
 
 	/**
-	 * Operator greater than or equal
-	 */
-	public static final String GTE = ">=";
-
-	/**
 	 * Operator range including boundaries
 	 */
 	public static final String RANGE = "-";
-
-	/**
-	 * Operator range, excluding boundaries
-	 */
-	public static final String RANGEEX = "><";
-
-	/**
-	 * Operator except range
-	 */
-	public static final String EXCEPT = "<>";
 
 	/**
 	 * Current operator
@@ -93,20 +68,11 @@ public class CpPortItem {
 		if (_operator.equals(EQ))
 			_portSpec = new PortSpec(PortOperator.EQ, port);
 
-		if (_operator.equals(NEQ))
-			_portSpec = new PortSpec(PortOperator.NEQ, port);
-
 		if (_operator.equals(LT))
 			_portSpec = new PortSpec(PortOperator.LT, port);
 
-		if (_operator.equals(LTE))
-			_portSpec = new PortSpec(PortOperator.LTE, port);
-
 		if (_operator.equals(GT))
 			_portSpec = new PortSpec(PortOperator.GT, port);
-
-		if (_operator.equals(GTE))
-			_portSpec = new PortSpec(PortOperator.GTE, port);
 
 		if (_portSpec == null)
 			throw new JtaclInternalException("Invalid port operator" +
@@ -125,12 +91,6 @@ public class CpPortItem {
 
 		if (_operator.equals(RANGE))
 			_portSpec = new PortSpec(PortOperator.RANGE, firstPort, lastPort);
-
-		if (_operator.equals(RANGEEX))
-			_portSpec = new PortSpec(PortOperator.RANGEEX, firstPort, lastPort);
-
-		if (_operator.equals(EXCEPT))
-			_portSpec = new PortSpec(PortOperator.EXCLUDE, firstPort, lastPort);
 
 		if (_portSpec == null)
 			throw new JtaclInternalException("Invalid port operator" +
