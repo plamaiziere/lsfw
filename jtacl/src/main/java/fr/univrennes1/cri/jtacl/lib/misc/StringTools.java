@@ -48,7 +48,7 @@ public class StringTools {
 		for (int i = 0; i < string.length(); i++) {
 			char c = string.charAt(i);
 			if (c == '\n' || c == '\r')
-				continue;
+				c = ' ';
 			if (c == ' ' || c == '\t') {
 				if (!wp) {
 					s.append(c);
