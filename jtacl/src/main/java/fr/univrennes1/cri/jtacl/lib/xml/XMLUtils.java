@@ -21,6 +21,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -47,6 +50,7 @@ public class XMLUtils {
 		Document doc = null;
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setCoalescing(true);
 			DocumentBuilder builder;
 			builder = factory.newDocumentBuilder();
 			doc = builder.parse(fis);
@@ -58,6 +62,21 @@ public class XMLUtils {
 			throw new JtaclConfigurationException(ex.getMessage());
 		}
 		return doc;
+	}
+
+	public static String getTagValue(Element element, String tag) {
+
+		NodeList elist = element.getElementsByTagName(tag);
+		if (elist.getLength() != 1)
+			return null;
+		Element e = (Element) elist.item(0);
+		NodeList nlist = e.getChildNodes();
+		if (nlist.getLength() != 1)
+			return null;
+		Node nvalue = (Node) nlist.item(0);
+		String value = nvalue.getNodeValue();
+		value = value.trim();
+		return value;
 	}
 
 }
