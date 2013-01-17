@@ -36,6 +36,7 @@ import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
+import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.io.File;
@@ -352,7 +353,7 @@ public class CiscoRouter extends GenericEquipment {
 
 		for (int i = 0; i < cfg.size(); i++) {
 			String line = cfg.get(i);
-			line = _parser.stripWhiteSpaces(line);
+			line = StringTools.stripWhiteSpaces(line);
 			_parseContext.set(cfg.getFileName(), i + 1, line);
 			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
@@ -741,7 +742,7 @@ public class CiscoRouter extends GenericEquipment {
 		for (int i = 0; i < cfg.size(); i++) {
 
 			String line = cfg.get(i);
-			line = _parser.stripWhiteSpaces(line);
+			line = StringTools.stripWhiteSpaces(line);
 			String lineCfg = _parser.stripComment(line).trim();
 			lineCfg = filter(lineCfg);
 

@@ -21,36 +21,11 @@ import org.parboiled.Rule;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CommonRules<T> extends BaseParser<T> {
-	
+
 	private char _quotec;
 	private String _lastqtString;
 	private char _previousChar;
 	private boolean _qtStringEnd = false;
-
-	/**
-	 * Strip dupplicate white spaces from the string in argument.
-	 * @param string String to strip.
-	 * @return the string striped.
-	 */
-	public String stripWhiteSpaces(String string) {
-		boolean wp = false;
-		StringBuilder s = new StringBuilder("");
-
-		for (int i = 0; i < string.length(); i++) {
-			char c = string.charAt(i);
-			if (c == ' ' || c == '\t') {
-				if (!wp) {
-					s.append(c);
-					wp = true;
-				}
-			} else {
-				s.append(c);
-				wp = false;
-			}
-
-		}
-		return s.toString();
-	}
 
 	/**
 	 * Matches an atom: a string delimited by white spaces.
@@ -182,7 +157,7 @@ public class CommonRules<T> extends BaseParser<T> {
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Returns the last quoted string that matches the rule QuotedString.
 	 * @return he last quoted string that matches the rule QuotedString.
@@ -190,7 +165,7 @@ public class CommonRules<T> extends BaseParser<T> {
 	public String getLastQuotedString() {
 		return _lastqtString;
 	}
-	
+
 	/**
 	 * Matches a quoted string.
 	 * @return a Rule; result in getLastQuotedString()
