@@ -89,24 +89,15 @@ public class CpParser extends CommonRules<Object> {
 
 	/**
 	 * Matches unaryop
-	 * unaryop : '='
-	 *	| NE
-	 *	| LE
-	 *	| '<'
-	 *	| GE
-	 *	| '>'
+	 * unaryop : '<' | '>'
 	 *
 	 * @return a Rule
 	 */
 	public Rule CpUnaryOp() {
 		return
 			FirstOf(
-				String("!="),
-				String("<="),
 				String("<"),
-				String(">="),
-				String(">"),
-				String("=")
+				String(">")
 			);
 	}
 
