@@ -28,47 +28,47 @@ public class PfPortItem {
 	/**
 	 * Operator equal
 	 */
-	public final String EQ = "=";
+	public static final String EQ = "=";
 
 	/**
 	 * Operator not equal
 	 */
-	public final String NEQ = "!=";
+	public static final String NEQ = "!=";
 
 	/**
 	 * Operator less than
 	 */
-	public final String LT = "<";
+	public static final String LT = "<";
 
 	/**
 	 * Operator less than or equal
 	 */
-	public final String LTE = "<=";
+	public static final String LTE = "<=";
 
 	/**
 	 * Operator greater than
 	 */
-	public final String GT = ">";
+	public static final String GT = ">";
 
 	/**
 	 * Operator greater than or equal
 	 */
-	public final String GTE = ">=";
+	public static final String GTE = ">=";
 
 	/**
 	 * Operator range including boundaries
 	 */
-	public final String RANGE = ":";
+	public static final String RANGE = ":";
 
 	/**
 	 * Operator range, excluding boundaries
 	 */
-	public final String RANGEEX = "><";
+	public static final String RANGEEX = "><";
 
 	/**
 	 * Operator except range
 	 */
-	public final String EXCEPT = "<>";
+	public static final String EXCEPT = "<>";
 
 	/**
 	 * Current operator
