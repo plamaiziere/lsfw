@@ -164,24 +164,34 @@ public class CpFw extends GenericEquipment {
 
 	protected CpService parseTcpUdpService(Element e) {
 
-		String sTagName = e.getTagName();
-		String sName = e.getAttribute("name");
+		String sName = XMLUtils.getTagValue(e, "Name");
 		String sComment = XMLUtils.getTagValue(e, "comments");
 		String sType = XMLUtils.getTagValue(e, "type");
 		String sPorts = XMLUtils.getTagValue(e, "port");
+		String sSourcePorts = XMLUtils.getTagValue(e, "src_port");
+		String sInAny = XMLUtils.getTagValue(e, "include_in_any");
 
+		/*
+		 * ports
+		 */
+		CpPortItem portItem = parsePort(sPorts);
+		CpPortItem srcPortItem = null;
+		srcPortItem = sSourcePorts == null ? null : parsePort(sSourcePorts);
+
+		/*
+		 * in any
+		 */
+		boolean inAny = Boolean.parseBoolean(sInAny);
 		/*
 		 * service type
 		 */
-		int type = 0;
+		CpService service = null;
 		if (sType.equalsIgnoreCase("tcp"))
-			type = CpService.TCP_SERVICE;
+			service = new CpTcpService(sName, sComment, portItem, srcPortItem,
+				inAny);
 		if (sType.equalsIgnoreCase("udp"))
-			type = CpService.UDP_SERVICE;
-
-		CpPortItem portItem = parsePort(sPorts);
-		CpService service = CpService.newTcpUdpService(sName, sTagName,
-				sComment, type,	portItem);
+			service = new CpUdpService(sName, sComment, portItem, srcPortItem,
+				inAny);
 
 		if (Log.debug().isLoggable(Level.INFO)) {
 			Log.debug().info("CpService: " + service.toString());
@@ -190,21 +200,30 @@ public class CpFw extends GenericEquipment {
 	}
 
 	protected void loadServices(String filename) {
+
+		filename = "/home/patrick/pb_service.xml";
 		Document doc = XMLUtils.getXMLDocument(filename);
 		doc.getDocumentElement().normalize();
 
 		_parseContext = new ParseContext();
+		CpService service;
 		/*
 		 * tcp services
 		 */
-		NodeList list = doc.getElementsByTagName("tcp_service");
+		NodeList list = doc.getElementsByTagName("service");
 		for (int i = 0; i < list.getLength(); i++) {
 			Node node = list.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element e = (Element) node;
 				_parseContext.set(filename, i,
 					StringTools.stripWhiteSpacesCrLf(node.getTextContent()));
-				CpService service = parseTcpUdpService(e);
+				String sName = XMLUtils.getTagValue(e, "Name");
+				String className = XMLUtils.getTagValue(e, "Class_Name");
+				service = null;
+				if (className.equalsIgnoreCase("tcp_service"))
+					service = parseTcpUdpService(e);
+				if (className.equalsIgnoreCase("udp_service"))
+					service = parseTcpUdpService(e);
 			}
 		}
 
@@ -218,7 +237,7 @@ public class CpFw extends GenericEquipment {
 				Element e = (Element) node;
 				_parseContext.set(filename, i,
 					StringTools.stripWhiteSpacesCrLf(node.getTextContent()));
-				CpService service = parseTcpUdpService(e);
+				service = parseTcpUdpService(e);
 			}
 		}
 

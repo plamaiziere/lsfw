@@ -13,83 +13,54 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
-
 /**
  * Checkpoint service object
  * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpService {
 	protected String _name;
-	protected String _serviceTable;
+	protected String _className;
 	protected String _comment;
-	protected int _serviceType = 0;
-	protected CpPortItem _portItem;
-	protected Integer _protocol;
+	protected CpServiceType _type;
 
-	public final static int TCP_SERVICE = 1;
-	public final static int UDP_SERVICE = 2;
-	public final static int SERVICE_GROUP = 3;
-
-	public CpService(String name, String serviceTable, String comment,
-			int serviceType) {
+	public CpService(String name, String className, String comment,
+			CpServiceType type) {
 
 		_name = name;
-		_serviceTable = serviceTable;
+		_className = className;
 		_comment = comment;
-		_serviceType = serviceType;
+		_type = type;
 	}
 
-	public static CpService newTcpUdpService(String name, String serviceTable,
-		String comment, int serviceType, CpPortItem portItem) {
+	public String getName() {
+		return _name;
+	}
 
-		if (serviceType != TCP_SERVICE && serviceType != UDP_SERVICE)
-			throw new JtaclInternalException("invalid serviceType");
+	public String getClassName() {
+		return _className;
+	}
 
-		CpService service = new CpService(name, serviceTable, comment,
-			serviceType);
+	public String getComment() {
+		return _comment;
+	}
 
-		service._portItem = portItem;
-		return service;
+	public CpServiceType getType() {
+		return _type;
 	}
 
 	public boolean isTcpService() {
-		return _serviceType == TCP_SERVICE;
+		return _type == CpServiceType.TCP;
 	}
 
 	public boolean isUdpService() {
-		return _serviceType == UDP_SERVICE;
+		return _type == CpServiceType.UDP;
 	}
 
 	public boolean isServiceGroup() {
-		return _serviceType == SERVICE_GROUP;
+		return _type == CpServiceType.GROUP;
 	}
 
-	@Override
-	public String toString() {
-
-		String st = null;
-		switch (_serviceType) {
-			case TCP_SERVICE:	st = "TCP_SERVICE";
-								break;
-			case UDP_SERVICE:	st = "UDP_SERVICE";
-								break;
-			case SERVICE_GROUP: st = "SERVICE_GROUP";
-								break;
-		}
-
-		String s = st + ", " + _serviceTable + ", " + _name + ", " + _comment
-				+ ", ";
-
-		switch (_serviceType) {
-			case TCP_SERVICE:	s+= _portItem.toString();
-								break;
-			case UDP_SERVICE:	s+= _portItem.toString();
-								break;
-			case SERVICE_GROUP: s+= "SERVICE_GROUP, ";
-								break;
-		}
-		return s;
+	public boolean isIcmpService() {
+		return _type == CpServiceType.ICMP;
 	}
-
 }
