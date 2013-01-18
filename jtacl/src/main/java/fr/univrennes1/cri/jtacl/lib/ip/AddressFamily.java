@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-package fr.univrennes1.cri.jtacl.equipments.openbsd;
+package fr.univrennes1.cri.jtacl.lib.ip;
 
 /**
  * Address Family (NONE, INET, NET6)

@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
 
 /**
  * PF Host.
- * 
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PfNodeHost {
@@ -147,7 +148,7 @@ public class PfNodeHost {
 	 */
 	public void addAddr(IPNet addr) {
 		if (!isAddrMask() && !isAddrRange())
-			throw new JtaclInternalException("invalid address type");			
+			throw new JtaclInternalException("invalid address type");
 		_addr.add(addr);
 	}
 
