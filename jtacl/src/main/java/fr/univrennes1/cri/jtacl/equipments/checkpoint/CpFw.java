@@ -23,6 +23,8 @@ import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
+import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
+import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
@@ -32,6 +34,7 @@ import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
@@ -199,48 +202,66 @@ public class CpFw extends GenericEquipment {
 		return service;
 	}
 
+	protected CpService parseIcmpService(Element e) {
+
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String className = XMLUtils.getTagValue(e, "Class_Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sIcmpType = XMLUtils.getTagValue(e, "icmp_type");
+		String sIcmpCode = XMLUtils.getTagValue(e, "icmp_code");
+
+		/*
+		 * icmp code and type
+		 */
+		int icmpCode = -1;
+		if (sIcmpCode != null) {
+			icmpCode = Integer.parseInt(sIcmpCode);
+		}
+		int icmpType = Integer.parseInt(sIcmpType);
+
+		/*
+		 * address family
+		 */
+		AddressFamily af = AddressFamily.INET;
+		if (className.equalsIgnoreCase("icmpv6_service"))
+			af = AddressFamily.INET6;
+
+		CpService service = new CpIcmpService(sName, sComment, af,
+			icmpType, icmpCode);
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("CpService: " + service.toString());
+		}
+		return service;
+	}
+
 	protected void loadServices(String filename) {
 
-		filename = "/home/patrick/pb_service.xml";
 		Document doc = XMLUtils.getXMLDocument(filename);
 		doc.getDocumentElement().normalize();
 
 		_parseContext = new ParseContext();
 		CpService service;
-		/*
-		 * tcp services
-		 */
-		NodeList list = doc.getElementsByTagName("service");
-		for (int i = 0; i < list.getLength(); i++) {
-			Node node = list.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element e = (Element) node;
-				_parseContext.set(filename, i,
-					StringTools.stripWhiteSpacesCrLf(node.getTextContent()));
-				String sName = XMLUtils.getTagValue(e, "Name");
-				String className = XMLUtils.getTagValue(e, "Class_Name");
-				service = null;
-				if (className.equalsIgnoreCase("tcp_service"))
-					service = parseTcpUdpService(e);
-				if (className.equalsIgnoreCase("udp_service"))
-					service = parseTcpUdpService(e);
-			}
-		}
 
-		/*
-		 * udp services
-		 */
-		list = doc.getElementsByTagName("udp_service");
-		for (int i = 0; i < list.getLength(); i++) {
-			Node node = list.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element e = (Element) node;
-				_parseContext.set(filename, i,
-					StringTools.stripWhiteSpacesCrLf(node.getTextContent()));
+		Element root = doc.getDocumentElement();
+		List<Element> list = XMLUtils.getDirectChildren(root, "service");
+		int i = 0;
+		for (Element e: list) {
+			_parseContext.set(filename, i,
+				StringTools.stripWhiteSpacesCrLf(e.getTextContent()));
+			String className = XMLUtils.getTagValue(e, "Class_Name");
+			service = null;
+			if (className.equalsIgnoreCase("tcp_service"))
 				service = parseTcpUdpService(e);
-			}
+			if (className.equalsIgnoreCase("udp_service"))
+				service = parseTcpUdpService(e);
+			if (className.equalsIgnoreCase("icmp_service"))
+				service = parseIcmpService(e);
+			if (className.equalsIgnoreCase("icmpv6_service"))
+				service = parseIcmpService(e);
+			i++;
 		}
-
+	System.exit(0);
 	}
 
 	protected void loadConfiguration(Document doc) {
