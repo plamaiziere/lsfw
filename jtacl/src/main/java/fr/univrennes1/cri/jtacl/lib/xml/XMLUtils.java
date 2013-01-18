@@ -17,6 +17,8 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,12 +66,19 @@ public class XMLUtils {
 		return doc;
 	}
 
+	/**
+	 * Returns the value of the tag 'tag' in element 'element'
+	 * @param element element
+	 * @param tag tag
+	 * @return the value of the tag 'tag' in element 'element'.
+	 * Null if not found.
+	 */
 	public static String getTagValue(Element element, String tag) {
 
-		NodeList elist = element.getElementsByTagName(tag);
-		if (elist.getLength() != 1)
+		List<Element> elist = getDirectChildren(element, tag);
+		if (elist.isEmpty())
 			return null;
-		Element e = (Element) elist.item(0);
+		Element e = elist.get(0);
 		NodeList nlist = e.getChildNodes();
 		if (nlist.getLength() != 1)
 			return null;
@@ -77,6 +86,30 @@ public class XMLUtils {
 		String value = nvalue.getNodeValue();
 		value = value.trim();
 		return value;
+	}
+
+	/**
+	 * Returns a list of the direct children of element 'element' with a given
+	 * tag name
+	 * @param element element
+	 * @param tag tag
+	 * @return the value of the tag 'tag' in element 'element'.
+	 * Null if not found.
+	 */
+	public static List<Element> getDirectChildren(Element element, String tag) {
+
+		LinkedList<Element> list = new LinkedList<Element>();
+
+		for (Node child = element.getFirstChild(); child != null;
+			child = child.getNextSibling()) {
+			if (child.getNodeType() == Node.ELEMENT_NODE ) {
+				String nodeName = child.getNodeName();
+				if (tag.equalsIgnoreCase(nodeName)) {
+					list.add((Element)child);
+				}
+			}
+		}
+		return list;
 	}
 
 }
