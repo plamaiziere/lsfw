@@ -1486,7 +1486,24 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 * service group
 			 */
 			if (aclSrcServiceGroup != null) {
-				mSourcePort = aclSrcServiceGroup.matches(aclProto, reqSourcePort);
+				mSourcePort = MatchResult.NOT;
+				int all = 0;
+				int may = 0;
+				for (int proto: reqProto) {
+					MatchResult mres =
+						aclSrcServiceGroup.matches(proto, reqSourcePort);
+
+					if (mres == MatchResult.ALL)
+						all++;
+					if (mres == MatchResult.MATCH)
+						may++;
+				}
+				if (all > 0) {
+					mSourcePort = MatchResult.ALL;
+				} else {
+					if (may > 0)
+						mSourcePort = MatchResult.MATCH;
+				}
 				if (mSourcePort == MatchResult.NOT)
 					return MatchResult.NOT;
 			}
@@ -1514,7 +1531,24 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 * service group
 			 */
 			if (aclDestServiceGroup != null) {
-				mDestPort = aclDestServiceGroup.matches(aclProto, reqDestPort);
+				mDestPort = MatchResult.NOT;
+				int all = 0;
+				int may = 0;
+				for (int proto: reqProto) {
+					MatchResult mres =
+						aclDestServiceGroup.matches(proto, reqDestPort);
+
+					if (mres == MatchResult.ALL)
+						all++;
+					if (mres == MatchResult.MATCH)
+						may++;
+				}
+				if (all > 0) {
+					mDestPort = MatchResult.ALL;
+				} else {
+					if (may > 0)
+						mDestPort = MatchResult.MATCH;
+				}
 				if (mDestPort == MatchResult.NOT)
 					return MatchResult.NOT;
 			}
