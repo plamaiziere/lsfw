@@ -960,7 +960,7 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 
 		line = "access-list inside_access_in " +
 				"extended deny tcp any object-group GDSTNETWORK";
-		
+
 		result = parseRunerParse.run(line);
 		assertTrue(result.matched);
 		if (result.matched) {
@@ -1051,6 +1051,24 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 			assertEquals("GSRCNETWORK", acl.getSrcNetworkGroup());
 			assertEquals("GDSTNETWORK", acl.getDstNetworkGroup());
 			assertEquals("echo", acl.getIcmp());
+		}
+
+		line = "access-list ID " +
+				"extended deny object-group GPROTO object-group GSRCNETWORK" +
+				" object-group GDSTNETWORK object-group GDSTSERV";
+
+		result = parseRunerParse.run(line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			acl = parser.getAcl();
+			assertEquals("access-list acl", parser.getRuleName());
+			assertEquals("ID", acl.getAccessListId());
+			assertEquals("deny", acl.getAction());
+			assertEquals("GPROTO", acl.getProtocolGroupId());
+			assertEquals(null, acl.getSrcIp());
+			assertEquals("GSRCNETWORK", acl.getSrcNetworkGroup());
+			assertEquals("GDSTNETWORK", acl.getDstNetworkGroup());
+			assertEquals("GDSTSERV", acl.getDstServiceGroup());
 		}
 
 	}
