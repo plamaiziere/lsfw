@@ -194,9 +194,6 @@ public class CpFw extends GenericEquipment {
 			service = new CpUdpService(sName, sComment, portItem, srcPortItem,
 				inAny);
 
-		if (Log.debug().isLoggable(Level.INFO)) {
-			Log.debug().info("CpService: " + service.toString());
-		}
 		return service;
 	}
 
@@ -227,9 +224,6 @@ public class CpFw extends GenericEquipment {
 		CpService service = new CpIcmpService(sName, sComment, af,
 			icmpType, icmpCode);
 
-		if (Log.debug().isLoggable(Level.INFO)) {
-			Log.debug().info("CpService: " + service.toString());
-		}
 		return service;
 	}
 
@@ -283,6 +277,10 @@ public class CpFw extends GenericEquipment {
 			if (className.equalsIgnoreCase("other_service"))
 				service = parseOtherService(e);
 			i++;
+
+			if (service != null && Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("CpService: " + service.toString());
+			}
 		}
 	System.exit(0);
 	}
