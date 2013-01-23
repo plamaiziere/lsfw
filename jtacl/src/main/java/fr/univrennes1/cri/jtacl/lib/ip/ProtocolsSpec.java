@@ -24,11 +24,10 @@ import java.util.ArrayList;
 public class ProtocolsSpec extends ArrayList<Integer> {
 
 	/**
-	 * Returns true if the protocol matches the list of protocols in argument.
+	 * Returns true if a given list of protocols matches this specification.
 	 * IP matches any protocol.
-	 * @param protocols list.
-	 * @param protocol protocol to check.
-	 * @return true if the protocol matches the list of protocols in argument.
+	 * @param protocols protocols list to check.
+	 * @return  true if a given list of protocols matches this specification.
 	 */
 	public MatchResult matches(ProtocolsSpec protocols) {
 
@@ -38,4 +37,19 @@ public class ProtocolsSpec extends ArrayList<Integer> {
 		}
 		return MatchResult.NOT;
 	}
+
+	/**
+	 * Returns true if a given protocol matches this specification.
+	 * IP matches any protocol.
+	 * @param protocol protocol to check.
+	 * @return true if a given protocol matches this specification.
+	 */
+	public MatchResult matches(Integer protocol) {
+
+		if (this.contains(protocol))
+				return MatchResult.ALL;
+
+		return MatchResult.NOT;
+	}
+
 }
