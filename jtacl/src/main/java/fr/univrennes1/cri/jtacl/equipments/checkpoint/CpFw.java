@@ -250,6 +250,30 @@ public class CpFw extends GenericEquipment {
 		return service;
 	}
 
+	protected CpService parseServiceGroup(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+
+		CpGroupService service = new CpGroupService(sName, sComment);
+
+		/*
+		 * members of this group (should be one member)
+		 */
+		List<Element> members = XMLUtils.getDirectChildren(e, "members");
+
+		/*
+		 * each reference
+		 */
+		List<Element> references =
+			XMLUtils.getDirectChildren(members.get(0), "reference");
+		for (Element reference: references) {
+			String refName = XMLUtils.getTagValue(reference, "Name");
+			service.addReference(refName, null);
+		}
+
+		return service;
+	}
+
 	protected void loadServices(String filename) {
 
 		Document doc = XMLUtils.getXMLDocument(filename);
@@ -276,6 +300,8 @@ public class CpFw extends GenericEquipment {
 				service = parseIcmpService(e);
 			if (className.equalsIgnoreCase("other_service"))
 				service = parseOtherService(e);
+			if (className.equalsIgnoreCase("service_group"))
+				service = parseServiceGroup(e);
 			i++;
 
 			if (service != null && Log.debug().isLoggable(Level.INFO)) {
