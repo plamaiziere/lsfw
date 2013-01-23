@@ -14,7 +14,7 @@
 package fr.univrennes1.cri.jtacl.core.probing;
 
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-import java.util.List;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * Describes what we want to check in a probe
@@ -26,7 +26,7 @@ public class ProbeRequest {
 	/**
 	 * protocols we should match (null: any)
 	 */
-	protected List<Integer> _protocols;
+	protected ProtocolsSpec _protocols;
 
 	/**
 	 * Sub type of the protocol, the value depends of the protocol.
@@ -42,13 +42,13 @@ public class ProbeRequest {
 
 	/**
 	 * The source port specification.
-	 * 
+	 *
 	 */
 	protected PortSpec _sourcePort;
 
 	/**
 	 * The destination port specification
-	 * 
+	 *
 	 */
 	protected PortSpec _destPort;
 
@@ -56,7 +56,7 @@ public class ProbeRequest {
 	 * TCP flags we should match (null: any)
 	 */
 	protected ProbeTcpFlags _tcpFlags;
-	
+
 	/**
 	 * Probe options
 	 */
@@ -68,7 +68,7 @@ public class ProbeRequest {
 	 * @return the internet protocol,
 	 * null if "any".
 	 */
-	public List<Integer> getProtocols() {
+	public ProtocolsSpec getProtocols() {
 		return _protocols;
 	}
 
@@ -76,7 +76,7 @@ public class ProbeRequest {
 	 * Sets the internet protocols we should match.
 	 * @param protocols protocols value to set. Null designates any protocol.
 	 */
-	public void setProtocols(List<Integer> protocols) {
+	public void setProtocols(ProtocolsSpec protocols) {
 		_protocols = protocols;
 	}
 
@@ -122,9 +122,9 @@ public class ProbeRequest {
 
 	/**
 	 * Returns the source port specification
-	 * 
+	 *
 	 * @return the source port specification.
-	 * 
+	 *
 	 */
 	public PortSpec getSourcePort() {
 		return _sourcePort;
@@ -140,9 +140,9 @@ public class ProbeRequest {
 
 	/**
 	 * Returns the destination port specification.
-	 * 
+	 *
 	 * @return the destination port specification.
-	 * 
+	 *
 	 */
 	public PortSpec getDestinationPort() {
 		return _destPort;
@@ -163,7 +163,7 @@ public class ProbeRequest {
 	public void setTcpFlags(ProbeTcpFlags tcpFlags) {
 		_tcpFlags = tcpFlags;
 	}
-	
+
 	public ProbeOptions getProbeOptions() {
 		return _probeOptions;
 	}

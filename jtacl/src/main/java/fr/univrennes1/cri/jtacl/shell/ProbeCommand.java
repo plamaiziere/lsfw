@@ -31,6 +31,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.net.UnknownHostException;
@@ -42,14 +43,14 @@ import java.util.List;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ProbeCommand {
-	
+
 	protected Monitor _monitor = Monitor.getInstance();
 	protected ProbeRequest _request;
 	protected IfaceLink _ilink;
 	protected Probing _probing;
 	protected IPNet _sourceAddress;
 	protected IPNet _destinationAddress;
-	
+
 	public void buildRequest(ProbeCommandTemplate probeCmd) {
 
 		boolean testMode = probeCmd.getProbeExpect() != null;
@@ -86,7 +87,7 @@ public class ProbeCommand {
 						sSourceAddress + " " +  ex1.getMessage());
 			}
 		}
-		
+
 		String sDestAddress = probeCmd.getDestAddress();
 		IPNet destAddress;
 		try {
@@ -96,7 +97,7 @@ public class ProbeCommand {
 				// not an IP try to resolve as a host.
 				destAddress = IPNet.getByName(sDestAddress, ipVersion);
 			} catch (UnknownHostException ex1) {
-				throw new JtaclParameterException("Error in destination address: " + 
+				throw new JtaclParameterException("Error in destination address: " +
 					 sDestAddress + ex1.getMessage());
 			}
 		}
@@ -115,7 +116,7 @@ public class ProbeCommand {
 		 */
 		IfaceLinks ilinks;
 		if (probeCmd.getEquipments() != null) {
-			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress, 
+			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress,
 					probeCmd.getEquipments());
 			// error
 			if (ilinks == null)
@@ -188,7 +189,7 @@ public class ProbeCommand {
 				throw new JtaclParameterException(
 					"unknown protocol: " + sprotocol);
 			}
-			List<Integer> protocols = new ArrayList<Integer>();
+			ProtocolsSpec protocols = new ProtocolsSpec();
 			request.setProtocols(protocols);
 			protocols.add(protocol);
 
@@ -295,7 +296,7 @@ public class ProbeCommand {
 		options.setNoAction(probeCmd.getProbeOptNoAction());
 		options.setQuickDeny(probeCmd.getProbeOptQuickDeny());
 
-		_ilink = ilinks.get(0);		
+		_ilink = ilinks.get(0);
 		_request = request;
 		_sourceAddress = sourceAddress;
 		_destinationAddress = destAddress;
@@ -306,7 +307,7 @@ public class ProbeCommand {
 		 * probe
 		 */
 		_monitor.resetProbing();
-		_monitor.newProbing(_ilink, _sourceAddress, 
+		_monitor.newProbing(_ilink, _sourceAddress,
 				_destinationAddress, _request);
 		_probing = _monitor.startProbing();
 	}
