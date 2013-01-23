@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-import java.util.List;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * Describes an enhanced service object group.
@@ -39,7 +39,7 @@ public class EnhancedServiceObjectGroup extends ObjectGroup {
 	 * @param protocols protocols value to check.
 	 * @return true if at least one item matches the protocols value in argument.
 	 */
-	public boolean matches(List<Integer> protocols) {
+	public boolean matches(ProtocolsSpec protocols) {
 		for (ObjectGroupItem item: this) {
 			EnhancedServiceObjectGroupItem sitem =
 					(EnhancedServiceObjectGroupItem) item;
@@ -59,7 +59,7 @@ public class EnhancedServiceObjectGroup extends ObjectGroup {
 	 * @return a {@link MatchResult} between this group and the port spec in
 	 * argument.
 	 */
-	public MatchResult matches(List<Integer> protocols, PortSpec port) {
+	public MatchResult matches(ProtocolsSpec protocols, PortSpec port) {
 		int match = 0;
 		int all = 0;
 
