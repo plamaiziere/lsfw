@@ -13,7 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import java.util.List;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * An item of a protocol object group.
@@ -62,8 +63,8 @@ public class ProtocolObjectGroupItem extends ObjectGroupItem {
 	 * @param protocols protocols value to check.
 	 * @return true if this item matches any of the protocols value in argument.
 	 */
-	public boolean matches(List<Integer> protocols) {
-		return ProtocolComparator.matches(protocols, _protocol);
+	public boolean matches(ProtocolsSpec protocols) {
+		return protocols.matches(_protocol) == MatchResult.ALL;
 	}
 
 }

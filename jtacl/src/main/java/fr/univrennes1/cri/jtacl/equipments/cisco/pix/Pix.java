@@ -33,6 +33,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
@@ -1444,7 +1445,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * check protocol
 		 */
-		List<Integer> reqProto = request.getProtocols();
+		ProtocolsSpec reqProto = request.getProtocols();
 		Integer aclProto = acl.getProtocol();
 		ProtocolObjectGroup aclProtoGroup = acl.getProtocolGroup();
 
@@ -1453,7 +1454,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 * protocol
 			 */
 			if (aclProto != null) {
-				if (!ProtocolComparator.matches(reqProto, aclProto))
+				if (reqProto.matches(aclProto) == MatchResult.NOT)
 					return MatchResult.NOT;
 			}
 			/*

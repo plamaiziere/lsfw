@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class ProtocolObjectGroup extends ObjectGroup {
 	 * @param protocols protocols value to check.
 	 * @return true if an item of this group matches the protocol in argument.
 	 */
-	public boolean matches(List<Integer> protocols) {
+	public boolean matches(ProtocolsSpec protocols) {
 		for (ObjectGroupItem item: this) {
 			ProtocolObjectGroupItem pitem = (ProtocolObjectGroupItem) item;
 			if (pitem.isGroup())
