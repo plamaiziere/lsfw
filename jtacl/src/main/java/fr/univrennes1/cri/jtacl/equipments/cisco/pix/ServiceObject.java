@@ -13,8 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import java.util.ArrayList;
-import java.util.List;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * Describes a service object.
@@ -26,14 +25,14 @@ public class ServiceObject {
 	/**
 	 * protocols of this object
 	 */
-	protected List<Integer> _protocols = new ArrayList<Integer>();
+	protected ProtocolsSpec _protocols = new ProtocolsSpec();
 
 	/**
 	 * port object associated to this item (may be null)
 	 */
 	protected PortObject _portObject;
 
-	public ServiceObject(List<Integer> protocols, PortObject portObject) {
+	public ServiceObject(ProtocolsSpec protocols, PortObject portObject) {
 		_protocols.addAll(protocols);
 		_portObject = portObject;
 	}
@@ -42,7 +41,7 @@ public class ServiceObject {
 		return _portObject;
 	}
 
-	public List<Integer> getProtocols() {
+	public ProtocolsSpec getProtocols() {
 		return _protocols;
 	}
 
