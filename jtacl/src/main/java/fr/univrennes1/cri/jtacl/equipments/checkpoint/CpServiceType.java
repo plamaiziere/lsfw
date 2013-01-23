@@ -21,5 +21,6 @@ public enum CpServiceType {
 	TCP,
 	UDP,
 	ICMP,
-	GROUP;
+	GROUP,
+	OTHER;
 }
