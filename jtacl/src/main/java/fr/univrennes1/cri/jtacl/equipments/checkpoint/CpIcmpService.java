@@ -48,6 +48,7 @@ public class CpIcmpService extends CpService {
 			comment, CpServiceType.ICMP);
 
 		_icmp = new IPIcmpEnt(name, icmpType, icmpCode);
+		_af = af;
 	}
 
 	public AddressFamily getAf() {
