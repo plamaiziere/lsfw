@@ -24,7 +24,6 @@ import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
@@ -42,7 +41,6 @@ import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -178,8 +176,8 @@ public class CpFw extends GenericEquipment {
 		 * ports
 		 */
 		CpPortItem portItem = parsePort(sPorts);
-		CpPortItem srcPortItem = null;
-		srcPortItem = sSourcePorts == null ? null : parsePort(sSourcePorts);
+		CpPortItem srcPortItem =
+			sSourcePorts == null ? null : parsePort(sSourcePorts);
 
 		/*
 		 * in any
@@ -235,6 +233,29 @@ public class CpFw extends GenericEquipment {
 		return service;
 	}
 
+	protected CpService parseOtherService(Element e) {
+
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sProtocol = XMLUtils.getTagValue(e, "protocol");
+		String sExp = XMLUtils.getTagValue(e, "exp");
+		String sInAny = XMLUtils.getTagValue(e, "include_in_any");
+
+		/*
+		 * protocol
+		 */
+		Integer proto = sProtocol == null ? null : Integer.parseInt(sProtocol);
+
+		/*
+		 * in any
+		 */
+		boolean inAny = Boolean.parseBoolean(sInAny);
+
+		CpService service =
+			new CpOtherService(sName, sComment, proto, sExp, inAny);
+		return service;
+	}
+
 	protected void loadServices(String filename) {
 
 		Document doc = XMLUtils.getXMLDocument(filename);
@@ -259,6 +280,8 @@ public class CpFw extends GenericEquipment {
 				service = parseIcmpService(e);
 			if (className.equalsIgnoreCase("icmpv6_service"))
 				service = parseIcmpService(e);
+			if (className.equalsIgnoreCase("other_service"))
+				service = parseOtherService(e);
 			i++;
 		}
 	System.exit(0);
