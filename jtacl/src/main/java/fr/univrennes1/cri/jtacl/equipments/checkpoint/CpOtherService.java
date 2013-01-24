@@ -33,7 +33,7 @@ public class CpOtherService extends CpService {
 	 * @param name service name
 	 * @param comment comment
 	 * @param protocol protocol
-	 * @param String exp expression
+	 * @param exp expression
 	 * @param inAny true if this service is included in any
 	 */
 	public CpOtherService(String name,
