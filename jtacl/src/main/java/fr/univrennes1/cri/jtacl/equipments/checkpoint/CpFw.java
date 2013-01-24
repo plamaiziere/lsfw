@@ -91,18 +91,25 @@ public class CpFw extends GenericEquipment {
 	/**
 	 * interfaces
 	 */
-	protected HashMap<String, CPfwIface> _cpfwIfaces = new HashMap<String, CPfwIface>();
+	protected HashMap<String, CPfwIface> _cpfwIfaces
+		= new HashMap<String, CPfwIface>();
 
 	/**
 	 * IPNet cross references
 	 */
-	protected Map<IPNet, IPNetCrossRef> _netCrossRef =
-			new HashMap<IPNet, IPNetCrossRef>();
+	protected Map<IPNet, IPNetCrossRef> _netCrossRef
+			= new HashMap<IPNet, IPNetCrossRef>();
 
 	/**
 	 * parse context
 	 */
 	 protected ParseContext _parseContext = new ParseContext();
+
+	/*
+	 * services keyed by name
+	 */
+	protected HashMap<String, CpService> _services
+			= new HashMap<String, CpService>();
 
 	/**
 	 * IPNet cross references
@@ -129,7 +136,7 @@ public class CpFw extends GenericEquipment {
 		ParsingResult<?> result = new BasicParseRunner(
 			_parser.CpPortItem()).run(sPorts);
 		if (!result.matched)
-			throwCfgException("invalid port specification: " + sPorts);
+			throwCfgException("invalid port specification: " + sPorts, true);
 
 		PortItemTemplate port = _parser.getPortItem();
 
@@ -140,13 +147,13 @@ public class CpFw extends GenericEquipment {
 		try {
 			first = Integer.parseInt(sfirst);
 		} catch (NumberFormatException ex) {
-			throwCfgException("invalid port number: " + sfirst);
+			throwCfgException("invalid port number: " + sfirst, true);
 		}
 		if (slast != null ) {
 			try {
 				last = Integer.parseInt(slast);
 			} catch (NumberFormatException ex) {
-				throwCfgException("invalid port number: " + slast);
+				throwCfgException("invalid port number: " + slast, true);
 			}
 		}
 
@@ -304,11 +311,39 @@ public class CpFw extends GenericEquipment {
 				service = parseServiceGroup(e);
 			i++;
 
+			if (service != null)
+				_services.put(service.getName(), service);
+
 			if (service != null && Log.debug().isLoggable(Level.INFO)) {
 			Log.debug().info("CpService: " + service.toString());
 			}
 		}
+		linkServices();
 	System.exit(0);
+	}
+
+	protected void linkServices() {
+		/*
+		 * each service
+		 */
+		for (String serviceName: _services.keySet()) {
+			CpService service = _services.get(serviceName);
+			if (service.getType() != CpServiceType.GROUP)
+				continue;
+			/*
+			 * resolves the references of the group
+			 */
+			CpGroupService group = (CpGroupService) service;
+			for (String refName: group.getReferencesName()) {
+				CpService ref = _services.get(refName);
+				if (ref == null) {
+					warnConfig("cannot link service group: "
+							+ serviceName + " to member: " + refName, false);
+				} else {
+					group.addReference(refName, ref);
+				}
+			}
+		}
 	}
 
 	protected void loadConfiguration(Document doc) {
@@ -408,8 +443,24 @@ public class CpFw extends GenericEquipment {
 		}
 	}
 
-	protected void throwCfgException(String msg) {
-		throw new JtaclConfigurationException(_parseContext.toString() + msg);
+	protected void throwCfgException(String msg, boolean context) {
+		String s = "Equipment: " + _name + " ";
+		if (context)
+			s += _parseContext + msg;
+		else
+			s += msg;
+
+		throw new JtaclConfigurationException(s);
+	}
+
+	protected void warnConfig(String msg, boolean context) {
+		String s = "Equipment: " + _name + " ";
+		if (context)
+			s += _parseContext + msg;
+		else
+			s += msg;
+
+		Log.config().warning(s);
 	}
 
 	protected IPNet parseIp(String ip) {
@@ -418,7 +469,7 @@ public class CpFw extends GenericEquipment {
 		try {
 			ipnet = new IPNet(ip);
 		} catch (UnknownHostException ex) {
-			throwCfgException("invalid IP address: " + ex.getMessage());
+			throwCfgException("invalid IP address: " + ex.getMessage(), true);
 		}
 		return ipnet;
 	}
@@ -427,28 +478,28 @@ public class CpFw extends GenericEquipment {
 
 		int port = _ipServices.serviceLookup(service, protocol);
 		if (port == -1)
-			throwCfgException("unknown service");
+			throwCfgException("unknown service", true);
 		return port;
 	}
 
 	protected int parseProtocol(String protocol) {
 		int proto = _ipProtocols.protocolLookup(protocol);
 		if (proto == -1)
-			throwCfgException("unknown protocol");
+			throwCfgException("unknown protocol", true);
 		return proto;
 	}
 
 	protected IPIcmpEnt parseIcmp4(String icmpName) {
 		IPIcmpEnt icmp = _ipIcmp4Types.icmpLookup(icmpName);
 		if (icmp == null)
-			throwCfgException("unknown icmp-type or message");
+			throwCfgException("unknown icmp-type or message", true);
 		return icmp;
 	}
 
 	protected IPIcmpEnt parseIcmp6(String icmpName) {
 		IPIcmpEnt icmp = _ipIcmp6Types.icmpLookup(icmpName);
 		if (icmp == null)
-			throwCfgException("unknown icmp-type or message");
+			throwCfgException("unknown icmp-type or message", true);
 		return icmp;
 	}
 
