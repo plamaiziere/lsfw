@@ -41,6 +41,7 @@ import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -350,39 +351,48 @@ public class CpFw extends GenericEquipment {
 
 		/* services */
 		NodeList list = doc.getElementsByTagName("services");
-		if (list.getLength() != 1) {
-			throw new JtaclConfigurationException("One services file must be specified");
+		if (list.getLength() < 1) {
+			throw new JtaclConfigurationException(
+					"At least one services file must be specified");
 		}
-		Element e = (Element) list.item(0);
-		String filename = e.getAttribute("filename");
-		if (filename.isEmpty())
-			throw new JtaclConfigurationException("Missing services file name");
-		loadServices(filename);
-		famAdd(filename);
+		for (int i = 0; i < list.getLength(); i++) {
+			Element e = (Element) list.item(i);
+			String filename = e.getAttribute("filename");
+			if (filename.isEmpty())
+				throw new JtaclConfigurationException("Missing services file name");
+			loadServices(filename);
+			famAdd(filename);
+		}
 
 		/* network_objects */
 		list = doc.getElementsByTagName("network_objects");
-		if (list.getLength() != 1) {
-			throw new JtaclConfigurationException("One network_object file must be specified");
+		if (list.getLength() < 1) {
+			throw new JtaclConfigurationException(
+					"At least one network_object file must be specified");
 		}
-		e = (Element) list.item(0);
-		filename = e.getAttribute("filename");
-		if (filename.isEmpty())
-			throw new JtaclConfigurationException("Missing netork_objects file name");
+		for (int i = 0; i < list.getLength(); i++) {
+			Element e = (Element) list.item(i);
+			String filename = e.getAttribute("filename");
+			if (filename.isEmpty())
+				throw new JtaclConfigurationException("Missing netork_objects file name");
 		/* TODO parse file */
-		famAdd(filename);
+			famAdd(filename);
+		}
 
 		/* fwpolicies */
 		list = doc.getElementsByTagName("fwpolicies");
-		if (list.getLength() != 1) {
-			throw new JtaclConfigurationException("One fwpolicies file must be specified");
+		if (list.getLength() < 1) {
+			throw new JtaclConfigurationException(
+				"At least one fwpolicies file must be specified");
 		}
-		e = (Element) list.item(0);
-		filename = e.getAttribute("filename");
-		if (filename.isEmpty())
-			throw new JtaclConfigurationException("Missing fwpolicies file name");
-		/* TODO parse file */
-		famAdd(filename);
+		for (int i = 0; i < list.getLength(); i++) {
+			Element e = (Element) list.item(i);
+			String filename = e.getAttribute("filename");
+			if (filename.isEmpty())
+				throw new JtaclConfigurationException("Missing fwpolicies file name");
+			/* TODO parse file */
+			famAdd(filename);
+		}
 	}
 
 	protected void loadIfaces(Document doc) {
