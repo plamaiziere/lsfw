@@ -37,4 +37,9 @@ public class IPRange {
 		return _ipLast;
 	}
 
+	@Override
+	public String toString() {
+		return _ipFirst.toString("i::") + " - " + _ipLast.toString("i::");
+	}
+
 }
