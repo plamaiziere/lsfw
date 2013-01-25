@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 
 /**
