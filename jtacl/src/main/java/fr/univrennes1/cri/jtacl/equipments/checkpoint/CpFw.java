@@ -464,6 +464,7 @@ public class CpFw extends GenericEquipment {
 			 */
 			if (service == null) {
 				service = parseUnhandledService(e);
+				warnConfig("service is unhandled: " + service, false);
 			}
 			i++;
 
