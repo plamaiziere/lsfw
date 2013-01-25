@@ -422,6 +422,14 @@ public class CpFw extends GenericEquipment {
 		return networkobj;
 	}
 
+	protected CpNetworkObject parseUnhandledNetwork(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+
+		return new CpUnhandledNetwork(sName, sClassName, sComment);
+	}
+
 	protected void loadServices(String filename) {
 
 		Document doc = XMLUtils.getXMLDocument(filename);
@@ -519,6 +527,15 @@ public class CpFw extends GenericEquipment {
 				networkObj = parseNetworkGroup(e);
 			if (className.equalsIgnoreCase("address_range"))
 				networkObj = parseNetworkRange(e);
+
+			/*
+			 * unhandled by lsfw
+			 */
+			if (networkObj == null) {
+				networkObj = parseUnhandledNetwork(e);
+				warnConfig("network object is unhandled: " + networkObj, false);
+			}
+
 			i++;
 
 			if (networkObj != null)
