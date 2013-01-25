@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 /**
  * Checkpoint service type
- * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum CpServiceType {
 	TCP,

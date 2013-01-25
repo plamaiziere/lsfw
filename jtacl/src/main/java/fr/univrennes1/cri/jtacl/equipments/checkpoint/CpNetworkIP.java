@@ -17,7 +17,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 
 /**
  * Checkpoint IP network object
- * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
 public class CpNetworkIP extends CpNetworkObject {

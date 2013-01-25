@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 /**
  * Checkpoint UDP service object
- * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpUdpService extends CpService {
 

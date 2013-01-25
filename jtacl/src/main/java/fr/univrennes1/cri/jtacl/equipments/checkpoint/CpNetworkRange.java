@@ -17,7 +17,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 
 /**
  * Checkpoint IP network range
- * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
 public class CpNetworkRange extends CpNetworkObject {

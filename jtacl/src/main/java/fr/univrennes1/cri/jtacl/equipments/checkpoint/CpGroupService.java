@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Checkpoint group service object
- * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpGroupService extends CpService {
 
