@@ -376,6 +376,34 @@ public class CpFw extends GenericEquipment {
 		return ngroup;
 	}
 
+	protected CpNetworkObject parseNetworkRange(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+
+		String sIpFirst = XMLUtils.getTagValue(e, "ipaddr_first");
+		String sIpLast = XMLUtils.getTagValue(e, "ipaddr_last");
+
+		IPNet ipFirst = null;
+		try {
+			ipFirst = new IPNet(sIpFirst);
+		} catch (UnknownHostException ex) {
+			throwCfgException("invalid IP address: " + sIpFirst, true);
+		}
+
+		IPNet ipLast = null;
+		try {
+			ipLast = new IPNet(sIpLast);
+		} catch (UnknownHostException ex) {
+			throwCfgException("invalid IP address: " + sIpLast, true);
+		}
+
+		CpNetworkRange networkobj = new CpNetworkRange(sName, sClassName,
+				sComment, ipFirst, ipLast);
+
+		return networkobj;
+	}
+
 	protected void loadServices(String filename) {
 
 		Document doc = XMLUtils.getXMLDocument(filename);
@@ -464,6 +492,8 @@ public class CpFw extends GenericEquipment {
 			if (className.equalsIgnoreCase("network_object_group")
 					|| className.equalsIgnoreCase("group_with_exception"))
 				networkObj = parseNetworkGroup(e);
+			if (className.equalsIgnoreCase("address_range"))
+				networkObj = parseNetworkRange(e);
 			i++;
 
 			if (networkObj != null)
@@ -696,7 +726,6 @@ public class CpFw extends GenericEquipment {
 
 		linkServices();
 		linkNetworkObjects();
-		System.exit(0);
 
 		/*
 		 * routing
