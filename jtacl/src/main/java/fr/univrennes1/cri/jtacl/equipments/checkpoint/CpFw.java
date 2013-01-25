@@ -41,7 +41,6 @@ import org.parboiled.parserunners.BasicParseRunner;
 import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -111,6 +110,12 @@ public class CpFw extends GenericEquipment {
 	 */
 	protected HashMap<String, CpService> _services
 			= new HashMap<String, CpService>();
+
+	/*
+	 * network objects keyed by name
+	 */
+	protected HashMap<String, CpNetworkObject> _networkObjects
+			= new HashMap<String, CpNetworkObject>();
 
 	/**
 	 * IPNet cross references
@@ -282,6 +287,95 @@ public class CpFw extends GenericEquipment {
 		return service;
 	}
 
+	protected CpNetworkObject parseNetworkHost(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+
+		String sBroadcast = XMLUtils.getTagValue(e, "broadcast");
+		boolean broadcast = sBroadcast == null ||
+			sBroadcast.equalsIgnoreCase("allow");
+
+		String sIp = XMLUtils.getTagValue(e, "ipaddr");
+		String sNetmask = XMLUtils.getTagValue(e, "netmask");
+
+		if (sNetmask != null)
+			sIp += "/" + sNetmask;
+
+		IPNet ip = null;
+		try {
+			ip = new IPNet(sIp);
+		} catch (UnknownHostException ex) {
+			throwCfgException("invalid IP address: " + sIp, true);
+		}
+
+		CpNetworkIP networkobj = new CpNetworkIP(sName, sClassName, sComment,
+			ip, broadcast);
+
+		return networkobj;
+	}
+
+	protected CpNetworkObject parseNetworkHostV6(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+
+		String sIp = XMLUtils.getTagValue(e, "ipv6_address");
+		String sNetmask = XMLUtils.getTagValue(e, "ipv6_prefix");
+
+		if (sNetmask != null)
+			sIp += "/" + sNetmask;
+
+		IPNet ip = null;
+		try {
+			ip = new IPNet(sIp);
+		} catch (UnknownHostException ex) {
+			throwCfgException("invalid IP address: " + sIp, true);
+		}
+
+		CpNetworkIP networkobj = new CpNetworkIP(sName, sClassName, sComment,
+			ip, true);
+
+		return networkobj;
+	}
+
+	protected CpNetworkObject parseNetworkGroup(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+
+		CpNetworkGroup ngroup = new CpNetworkGroup(sName, sClassName, sComment);
+
+		if (sClassName.equalsIgnoreCase("network_object_group")) {
+			/*
+			 * members of this group (should be one member)
+			 */
+			List<Element> members = XMLUtils.getDirectChildren(e, "members");
+
+			/*
+			 * each reference
+			 */
+			List<Element> references =
+				XMLUtils.getDirectChildren(members.get(0), "reference");
+			for (Element reference: references) {
+				String refName = XMLUtils.getTagValue(reference, "Name");
+				ngroup.addBaseReference(refName, null);
+			}
+		}
+
+		if (sClassName.equalsIgnoreCase("group_with_exception")) {
+			/* base of this group */
+			List<Element> base = XMLUtils.getDirectChildren(e, "base");
+			String refname = XMLUtils.getTagValue(base.get(0), "Name");
+			ngroup.addBaseReference(refname, null);
+			List<Element> except = XMLUtils.getDirectChildren(e, "exception");
+			String exceptName = XMLUtils.getTagValue(except.get(0), "Name");
+			ngroup.addExcludedReference(exceptName, null);
+		}
+
+		return ngroup;
+	}
+
 	protected void loadServices(String filename) {
 
 		Document doc = XMLUtils.getXMLDocument(filename);
@@ -319,8 +413,6 @@ public class CpFw extends GenericEquipment {
 			Log.debug().info("CpService: " + service.toString());
 			}
 		}
-		linkServices();
-	System.exit(0);
 	}
 
 	protected void linkServices() {
@@ -342,6 +434,79 @@ public class CpFw extends GenericEquipment {
 							+ serviceName + " to member: " + refName, false);
 				} else {
 					group.addReference(refName, ref);
+				}
+			}
+		}
+	}
+
+	protected void loadNetworkObject(String filename) {
+
+		Document doc = XMLUtils.getXMLDocument(filename);
+		doc.getDocumentElement().normalize();
+
+		_parseContext = new ParseContext();
+		CpNetworkObject networkObj;
+
+		Element root = doc.getDocumentElement();
+		List<Element> list = XMLUtils.getDirectChildren(root, "network_object");
+		int i = 0;
+		for (Element e: list) {
+			_parseContext.set(filename, i,
+				StringTools.stripWhiteSpacesCrLf(e.getTextContent()));
+			String className = XMLUtils.getTagValue(e, "Class_Name");
+			networkObj = null;
+			if (className.equalsIgnoreCase("host_plain"))
+				networkObj = parseNetworkHost(e);
+			if (className.equalsIgnoreCase("network"))
+				networkObj = parseNetworkHost(e);
+			if (className.equalsIgnoreCase("ipv6_object"))
+				networkObj = parseNetworkHostV6(e);
+			if (className.equalsIgnoreCase("network_object_group")
+					|| className.equalsIgnoreCase("group_with_exception"))
+				networkObj = parseNetworkGroup(e);
+			i++;
+
+			if (networkObj != null)
+				_networkObjects.put(networkObj.getName(), networkObj);
+
+			if (networkObj != null && Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("CpNetworkObject: " + networkObj.toString());
+			}
+		}
+	}
+
+	protected void linkNetworkObjects() {
+		/*
+		 * each network object
+		 */
+		for (String objectName: _networkObjects.keySet()) {
+			CpNetworkObject nobj = _networkObjects.get(objectName);
+			if (nobj.getType() != CpNetworkType.GROUP)
+				continue;
+			/*
+			 * resolves the base references of the group
+			 */
+			CpNetworkGroup group = (CpNetworkGroup) nobj;
+			for (String refName: group.getBaseReferencesName()) {
+				CpNetworkObject ref = _networkObjects.get(refName);
+				if (ref == null) {
+					warnConfig("cannot link network group: "
+							+ objectName + " to member: " + refName, false);
+				} else {
+					group.addBaseReference(refName, ref);
+				}
+			}
+			/*
+			 * excluded ref
+			 */
+			for (String refName: group.getExcludedReferencesName()) {
+				CpNetworkObject ref = _networkObjects.get(refName);
+				if (ref == null) {
+					warnConfig("cannot link network group: "
+							+ objectName
+							+ " to excluded member: " + refName, false);
+				} else {
+					group.addExcludedReference(refName, ref);
 				}
 			}
 		}
@@ -374,8 +539,8 @@ public class CpFw extends GenericEquipment {
 			Element e = (Element) list.item(i);
 			String filename = e.getAttribute("filename");
 			if (filename.isEmpty())
-				throw new JtaclConfigurationException("Missing netork_objects file name");
-		/* TODO parse file */
+				throw new JtaclConfigurationException("Missing network_objects file name");
+			loadNetworkObject(filename);
 			famAdd(filename);
 		}
 
@@ -528,6 +693,10 @@ public class CpFw extends GenericEquipment {
 
 		loadIfaces(doc);
 		loadConfiguration(doc);
+
+		linkServices();
+		linkNetworkObjects();
+		System.exit(0);
 
 		/*
 		 * routing
