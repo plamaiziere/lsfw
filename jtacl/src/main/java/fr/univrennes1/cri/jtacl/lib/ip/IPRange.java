@@ -17,7 +17,7 @@ import java.net.UnknownHostException;
 
 /**
  * IP range. A range of ip addresses
- * Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IPRange {
 
