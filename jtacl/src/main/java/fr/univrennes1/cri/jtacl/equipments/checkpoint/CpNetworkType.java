@@ -19,5 +19,6 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
  */
 public enum CpNetworkType {
 	IP,
+	RANGE,
 	GROUP;
 }
