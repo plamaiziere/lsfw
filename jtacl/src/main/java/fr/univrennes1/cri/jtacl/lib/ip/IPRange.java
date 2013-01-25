@@ -39,7 +39,7 @@ public class IPRange {
 
 	@Override
 	public String toString() {
-		return _ipFirst.toString("i::") + " - " + _ipLast.toString("i::");
+		return _ipFirst.toString("i::") + "-" + _ipLast.toString("i::");
 	}
 
 }
