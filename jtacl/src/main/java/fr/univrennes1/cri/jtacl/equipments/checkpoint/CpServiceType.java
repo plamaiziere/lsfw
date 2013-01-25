@@ -18,6 +18,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum CpServiceType {
+	UNHANDLED,
 	TCP,
 	UDP,
 	ICMP,
