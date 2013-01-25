@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 
 /**
  * Checkpoint IP network range
@@ -22,11 +23,8 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 
 public class CpNetworkRange extends CpNetworkObject {
 
-	/* ip first address */
-	protected IPNet _ipFirst;
-
-	/* ip last address */
-	protected IPNet _ipLast;
+	/* ip range */
+	protected IPRange _ipRange;
 
 	/**
 	 * Construct a new checkpoint IP network range object
@@ -37,25 +35,19 @@ public class CpNetworkRange extends CpNetworkObject {
 	 * @param ipLast ip last address
 	 */
 	public CpNetworkRange(String name,	String className, String comment,
-			IPNet ipFirst, IPNet ipLast)  {
+			IPRange ipRange)  {
 
 		super(name, className, comment, CpNetworkType.RANGE);
-		_ipFirst = ipFirst;
-		_ipLast = ipLast;
+		_ipRange = ipRange;
 	}
 
-	public IPNet getIpFist() {
-		return _ipFirst;
-	}
-
-	public IPNet getIpLast() {
-		return _ipLast;
+	public IPRange getIpRange() {
+		return _ipRange;
 	}
 
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
-				+ ", IP_first=" + _ipFirst.toString("i::")
-				+ ", IP_last=" + _ipLast.toString("i::");
+				+ ", IPRange=" + _ipRange;
 	}
 }

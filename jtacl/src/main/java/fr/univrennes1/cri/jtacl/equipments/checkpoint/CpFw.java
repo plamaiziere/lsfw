@@ -26,6 +26,7 @@ import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
@@ -398,8 +399,17 @@ public class CpFw extends GenericEquipment {
 			throwCfgException("invalid IP address: " + sIpLast, true);
 		}
 
+		IPRange ipRange = null;
+		try {
+			ipRange = new IPRange(ipFirst, ipLast);
+		} catch (UnknownHostException ex) {
+			throwCfgException("invalid IP range: " + sIpFirst + " - "
+					+ sIpLast, true);
+		}
+
+
 		CpNetworkRange networkobj = new CpNetworkRange(sName, sClassName,
-				sComment, ipFirst, ipLast);
+				sComment, ipRange);
 
 		return networkobj;
 	}
