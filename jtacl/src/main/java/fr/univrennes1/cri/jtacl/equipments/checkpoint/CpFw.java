@@ -288,6 +288,14 @@ public class CpFw extends GenericEquipment {
 		return service;
 	}
 
+	protected CpService parseUnhandledService(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+
+		return new CpUnhandledService(sName, sClassName, sComment);
+	}
+
 	protected CpNetworkObject parseNetworkHost(Element e) {
 		String sName = XMLUtils.getTagValue(e, "Name");
 		String sComment = XMLUtils.getTagValue(e, "comments");
@@ -442,6 +450,13 @@ public class CpFw extends GenericEquipment {
 				service = parseOtherService(e);
 			if (className.equalsIgnoreCase("service_group"))
 				service = parseServiceGroup(e);
+
+			/*
+			 * unhandled by lsfw
+			 */
+			if (service == null) {
+				service = parseUnhandledService(e);
+			}
 			i++;
 
 			if (service != null)
