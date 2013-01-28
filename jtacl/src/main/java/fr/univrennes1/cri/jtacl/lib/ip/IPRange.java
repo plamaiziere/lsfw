@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
+import java.math.BigInteger;
 import java.net.UnknownHostException;
 
 /**
@@ -24,9 +25,47 @@ public class IPRange {
 	protected IPNet _ipFirst;
 	protected IPNet _ipLast;
 
+	/**
+	 * Constructs a new range using the two IP address in argument
+	 * @param ipFirst first IP address
+	 * @param ipLast last IP address
+	 * @throws UnknownHostException  if some parameters are invalid.
+	 */
 	public IPRange(IPNet ipFirst, IPNet ipLast) throws UnknownHostException {
 		_ipFirst = ipFirst.hostAddress();
 		_ipLast = ipLast.hostAddress();
+	}
+
+	/**
+	 * Constructs a new range using the the IPNet address in argument.
+	 * The new range is between the host ip address of the given ipnet address
+	 * and the lastNetworkAddress of the given ipnet address.
+	 * @param ipnet ipnet address to use.
+	 * @throws UnknownHostException if some parameters are invalid.
+	 */
+	public IPRange(IPNet ipnet) throws UnknownHostException {
+		_ipFirst = ipnet.hostAddress();
+		_ipLast = ipnet.lastNetworkAddress();
+	}
+
+	/**
+	 * Constructs a new range using the the IPNet address in argument.
+	 * The new range is between the host ip address of the given ipnet address
+	 * and the lastNetworkAddress of the given ipnet address. If
+	 * includeLastAddress is true, the last network address is included.
+	 * @param ipnet ipnet address to use.
+	 * @param includeLastAddress set to true to include the last network address.
+	 * @throws UnknownHostException if some parameters are invalid.
+	 */
+	public IPRange(IPNet ipnet, boolean includeLastAddress) throws UnknownHostException {
+		_ipFirst = ipnet.hostAddress();
+		if (includeLastAddress) {
+			_ipLast = ipnet.lastNetworkAddress();
+		} else {
+			BigInteger lip = _ipLast.getIP();
+			lip = lip.subtract(BigInteger.ONE);
+			_ipLast = new IPNet(lip, ipnet.getIpVersion());
+		}
 	}
 
 	public IPNet getIpFirst() {
