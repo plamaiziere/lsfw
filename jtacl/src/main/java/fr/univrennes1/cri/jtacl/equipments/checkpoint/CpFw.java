@@ -214,6 +214,11 @@ public class CpFw extends GenericEquipment {
 			service = new CpUdpService(sName, sComment, portItem, srcPortItem,
 				inAny);
 
+		if (inAny) {
+			CpGroupService any = (CpGroupService) _services.get("Any");
+			any.addReference(sName, service);
+		}
+
 		return service;
 	}
 
@@ -267,6 +272,12 @@ public class CpFw extends GenericEquipment {
 
 		CpService service =
 			new CpOtherService(sName, sComment, proto, sExp, inAny);
+
+		if (inAny) {
+			CpGroupService any = (CpGroupService) _services.get("Any");
+			any.addReference(sName, service);
+		}
+
 		return service;
 	}
 
@@ -725,6 +736,12 @@ public class CpFw extends GenericEquipment {
 	protected void loadConfiguration(Document doc) {
 
 		/* services */
+		/*
+		 *  ANY service object.
+		 */
+		CpService servAny = new CpGroupService("Any", "Any service");
+		_services.put("Any", servAny);
+
 		NodeList list = doc.getElementsByTagName("services");
 		if (list.getLength() < 1) {
 			throw new JtaclConfigurationException(
@@ -750,7 +767,7 @@ public class CpFw extends GenericEquipment {
 		 */
 		CpNetworkObject any = new CpNetworkAny("Any", "ANY_object", "any network object");
 		_networkObjects.put("Any", any);
-		
+
 		for (int i = 0; i < list.getLength(); i++) {
 			Element e = (Element) list.item(i);
 			String filename = e.getAttribute("filename");
@@ -773,6 +790,10 @@ public class CpFw extends GenericEquipment {
 				throw new JtaclConfigurationException("Missing fwpolicies file name");
 			loadFwRules(filename);
 			famAdd(filename);
+		}
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("'Any' service: " + servAny.toString());
 		}
 	}
 
