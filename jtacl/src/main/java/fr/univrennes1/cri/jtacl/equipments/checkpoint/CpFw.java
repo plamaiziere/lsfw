@@ -635,8 +635,20 @@ public class CpFw extends GenericEquipment {
 		return ipSpec;
 	}
 
+	protected String parseFwAction(Element e) {
+
+		/*
+		 * action/Class_Name
+		 */
+		List<Element> action
+				= XMLUtils.getDirectChildren(e, "action");
+
+		String sAction = XMLUtils.getTagValue(action.get(0), "Class_Name");
+		return sAction;
+	}
+
 	protected CpFwRule parseFwRule(Element e) {
-		String sName = XMLUtils.getTagValue(e, "Name");
+		String sName = XMLUtils.getTagValue(e, "name");
 		String sComment = XMLUtils.getTagValue(e, "comments");
 		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
 		String sRuleNumber = XMLUtils.getTagValue(e, "Rule_Number");
@@ -645,12 +657,14 @@ public class CpFw extends GenericEquipment {
 		List<Element> sources = XMLUtils.getDirectChildren(e, "src");
 		List<Element> dsts = XMLUtils.getDirectChildren(e, "dst");
 		List<Element> services = XMLUtils.getDirectChildren(e, "services");
+		List<Element> actions = XMLUtils.getDirectChildren(e, "action");
 		/*
 		 * sanity checks
 		 */
 		if (sRuleNumber == null || sDisabled == null ||sources == null
 			|| dsts == null || sources.isEmpty() || dsts.isEmpty()
-			|| services == null || services.isEmpty()) {
+			|| services == null || services.isEmpty() || actions == null
+				|| actions.isEmpty()) {
 			warnConfig("cannot parse rule", true);
 			return null;
 		}
@@ -664,11 +678,13 @@ public class CpFw extends GenericEquipment {
 		Element service = services.get(0);
 		CpFwServicesSpec servicesSpec = parseFwServicesSpec(service);
 
+		String sAction = parseFwAction(actions.get(0));
+
 		Integer rNumber = Integer.parseInt(sRuleNumber);
 		Boolean disabled = Boolean.parseBoolean(sDisabled);
 
 		CpFwRule fwrule = new CpFwRule(sName, sClassName, sComment, rNumber,
-				disabled, srcIpSpec, dstIpSpec, servicesSpec);
+				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction);
 
 		return fwrule;
 	}
