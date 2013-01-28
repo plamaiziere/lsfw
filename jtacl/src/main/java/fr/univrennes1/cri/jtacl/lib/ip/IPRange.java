@@ -32,8 +32,8 @@ public class IPRange {
 	 * @throws UnknownHostException  if some parameters are invalid.
 	 */
 	public IPRange(IPNet ipFirst, IPNet ipLast) throws UnknownHostException {
-		_ipFirst = ipFirst.hostAddress();
-		_ipLast = ipLast.hostAddress();
+		_ipFirst = ipFirst.networkAddress();
+		_ipLast = ipLast.networkAddress();
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class IPRange {
 	 * @throws UnknownHostException if some parameters are invalid.
 	 */
 	public IPRange(IPNet ipnet) throws UnknownHostException {
-		_ipFirst = ipnet.hostAddress();
+		_ipFirst = ipnet.networkAddress();
 		_ipLast = ipnet.lastNetworkAddress();
 	}
 
@@ -58,10 +58,11 @@ public class IPRange {
 	 * @throws UnknownHostException if some parameters are invalid.
 	 */
 	public IPRange(IPNet ipnet, boolean includeLastAddress) throws UnknownHostException {
-		_ipFirst = ipnet.hostAddress();
+		_ipFirst = ipnet.networkAddress();
 		if (includeLastAddress) {
 			_ipLast = ipnet.lastNetworkAddress();
 		} else {
+			_ipLast = ipnet.lastNetworkAddress();
 			BigInteger lip = _ipLast.getIP();
 			lip = lip.subtract(BigInteger.ONE);
 			_ipLast = new IPNet(lip, ipnet.getIpVersion());
