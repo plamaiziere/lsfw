@@ -13,11 +13,14 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+
 /**
  * Checkpoint network object
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class CpNetworkObject {
+public abstract class CpNetworkObject {
 	protected String _name;
 	protected String _className;
 	protected String _comment;
@@ -47,4 +50,11 @@ public class CpNetworkObject {
 	public CpNetworkType getType() {
 		return _type;
 	}
+
+	/**
+	 * Returns the {@link MatchResult} of the given IP address.
+	 * @param ip IP address to test.
+	 * @return the MatchResult of the given IP address.
+	 */
+	public abstract MatchResult matches(IPNet ip);
 }
