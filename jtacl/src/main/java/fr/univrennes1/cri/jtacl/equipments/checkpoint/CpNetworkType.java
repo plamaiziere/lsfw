@@ -21,5 +21,6 @@ public enum CpNetworkType {
 	UNHANDLED,
 	IP,
 	RANGE,
-	GROUP;
+	GROUP,
+	ANY;
 }
