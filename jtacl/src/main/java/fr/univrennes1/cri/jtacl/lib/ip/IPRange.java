@@ -37,6 +37,41 @@ public class IPRange {
 		return _ipLast;
 	}
 
+/**
+	 * Checks if this range instance contains an {@link IPNet} object.<br/>
+	 * A range object contains another {@link IPNet} object if all the
+	 * IP addresses designated by the second {@link IPNet} object are included
+	 * in this range.
+	 * @param ipnet IPNet object to compare.
+	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
+	 * included in this instance.
+	 */
+	public final boolean contains(IPNet ipnet)
+			throws UnknownHostException {
+
+		IPNet firstOther = ipnet.networkAddress();
+		IPNet lastOther = ipnet.lastNetworkAddress();
+
+		return firstOther.isBetweenIP(_ipFirst, _ipLast) &&
+				lastOther.isBetweenIP(_ipFirst, _ipLast);
+	}
+
+	/**
+	 * Checks if this range instance overlaps the IPNet object in
+	 * argument. The range overlaps if they share at least one IP address.
+	 * @param ipnet IPNet object to compare.
+	 * @return true if this range instance overlaps the IPNet object in argument.
+	 */
+	public final boolean overlaps(IPNet ipnet) throws UnknownHostException {
+		IPNet firstOther = ipnet.networkAddress();
+		IPNet lastOther = ipnet.lastNetworkAddress();
+
+		return _ipFirst.isBetweenIP(firstOther, lastOther) ||
+				_ipLast.isBetweenIP(firstOther, lastOther) ||
+				firstOther.isBetweenIP(_ipFirst, _ipLast) ||
+				lastOther.isBetweenIP(_ipFirst, _ipLast);
+	}
+
 	@Override
 	public String toString() {
 		return _ipFirst.toString("i::") + "-" + _ipLast.toString("i::");
