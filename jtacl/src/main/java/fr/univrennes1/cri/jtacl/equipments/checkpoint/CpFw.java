@@ -34,6 +34,7 @@ import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -117,6 +118,11 @@ public class CpFw extends GenericEquipment {
 	 */
 	protected HashMap<String, CpNetworkObject> _networkObjects
 			= new HashMap<String, CpNetworkObject>();
+
+	/*
+	 * firewall rules
+	 */
+	protected LinkedList <CpFwRule> _fwRules = new LinkedList<CpFwRule>();
 
 	/**
 	 * IPNet cross references
@@ -585,6 +591,121 @@ public class CpFw extends GenericEquipment {
 		}
 	}
 
+	protected CpFwServicesSpec parseFwServicesSpec(Element e) {
+
+		CpFwServicesSpec servicesSpec = new CpFwServicesSpec();
+		/*
+		 * members/reference
+		 */
+		List<Element> members = XMLUtils.getDirectChildren(e, "members");
+		List<Element> references
+				= XMLUtils.getDirectChildren(members.get(0), "reference");
+
+		for (Element ref: references) {
+			String refName = XMLUtils.getTagValue(ref, "Name");
+			CpService service = _services.get(refName);
+			if (service == null) {
+				warnConfig("unknown service object: " + refName, true);
+				continue;
+			}
+			servicesSpec.addReference(refName, service);
+		}
+		return servicesSpec;
+	}
+
+	protected CpFwIpSpec parseFwIpSpec(Element e) {
+
+		CpFwIpSpec ipSpec = new CpFwIpSpec();
+		/*
+		 * members/reference
+		 */
+		List<Element> members = XMLUtils.getDirectChildren(e, "members");
+		List<Element> references
+				= XMLUtils.getDirectChildren(members.get(0), "reference");
+
+		for (Element ref: references) {
+			String refName = XMLUtils.getTagValue(ref, "Name");
+			CpNetworkObject nobj = _networkObjects.get(refName);
+			if (nobj == null) {
+				warnConfig("unknown network object: " + refName, true);
+				continue;
+			}
+			ipSpec.addReference(refName, nobj);
+		}
+		return ipSpec;
+	}
+
+	protected CpFwRule parseFwRule(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+		String sRuleNumber = XMLUtils.getTagValue(e, "Rule_Number");
+		String sDisabled = XMLUtils.getTagValue(e, "disabled");
+
+		List<Element> sources = XMLUtils.getDirectChildren(e, "src");
+		List<Element> dsts = XMLUtils.getDirectChildren(e, "dst");
+		List<Element> services = XMLUtils.getDirectChildren(e, "services");
+		/*
+		 * sanity checks
+		 */
+		if (sRuleNumber == null || sDisabled == null ||sources == null
+			|| dsts == null || sources.isEmpty() || dsts.isEmpty()
+			|| services == null || services.isEmpty()) {
+			warnConfig("cannot parse rule", true);
+			return null;
+		}
+
+		Element source = sources.get(0);
+		CpFwIpSpec srcIpSpec = parseFwIpSpec(source);
+
+		Element dst = dsts.get(0);
+		CpFwIpSpec dstIpSpec = parseFwIpSpec(dst);
+
+		Element service = services.get(0);
+		CpFwServicesSpec servicesSpec = parseFwServicesSpec(service);
+
+		Integer rNumber = Integer.parseInt(sRuleNumber);
+		Boolean disabled = Boolean.parseBoolean(sDisabled);
+
+		CpFwRule fwrule = new CpFwRule(sName, sClassName, sComment, rNumber,
+				disabled, srcIpSpec, dstIpSpec, servicesSpec);
+
+		return fwrule;
+	}
+
+	protected void loadFwRules(String filename) {
+		Document doc = XMLUtils.getXMLDocument(filename);
+		doc.getDocumentElement().normalize();
+
+		_parseContext = new ParseContext();
+		CpNetworkObject networkObj;
+
+		Element root = doc.getDocumentElement();
+		/*
+		 * fw_policies/fw_policie/rule/rule
+		 */
+		List<Element> policie = XMLUtils.getDirectChildren(root, "fw_policie");
+		List<Element> rule = XMLUtils.getDirectChildren(policie.get(0), "rule");
+		List<Element> rules = XMLUtils.getDirectChildren(rule.get(0), "rule");
+
+		int i = 0;
+		for (Element e: rules) {
+			_parseContext.set(filename, i,
+				StringTools.stripWhiteSpacesCrLf(e.getTextContent()));
+			String className = XMLUtils.getTagValue(e, "Class_Name");
+			CpFwRule fwRule = null;
+			if (className.equalsIgnoreCase("security_rule"))
+				fwRule = parseFwRule(e);
+
+			if (fwRule != null ) {
+				_fwRules.add(fwRule);
+			}
+			if (fwRule != null && Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("CpFwRule: " + fwRule);
+			}
+		}
+	}
+
 	protected void loadConfiguration(Document doc) {
 
 		/* services */
@@ -628,7 +749,7 @@ public class CpFw extends GenericEquipment {
 			String filename = e.getAttribute("filename");
 			if (filename.isEmpty())
 				throw new JtaclConfigurationException("Missing fwpolicies file name");
-			/* TODO parse file */
+			loadFwRules(filename);
 			famAdd(filename);
 		}
 	}
