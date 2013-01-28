@@ -13,7 +13,11 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import java.net.UnknownHostException;
 
 /**
  * Checkpoint IP network range
@@ -48,5 +52,20 @@ public class CpNetworkRange extends CpNetworkObject {
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
 				+ ", IPRange=" + _ipRange;
+	}
+
+	@Override
+	public MatchResult matches(IPNet ip) {
+		try {
+			if (_ipRange.contains(ip))
+				return MatchResult.ALL;
+			if (_ipRange.overlaps(ip))
+				return MatchResult.MATCH;
+			return MatchResult.NOT;
+		} catch (UnknownHostException ex) {
+			// should not happen
+			throw new JtaclInternalException("unexpected exception: "
+				+ ex.getMessage());
+		}
 	}
 }
