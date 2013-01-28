@@ -13,6 +13,9 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+
 /**
  * Checkpoint IP network "ANY" object
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -34,5 +37,10 @@ public class CpNetworkAny extends CpNetworkObject {
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type;
+	}
+
+	@Override
+	public MatchResult matches(IPNet ip) {
+		return MatchResult.ALL;
 	}
 }
