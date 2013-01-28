@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,4 +76,40 @@ public class CpNetworkGroup extends CpNetworkObject {
 				+ getExcludedReferencesName();
 	}
 
+	@Override
+	public MatchResult matches(IPNet ip) {
+		/*
+		 * excluded items
+		 */
+		int mayexcluded = 0;
+		for (CpNetworkObject nobject: _excludedObjects.values()) {
+			MatchResult mres = nobject.matches(ip);
+			if (mres == MatchResult.ALL)
+				return MatchResult.NOT;
+			if (mres != MatchResult.NOT)
+				mayexcluded++;
+		}
+		/*
+		 * base items
+		 */
+		int mayincluded = 0;
+		int all = 0;
+		for (CpNetworkObject nobject: _baseObjects.values()) {
+			MatchResult mres = nobject.matches(ip);
+			if (mres == MatchResult.ALL) {
+				all++;
+				continue;
+			}
+			if (mres != MatchResult.NOT) {
+				mayincluded++;
+				continue;
+			}
+		}
+		if (all > 0) {
+			return mayexcluded == 0 ? MatchResult.ALL : MatchResult.MATCH;
+		}
+		if (mayincluded == 0)
+			return MatchResult.NOT;
+		return MatchResult.MATCH;
+	}
 }
