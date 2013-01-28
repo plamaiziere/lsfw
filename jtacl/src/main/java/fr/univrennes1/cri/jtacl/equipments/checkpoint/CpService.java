@@ -13,14 +13,11 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-
 /**
  * Checkpoint service object
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public abstract class CpService {
+public class CpService {
 	protected String _name;
 	protected String _className;
 	protected String _comment;
@@ -67,10 +64,4 @@ public abstract class CpService {
 		return _type == CpServiceType.ICMP;
 	}
 
-	/**
-	 * Checks if the portSpec in argument matches this service object.
-	 * @param port portSpec to check
-	 * @return the MatchResult of the given portSpec
-	 */
-	public abstract MatchResult matches(PortSpec port);
 }
