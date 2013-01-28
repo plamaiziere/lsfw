@@ -104,7 +104,7 @@ public class XMLUtils {
 			child = child.getNextSibling()) {
 			if (child.getNodeType() == Node.ELEMENT_NODE ) {
 				String nodeName = child.getNodeName();
-				if (tag.equalsIgnoreCase(nodeName)) {
+				if (tag.equals(nodeName)) {
 					list.add((Element)child);
 				}
 			}
