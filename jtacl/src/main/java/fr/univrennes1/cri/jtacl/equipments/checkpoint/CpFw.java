@@ -745,6 +745,12 @@ public class CpFw extends GenericEquipment {
 			throw new JtaclConfigurationException(
 					"At least one network_object file must be specified");
 		}
+		/*
+		 *  ANY network object.
+		 */
+		CpNetworkObject any = new CpNetworkAny("Any", "ANY_object", "any network object");
+		_networkObjects.put("Any", any);
+		
 		for (int i = 0; i < list.getLength(); i++) {
 			Element e = (Element) list.item(i);
 			String filename = e.getAttribute("filename");
