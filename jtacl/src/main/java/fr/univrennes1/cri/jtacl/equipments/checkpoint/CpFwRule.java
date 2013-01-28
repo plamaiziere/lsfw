@@ -71,10 +71,6 @@ public class CpFwRule {
 		return _services;
 	}
 
-	public void setServices(CpFwServicesSpec _services) {
-		this._services = _services;
-	}
-
 	/**
 	 * Construct a new fw rule
 	 * @param name name
@@ -85,11 +81,12 @@ public class CpFwRule {
 	 * @param srcIpSpec source IP specification
 	 * @param dstIpSpec destination IP specification
 	 * @param servicesSpec services specification
+	 * @param action action class name
 	 */
 	public CpFwRule(String name, String className, String comment,
 			Integer number, boolean disabled,
 			CpFwIpSpec srcIpSpec, CpFwIpSpec dstIpSpec,
-			CpFwServicesSpec servicesSpec) {
+			CpFwServicesSpec servicesSpec, String action) {
 		_name = name;
 		_className = className;
 		_comment = comment;
@@ -98,6 +95,7 @@ public class CpFwRule {
 		_sourceIp = srcIpSpec;
 		_destIp = dstIpSpec;
 		_services = servicesSpec;
+		_action = action;
 	}
 
 	@Override
