@@ -31,12 +31,11 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Shell probe command.
@@ -202,9 +201,9 @@ public class ProbeCommand {
 				 * if tcp or udp we want to match ip too.
 				 */
 				if (sourceAddress.isIPv4())
-					protocols.add(ipProtocols.IP());
+					protocols.add(Protocols.IP);
 				else
-					protocols.add(ipProtocols.IPV6());
+					protocols.add(Protocols.IPV6);
 
 				/*
 				 * services lookup, by default "any"
@@ -260,10 +259,10 @@ public class ProbeCommand {
 			 */
 			if (sprotocol.equalsIgnoreCase("ip") ||
 					sprotocol.equalsIgnoreCase("ipv6")) {
-				protocols.add(ipProtocols.TCP());
-				protocols.add(ipProtocols.UDP());
-				protocols.add(ipProtocols.ICMP());
-				protocols.add(ipProtocols.ICMP6());
+				protocols.add(Protocols.TCP);
+				protocols.add(Protocols.UDP);
+				protocols.add(Protocols.ICMP);
+				protocols.add(Protocols.ICMP6);
 			}
 
 			/*
