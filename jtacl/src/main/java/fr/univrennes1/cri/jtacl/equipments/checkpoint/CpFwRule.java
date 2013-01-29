@@ -107,4 +107,19 @@ public class CpFwRule {
 				+ " services=" + _services;
 	}
 
+	public String toText() {
+		String s = "N°: " + _number;
+		if (_name != null)
+			s+= "; name: " + _name;
+
+		s += "; from: " +
+			_sourceIp.getNetworks().getBaseReferencesName() +
+			"; to: " + _destIp.getNetworks().getBaseReferencesName() +
+			"; services: " + _services.getServices().getReferencesName() +
+			"; action: " + _action;
+		if (_comment != null)
+			s+= "; # "	+ _comment;
+		return s;
+	}
+
 }
