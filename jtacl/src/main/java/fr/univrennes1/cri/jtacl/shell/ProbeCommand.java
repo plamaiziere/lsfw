@@ -261,8 +261,10 @@ public class ProbeCommand {
 					sprotocol.equalsIgnoreCase("ipv6")) {
 				protocols.add(Protocols.TCP);
 				protocols.add(Protocols.UDP);
-				protocols.add(Protocols.ICMP);
-				protocols.add(Protocols.ICMP6);
+				if (!sprotocol.equalsIgnoreCase("ipv6"))
+					protocols.add(Protocols.ICMP);
+				else
+					protocols.add(Protocols.ICMP6);
 			}
 
 			/*
