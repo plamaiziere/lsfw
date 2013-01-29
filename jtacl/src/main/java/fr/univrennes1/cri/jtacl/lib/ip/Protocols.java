@@ -26,16 +26,6 @@ import java.util.ArrayList;
  */
 public class Protocols extends ArrayList<IPProtoEnt> {
 
-	/*
-	 * Common protocols
-	 */
-	protected int _ip;
-	protected int _ipv6;
-	protected int _icmp;
-	protected int _icmp6;
-	protected int _tcp;
-	protected int _udp;
-
 	/**
 	 * Strip comment ("#") from the string in argument.
 	 * @param str String to strip.
@@ -127,15 +117,6 @@ public class Protocols extends ArrayList<IPProtoEnt> {
 			add(ent);
 		}
 
-		/*
-		 * common protocols
-		 */
-		_ip = protocolLookup("ip");
-		_ipv6 = protocolLookup("ipv6");
-		_icmp = protocolLookup("icmp");
-		_icmp6 = protocolLookup("icmp6");
-		_tcp = protocolLookup("tcp");
-		_udp = protocolLookup("udp");
 	}
 
 	/**
@@ -161,51 +142,33 @@ public class Protocols extends ArrayList<IPProtoEnt> {
 	}
 
 	/**
-	 * Value for IP;
-	 * @return the value for the protocol IP.
+	 * value for IP
 	 */
-	public int IP() {
-		return _ip;
-	}
+	public static int IP = 0;
 
 	/**
-	 * Value for IPv6;
-	 * @return the value for the protocol IPv6.
+	 * value for IPv6
 	 */
-	public int IPV6() {
-		return _ipv6;
-	}
+	public static int IPV6 = 41;
 
 	/**
-	 * Value for ICMP;
-	 * @return the value for the protocol ICMP.
+	 * value for ICMP
 	 */
-	public int ICMP() {
-		return _icmp;
-	}
+	public static int ICMP = 1;
 
 	/**
-	 * Value for ICMP6;
-	 * @return the value for the protocol ICMP6.
+	 * value for ICMP6
 	 */
-	public int ICMP6() {
-		return _icmp6;
-	}
+	public static int ICMP6 = 58;
 
 	/**
-	 * Value for TCP;
-	 * @return the value for the protocol TCP.
+	 * value for TCP
 	 */
-	public int TCP() {
-		return _tcp;
-	}
+	public static int TCP = 6;
 
 	/**
-	 * Value for UDP;
-	 * @return the value for the protocol UDP.
+	 * value for UDP;
 	 */
-	public int UDP() {
-		return _udp;
-	}
+	public static int UDP = 17;
 
 }
