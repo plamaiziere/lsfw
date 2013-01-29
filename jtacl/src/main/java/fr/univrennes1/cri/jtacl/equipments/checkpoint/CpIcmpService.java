@@ -13,8 +13,12 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * Checkpoint ICMP service object
@@ -64,5 +68,38 @@ public class CpIcmpService extends CpService {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
 				+ ", " + _af + ", " + _icmp;
 	}
+
+	@Override
+	public MatchResult matches(ProbeRequest request) {
+
+		ProtocolsSpec reqProto = request.getProtocols();
+
+		/*
+		 * address family
+		 */
+		if (_af == AddressFamily.INET && !reqProto.contains(Protocols.ICMP))
+			return MatchResult.NOT;
+
+		if (_af == AddressFamily.INET6 && !reqProto.contains(Protocols.ICMP6))
+			return MatchResult.NOT;
+
+		/*
+		 * icmp type and code
+		 */
+		Integer icmpType = request.getSubType();
+		if (icmpType == null)
+			return MatchResult.ALL;
+		if (icmpType != _icmp.getIcmp())
+			return MatchResult.NOT;
+
+		Integer icmpCode = request.getCode();
+		if (icmpCode == null)
+			return MatchResult.ALL;
+		if (icmpCode == _icmp.getCode())
+			return MatchResult.ALL;
+
+		return MatchResult.NOT;
+	}
+
 
 }
