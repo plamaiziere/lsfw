@@ -67,6 +67,11 @@ public abstract class CpService {
 		return _type == CpServiceType.ICMP;
 	}
 
+	/**
+	 * Returns the {@link MatchResult} of the given {@link ProbeRequest}.
+	 * @param request request to test.
+	 * @return the MatchResult of the given ProbeRequest.
+	 */
 	public abstract MatchResult matches(ProbeRequest request);
 
 }
