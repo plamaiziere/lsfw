@@ -35,6 +35,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
@@ -1181,7 +1182,7 @@ public class CiscoRouter extends GenericEquipment {
 	Integer aceCode = ace.getCode();
 
 	if (reqProto != null &&
-			reqProto.contains(_ipProtocols.ICMP())) {
+			reqProto.contains(Protocols.ICMP)) {
 		if (reqSubType != null) {
 
 			/*
