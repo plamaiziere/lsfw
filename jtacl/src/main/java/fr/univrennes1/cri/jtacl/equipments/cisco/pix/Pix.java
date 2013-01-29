@@ -15,25 +15,26 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
-import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
-import fr.univrennes1.cri.jtacl.core.probing.Probe;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
+import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
@@ -710,8 +711,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				protocol = parser.getProtocol();
 				ProtocolsSpec protos = new ProtocolsSpec();
 				if (protocol.equalsIgnoreCase("tcp-udp")) {
-					protos.add(_ipProtocols.UDP());
-					protos.add(_ipProtocols.TCP());
+					protos.add(Protocols.UDP);
+					protos.add(Protocols.TCP);
 					protocol = "tcp";
 				} else {
 					protos.add(parseProtocol(protocol));
@@ -1563,7 +1564,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		IcmpObjectGroup aclIcmpGroup = acl.getIcmpGroup();
 
 		if (reqProto != null &&
-				reqProto.contains(_ipProtocols.ICMP())) {
+				reqProto.contains(Protocols.ICMP)) {
 			if (reqSubType != null) {
 				/*
 				 * icmp type
