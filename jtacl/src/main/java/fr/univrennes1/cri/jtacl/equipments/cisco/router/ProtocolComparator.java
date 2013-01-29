@@ -13,7 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
-import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ public class ProtocolComparator {
 	 * @return true if the protocol matches the list of protocols in argument.
 	 */
 	public static boolean matches(List<Integer> protocols, int protocol) {
-		if (protocol == IPProtocols.getInstance().IP())
+		if (protocol == Protocols.IP)
 			return true;
 
 		return protocols.contains(protocol);
