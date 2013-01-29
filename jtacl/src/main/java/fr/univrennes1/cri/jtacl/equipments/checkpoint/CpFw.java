@@ -21,7 +21,11 @@ import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
+import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
@@ -1051,11 +1055,95 @@ public class CpFw extends GenericEquipment {
 		}
 	}
 
+	protected MatchResult ruleFilter(Probe probe, CpFwRule rule) {
+
+		ProbeRequest request = probe.getRequest();
+		/*
+		 * check source IP
+		 */
+		CpFwIpSpec ipspec = rule.getSourceIp();
+		MatchResult mIpSource =
+			ipspec.getNetworks().matches(probe.getSourceAddress());
+		if (mIpSource == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		/*
+		 * check destination IP
+		 */
+		ipspec = rule.getDestIp();
+		MatchResult mIpDest =
+			ipspec.getNetworks().matches(probe.getDestinationAddress());
+		if (mIpDest == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		/*
+		 * check services
+		 */
+		MatchResult mService;
+		if (request.getProtocols() != null) {
+			CpFwServicesSpec services = rule.getServices();
+			mService = services.getServices().matches(request);
+			if (mService == MatchResult.NOT)
+				return MatchResult.NOT;
+		} else {
+			mService = MatchResult.ALL;
+		}
+
+		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
+				mService == MatchResult.ALL)
+			return MatchResult.ALL;
+
+		return MatchResult.MATCH;
+	}
+
+
 	/**
 	 * Packet filter
 	 */
 	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
-		//TODO
+
+		String ifaceName = link.getIfaceName();
+		String ifaceComment = link.getIface().getComment();
+		ProbeResults results = probe.getResults();
+		boolean first = true;
+
+		/*
+		 * check each rule
+		 */
+		MatchResult match;
+		for (CpFwRule rule: _fwRules) {
+			match = ruleFilter(probe, rule);
+			if (match != MatchResult.NOT) {
+				/*
+				 * store the result in the probe
+				 */
+				AclResult aclResult = new AclResult();
+				aclResult.setResult(rule.getAction().equals("accept_action") ?
+					AclResult.ACCEPT : AclResult.DENY);
+				if (match != MatchResult.ALL)
+					aclResult.addResult(AclResult.MAY);
+
+				results.addMatchingAcl(direction, rule.toText(),
+					aclResult);
+
+				results.setInterface(direction,
+					ifaceName + " (" + ifaceComment + ")");
+
+
+				/*
+				 * the active ace is the ace accepting or denying the packet.
+				 * this is the first ace that match the packet.
+				 */
+				if (first) {
+						results.addActiveAcl(direction,
+								rule.toText(),
+								aclResult);
+					results.setAclResult(direction,
+							aclResult);
+					first = false;
+				}
+			}
+		}
 	}
 
 
