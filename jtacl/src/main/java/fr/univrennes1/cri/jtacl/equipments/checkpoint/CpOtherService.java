@@ -15,6 +15,8 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * Checkpoint other service object
@@ -72,9 +74,22 @@ public class CpOtherService extends CpService {
 
 	@Override
 	public MatchResult matches(ProbeRequest request) {
-		//TODO
-		return MatchResult.NOT;
 
+		ProtocolsSpec reqProto = request.getProtocols();
+
+		/*
+		 * protocol
+		 */
+		if (!reqProto.contains(_protocol))
+			return MatchResult.NOT;
+
+		/*
+		 * we don't handle the "exp" expression
+		 */
+		if (_exp == null)
+			return MatchResult.ALL;
+
+		return MatchResult.UNKNOWN;
 	}
 
 
