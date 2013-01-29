@@ -13,27 +13,23 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Checkpoint IP specification firewall rule
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpFwIpSpec {
-	protected Map <String, CpNetworkObject> _networks
-			= new HashMap<String, CpNetworkObject>();
+	protected CpNetworkGroup _networks = new CpNetworkGroup("", "", "");
 
-	public Map<String, CpNetworkObject> getNetworks() {
+	public CpNetworkGroup getNetworks() {
 		return _networks;
 	}
 
 	public void addReference(String name, CpNetworkObject networkObject) {
-		_networks.put(name, networkObject);
+		_networks.addBaseReference(name, networkObject);
 	}
 
 	@Override
 	public String toString() {
-		return "" + _networks.keySet();
+		return "" + _networks.getBaseReferencesName();
 	}
 }
