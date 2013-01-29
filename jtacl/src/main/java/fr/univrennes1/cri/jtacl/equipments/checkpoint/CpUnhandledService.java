@@ -13,6 +13,9 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+
 /**
  * Checkpoint service left unhandled by lsfw
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -33,6 +36,11 @@ public class CpUnhandledService extends CpService {
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type;
+	}
+
+	@Override
+	public MatchResult matches(ProbeRequest request) {
+		return MatchResult.UNKNOWN;
 	}
 
 }
