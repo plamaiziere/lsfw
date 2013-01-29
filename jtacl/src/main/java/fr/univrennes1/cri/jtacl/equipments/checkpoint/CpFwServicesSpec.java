@@ -13,28 +13,25 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Checkpoint service specification firewall rule
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpFwServicesSpec {
-	protected Map <String, CpService> _services
-			= new HashMap<String, CpService>();
 
-	public Map<String, CpService> getServices() {
+	protected CpGroupService _services = new CpGroupService("", "");
+
+	public CpGroupService getServices() {
 		return _services;
 	}
 
 	public void addReference(String name, CpService service) {
-		_services.put(name, service);
+		_services.addReference(name, service);
 	}
 
 	@Override
 	public String toString() {
-		return "" + _services.keySet();
+		return _services.toString();
 	}
 
 }
