@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +54,29 @@ public class CpGroupService extends CpService {
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
 				+ ", services=" + getReferencesName();
+	}
+
+	@Override
+	public MatchResult matches(ProbeRequest request) {
+		int match = 0;
+		int unknown = 0;
+
+		for (CpService service: _services.values()) {
+			MatchResult mres = service.matches(request);
+			if (mres == MatchResult.ALL)
+				return MatchResult.ALL;
+			if (mres == MatchResult.MATCH)
+				match++;
+			if (mres == MatchResult.UNKNOWN)
+				unknown++;
+		}
+
+		if (match > 0 )
+			return MatchResult.MATCH;
+		if (unknown > 0)
+			return MatchResult.UNKNOWN;
+
+		return MatchResult.NOT;
 	}
 
 }
