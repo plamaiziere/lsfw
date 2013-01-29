@@ -28,7 +28,6 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
@@ -888,35 +887,6 @@ public class CpFw extends GenericEquipment {
 			throwCfgException("invalid IP address: " + ex.getMessage(), true);
 		}
 		return ipnet;
-	}
-
-	protected int parseService(String service, String protocol) {
-
-		int port = _ipServices.serviceLookup(service, protocol);
-		if (port == -1)
-			throwCfgException("unknown service", true);
-		return port;
-	}
-
-	protected int parseProtocol(String protocol) {
-		int proto = _ipProtocols.protocolLookup(protocol);
-		if (proto == -1)
-			throwCfgException("unknown protocol", true);
-		return proto;
-	}
-
-	protected IPIcmpEnt parseIcmp4(String icmpName) {
-		IPIcmpEnt icmp = _ipIcmp4Types.icmpLookup(icmpName);
-		if (icmp == null)
-			throwCfgException("unknown icmp-type or message", true);
-		return icmp;
-	}
-
-	protected IPIcmpEnt parseIcmp6(String icmpName) {
-		IPIcmpEnt icmp = _ipIcmp6Types.icmpLookup(icmpName);
-		if (icmp == null)
-			throwCfgException("unknown icmp-type or message", true);
-		return icmp;
 	}
 
 	@Override
