@@ -112,4 +112,49 @@ public class XMLUtils {
 		return list;
 	}
 
+	/**
+	 * Returns a text representation of the XML element e
+	 * @param indent level of indentation
+	 * @param e element to output
+	 * @return a text representation of the XML element e
+	 */
+	public static String elementToText(int indent, Element e) {
+
+		String s = "";
+		String name = e.getNodeName();
+		for (int i = 0; i < indent; i++)
+			s += "\t";
+		s += "<" + name + ">";
+		s += "\n";
+		NodeList nlist = e.getChildNodes();
+		if (nlist != null && nlist.getLength() > 0) {
+			String v = "" + e.getChildNodes().item(0).getNodeValue();
+			if (!v.equals("null")) {
+				for (int i = 0; i < indent + 1; i++)
+					s += "\t";
+				s += v;
+				s += "\n";
+			}
+		}
+		for (Node child = e.getFirstChild(); child != null;
+			child = child.getNextSibling()) {
+			if (child.getNodeType() == Node.ELEMENT_NODE ) {
+				s += elementToText(indent + 1, (Element) child);
+			}
+		}
+		for (int i = 0; i < indent; i++)
+			s += "\t";
+		s += "</" + name + ">\n";
+		return s;
+	}
+
+	/**
+	 * Returns a text representation of the XML element e
+	 * @param e element to output
+	 * @return a text representation of the XML element e
+	 */
+	public static String elementToText(Element e) {
+		return elementToText(0, e);
+	}
+
 }
