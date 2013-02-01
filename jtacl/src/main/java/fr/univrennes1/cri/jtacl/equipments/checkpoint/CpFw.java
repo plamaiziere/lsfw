@@ -32,7 +32,6 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
-import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -706,7 +705,6 @@ public class CpFw extends GenericEquipment {
 		doc.getDocumentElement().normalize();
 
 		_parseContext = new ParseContext();
-		CpNetworkObject networkObj;
 
 		Element root = doc.getDocumentElement();
 		/*
