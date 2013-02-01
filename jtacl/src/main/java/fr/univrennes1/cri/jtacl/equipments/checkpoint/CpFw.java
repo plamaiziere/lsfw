@@ -462,8 +462,7 @@ public class CpFw extends GenericEquipment {
 		List<Element> list = XMLUtils.getDirectChildren(root, "service");
 		int i = 0;
 		for (Element e: list) {
-			_parseContext.set(filename, i,
-				StringTools.stripWhiteSpacesCrLf(e.getTextContent()));
+			_parseContext.set(filename, i, XMLUtils.elementToText(e));
 			String className = XMLUtils.getTagValue(e, "Class_Name");
 			service = null;
 			if (className.equalsIgnoreCase("tcp_service"))
@@ -533,8 +532,7 @@ public class CpFw extends GenericEquipment {
 		List<Element> list = XMLUtils.getDirectChildren(root, "network_object");
 		int i = 0;
 		for (Element e: list) {
-			_parseContext.set(filename, i,
-				StringTools.stripWhiteSpacesCrLf(e.getTextContent()));
+			_parseContext.set(filename, i, XMLUtils.elementToText(e));
 			String className = XMLUtils.getTagValue(e, "Class_Name");
 			networkObj = null;
 			if (className.equalsIgnoreCase("host_plain"))
@@ -720,8 +718,7 @@ public class CpFw extends GenericEquipment {
 
 		int i = 0;
 		for (Element e: rules) {
-			_parseContext.set(filename, i,
-				StringTools.stripWhiteSpacesCrLf(e.getTextContent()));
+			_parseContext.set(filename, i, XMLUtils.elementToText(e));
 			String className = XMLUtils.getTagValue(e, "Class_Name");
 			CpFwRule fwRule = null;
 			if (className.equalsIgnoreCase("security_rule"))
