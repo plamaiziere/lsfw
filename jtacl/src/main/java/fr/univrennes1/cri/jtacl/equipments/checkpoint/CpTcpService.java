@@ -40,7 +40,7 @@ public class CpTcpService extends CpService {
 	 * TCP flags / TCP flagsSet
 	 */
 	TcpFlags _tcpFlags = new TcpFlags("S");
-	TcpFlags _tcpFlagSet = new TcpFlags("A");
+	TcpFlags _tcpFlagSet = new TcpFlags("SA");
 
 	/**
 	 * Construct a new checkpoint TCP service
