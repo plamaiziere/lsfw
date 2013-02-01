@@ -15,9 +15,11 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 
 /**
  * Checkpoint TCP service object
@@ -33,6 +35,12 @@ public class CpTcpService extends CpService {
 
 	/* included in "Any" service */
 	protected boolean _inAny;
+
+	/*
+	 * TCP flags / TCP flagsSet
+	 */
+	TcpFlags _tcpFlags = new TcpFlags("S");
+	TcpFlags _tcpFlagSet = new TcpFlags("A");
 
 	/**
 	 * Construct a new checkpoint TCP service
@@ -82,6 +90,14 @@ public class CpTcpService extends CpService {
 		 * protocol
 		 */
 		if (!reqProto.contains(Protocols.TCP))
+			return MatchResult.NOT;
+
+		/*
+		 * TCP flags
+		 */
+		ProbeTcpFlags reqFlags = request.getTcpFlags();
+
+		if (reqFlags != null && !reqFlags.matchAllWithout(_tcpFlags, _tcpFlagSet))
 			return MatchResult.NOT;
 
 		/*
