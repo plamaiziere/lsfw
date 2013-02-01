@@ -69,6 +69,14 @@ public class CpNetworkGroup extends CpNetworkObject {
 		return new LinkedList<String>(_excludedObjects.keySet());
 	}
 
+	public HashMap<String, CpNetworkObject> getBaseObjects() {
+		return _baseObjects;
+	}
+
+	public HashMap<String, CpNetworkObject> getExcludedObjects() {
+		return _excludedObjects;
+	}
+	
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
