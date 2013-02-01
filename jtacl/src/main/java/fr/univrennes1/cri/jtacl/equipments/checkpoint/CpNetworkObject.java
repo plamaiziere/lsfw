@@ -15,6 +15,8 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Checkpoint network object
@@ -25,6 +27,8 @@ public abstract class CpNetworkObject {
 	protected String _className;
 	protected String _comment;
 	protected CpNetworkType _type;
+	protected List<Object> _linkedTo =
+		new LinkedList<Object>();
 
 	public CpNetworkObject(String name, String className, String comment,
 			CpNetworkType type) {
@@ -33,6 +37,16 @@ public abstract class CpNetworkObject {
 		_className = className;
 		_comment = comment;
 		_type = type;
+	}
+
+	public List<Object> getLinkedTo() {
+		return _linkedTo;
+	}
+
+	public void linkWith(Object nobj) {
+		if (!_linkedTo.contains(nobj)) {
+			_linkedTo.add(nobj);
+		}
 	}
 
 	public String getName() {
