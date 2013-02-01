@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
@@ -584,6 +585,7 @@ public class CpFw extends GenericEquipment {
 							+ objectName + " to member: " + refName, false);
 				} else {
 					group.addBaseReference(refName, ref);
+					ref.linkWith(group);
 				}
 			}
 			/*
@@ -597,6 +599,7 @@ public class CpFw extends GenericEquipment {
 							+ " to excluded member: " + refName, false);
 				} else {
 					group.addExcludedReference(refName, ref);
+					ref.linkWith(group);
 				}
 			}
 		}
@@ -696,6 +699,9 @@ public class CpFw extends GenericEquipment {
 
 		CpFwRule fwrule = new CpFwRule(sName, sClassName, sComment, rNumber,
 				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction);
+
+		srcIpSpec.linkTo(fwrule);
+		dstIpSpec.linkTo(fwrule);
 
 		return fwrule;
 	}
@@ -923,11 +929,54 @@ public class CpFw extends GenericEquipment {
 		return ref;
 	}
 
+	protected void crossRefNetworkLink(IPNetCrossRef ipNetRef,
+			Object obj) {
+
+		ParseContext pctxt = new ParseContext();
+		if (obj instanceof CpNetworkObject) {
+			CpNetworkObject nobj = (CpNetworkObject) obj;
+			pctxt.set(null, 0, nobj.toString());
+			CrossRefContext refContext =
+				new CrossRefContext(pctxt, nobj.getType().toString(),
+					nobj.getName(), null, 0);
+			ipNetRef.addContext(refContext);
+			for (Object linkobj: nobj.getLinkedTo()) {
+				crossRefNetworkLink(ipNetRef, linkobj);
+			}
+		}
+		if (obj instanceof CpFwRule) {
+			CpFwRule rule = (CpFwRule) obj;
+			pctxt.set(null, 0, rule.toText());
+			CrossRefContext refContext =
+				new CrossRefContext(pctxt, "rule", "", null, 0);
+			ipNetRef.addContext(refContext);
+
+		}
+	}
+
 	/**
 	 * Compute IPNet cross references
 	 */
 	protected void ipNetCrossReference() {
-		//TODO
+		/*
+		 * network object
+		 */
+		for (CpNetworkObject nobj: _networkObjects.values()) {
+			if (nobj.getType() != CpNetworkType.IP &&
+					nobj.getType() != CpNetworkType.RANGE)
+				continue;
+			IPNet ipnet = null;
+			switch (nobj.getType()) {
+				case IP	:	CpNetworkIP nip = (CpNetworkIP) nobj;
+							ipnet = nip.getIpAddress();
+							break;
+				case RANGE: CpNetworkRange nrange = (CpNetworkRange) nobj;
+							ipnet = nrange.getIpRange().getIpFirst();
+							break;
+			}
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ipnet);
+			crossRefNetworkLink(ipNetRef, nobj);
+		}
 	}
 
 	@Override
