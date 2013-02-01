@@ -28,6 +28,12 @@ public class CpFwIpSpec {
 		_networks.addBaseReference(name, networkObject);
 	}
 
+	public void linkTo(CpFwRule fwrule) {
+		for (CpNetworkObject nobj: _networks.getBaseObjects().values()) {
+			nobj.linkWith(fwrule);
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "" + _networks.getBaseReferencesName();
