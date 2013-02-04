@@ -19,6 +19,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.TreeMap;
 import org.parboiled.Parboiled;
+import org.parboiled.buffers.InputBuffer;
+import org.parboiled.errors.ParseError;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
@@ -88,6 +90,12 @@ public class PixShell extends GenericEquipmentShell {
 		ParsingResult<?> result = _parseRunner.run(command);
 
 		if (!result.matched) {
+			if (result.hasErrors()) {
+				ParseError error = result.parseErrors.get(0);
+				InputBuffer buf = error.getInputBuffer();
+				_outStream.println("Syntax error: " +
+					buf.extract(0, error.getStartIndex()));
+			}
 			return;
 		}
 

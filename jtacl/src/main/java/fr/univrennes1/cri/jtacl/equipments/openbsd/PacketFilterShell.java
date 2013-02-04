@@ -17,6 +17,8 @@ import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import java.io.PrintStream;
 import org.parboiled.Parboiled;
+import org.parboiled.buffers.InputBuffer;
+import org.parboiled.errors.ParseError;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 
@@ -49,6 +51,12 @@ public class PacketFilterShell extends GenericEquipmentShell {
 		ParsingResult<?> result = _parseRunner.run(command);
 
 		if (!result.matched) {
+			if (result.hasErrors()) {
+				ParseError error = result.parseErrors.get(0);
+				InputBuffer buf = error.getInputBuffer();
+				_outStream.println("Syntax error: " +
+					buf.extract(0, error.getStartIndex()));
+			}
 			return;
 		}
 
