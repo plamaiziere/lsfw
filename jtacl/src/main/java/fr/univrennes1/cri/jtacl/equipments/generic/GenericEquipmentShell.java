@@ -188,6 +188,8 @@ public abstract class GenericEquipmentShell {
 
 		String format = parser.getXrefFormat();
 		String fmt = parser.getXrefFmt();
+		if (format == null && fmt == null)
+			format = "s";
 		if (format != null) {
 			format = format.toLowerCase();
 			fmt = "%i";
