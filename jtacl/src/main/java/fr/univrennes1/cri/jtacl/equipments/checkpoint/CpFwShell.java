@@ -33,7 +33,7 @@ public class CpFwShell extends GenericEquipmentShell {
 
 	@Override
 	public void shellHelp(PrintStream output) {
-		printHelp(output, "/help/CpFw");
+		printHelp(output, "/help/checkpoint");
 	}
 
 	public CpFwShell(CpFw cpfw) {
