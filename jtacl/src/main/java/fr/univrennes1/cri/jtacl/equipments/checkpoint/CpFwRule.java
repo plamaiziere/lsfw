@@ -108,9 +108,6 @@ public class CpFwRule {
 	 * Construct a new fw rule (implicit drop)
 	 * @param name name
 	 * @param className class name
-	 * @param comment comment
-	 * @param srcIpSpec source IP specification
-	 * @param dstIpSpec destination IP specification
 	 */
 	public CpFwRule(String name, String className) {
 		_name = name;
