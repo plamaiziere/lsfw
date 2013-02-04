@@ -796,6 +796,10 @@ public class CpFw extends GenericEquipment {
 			famAdd(filename);
 		}
 
+		/* implicit drop rule */
+		CpFwRule fwdrop = new CpFwRule("implicit_drop", "");
+		_fwRules.add(fwdrop);
+
 		if (Log.debug().isLoggable(Level.INFO)) {
 			Log.debug().info("'Any' service: " + servAny.toString());
 		}
@@ -1072,6 +1076,19 @@ public class CpFw extends GenericEquipment {
 	protected MatchResult ruleFilter(Probe probe, CpFwRule rule) {
 
 		ProbeRequest request = probe.getRequest();
+
+		/*
+		 * implicit drop rule
+		 */
+		if (rule.isImplicitDrop())
+			return MatchResult.ALL;
+
+		/*
+		 * disabled
+		 */
+		if (rule.isDisabled())
+			return MatchResult.NOT;
+
 		/*
 		 * check source IP
 		 */
