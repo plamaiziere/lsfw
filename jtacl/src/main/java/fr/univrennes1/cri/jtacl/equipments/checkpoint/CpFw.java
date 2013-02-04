@@ -783,18 +783,16 @@ public class CpFw extends GenericEquipment {
 
 		/* fwpolicies */
 		list = doc.getElementsByTagName("fwpolicies");
-		if (list.getLength() < 1) {
+		if (list.getLength() != 1) {
 			throw new JtaclConfigurationException(
-				"At least one fwpolicies file must be specified");
+				"one fwpolicies file must be specified");
 		}
-		for (int i = 0; i < list.getLength(); i++) {
-			Element e = (Element) list.item(i);
-			String filename = e.getAttribute("filename");
-			if (filename.isEmpty())
-				throw new JtaclConfigurationException("Missing fwpolicies file name");
-			loadFwRules(filename);
-			famAdd(filename);
-		}
+		Element e = (Element) list.item(0);
+		String filename = e.getAttribute("filename");
+		if (filename.isEmpty())
+			throw new JtaclConfigurationException("Missing fwpolicies file name");
+		loadFwRules(filename);
+		famAdd(filename);
 
 		/* implicit drop rule */
 		CpFwRule fwdrop = new CpFwRule("implicit_drop", "");
