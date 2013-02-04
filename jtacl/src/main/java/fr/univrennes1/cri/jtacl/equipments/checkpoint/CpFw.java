@@ -34,6 +34,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
+import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,6 +135,8 @@ public class CpFw extends GenericEquipment {
 		return _netCrossRef;
 	}
 
+	CpFwShell _shell = new CpFwShell(this);
+
 	/**
 	 * Create a new {@link CpFw} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -143,8 +146,6 @@ public class CpFw extends GenericEquipment {
 	 */
 	public CpFw(Monitor monitor, String name, String comment, String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
-		CpFwShell shell = new CpFwShell(this);
-		registerShell(shell);
 	}
 
 	protected CpPortItem parsePort(String sPorts) {
@@ -1173,6 +1174,11 @@ public class CpFw extends GenericEquipment {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void runShell(String command, PrintStream output) {
+		_shell.shellCommand(command, output);
 	}
 
 

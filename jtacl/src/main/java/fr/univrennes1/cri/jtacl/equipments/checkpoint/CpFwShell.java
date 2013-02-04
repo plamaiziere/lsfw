@@ -43,28 +43,21 @@ public class CpFwShell extends GenericEquipmentShell {
 	}
 
 	@Override
-	public boolean shellCommand(String command, PrintStream output) {
+	public void shellCommand(String command, PrintStream output) {
 		_outStream = output;
 		_parseRunner.getParseErrors().clear();
 		ParsingResult<?> result = _parseRunner.run(command);
 
 		if (!result.matched) {
-			return false;
+			return;
 		}
 
 		String shellCmd = _shellParser.getCommand();
 
-		if (shellCmd.equals("help")) {
+		if (shellCmd.equals("help"))
 			shellHelp(_outStream);
-			return true;
-		}
-
-		if (shellCmd.equals("xref")) {
+		if (shellCmd.equals("xref"))
 			printXrefIp(_outStream, _cpfw.getNetCrossRef(), _shellParser);
-			return true;
-		}
-
-		return false;
 	}
 
 	@Override

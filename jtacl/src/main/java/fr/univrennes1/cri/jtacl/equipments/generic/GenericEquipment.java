@@ -35,7 +35,6 @@ import fr.univrennes1.cri.jtacl.lib.misc.KeyValue;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -212,13 +211,13 @@ public class GenericEquipment extends NetworkEquipment {
 		}
 
 		/*
-		 * null route 
+		 * null route
 		 */
 		if (snexthop.equalsIgnoreCase("null-route")) {
 			Route<IfaceLink> route = new Route<IfaceLink>(prefix);
 			return route;
 		}
-		
+
 		IPNet nexthop;
 		try {
 			nexthop = new IPNet(snexthop);
@@ -397,7 +396,7 @@ public class GenericEquipment extends NetworkEquipment {
 	protected void famAdd(String fileName) {
 		_fam.addFile(fileName);
 	}
-	
+
 	/**
 	 * Create a new {@link GenericEquipment} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -421,37 +420,6 @@ public class GenericEquipment extends NetworkEquipment {
 		return _routingEngine;
 	}
 
-	@Override
-	public void runShell(String command, PrintStream output) {
-
-		if (command.equalsIgnoreCase("help")) {
-			for (GenericEquipmentShell shell: _shells) {
-				shell.shellHelp(output);
-			}
-			return;
-		}
-
-		boolean cmdMatch = false;
-		for (GenericEquipmentShell shell: _shells) {
-			if (shell.shellCommand(command, output)) {
-				cmdMatch = true;
- 				break;
-			}
-		}
-
-		if (!cmdMatch) {
-			super.runShell(command, output);
-		}
-	}
-
-	/**
-	 * Registers the specified shell in argument.
-	 * @param shell shell to register.
-	 */
-	public void registerShell(GenericEquipmentShell shell) {
-		_shells.add(shell);
-	}
-
 	/**
 	 * Returns the file alteration monitor of this equipment.
 	 * @return the file alteration monitor of this equipment.
@@ -459,7 +427,7 @@ public class GenericEquipment extends NetworkEquipment {
 	public FilesMonitor getFam() {
 		return _fam;
 	}
-	
+
 	@Override
 	public boolean hasChanged() {
 		List<String> files = _fam.checkFiles();

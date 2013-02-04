@@ -42,6 +42,7 @@ import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -264,6 +265,8 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		return _netCrossRef;
 	}
 
+	protected PixShell _shell = new PixShell(this);
+
 	/**
 	 * Create a new {@link Pix} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -273,8 +276,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 */
 	public Pix(Monitor monitor, String name, String comment, String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
-		PixShell shell = new PixShell(this);
-		registerShell(shell);
 	}
 
 	protected void loadConfiguration(Document doc) {
@@ -1685,6 +1686,11 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void runShell(String command, PrintStream output) {
+		_shell.shellCommand(command, output);
 	}
 
 }

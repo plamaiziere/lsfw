@@ -82,26 +82,22 @@ public class PixShell extends GenericEquipmentShell {
 	}
 
 	@Override
-	public boolean shellCommand(String command, PrintStream output) {
+	public void shellCommand(String command, PrintStream output) {
 		_outStream = output;
 		_parseRunner.getParseErrors().clear();
 		ParsingResult<?> result = _parseRunner.run(command);
 
 		if (!result.matched) {
-			return false;
+			return;
 		}
 
 		String shellCmd = _shellParser.getCommand();
 
-		if (shellCmd.equals("help")) {
+		if (shellCmd.equals("help"))
 			shellHelp(output);
-			return true;
-		}
 
-		if (shellCmd.equals("show-name")) {
+		if (shellCmd.equals("show-name"))
 			commandShowNames(_shellParser);
-			return true;
-		}
 
 		String using = null;
 		if (!_shellParser.getParam().isEmpty())
@@ -110,39 +106,31 @@ public class PixShell extends GenericEquipmentShell {
 		if (shellCmd.equals("show-enhanced-group")) {
 			HashMap<String, ObjectGroup> groups = _pix.getEnhancedGroups();
 			outputGroups(groups, using);
-			return true;
 		}
 
 		if (shellCmd.equals("show-icmp-group")) {
 			HashMap<String, ObjectGroup> groups = _pix.getIcmpGroups();
 			outputGroups(groups, using);
-			return true;
 		}
 
 		if (shellCmd.equals("show-network-group")) {
 			HashMap<String, ObjectGroup> groups = _pix.getNetworkGroups();
 			outputGroups(groups, using);
-			return true;
 		}
 
 		if (shellCmd.equals("show-protocol-group")) {
 			HashMap<String, ObjectGroup> groups = _pix.getProtocolGroups();
 			outputGroups(groups, using);
-			return true;
 		}
 
 		if (shellCmd.equals("show-service-group")) {
 			HashMap<String, ObjectGroup> groups = _pix.getServiceGroups();
 			outputGroups(groups, using);
-			return true;
 		}
 
 		if (shellCmd.equals("xref")) {
 			printXrefIp(_outStream, _pix.getNetCrossRef(), _shellParser);
-			return true;
 		}
-
-		return false;
 	}
 
 	@Override

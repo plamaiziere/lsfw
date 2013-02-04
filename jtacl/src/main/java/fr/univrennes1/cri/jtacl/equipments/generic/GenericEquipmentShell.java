@@ -45,9 +45,8 @@ public abstract class GenericEquipmentShell {
 	 * Runs the specified shell command in argument.
 	 * @param command command to run.
 	 * @param output Stream to output.
-	 * @return true if the command is part of this shell, false otherwise.
 	 */
-	abstract public boolean shellCommand(String command, PrintStream output);
+	abstract public void shellCommand(String command, PrintStream output);
 
 	/**
 	 * Print the help ressource

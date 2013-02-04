@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -366,6 +367,8 @@ public class PacketFilter extends GenericEquipment {
 		return _netCrossRef;
 	}
 
+	protected PacketFilterShell _shell = new PacketFilterShell(this);
+
 	/**
 	 * Create a new {@link PacketFilter} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -377,8 +380,6 @@ public class PacketFilter extends GenericEquipment {
 			String configurationFileName) {
 
 		super(monitor, name, comment, configurationFileName);
-		PacketFilterShell shell = new PacketFilterShell(this);
-		registerShell(shell);
 		_rootAnchor = PfAnchor.newRootAnchor();
 	}
 
@@ -2908,6 +2909,11 @@ public class PacketFilter extends GenericEquipment {
 
 		probeResults.setInterface(direction, interfaceDesc);
 
+	}
+
+	@Override
+	public void runShell(String command, PrintStream output) {
+		_shell.shellCommand(command, output);
 	}
 
 }

@@ -43,6 +43,7 @@ import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.math.BigInteger;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -218,6 +219,8 @@ public class CiscoRouter extends GenericEquipment {
 		return _netCrossRef;
 	}
 
+	protected IOSShell _shell = new IOSShell(this);
+
 	/**
 	 * Create a new {@link CiscoRouter} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
@@ -227,8 +230,6 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	public CiscoRouter(Monitor monitor, String name, String comment, String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
-		IOSShell shell = new IOSShell(this);
-		registerShell(shell);
 	}
 
 	protected void loadConfiguration(Document doc) {
@@ -1318,5 +1319,9 @@ public class CiscoRouter extends GenericEquipment {
 		}
 	}
 
+	@Override
+	public void runShell(String command, PrintStream output) {
+		_shell.shellCommand(command, output);
+	}
 
 }
