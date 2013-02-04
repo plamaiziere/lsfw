@@ -51,22 +51,6 @@ public abstract class CpService {
 		return _type;
 	}
 
-	public boolean isTcpService() {
-		return _type == CpServiceType.TCP;
-	}
-
-	public boolean isUdpService() {
-		return _type == CpServiceType.UDP;
-	}
-
-	public boolean isServiceGroup() {
-		return _type == CpServiceType.GROUP;
-	}
-
-	public boolean isIcmpService() {
-		return _type == CpServiceType.ICMP;
-	}
-
 	/**
 	 * Returns the {@link MatchResult} of the given {@link ProbeRequest}.
 	 * @param request request to test.
