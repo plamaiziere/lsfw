@@ -34,8 +34,7 @@ public class CpNetworkRange extends CpNetworkObject {
 	 * @param name object name name
 	 * @param className checkpoint class name
 	 * @param comment comment
-	 * @param ipFirst ip first address
-	 * @param ipLast ip last address
+	 * @param ipRange ip range address
 	 */
 	public CpNetworkRange(String name,	String className, String comment,
 			IPRange ipRange)  {
