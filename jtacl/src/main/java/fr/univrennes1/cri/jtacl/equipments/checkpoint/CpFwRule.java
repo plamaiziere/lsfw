@@ -31,6 +31,8 @@ public class CpFwRule {
 	protected CpFwIpSpec _destIp;
 	protected CpFwServicesSpec _services;
 
+	protected boolean _implicitDrop;
+
 	public String getName() {
 		return _name;
 	}
@@ -71,6 +73,10 @@ public class CpFwRule {
 		return _services;
 	}
 
+	public boolean isImplicitDrop() {
+		return _implicitDrop;
+	}
+
 	/**
 	 * Construct a new fw rule
 	 * @param name name
@@ -98,16 +104,36 @@ public class CpFwRule {
 		_action = action;
 	}
 
+	/**
+	 * Construct a new fw rule (implicit drop)
+	 * @param name name
+	 * @param className class name
+	 * @param comment comment
+	 * @param srcIpSpec source IP specification
+	 * @param dstIpSpec destination IP specification
+	 */
+	public CpFwRule(String name, String className) {
+		_name = name;
+		_className = className;
+		_comment = "implicit drop rule";
+		_number = 999999;
+		_action = "drop_action";
+		_implicitDrop = true;
+	}
+
 	@Override
 	public String toString() {
 		return "rule name=" + _name + ", className=" + _className
 				+ ", comment=" + _comment + ", number=" + _number +
-				", disabled=" + _disabled + ", action=" + _action
-				+ ", sourceIp=" + _sourceIp + ", destIp=" + _destIp
-				+ " services=" + _services;
+				", disabled=" + _disabled + ", implicit= " + _implicitDrop
+				+ ", action=" + _action + ", sourceIp=" + _sourceIp
+				+ ", destIp=" + _destIp	+ " services=" + _services;
 	}
 
 	public String toText() {
+		if (isImplicitDrop())
+			return "*** implicit drop ***";
+
 		String s = "N°: " + _number;
 		if (_name != null)
 			s+= "; name: " + _name;
