@@ -33,7 +33,7 @@ import java.net.UnknownHostException;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ShellUtils {
-	
+
 	/**
 	 * Returns true if all the flags specified in 'flags' are valid TCP flags.
 	 * @param flags flags to check.
@@ -47,7 +47,7 @@ public class ShellUtils {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Returns the port number of the service / protocol in arguments.
 	 * @param service service to get
@@ -65,7 +65,7 @@ public class ShellUtils {
 		}
 		return port;
 	}
-	
+
 
 	/**
 	 * Parses and returns the ports specification in arguments.
@@ -136,7 +136,7 @@ public class ShellUtils {
 		PortSpec spec = new PortSpec(PortOperator.EQ, port);
 		return spec;
 	}
-	
+
 	/**
 	 * Returns all the {@link IfaceLink} links matching an 'equipment specification'
 	 * string.
@@ -219,7 +219,7 @@ public class ShellUtils {
 				 */
 				try {
 					if (link.getIp().equals(sourceIP) ||
-							link.getNetwork().networkContains(sourceIP))
+							link.getNetwork().contains(sourceIP))
 						resLinks.add(link);
 
 					} catch (UnknownHostException ex) {
@@ -245,8 +245,8 @@ public class ShellUtils {
 		} catch (JtaclInternalException ex) {
 			throw new JtaclParameterException("invalid expect: " + expect);
 		}
-		
+
 		return ep;
 	}
-	
+
 }

@@ -437,42 +437,42 @@ public class IPNetTest extends TestCase {
 	}
 
 	/**
-	 * Test of networkContains, of class IPNet.
+	 * Test of contains, of class IPNet.
 	 */
 	public void testNetworkContains() throws UnknownHostException  {
 		System.out.println("networkContains");
 
 		IPNet ip1 = new IPNet("127.0.0.1");
 		IPNet ip2 = new IPNet("127.0.0.1");
-		assertTrue(ip1.networkContains(ip2));
+		assertTrue(ip1.contains(ip2));
 
 		ip1 = new IPNet("127.0.0.1");
 		ip2 = new IPNet("127.0.0.2");
-		assertFalse(ip1.networkContains(ip2));
+		assertFalse(ip1.contains(ip2));
 
 		ip1 = new IPNet("::1");
 		ip2 = new IPNet("::1");
-		assertTrue(ip1.networkContains(ip2));
+		assertTrue(ip1.contains(ip2));
 
 		ip1 = new IPNet("::1");
 		ip2 = new IPNet("::2");
-		assertFalse(ip1.networkContains(ip2));
+		assertFalse(ip1.contains(ip2));
 
 		ip1 = new IPNet("127.0.0.1/16");
 		ip2 = new IPNet("127.0.0.2/24");
-		assertTrue(ip1.networkContains(ip2));
+		assertTrue(ip1.contains(ip2));
 
 		ip1 = new IPNet("::1/16");
 		ip2 = new IPNet("::1/24");
-		assertTrue(ip1.networkContains(ip2));
+		assertTrue(ip1.contains(ip2));
 
 		ip1 = new IPNet("127.0.0.1/24");
 		ip2 = new IPNet("127.0.0.1/16");
-		assertFalse(ip1.networkContains(ip2));
+		assertFalse(ip1.contains(ip2));
 
 		ip1 = new IPNet("::1/24");
 		ip2 = new IPNet("::1/16");
-		assertFalse(ip1.networkContains(ip2));
+		assertFalse(ip1.contains(ip2));
 	}
 
 
@@ -637,7 +637,7 @@ public class IPNetTest extends TestCase {
 		String ihostname = inet.getCanonicalHostName();
 		assertEquals(ihostname, hostname);
 	}
-	
+
 	/**
 	 * Test of getHostname()
 	 */
@@ -656,7 +656,7 @@ public class IPNetTest extends TestCase {
 		assertTrue(hostname.contains(ihostname) ||
 			hostname.equals("127.0.0.1"));
 	}
-	
+
 	public void testIsReachable() throws UnknownHostException {
 		System.out.println("testIsReachable");
 

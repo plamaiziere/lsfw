@@ -214,7 +214,7 @@ public class Topology {
 
 		for (NetworkLink link: _networkLinks) {
 			try {
-				if (link.getNetwork().networkContains(ip)) {
+				if (link.getNetwork().contains(ip)) {
 					links.add(link);
 				}
 			} catch (UnknownHostException ex) {

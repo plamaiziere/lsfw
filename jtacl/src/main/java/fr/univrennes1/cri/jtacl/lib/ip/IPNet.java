@@ -42,7 +42,7 @@ import org.xbill.DNS.Type;
  * Mostly taken from IPy http://pypi.python.org/pypi/IPy
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public final class IPNet implements Comparable {
+public final class IPNet implements Comparable, IPComparable {
 
 	/*
 	 * ip, prefixlen, ipversion
@@ -792,16 +792,8 @@ public final class IPNet implements Comparable {
 		return getIpVersion().equals(ipnet.getIpVersion());
 	}
 
-	/**
-	 * Checks if this {@link IPNet} instance contains another {@link IPNet} object.<br/>
-	 * An {@link IPNet} object contains another {@link IPNet} object if all the
-	 * IP addresses designated by the second {@link IPNet} object are included
-	 * in the first {@link IPNet} object.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
-	 * included in this instance.
-	 */
-	public final boolean networkContains(IPNet ipnet)
+	@Override
+	public final boolean contains(IPNet ipnet)
 			throws UnknownHostException {
 
 		IPNet first = networkAddress();
@@ -813,12 +805,7 @@ public final class IPNet implements Comparable {
 				lastOther.isBetweenIP(first, last);
 	}
 
-	/**
-	 * Checks if this {@link IPNet} instance overlaps the IPNet object in
-	 * argument. Two IPNet objects overlap if they share at least one IP address.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if this IPNet instance overlaps the IPNet object in argument.
-	 */
+	@Override
 	public final boolean overlaps(IPNet ipnet) throws UnknownHostException {
 		IPNet first = networkAddress();
 		IPNet last  = lastNetworkAddress();
@@ -831,15 +818,7 @@ public final class IPNet implements Comparable {
 				lastOther.isBetweenIP(first, last);
 	}
 
-	/**
-	 * Checks if this {@link IPNet} instance is between two another
-	 * {@link IPNet} objects.<br/>
-	 * @param first the first {@link IPNet} object to compare.
-	 * @param second the second {@link IPNet} object to compare.
-	 * @return true if the {@link BigInteger} IP address of this instance is:
-	 * first &lt= IP &lt= second.
-	 * We do not take care of the prefix length of the {@link IPNet} objects.
-	 */
+	@Override
 	public final boolean isBetweenIP(IPNet first, IPNet second) {
 		if (getIP().compareTo(first.getIP()) < 0)
 			return false;
