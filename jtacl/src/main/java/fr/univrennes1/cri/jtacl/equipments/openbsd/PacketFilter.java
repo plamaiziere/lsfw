@@ -92,7 +92,7 @@ public class PacketFilter extends GenericEquipment {
 		public void readFromFile(String fileName)
 				throws FileNotFoundException, IOException {
 
-			BufferedReader reader = null;
+			BufferedReader reader;
 			reader = new BufferedReader(new FileReader(fileName));
 			try {
 				for (;;) {
@@ -300,7 +300,7 @@ public class PacketFilter extends GenericEquipment {
 
 	protected void warnConfig(String msg) {
 
-		String context = "";
+		String context;
 		if (_parseContext != null)
 			context = _parseContext.toString();
 		else
@@ -311,7 +311,7 @@ public class PacketFilter extends GenericEquipment {
 
 	protected void severeConfig(String msg) {
 
-		String context = "";
+		String context;
 		if (_parseContext != null)
 			context = _parseContext.toString();
 		else
@@ -926,7 +926,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * mask
 		 */
-		String mask = null;
+		String mask;
 		String dup = host;
 		p = host.lastIndexOf('/');
 		if (p > 0) {
@@ -969,9 +969,6 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		if (cont) {
 			hosts = pfHostDns(host, imask);
-			if (!hosts.isEmpty()) {
-				cont = false;
-			}
 		}
 		return hosts;
 
@@ -1213,7 +1210,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * nexthop
 		 */
-		PfNodeHost nhost = null;
+		PfNodeHost nhost;
 		try {
 			nhost = xhostToHost(xhost);
 		} catch (UnknownHostException ex) {
@@ -2160,7 +2157,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * Route the probe.
 		 */
-		Routes routes = null;
+		Routes routes;
 		if (_routeToEngine != null)
 			routes = _routeToEngine.getRoutes(probe);
 		else
@@ -2768,7 +2765,7 @@ public class PacketFilter extends GenericEquipment {
 				 * inlined anchor: get the anchor from the rule.
 				 * Else, search them by the anchor name.
 				 */
-				List<PfAnchor> anchorList = null;
+				List<PfAnchor> anchorList;
 				if (anchorRule.isInlined()) {
 					anchorList = new ArrayList<PfAnchor>();
 					anchorList.add(anchorRule.getInlinedAnchor());
@@ -2783,7 +2780,7 @@ public class PacketFilter extends GenericEquipment {
 				 */
 				FilterContext save = context;
 				context = context.newInstance();
-				RuleResult lastResult = null;
+				RuleResult lastResult;
 				int matchCount = 0;
 				for (PfAnchor anchorItem : anchorList) {
 					context.setAnchor(anchorItem);
