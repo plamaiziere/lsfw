@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +59,9 @@ public class CpNetworkGroup extends CpNetworkObject {
 	 * @return a list of the base references name included in this group.
 	 */
 	public List<String> getBaseReferencesName() {
-		return new LinkedList<String>(_baseObjects.keySet());
+		List<String> list = new LinkedList<String>(_baseObjects.keySet());
+		Collections.sort(list);
+		return list;
 	}
 
 	/**
@@ -66,7 +69,9 @@ public class CpNetworkGroup extends CpNetworkObject {
 	 * @return a list of the excluded references name included in this group.
 	 */
 	public List<String> getExcludedReferencesName() {
-		return new LinkedList<String>(_excludedObjects.keySet());
+		List<String> list = new LinkedList<String>(_excludedObjects.keySet());
+		Collections.sort(list);
+		return list;
 	}
 
 	public HashMap<String, CpNetworkObject> getBaseObjects() {
@@ -76,7 +81,7 @@ public class CpNetworkGroup extends CpNetworkObject {
 	public HashMap<String, CpNetworkObject> getExcludedObjects() {
 		return _excludedObjects;
 	}
-	
+
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
