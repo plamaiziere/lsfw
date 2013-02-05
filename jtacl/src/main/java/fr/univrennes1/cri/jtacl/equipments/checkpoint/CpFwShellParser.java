@@ -22,9 +22,33 @@ import org.parboiled.Rule;
  */
 public class CpFwShellParser extends GenericEquipmentShellParser {
 
+	protected String _service;
+	protected String _network;
+
+
 	@Override
 	protected boolean clear() {
+		_service = null;
+		_network = null;
 		return super.clear();
+	}
+
+	public String getService() {
+		return _service;
+	}
+
+	public boolean setService(String service) {
+		_service = service;
+		return true;
+	}
+
+	public String getNetwork() {
+		return _network;
+	}
+
+	public boolean setNetwork(String network) {
+		_network = network;
+		return true;
 	}
 
 	public Rule CommandLine() {
@@ -33,9 +57,48 @@ public class CpFwShellParser extends GenericEquipmentShellParser {
 				clear(),
 				FirstOf(
 					CommandHelp(),
-					CommandXref()
+					CommandXref(),
+					CommandShowService(),
+					CommandShowNetwork(),
+					CommandShowRules()
 				)
 			);
+	}
+
+	public Rule CommandShowService() {
+		return
+			Sequence(
+				IgnoreCase("show"),
+				WhiteSpaces(),
+				IgnoreCase("service"),
+				UntilEOI(),
+				setService(match().trim()),
+				setCommand("show-service")
+		);
+	}
+
+	public Rule CommandShowNetwork() {
+		return
+			Sequence(
+				IgnoreCase("show"),
+				WhiteSpaces(),
+				IgnoreCase("network"),
+				UntilEOI(),
+				setNetwork(match().trim()),
+				setCommand("show-network")
+		);
+	}
+
+	public Rule CommandShowRules() {
+		return
+			Sequence(
+				IgnoreCase("show"),
+				WhiteSpaces(),
+				IgnoreCase("rules"),
+				SkipSpaces(),
+				EOI,
+				setCommand("show-rules")
+		);
 	}
 
 }

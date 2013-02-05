@@ -37,6 +37,7 @@ import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -1176,6 +1177,42 @@ public class CpFw extends GenericEquipment {
 	@Override
 	public void runShell(String command, PrintStream output) {
 		_shell.shellCommand(command, output);
+	}
+
+	public HashMap<String, CpService> getServices() {
+		return _services;
+	}
+
+	public HashMap<String, CpNetworkObject> getNetworkObjects() {
+		return _networkObjects;
+	}
+
+	public LinkedList<CpFwRule> getFwRules() {
+		return _fwRules;
+	}
+
+	/**
+	 * Sorted list of services name
+	 * @return a sorted list of services name.
+	 */
+	public List<String> getServicesName() {
+
+		List<String> list = new LinkedList<String>();
+		list.addAll(_services.keySet());
+		Collections.sort(list);
+		return list;
+	}
+
+	/**
+	 * Sorted list of networks name
+	 * @return a sorted list of networks name.
+	 */
+	public List<String> getNetworksName() {
+
+		List<String> list = new LinkedList<String>();
+		list.addAll(_networkObjects.keySet());
+		Collections.sort(list);
+		return list;
 	}
 
 

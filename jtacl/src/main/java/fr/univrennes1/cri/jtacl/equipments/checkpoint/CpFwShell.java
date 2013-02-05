@@ -16,6 +16,8 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import java.io.PrintStream;
+import java.util.List;
+import java.util.Map;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
@@ -44,6 +46,56 @@ public class CpFwShell extends GenericEquipmentShell {
 		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
 	}
 
+	public void commandShowService(PrintStream output, CpFwShellParser parser) {
+
+		String service = parser.getService();
+		Map<String, CpService> services = _cpfw.getServices();
+
+		if (!service.isEmpty()) {
+			CpService servobj = services.get(service);
+			if (servobj == null) {
+				output.println("No such service: " + service);
+			} else {
+				output.println(servobj.toString());
+			}
+		} else {
+			List<String> snames = _cpfw.getServicesName();
+			for (String name: snames) {
+				CpService servobj = services.get(name);
+				output.println(servobj.toString());
+			}
+		}
+	}
+
+	public void commandShowNetwork(PrintStream output, CpFwShellParser parser) {
+
+		String network = parser.getNetwork();
+		Map<String, CpNetworkObject> networks = _cpfw.getNetworkObjects();
+
+		if (!network.isEmpty()) {
+			CpNetworkObject netobj = networks.get(network);
+			if (netobj == null) {
+				output.println("No such network: " + network);
+			} else {
+				output.println(netobj.toString());
+			}
+		} else {
+			List<String> snames = _cpfw.getNetworksName();
+			for (String name: snames) {
+				CpNetworkObject netobj = networks.get(name);
+				output.println(netobj.toString());
+			}
+		}
+	}
+
+	public void commandShowRules(PrintStream output, CpFwShellParser parser) {
+
+		for (CpFwRule rule: _cpfw.getFwRules()) {
+			output.println(rule.toText());
+		}
+	}
+
+
 	@Override
 	public void shellCommand(String command, PrintStream output) {
 		_outStream = output;
@@ -66,6 +118,13 @@ public class CpFwShell extends GenericEquipmentShell {
 			shellHelp(_outStream);
 		if (shellCmd.equals("xref"))
 			printXrefIp(_outStream, _cpfw.getNetCrossRef(), _shellParser);
+		if (shellCmd.equals("show-service"))
+			commandShowService(_outStream, _shellParser);
+		if (shellCmd.equals("show-network"))
+			commandShowNetwork(_outStream, _shellParser);
+		if (shellCmd.equals("show-rules"))
+			commandShowRules(_outStream, _shellParser);
+
 	}
 
 	@Override
