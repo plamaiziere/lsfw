@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +48,9 @@ public class CpGroupService extends CpService {
 	 * @return a list of the references name included in this group.
 	 */
 	public List<String> getReferencesName() {
-		return new LinkedList<String>(_services.keySet());
+		List<String> list = new LinkedList<String>(_services.keySet());
+		Collections.sort(list);
+		return list;
 	}
 
 	@Override
