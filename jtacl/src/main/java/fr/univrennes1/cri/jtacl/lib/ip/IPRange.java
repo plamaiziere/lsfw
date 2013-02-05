@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
  * IP range. A range of ip addresses
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class IPRange {
+public class IPRange implements IPComparable {
 
 	protected IPNet _ipFirst;
 	protected IPNet _ipLast;
@@ -77,15 +77,16 @@ public class IPRange {
 		return _ipLast;
 	}
 
-/**
-	 * Checks if this range instance contains an {@link IPNet} object.<br/>
-	 * A range object contains another {@link IPNet} object if all the
-	 * IP addresses designated by the second {@link IPNet} object are included
-	 * in this range.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
-	 * included in this instance.
-	 */
+	@Override
+	public final boolean isBetweenIP(IPNet first, IPNet second) {
+		if (_ipFirst.getIP().compareTo(first.getIP()) < 0)
+			return false;
+		if (_ipFirst.getIP().compareTo(second.getIP()) > 0)
+			return false;
+		return true;
+	}
+
+	@Override
 	public final boolean contains(IPNet ipnet)
 			throws UnknownHostException {
 
@@ -96,12 +97,7 @@ public class IPRange {
 				lastOther.isBetweenIP(_ipFirst, _ipLast);
 	}
 
-	/**
-	 * Checks if this range instance overlaps the IPNet object in
-	 * argument. The range overlaps if they share at least one IP address.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if this range instance overlaps the IPNet object in argument.
-	 */
+	@Override
 	public final boolean overlaps(IPNet ipnet) throws UnknownHostException {
 		IPNet firstOther = ipnet.networkAddress();
 		IPNet lastOther = ipnet.lastNetworkAddress();
