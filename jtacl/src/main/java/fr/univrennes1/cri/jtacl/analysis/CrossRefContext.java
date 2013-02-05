@@ -20,18 +20,18 @@ import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CrossRefContext {
-	protected ParseContext _parseContext;
+	protected String _contextString;
 	protected String _contextName;
 	protected String _comment;
 	protected String _filename;
 	protected int _linenumber;
 
-	public CrossRefContext(ParseContext parseContext,
+	public CrossRefContext(String contextString,
 			String contextName,
 			String comment,
 			String filename,
 			int linenumber) {
-		_parseContext = parseContext;
+		_contextString = contextString;
 		_contextName = contextName;
 		_comment = comment;
 		_filename = filename;
@@ -46,8 +46,8 @@ public class CrossRefContext {
 		return _contextName;
 	}
 
-	public ParseContext getParseContext() {
-		return _parseContext;
+	public String getContextString() {
+		return _contextString;
 	}
 
 	public String getFilename() {

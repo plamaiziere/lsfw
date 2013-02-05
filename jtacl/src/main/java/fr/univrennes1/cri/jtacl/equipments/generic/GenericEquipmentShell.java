@@ -141,7 +141,7 @@ public abstract class GenericEquipmentShell {
 				}
 				// line short
 				if (fmt.equals("%l")) {
-					String line = ctx.getParseContext().getLine().trim();
+					String line = ctx.getContextString().trim();
 					Scanner sc = new Scanner(line);
 					if (sc.hasNextLine())
 						output.print(sc.nextLine());
@@ -151,7 +151,7 @@ public abstract class GenericEquipmentShell {
 				}
 				// line long
 				if (fmt.equals("%L")) {
-					String line = ctx.getParseContext().getLine().trim();
+					String line = ctx.getContextString().trim();
 					output.print(line);
 					continue;
 				}

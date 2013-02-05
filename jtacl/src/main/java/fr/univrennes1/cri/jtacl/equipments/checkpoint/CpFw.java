@@ -935,12 +935,10 @@ public class CpFw extends GenericEquipment {
 	protected void crossRefNetworkLink(IPNetCrossRef ipNetRef,
 			Object obj) {
 
-		ParseContext pctxt = new ParseContext();
 		if (obj instanceof CpNetworkObject) {
 			CpNetworkObject nobj = (CpNetworkObject) obj;
-			pctxt.set(null, 0, nobj.toString());
 			CrossRefContext refContext =
-				new CrossRefContext(pctxt, nobj.getType().toString(),
+				new CrossRefContext(nobj.toString(), nobj.getType().toString(),
 					nobj.getName(), null, 0);
 			ipNetRef.addContext(refContext);
 			for (Object linkobj: nobj.getLinkedTo()) {
@@ -949,9 +947,8 @@ public class CpFw extends GenericEquipment {
 		}
 		if (obj instanceof CpFwRule) {
 			CpFwRule rule = (CpFwRule) obj;
-			pctxt.set(null, 0, rule.toText());
 			CrossRefContext refContext =
-				new CrossRefContext(pctxt, "rule", "", null, 0);
+				new CrossRefContext(rule.toText(), "rule", "", null, 0);
 			ipNetRef.addContext(refContext);
 
 		}

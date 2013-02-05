@@ -889,7 +889,8 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	protected void crossRefAccessList(AccessListElement ace) {
 		ParseContext context = ace.getParseContext();
-		CrossRefContext refContext = new CrossRefContext(context, "ace",
+		CrossRefContext refContext = new CrossRefContext(context.getLine(),
+			"ace",
 			ace.getAction(),
 			context.getFileName(),
 			context.getLineNumber());
