@@ -133,15 +133,15 @@ public class CpFwRule {
 
 		String s = "N°: " + _number;
 		if (_name != null)
-			s+= "; name: " + _name;
+			s+= ", name: " + _name;
 
-		s += "; from: " +
+		s += ", from: " +
 			_sourceIp.getNetworks().getBaseReferencesName() +
-			"; to: " + _destIp.getNetworks().getBaseReferencesName() +
-			"; services: " + _services.getServices().getReferencesName() +
-			"; action: " + _action;
+			", to: " + _destIp.getNetworks().getBaseReferencesName() +
+			", services: " + _services.getServices().getReferencesName() +
+			", action: " + _action;
 		if (_comment != null)
-			s+= "; # "	+ _comment;
+			s+= ", # "	+ _comment;
 		return s;
 	}
 
