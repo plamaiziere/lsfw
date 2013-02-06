@@ -13,11 +13,9 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
-import java.net.UnknownHostException;
 
 /**
  * Checkpoint IP network object
@@ -46,13 +44,7 @@ public class CpNetworkIP extends CpNetworkObject {
 		super(name, className, comment, CpNetworkType.IP);
 		_ipAddress = ip;
 		_allowBroadcast = allowBroadcast;
-		try {
-			_ipRange = new IPRange(ip, _allowBroadcast);
-		} catch (UnknownHostException ex) {
-			// should not happen
-			throw new JtaclInternalException("unexpected exception: "
-				+ ex.getMessage());
-		}
+		_ipRange = new IPRange(ip, _allowBroadcast);
 	}
 
 	public IPNet getIpAddress() {
@@ -72,17 +64,11 @@ public class CpNetworkIP extends CpNetworkObject {
 
 	@Override
 	public MatchResult matches(IPNet ip) {
-		try {
-			if (_ipRange.contains(ip))
-				return MatchResult.ALL;
-			if (_ipRange.overlaps(ip))
-				return MatchResult.MATCH;
-			return MatchResult.NOT;
-		} catch (UnknownHostException ex) {
-			// should not happen
-			throw new JtaclInternalException("unexpected exception: "
-				+ ex.getMessage());
-		}
+		if (_ipRange.contains(ip))
+			return MatchResult.ALL;
+		if (_ipRange.overlaps(ip))
+			return MatchResult.MATCH;
+		return MatchResult.NOT;
 	}
 
 }
