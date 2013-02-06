@@ -13,8 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
-import java.net.UnknownHostException;
-
 /**
  * interface for IP range. A range of ip addresses
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
