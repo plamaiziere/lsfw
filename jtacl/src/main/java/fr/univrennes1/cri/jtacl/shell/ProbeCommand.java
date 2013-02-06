@@ -129,12 +129,7 @@ public class ProbeCommand {
 			if (!equalSourceAddress) {
 				nlinks = topology.getNetworkLinksByIP(sourceAddress);
 			} else {
-				try {
-					nlinks = topology.getNetworkLinksByIP(sourceAddress.hostAddress());
-				}  catch (UnknownHostException ex1) {
-					throw new JtaclParameterException(
-						"Error: " + ex1.getMessage());
-				}
+				nlinks = topology.getNetworkLinksByIP(sourceAddress.hostAddress());
 			}
 			if (nlinks.isEmpty()) {
 				/*
