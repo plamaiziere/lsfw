@@ -67,7 +67,7 @@ public class NetworkObjectGroupItem extends ObjectGroupItem {
 	 */
 	public MatchResult matches(IPNet ip) {
 		try {
-			if (_ipAddress.networkContains(ip))
+			if (_ipAddress.contains(ip))
 				return MatchResult.ALL;
 			if (_ipAddress.overlaps(ip))
 				return MatchResult.MATCH;

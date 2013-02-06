@@ -100,7 +100,7 @@ public class Iface {
 	}
 
 	/**
-	 * Get the {@link IfaceLink} link with this {@link IPNet} IP address 
+	 * Get the {@link IfaceLink} link with this {@link IPNet} IP address
 	 * on this {@link Iface} interface.
 	 * @param ip the {@link IPNet} IP address of the link
 	 * @return the {@link IfaceLink} link with this IP address.
@@ -121,7 +121,7 @@ public class Iface {
 	public IfaceLink getLinkConnectedTo(IPNet ip) throws UnknownHostException {
 		for (Integer i: _links.keySet()) {
 			IfaceLink ilink = _links.get(i);
-			if (ilink.getNetwork().networkContains(ip))
+			if (ilink.getNetwork().contains(ip))
 				return ilink;
 		}
 		return null;

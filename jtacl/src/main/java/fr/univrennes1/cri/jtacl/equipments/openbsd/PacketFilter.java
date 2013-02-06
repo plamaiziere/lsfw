@@ -2320,7 +2320,7 @@ public class PacketFilter extends GenericEquipment {
 				if (!ip.sameIPVersion(ipAddress))
 					continue;
 
-				if (ip.networkContains(ipAddress)) {
+				if (ip.contains(ipAddress)) {
 					mAll++;
 				} else {
 					if (ip.overlaps(ipAddress))

@@ -1406,7 +1406,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 
 		MatchResult mIpSource = MatchResult.ALL;
 		if (aclIpSource != null) {
-			if (!aclIpSource.networkContains(probeIpSource)) {
+			if (!aclIpSource.contains(probeIpSource)) {
 				if (!aclIpSource.overlaps(probeIpSource))
 					return MatchResult.NOT;
 				else
@@ -1430,7 +1430,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		NetworkObjectGroup aclDestNetwork = acl.getDestNetworkGroup();
 		MatchResult mIpDest = MatchResult.ALL;
 		if (aclIpDest != null) {
-			if (!aclIpDest.networkContains(probeIpDest)) {
+			if (!aclIpDest.contains(probeIpDest)) {
 				if (!aclIpDest.overlaps(probeIpDest))
 					return MatchResult.NOT;
 				else

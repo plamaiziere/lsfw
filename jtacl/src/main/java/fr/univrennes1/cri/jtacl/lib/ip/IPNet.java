@@ -801,7 +801,7 @@ public final class IPNet implements Comparable {
 	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
 	 * included in this instance.
 	 */
-	public final boolean networkContains(IPNet ipnet)
+	public final boolean contains(IPNet ipnet)
 			throws UnknownHostException {
 
 		IPNet first = networkAddress();

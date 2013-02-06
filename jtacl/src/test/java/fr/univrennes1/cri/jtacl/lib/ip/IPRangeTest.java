@@ -37,7 +37,7 @@ public class IPRangeTest extends TestCase {
 	}
 
 	/**
-	 * Test of networkContains, of class IPRange.
+	 * Test of contains, of class IPRange.
 	 */
 	public void testContains() throws UnknownHostException  {
 		System.out.println("contains");
