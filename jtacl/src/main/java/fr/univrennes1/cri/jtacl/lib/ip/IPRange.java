@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
  * IP range. A range of ip addresses
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class IPRange {
+public class IPRange implements IPRangeable {
 
 	protected IPNet _ipFirst;
 	protected IPNet _ipLast;
@@ -41,9 +41,8 @@ public class IPRange {
 	 * The new range is between the host ip address of the given ipnet address
 	 * and the lastNetworkAddress of the given ipnet address.
 	 * @param ipnet ipnet address to use.
-	 * @throws UnknownHostException if some parameters are invalid.
 	 */
-	public IPRange(IPNet ipnet) throws UnknownHostException {
+	public IPRange(IPNet ipnet) {
 		_ipFirst = ipnet.networkAddress();
 		_ipLast = ipnet.lastNetworkAddress();
 	}
@@ -55,24 +54,33 @@ public class IPRange {
 	 * includeLastAddress is true, the last network address is included.
 	 * @param ipnet ipnet address to use.
 	 * @param includeLastAddress set to true to include the last network address.
-	 * @throws UnknownHostException if some parameters are invalid.
 	 */
-	public IPRange(IPNet ipnet, boolean includeLastAddress) throws UnknownHostException {
+	public IPRange(IPNet ipnet, boolean includeLastAddress) {
 		_ipFirst = ipnet.networkAddress();
-		if (includeLastAddress) {
-			_ipLast = ipnet.lastNetworkAddress();
+		if (ipnet.isHost()) {
+			_ipLast = ipnet;
 		} else {
-			_ipLast = ipnet.lastNetworkAddress();
-			BigInteger lip = _ipLast.getIP();
-			lip = lip.subtract(BigInteger.ONE);
-			_ipLast = new IPNet(lip, ipnet.getIpVersion());
+			if (includeLastAddress) {
+				_ipLast = ipnet.lastNetworkAddress();
+			} else {
+				_ipLast = ipnet.lastNetworkAddress();
+				BigInteger lip = _ipLast.getIP();
+				lip = lip.subtract(BigInteger.ONE);
+				try {
+					_ipLast = new IPNet(lip, ipnet.getIpVersion());
+				} catch (UnknownHostException ex) {
+					// could not happen
+				}
+			}
 		}
 	}
 
+	@Override
 	public IPNet getIpFirst() {
 		return _ipFirst;
 	}
 
+	@Override
 	public IPNet getIpLast() {
 		return _ipLast;
 	}
@@ -86,8 +94,8 @@ public class IPRange {
 	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
 	 * included in this instance.
 	 */
-	public final boolean contains(IPNet ipnet)
-			throws UnknownHostException {
+	@Override
+	public final boolean contains(IPNet ipnet) {
 
 		IPNet firstOther = ipnet.networkAddress();
 		IPNet lastOther = ipnet.lastNetworkAddress();
@@ -102,7 +110,8 @@ public class IPRange {
 	 * @param ipnet IPNet object to compare.
 	 * @return true if this range instance overlaps the IPNet object in argument.
 	 */
-	public final boolean overlaps(IPNet ipnet) throws UnknownHostException {
+	@Override
+	public final boolean overlaps(IPNet ipnet) {
 		IPNet firstOther = ipnet.networkAddress();
 		IPNet lastOther = ipnet.lastNetworkAddress();
 
