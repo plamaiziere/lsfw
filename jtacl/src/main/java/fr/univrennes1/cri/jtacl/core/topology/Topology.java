@@ -207,18 +207,13 @@ public class Topology {
 	 * on their subnet.
 	 * @param ip the {@link IPNet} IP Address contained by the {@link NetworkLink} links.
 	 * @return a {@link NetworkLinks} list containing the links.
-	 * @throws JtaclTopologyException if an item can not be expressed as a network.
 	 */
 	public NetworkLinks getNetworkLinksByIP(IPNet ip) {
 		NetworkLinks links = new NetworkLinks();
 
 		for (NetworkLink link: _networkLinks) {
-			try {
-				if (link.getNetwork().contains(ip)) {
-					links.add(link);
-				}
-			} catch (UnknownHostException ex) {
-				throw new JtaclTopologyException(ex.getMessage());
+			if (link.getNetwork().contains(ip)) {
+				links.add(link);
 			}
 		}
 		return links;
