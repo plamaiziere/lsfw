@@ -16,7 +16,6 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
@@ -1380,8 +1379,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	/**
 	 *
 	 */
-	protected MatchResult probeFilter(Probe probe, AccessList acl, Direction direction)
-			throws UnknownHostException {
+	protected MatchResult probeFilter(Probe probe, AccessList acl, Direction direction) {
 
 		ProbeRequest request = probe.getRequest();
 
@@ -1635,43 +1633,37 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			for (AccessList acl: acg) {
 				if (!acl.isRemark()) {
 					MatchResult match;
-					try {
-						match = probeFilter(probe, acl, direction);
-						if (match != MatchResult.NOT) {
-							/*
-							 * store the result in the probe
-							 */
-							AclResult aclResult = new AclResult();
-							aclResult.addResult(acl.getAction().equals("permit") ?
-								AclResult.ACCEPT : AclResult.DENY);
+					match = probeFilter(probe, acl, direction);
+					if (match != MatchResult.NOT) {
+						/*
+						 * store the result in the probe
+						 */
+						AclResult aclResult = new AclResult();
+						aclResult.addResult(acl.getAction().equals("permit") ?
+							AclResult.ACCEPT : AclResult.DENY);
 
-							if (match != MatchResult.ALL)
-								aclResult.addResult(AclResult.MAY);
+						if (match != MatchResult.ALL)
+							aclResult.addResult(AclResult.MAY);
 
-							results.addMatchingAcl(direction,
-								acl.getConfigurationLine(),
-								aclResult);
+						results.addMatchingAcl(direction,
+							acl.getConfigurationLine(),
+							aclResult);
 
-							results.setInterface(direction,
-								ifaceName);
+						results.setInterface(direction,
+							ifaceName);
 
-							/*
-							 * the active acl is the acl accepting or denying the packet.
-							 * On pix this is the first acl that match the packet.
-							 */
-							if (first) {
-								results.addActiveAcl(direction,
-										acl.getConfigurationLine(),
-										aclResult);
-								results.setAclResult(direction,
-										aclResult);
-								first = false;
-							}
+						/*
+						 * the active acl is the acl accepting or denying the packet.
+						 * On pix this is the first acl that match the packet.
+						 */
+						if (first) {
+							results.addActiveAcl(direction,
+									acl.getConfigurationLine(),
+									aclResult);
+							results.setAclResult(direction,
+									aclResult);
+							first = false;
 						}
-					} catch (UnknownHostException ex) {
-						// should not happen
-						throw new JtaclInternalException(("unexpected exception: " +
-							ex.getMessage()));
 					}
 				}
 			}
