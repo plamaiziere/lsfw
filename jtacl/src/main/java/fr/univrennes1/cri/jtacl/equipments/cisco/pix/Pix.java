@@ -443,14 +443,9 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		Iface iface = addIface(csIface.getName(), description);
 
 		for (IPNet ip: csIface.getIpAddresses()) {
-			try {
-				IPNet hostIP = ip.hostAddress();
-				IPNet networkIP = ip.networkAddress();
-				iface.addLink(hostIP, networkIP);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Iface: " + csIface.getName() +
-						" Invalid IP address: " + ex.getMessage());
-			}
+			IPNet hostIP = ip.hostAddress();
+			IPNet networkIP = ip.networkAddress();
+			iface.addLink(hostIP, networkIP);
 		}
 	}
 
@@ -463,45 +458,39 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		String routeIPNetmask = nameLookup(parser.getIpNetmask());
 		String routeNexthop = nameLookup(parser.getNexthop());
 
-		try {
-			IPNet prefix= null;
-			// IPv4
-			if (rule.equals("ip route") || rule.equals("route"))
-				prefix = parseIp(routeIPAddress + "/" + routeIPNetmask);
-			// IPv6
-			if (rule.equals("ipv6 route"))
-				prefix = parseIp(routeIPAddress);
+		IPNet prefix= null;
+		// IPv4
+		if (rule.equals("ip route") || rule.equals("route"))
+			prefix = parseIp(routeIPAddress + "/" + routeIPNetmask);
+		// IPv6
+		if (rule.equals("ipv6 route"))
+			prefix = parseIp(routeIPAddress);
 
-			Route<IfaceLink> route;
+		Route<IfaceLink> route;
 
+		/*
+		 * null route
+		 */
+		if (routeNexthop == null ||
+				routeNexthop.equalsIgnoreCase("null0")) {
+			route = new Route<IfaceLink>(prefix);
+		} else {
 			/*
-			 * null route
+			 * Retrieve the link associated to the nexthop (may be null)
 			 */
-			if (routeNexthop == null ||
-					routeNexthop.equalsIgnoreCase("null0")) {
-				route = new Route<IfaceLink>(prefix);
-			} else {
-				/*
-				 * Retrieve the link associated to the nexthop (may be null)
-				 */
-				IPNet nexthop = parseIp(routeNexthop);
-				Iface iface = getIfaceConnectedTo(nexthop);
-				IfaceLink link = null;
-				if (iface != null)
-					link = iface.getLinkConnectedTo(nexthop);
-				route = new Route<IfaceLink>(prefix, nexthop, 1, link);
-			}
-			/*
-			 * Add the route.
-			 */
-
-			Log.debug().info(_name + " add route: " + route.toString());
-			_routingEngine.addRoute(route);
-
-		} catch (UnknownHostException ex) {
-				throwCfgException("Invalid route: " + ex.getMessage());
+			IPNet nexthop = parseIp(routeNexthop);
+			Iface iface = getIfaceConnectedTo(nexthop);
+			IfaceLink link = null;
+			if (iface != null)
+				link = iface.getLinkConnectedTo(nexthop);
+			route = new Route<IfaceLink>(prefix, nexthop, 1, link);
 		}
+		/*
+		 * Add the route.
+		 */
 
+		Log.debug().info(_name + " add route: " + route.toString());
+		_routingEngine.addRoute(route);
 	}
 
 	// used while parsing
