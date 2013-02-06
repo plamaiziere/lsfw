@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Universite de Rennes 1
+ * Copyright (c) 2010 - 2013, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -801,8 +801,7 @@ public final class IPNet implements Comparable {
 	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
 	 * included in this instance.
 	 */
-	public final boolean contains(IPNet ipnet)
-			throws UnknownHostException {
+	public final boolean contains(IPNet ipnet) {
 
 		IPNet first = networkAddress();
 		IPNet last  = lastNetworkAddress();
@@ -819,7 +818,7 @@ public final class IPNet implements Comparable {
 	 * @param ipnet IPNet object to compare.
 	 * @return true if this IPNet instance overlaps the IPNet object in argument.
 	 */
-	public final boolean overlaps(IPNet ipnet) throws UnknownHostException {
+	public final boolean overlaps(IPNet ipnet) {
 		IPNet first = networkAddress();
 		IPNet last  = lastNetworkAddress();
 		IPNet firstOther = ipnet.networkAddress();
@@ -851,10 +850,8 @@ public final class IPNet implements Comparable {
 	/**
 	 * Returns the network IP address of this {@link IPNet} instance.
 	 * @return the {@link IPNet} network IP address.
-	 * @throws UnknownHostException if this instance can not be expressed as a
-	 * network IP address.
 	 */
-	public final IPNet networkAddress() throws UnknownHostException {
+	public final IPNet networkAddress() {
 		if (_networkAddress == null) {
 			BigInteger bi = IP.prefixLenToNetmask(_ip.getPrefixlen(),
 				_ip.getIpVersion());
@@ -870,9 +867,8 @@ public final class IPNet implements Comparable {
 	 * The host address is expressed by setting the prefixlen to 32 or 128
 	 * according to the IP version of the instance.
 	 * @return the {@link IPNet} host address.
-	 * @throws UnknownHostException
 	 */
-	public final IPNet hostAddress() throws UnknownHostException {
+	public final IPNet hostAddress() {
 		if (_hostAddress == null) {
 			IPBase ip = new IPBase(_ip.getIP(),
 					IP.maxPrefixLen(_ip.getIpVersion()), _ip.getIpVersion());
@@ -886,10 +882,8 @@ public final class IPNet implements Comparable {
 	 * For IPv4, this is the broadcast address.
 	 * @return the {@link IPNet} last network IP address of the network associated
 	 * to this instance.
-	 * @throws UnknownHostException if this instance can not be expressed as a
-	 * network.
 	 */
-	public final IPNet lastNetworkAddress() throws UnknownHostException {
+	public final IPNet lastNetworkAddress() {
 		if (_lastNetworkAddress == null) {
 			IPNet net = networkAddress();
 			BigInteger bi = net.getIP().add(IP.networkLength(_ip.getPrefixlen(),
@@ -906,18 +900,17 @@ public final class IPNet implements Comparable {
 	 * set to the value in argument.
 	 * @param mask mask to set in cidr notation.
 	 * @return a new {@link IPNet} instance.
-	 * @throws UnknownHostException
+	 * @throws UnknownHostException if some parameters are invalid
 	 */
-	public final IPNet setMask(int mask) throws UnknownHostException {
+	public final IPNet setMask(int mask) throws UnknownHostException  {
 		return new IPNet(_ip.getIP(), _ip.getIpVersion(), mask);
 	}
 
 	/**
 	 * Tests if this {@link IPNet} instance is a single host IP address.
 	 * @return true if this {@link IPNet} instance is a single host IP address.
-	 * @throws UnknownHostException
 	 */
-	public final boolean isHost() throws UnknownHostException {
+	public final boolean isHost() {
 		return _ip.getPrefixlen() == IP.maxPrefixLen(_ip.getIpVersion());
 	}
 
