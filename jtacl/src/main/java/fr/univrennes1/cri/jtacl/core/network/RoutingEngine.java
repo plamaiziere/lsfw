@@ -13,8 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.core.network;
 
-import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRoutingException;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import java.io.CharArrayWriter;
