@@ -16,26 +16,25 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
-import fr.univrennes1.cri.jtacl.core.probing.Probe;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
+import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
-import fr.univrennes1.cri.jtacl.lib.misc.Direction;
-import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
@@ -489,14 +488,9 @@ public class CiscoRouter extends GenericEquipment {
 		Iface iface = addIface(csIface.getName(), description);
 
 		for (IPNet ip: csIface.getIpAddresses()) {
-			try {
-				IPNet hostIP = ip.hostAddress();
-				IPNet networkIP = ip.networkAddress();
-				 iface.addLink(hostIP, networkIP);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Iface: " + csIface.getName() +
-						" Invalid IP address: " + ex.getMessage());
-			}
+			IPNet hostIP = ip.hostAddress();
+			IPNet networkIP = ip.networkAddress();
+			iface.addLink(hostIP, networkIP);
 		}
 	}
 
@@ -1018,7 +1012,7 @@ public class CiscoRouter extends GenericEquipment {
 	}
 
 	protected MatchResult compareIpIpNetmask(IPNet ip, IPNet aceIp,
-			IPNet aceNetmask) throws UnknownHostException {
+			IPNet aceNetmask) {
 
 		/*
 		 * if aceNetmask is null, aceIp is a valid network.
@@ -1089,8 +1083,7 @@ public class CiscoRouter extends GenericEquipment {
 	 *
 	 */
 	protected MatchResult probeFilter(Probe probe, AccessListElement ace,
-				Direction direction)
-			throws UnknownHostException {
+				Direction direction) {
 
 	ProbeRequest request = probe.getRequest();
 
@@ -1278,43 +1271,37 @@ public class CiscoRouter extends GenericEquipment {
 			 */
 			MatchResult match;
 			for (AccessListElement ace: acl) {
-				try {
-					match = probeFilter(probe, ace, direction);
-					if (match != MatchResult.NOT) {
-						/*
-						 * store the result in the probe
-						 */
-						AclResult aclResult = new AclResult();
-						aclResult.setResult(ace.getAction().equals("permit") ?
-							AclResult.ACCEPT : AclResult.DENY);
-						if (match != MatchResult.ALL)
-							aclResult.addResult(AclResult.MAY);
+				match = probeFilter(probe, ace, direction);
+				if (match != MatchResult.NOT) {
+					/*
+					 * store the result in the probe
+					 */
+					AclResult aclResult = new AclResult();
+					aclResult.setResult(ace.getAction().equals("permit") ?
+						AclResult.ACCEPT : AclResult.DENY);
+					if (match != MatchResult.ALL)
+						aclResult.addResult(AclResult.MAY);
 
-						results.addMatchingAcl(direction,
-							ace.getConfigurationLine(),
-							aclResult);
+					results.addMatchingAcl(direction,
+						ace.getConfigurationLine(),
+						aclResult);
 
-						results.setInterface(direction,
-							ifaceName + " (" + ifaceComment + ")");
+					results.setInterface(direction,
+						ifaceName + " (" + ifaceComment + ")");
 
 
-						/*
-						 * the active ace is the ace accepting or denying the packet.
-						 * this is the first ace that match the packet.
-						 */
-						if (first) {
-							results.addActiveAcl(direction,
-									ace.getConfigurationLine(),
-									aclResult);
-							results.setAclResult(direction,
-									aclResult);
-							first = false;
-						}
+					/*
+					 * the active ace is the ace accepting or denying the packet.
+					 * this is the first ace that match the packet.
+					 */
+					if (first) {
+						results.addActiveAcl(direction,
+								ace.getConfigurationLine(),
+								aclResult);
+						results.setAclResult(direction,
+								aclResult);
+						first = false;
 					}
-				} catch (UnknownHostException ex) {
-					// should not happen
-					throw new JtaclInternalException(("unexpected exception: " +
-						ex.getMessage()));
 				}
 			}
 		}
