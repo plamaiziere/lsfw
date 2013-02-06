@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class TopologyTest extends TestCase {
-    
+
     public TopologyTest(String testName) {
         super(testName);
     }
@@ -44,7 +44,7 @@ public class TopologyTest extends TestCase {
 	/**
 	 * Test of registerNetworkequipment method, of class Topology.
 	 */
-	public void testRegisterNetworkequipment() throws UnknownHostException {
+	public void testRegisterNetworkequipment() {
 		System.out.println("registerNetworkequipment");
 		Topology topology = new Topology();
 		Monitor monitor = Monitor.getInstance();
