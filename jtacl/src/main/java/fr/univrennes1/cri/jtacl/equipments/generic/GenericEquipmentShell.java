@@ -204,16 +204,10 @@ public abstract class GenericEquipmentShell {
 		}
 		for (IPNet ip: netCrossRef.keySet()) {
 			IPNetCrossRef crossref = netCrossRef.get(ip);
-			try {
-				if (ipreq != null && !ipreq.overlaps(ip))
-					continue;
-				if (parser.getXrefHost() != null && !ip.isHost())
-					continue;
-			}
-			catch (UnknownHostException ex) {
-				output.println("Error " + ex.getMessage());
-				return;
-			}
+			if (ipreq != null && !ipreq.overlaps(ip))
+				continue;
+			if (parser.getXrefHost() != null && !ip.isHost())
+				continue;
 			for (CrossRefContext ctx: crossref.getContexts()) {
 				printContext(output, ip, ctx, fmt);
 			}
