@@ -221,14 +221,8 @@ public class Shell {
 			 * IP
 			 */
 			if (ip != null) {
-				try {
-					if (link.getNetwork().overlaps(ip)) {
+				if (link.getNetwork().overlaps(ip))
 						candidate = link;
-					}
-				} catch (UnknownHostException ex) {
-					_outStream.println("Error " + ex.getMessage());
-					return;
-				}
 			} else {
 				/*
 				 * Equipment
@@ -335,11 +329,11 @@ public class Shell {
 			return false;
 		}
 
-		if (!silent) { 
+		if (!silent) {
 			_outStream.println("probe from: " +
-				cmd.getSourceAddress().toString("::i") + 
+				cmd.getSourceAddress().toString("::i") +
 				" to: " + cmd.getDestinationAddress().toString("::i"));
-		}		
+		}
 
 		/*
 		 * probe
@@ -404,7 +398,7 @@ public class Shell {
 			_outStream.println(ex.getMessage());
 			return false;
 		}
-		
+
 		boolean testExpect = _lastProbing.checkExpectedResult(ep);
 
 		if (testMode) {
@@ -453,7 +447,7 @@ public class Shell {
 		Console console = new Console(binding);
 		console.run();
 	}
-	
+
 	public void hostCommand(ShellParser parser) {
 
 		IPversion ipversion;
@@ -461,7 +455,7 @@ public class Shell {
 			ipversion = IPversion.IPV6;
 		else
 			ipversion = IPversion.IPV4;
-		
+
 		IPNet ip;
 		String hostname = parser.getAddressArg();
 		try {
@@ -569,7 +563,7 @@ public class Shell {
 			groovyConsoleCommand(_parser);
 		if (command.equals("host") || command.equals("host6"))
 			hostCommand(_parser);
-	
+
 		/*
 		 * 'untee' stdout
 		 */
@@ -581,7 +575,7 @@ public class Shell {
 			}
 		}
 	}
-	
+
 	public int runCommand(String commandLine) {
 		_testResult = true;
 		parseShellCommand(commandLine.trim());
