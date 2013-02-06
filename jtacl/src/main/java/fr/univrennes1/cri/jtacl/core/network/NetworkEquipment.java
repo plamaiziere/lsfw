@@ -13,11 +13,10 @@
 
 package fr.univrennes1.cri.jtacl.core.network;
 
-import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.io.PrintStream;
-import java.net.UnknownHostException;
 
 /**
  *	Describes a network equipment.<br/><br/>
@@ -174,11 +173,9 @@ public class NetworkEquipment {
 	 * @return the {@link Iface} directely connected to this IP address.
 	 * Null if this {@link NetworkEquipment} does not contain any interface connected
 	 * to this IP address.
-	 * @throws UnknownHostException if IP addresses cannot be expressed as network addresses.
 	 */
-	public Iface getIfaceConnectedTo(IPNet ip) throws UnknownHostException {
+	public Iface getIfaceConnectedTo(IPNet ip) {
 		for (String name: _ifaces.keySet()) {
-
 			Iface iface = _ifaces.get(name);
 			if (iface.getLinkConnectedTo(ip) != null)
 				return iface;
