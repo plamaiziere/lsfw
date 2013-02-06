@@ -16,7 +16,6 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
@@ -515,30 +514,20 @@ public class PacketFilter extends GenericEquipment {
 			if (nbargs == 5 && sparams[4].equals("-blackhole")) {
 				route = new Route<IfaceLink>(prefix);
 			} else {
-				Iface iface = null;
-				IfaceLink link = null;
+				Iface iface;
+				IfaceLink link;
 
 				/*
 				 * use the directly connected network containing nextHop
 				 */
-				try {
-					iface = getIfaceConnectedTo(nexthop);
-				} catch (UnknownHostException ex) {
-					throw new JtaclConfigurationException("Invalid route " +
-							sroute + " " + ex.getMessage());
-				}
+				iface = getIfaceConnectedTo(nexthop);
 				if (iface == null) {
 					Log.config().severe("Invalid route, nexthop" +
 							" is not on a subnet of this equipment: " + _name +
 							": " + sroute);
 					continue;
 				}
-				try {
-					link = iface.getLinkConnectedTo(nexthop);
-				} catch (UnknownHostException ex) {
-					throw new JtaclConfigurationException("Invalid route " +
-							sroute + " " + ex.getMessage());
-				}
+				link = iface.getLinkConnectedTo(nexthop);
 
 				/*
 				 * add the route.
@@ -799,12 +788,8 @@ public class PacketFilter extends GenericEquipment {
 				 * XXX: we don't handle PFI_AFLAG_PEER
 				 */
 				if ((flags & PfConst.PFI_AFLAG_BROADCAST) > 0) {
-					try {
-						IPNet ip = link.getNetwork().lastNetworkAddress().hostAddress();
-						addr.add(ip);
-					} catch (UnknownHostException ex) {
-						throwCfgException("invalid IP address: " + ex.getMessage());
-					}
+					IPNet ip = link.getNetwork().lastNetworkAddress().hostAddress();
+					addr.add(ip);
 				}
 				if ((flags & PfConst.PFI_AFLAG_NETWORK) > 0) {
 					IPNet ip = link.getNetwork();
@@ -1227,11 +1212,7 @@ public class PacketFilter extends GenericEquipment {
 		 * link
 		 */
 		IfaceLink link;
-		try {
-			link = pfiface.getIface().getLinkConnectedTo(nhost.getAddr().get(0));
-		} catch (UnknownHostException ex) {
-			link = null;
-		}
+		link = pfiface.getIface().getLinkConnectedTo(nhost.getAddr().get(0));
 		if (link == null) {
 			warnConfig("invalid nexthop (no link): " + xhost.getFirstAddress());
 		}
@@ -2233,7 +2214,7 @@ public class PacketFilter extends GenericEquipment {
 	 */
 	protected MatchResult hostFilter(FilterContext context, PfNodeHost host,
 			IPNet ipAddress, AddressFamily af)
-		throws UnknownHostException {
+		 {
 
 		/*
 		 * any
@@ -2408,14 +2389,7 @@ public class PacketFilter extends GenericEquipment {
 		int mUnknown = 0;
 
 		for (PfNodeHost host: ipspec) {
-			MatchResult match = MatchResult.NOT;
-			try {
-				match = hostFilter(context, host, ipAddress, af);
-			} catch (UnknownHostException ex) {
-				// should not happen
-				throw new JtaclInternalException(("unexpected exception: " +
-					ex.getMessage()));
-			}
+			MatchResult match = hostFilter(context, host, ipAddress, af);
 			switch (match) {
 				case ALL:
 						mAll++;
