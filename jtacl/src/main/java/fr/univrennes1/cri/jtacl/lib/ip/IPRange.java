@@ -29,9 +29,8 @@ public class IPRange implements IPRangeable {
 	 * Constructs a new range using the two IP address in argument
 	 * @param ipFirst first IP address
 	 * @param ipLast last IP address
-	 * @throws UnknownHostException  if some parameters are invalid.
 	 */
-	public IPRange(IPNet ipFirst, IPNet ipLast) throws UnknownHostException {
+	public IPRange(IPNet ipFirst, IPNet ipLast) {
 		_ipFirst = ipFirst.networkAddress();
 		_ipLast = ipLast.networkAddress();
 	}
@@ -85,15 +84,6 @@ public class IPRange implements IPRangeable {
 		return _ipLast;
 	}
 
-/**
-	 * Checks if this range instance contains an {@link IPNet} object.<br/>
-	 * A range object contains another {@link IPNet} object if all the
-	 * IP addresses designated by the second {@link IPNet} object are included
-	 * in this range.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
-	 * included in this instance.
-	 */
 	@Override
 	public final boolean contains(IPNet ipnet) {
 
@@ -104,12 +94,6 @@ public class IPRange implements IPRangeable {
 				lastOther.isBetweenIP(_ipFirst, _ipLast);
 	}
 
-	/**
-	 * Checks if this range instance overlaps the IPNet object in
-	 * argument. The range overlaps if they share at least one IP address.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if this range instance overlaps the IPNet object in argument.
-	 */
 	@Override
 	public final boolean overlaps(IPNet ipnet) {
 		IPNet firstOther = ipnet.networkAddress();
