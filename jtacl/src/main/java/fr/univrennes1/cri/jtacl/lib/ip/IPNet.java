@@ -42,7 +42,7 @@ import org.xbill.DNS.Type;
  * Mostly taken from IPy http://pypi.python.org/pypi/IPy
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public final class IPNet implements Comparable {
+public final class IPNet implements Comparable, IPRangeable {
 
 	/*
 	 * ip, prefixlen, ipversion
@@ -792,37 +792,34 @@ public final class IPNet implements Comparable {
 		return getIpVersion().equals(ipnet.getIpVersion());
 	}
 
-	/**
-	 * Checks if this {@link IPNet} instance contains another {@link IPNet} object.<br/>
-	 * An {@link IPNet} object contains another {@link IPNet} object if all the
-	 * IP addresses designated by the second {@link IPNet} object are included
-	 * in the first {@link IPNet} object.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
-	 * included in this instance.
-	 */
-	public final boolean contains(IPNet ipnet) {
+	@Override
+	public IPNet getIpFirst() {
+		return networkAddress();
+	}
+
+	@Override
+	public IPNet getIpLast() {
+		return lastNetworkAddress();
+	}
+
+	@Override
+	public final boolean contains(IPRangeable iprange) {
 
 		IPNet first = networkAddress();
 		IPNet last  = lastNetworkAddress();
-		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.lastNetworkAddress();
+		IPNet firstOther = iprange.getIpFirst();
+		IPNet lastOther = iprange.getIpLast();
 
 		return firstOther.isBetweenIP(first, last) &&
 				lastOther.isBetweenIP(first, last);
 	}
 
-	/**
-	 * Checks if this {@link IPNet} instance overlaps the IPNet object in
-	 * argument. Two IPNet objects overlap if they share at least one IP address.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if this IPNet instance overlaps the IPNet object in argument.
-	 */
-	public final boolean overlaps(IPNet ipnet) {
+	@Override
+	public final boolean overlaps(IPRangeable iprange) {
 		IPNet first = networkAddress();
 		IPNet last  = lastNetworkAddress();
-		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.lastNetworkAddress();
+		IPNet firstOther = iprange.getIpFirst();
+		IPNet lastOther = iprange.getIpLast();
 
 		return first.isBetweenIP(firstOther, lastOther) ||
 				last.isBetweenIP(firstOther, lastOther) ||
