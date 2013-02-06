@@ -429,15 +429,7 @@ public class CpFw extends GenericEquipment {
 			throwCfgException("invalid IP address: " + sIpLast, true);
 		}
 
-		IPRange ipRange = null;
-		try {
-			ipRange = new IPRange(ipFirst, ipLast);
-		} catch (UnknownHostException ex) {
-			throwCfgException("invalid IP range: " + sIpFirst + " - "
-					+ sIpLast, true);
-		}
-
-
+		IPRange ipRange = new IPRange(ipFirst, ipLast);
 		CpNetworkRange networkobj = new CpNetworkRange(sName, sClassName,
 				sComment, ipRange);
 
