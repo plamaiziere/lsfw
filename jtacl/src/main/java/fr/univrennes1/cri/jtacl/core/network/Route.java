@@ -15,7 +15,6 @@ package fr.univrennes1.cri.jtacl.core.network;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRoutingException;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import java.net.UnknownHostException;
 
 /**
  * This class describes a route.<br/>
@@ -57,17 +56,12 @@ public class Route<T> {
 	 * @param link the outgoing link associated to this route. Could be null.
 	 */
 	public Route(IPNet prefix, IPNet nextHop, int metric, T link) {
-		try {
-			/*
-			 * we assert that prefix is really a network prefix.
-			 */
-			if (!prefix.networkAddress().equals(prefix)) {
-				throw new JtaclRoutingException("route with not a network address prefix");
-			}
-		} catch (UnknownHostException ex) {
-				throw new JtaclRoutingException("route with invalid prefix: " +
-					ex.getMessage());
-		}
+		/*
+		 * we assert that prefix is really a network prefix.
+		 */
+		if (!prefix.networkAddress().equals(prefix))
+			throw new JtaclRoutingException("route with invalid network prefix");
+
 		_prefix = prefix;
 		_nextHop = nextHop;
 		_metric = metric;
@@ -79,17 +73,9 @@ public class Route<T> {
 	 * @param prefix the {@link IPNet} prefix of the route.
 	 */
 	public Route(IPNet prefix) {
-		try {
-			/*
-			 * we assert that prefix is really a network prefix.
-			 */
-			if (!prefix.networkAddress().equals(prefix)) {
-				throw new JtaclRoutingException("route with not a network address prefix");
-			}
-		} catch (UnknownHostException ex) {
-				throw new JtaclRoutingException("route with invalid prefix: " +
-					ex.getMessage());
-		}
+		if (!prefix.networkAddress().equals(prefix))
+			throw new JtaclRoutingException("route with invalid network prefix");
+
 		_prefix = prefix;
 		_nextHop = null;
 		_metric = 0;
@@ -135,7 +121,7 @@ public class Route<T> {
 	public boolean isNullRoute() {
 		return _link == null && _nextHop == null;
 	}
-	
+
 	@Override
 	public String toString() {
 		if (isNullRoute())
