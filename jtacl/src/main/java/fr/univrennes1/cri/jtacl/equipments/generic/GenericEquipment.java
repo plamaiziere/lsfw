@@ -240,23 +240,13 @@ public class GenericEquipment extends NetworkEquipment {
 		 * containing nextHop
 		 */
 		if (sLink.isEmpty()) {
-			try {
-				iface = getIfaceConnectedTo(nexthop);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid route " +
-						s + " " + ex.getMessage());
-			}
+			iface = getIfaceConnectedTo(nexthop);
 			if (iface == null) {
 				throw new JtaclConfigurationException("Invalid route, nexthop" +
 						" is not on a subnet of this equipment: " + s);
 			}
 
-			try {
-				link = iface.getLinkConnectedTo(nexthop);
-			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid route " +
-						s + " " + ex.getMessage());
-			}
+			link = iface.getLinkConnectedTo(nexthop);
 		} else {
 			/*
 			 * link specified
