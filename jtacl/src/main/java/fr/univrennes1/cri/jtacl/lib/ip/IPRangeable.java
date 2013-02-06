@@ -22,15 +22,15 @@ import java.net.UnknownHostException;
 public interface IPRangeable {
 
 	/**
-	 * Checks if this range instance contains an {@link IPNet} object.<br/>
-	 * A range object contains another {@link IPNet} object if all the
-	 * IP addresses designated by the second {@link IPNet} object are included
+	 * Checks if this range instance contains a range.<br/>
+	 * A range object contains another range object if all the
+	 * IP addresses designated by the second range object are included
 	 * in this range.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if all the IP addresses of the {@link IPNet} ipnet object are
+	 * @param iprange Range object to compare.
+	 * @return true if all the IP addresses of the range object are
 	 * included in this instance.
 	 */
-	boolean contains(IPNet ipnet);
+	boolean contains(IPRangeable iprange);
 
 	/**
 	 * Returns the first IP address of this range.
@@ -45,11 +45,11 @@ public interface IPRangeable {
 	IPNet getIpLast();
 
 	/**
-	 * Checks if this range instance overlaps the IPNet object in
-	 * argument. The range overlaps if they share at least one IP address.
-	 * @param ipnet IPNet object to compare.
-	 * @return true if this range instance overlaps the IPNet object in argument.
+	 * Checks if this range instance overlaps the range in argument.
+	 * The range overlaps if they share at least one IP address.
+	 * @param iprange IPRangeable object to compare.
+	 * @return true if this range instance overlaps the range in argument.
 	 */
-	boolean overlaps(IPNet ipnet);
+	boolean overlaps(IPRangeable iprange);
 
 }
