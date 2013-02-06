@@ -85,19 +85,19 @@ public class IPRange implements IPRangeable {
 	}
 
 	@Override
-	public final boolean contains(IPNet ipnet) {
+	public final boolean contains(IPRangeable iprange) {
 
-		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.lastNetworkAddress();
+		IPNet firstOther = iprange.getIpFirst();
+		IPNet lastOther = iprange.getIpLast();
 
 		return firstOther.isBetweenIP(_ipFirst, _ipLast) &&
 				lastOther.isBetweenIP(_ipFirst, _ipLast);
 	}
 
 	@Override
-	public final boolean overlaps(IPNet ipnet) {
-		IPNet firstOther = ipnet.networkAddress();
-		IPNet lastOther = ipnet.lastNetworkAddress();
+	public final boolean overlaps(IPRangeable iprange) {
+		IPNet firstOther = iprange.getIpFirst();
+		IPNet lastOther = iprange.getIpLast();
 
 		return _ipFirst.isBetweenIP(firstOther, lastOther) ||
 				_ipLast.isBetweenIP(firstOther, lastOther) ||
