@@ -13,11 +13,10 @@
 
 package fr.univrennes1.cri.jtacl.core.network;
 
-import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclTopologyException;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import java.net.UnknownHostException;
 
 /**
  * Describes a network interface.<br/><br/>
@@ -116,9 +115,8 @@ public class Iface {
 	 * @param ip the {@link IPNet} IP address directely connected.
 	 * @return the {@link IfaceLink} link with the IP address directely connected.
 	 * Null if no link was found.
-	 * @throws UnknownHostException if IP addresses cannot be expressed as network addresses.
 	 */
-	public IfaceLink getLinkConnectedTo(IPNet ip) throws UnknownHostException {
+	public IfaceLink getLinkConnectedTo(IPNet ip) {
 		for (Integer i: _links.keySet()) {
 			IfaceLink ilink = _links.get(i);
 			if (ilink.getNetwork().contains(ip))
