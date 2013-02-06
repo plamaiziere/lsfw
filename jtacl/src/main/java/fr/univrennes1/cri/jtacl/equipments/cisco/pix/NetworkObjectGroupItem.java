@@ -13,10 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import java.net.UnknownHostException;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 
 /**
  * An item of a network object group.
@@ -66,17 +64,11 @@ public class NetworkObjectGroupItem extends ObjectGroupItem {
 	 * @return a {@link MatchResult} according to the test.
 	 */
 	public MatchResult matches(IPNet ip) {
-		try {
-			if (_ipAddress.contains(ip))
-				return MatchResult.ALL;
-			if (_ipAddress.overlaps(ip))
-				return MatchResult.MATCH;
-			return MatchResult.NOT;
-			} catch (UnknownHostException ex) {
-			// should not happen
-			throw new JtaclInternalException("unexpected exception: "
-				+ ex.getMessage());
-		}
+		if (_ipAddress.contains(ip))
+			return MatchResult.ALL;
+		if (_ipAddress.overlaps(ip))
+			return MatchResult.MATCH;
+		return MatchResult.NOT;
 	}
 
 }
