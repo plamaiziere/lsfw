@@ -55,16 +55,10 @@ public class CpNetworkRange extends CpNetworkObject {
 
 	@Override
 	public MatchResult matches(IPNet ip) {
-		try {
-			if (_ipRange.contains(ip))
-				return MatchResult.ALL;
-			if (_ipRange.overlaps(ip))
-				return MatchResult.MATCH;
-			return MatchResult.NOT;
-		} catch (UnknownHostException ex) {
-			// should not happen
-			throw new JtaclInternalException("unexpected exception: "
-				+ ex.getMessage());
-		}
+		if (_ipRange.contains(ip))
+			return MatchResult.ALL;
+		if (_ipRange.overlaps(ip))
+			return MatchResult.MATCH;
+		return MatchResult.NOT;
 	}
 }
