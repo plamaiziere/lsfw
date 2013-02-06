@@ -314,10 +314,10 @@ public class SimpleRouter extends GenericEquipment {
 				 */
 				IPNet fromIP = new IPNet(rfromIP);
 				IPNet toIP = new IPNet(rtoIP);
-				if (!fromIP.contains(probe.getSourceAddress())) {
+				if (!fromIP.networkContains(probe.getSourceAddress())) {
 					continue;
 				}
-				if (!toIP.contains(probe.getDestinationAddress())) {
+				if (!toIP.networkContains(probe.getDestinationAddress())) {
 					continue;
 				}
 				AclResult aclResult = new AclResult(raction.equals("accept") ?

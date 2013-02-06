@@ -1025,7 +1025,7 @@ public class CiscoRouter extends GenericEquipment {
 		 * so compare the networks.
 		 */
 		if (aceNetmask == null) {
- 			if (!aceIp.contains(ip)) {
+ 			if (!aceIp.networkContains(ip)) {
 				if (!aceIp.overlaps(ip))
 					return MatchResult.NOT;
 				else
