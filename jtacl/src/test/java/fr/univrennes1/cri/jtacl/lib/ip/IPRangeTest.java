@@ -137,4 +137,52 @@ public class IPRangeTest extends TestCase {
 		assertFalse(range.overlaps(ip2));
  	}
 
+	/**
+	 * Test of toIPNet()
+	 */
+	public void testToIPNet() throws UnknownHostException, IOException  {
+		System.out.println("toIPNet");
+
+		IPNet ip1;
+		IPNet ip2;
+
+		ip1 = new IPNet("127.0.0.0");
+		ip2 = new IPNet("127.0.0.255");
+
+		IPRange range = new IPRange(ip1, ip2);
+		IPNet rip = range.toIPNet();
+		assertEquals("127.0.0.0/24", rip.toString());
+
+		ip1 = new IPNet("0.0.0.0/0");
+		range = new IPRange(ip1);
+		rip = range.toIPNet();
+		assertEquals("0.0.0.0/0", rip.toString());
+
+		ip1 = new IPNet("::0");
+		ip2 = new IPNet("::ffff");
+		range = new IPRange(ip1, ip2);
+		rip = range.toIPNet();
+		assertEquals("::0/112", rip.toString("::"));
+
+		ip1 = new IPNet("127.0.0.1");
+		ip2 = new IPNet("127.0.0.255");
+		range = new IPRange(ip1, ip2);
+		try {
+			rip = range.toIPNet();
+			assertTrue("should be unreached (not a network boundary)", false);
+		} catch (UnknownHostException ex) {
+			assertTrue("Exception raided ok", true);
+		}
+
+		ip1 = new IPNet("::1");
+		ip2 = new IPNet("::ffff");
+		range = new IPRange(ip1, ip2);
+		try {
+			rip = range.toIPNet();
+			assertTrue("should be unreached (not a network boundary)", false);
+		} catch (UnknownHostException ex) {
+			assertTrue("Exception raided ok", true);
+		}
+	}
+
 }

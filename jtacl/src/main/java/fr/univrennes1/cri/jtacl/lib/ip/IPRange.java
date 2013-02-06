@@ -110,4 +110,41 @@ public class IPRange implements IPRangeable {
 		return _ipFirst.toString("i::") + "-" + _ipLast.toString("i::");
 	}
 
+	@Override
+	public String toString(String format) {
+		return _ipFirst.toString(format) + "-" + _ipLast.toString(format);
+	}
+
+	@Override
+	public IPNet toIPNet() throws UnknownHostException {
+
+		// size = last - first
+		BigInteger size = _ipLast.getIP();
+		size = size.subtract(_ipFirst.getIP());
+
+		BigInteger ip = _ipFirst.getIP();
+		int len = _ipFirst.isIPv4() ? 31:127;
+		int prefixLen = len - IP.highest1Bits(size);
+		IPBase ipbase = new IPBase(ip, prefixLen, _ipFirst.getIpVersion());
+
+		/*
+		 *  make sure the network is the same as the first ip
+		 * otherwise it will return /24 for something like:
+		 * 192.168.0.1-192.168.1.255
+		 */
+		IPNet checkboundary = new IPNet(ipbase).networkAddress();
+		if (!checkboundary.getIP().equals(_ipFirst.getIP()))
+			throw new UnknownHostException(
+					"Range is not on a network boundary");
+		/*
+		 *  make sure the broadcast is the same as the last ip
+		 * otherwise it will return /16 for something like:
+		 * 192.168.0.0-192.168.191.255
+		 */
+		checkboundary = new IPNet(ipbase).lastNetworkAddress();
+		if (!checkboundary.getIP().equals(_ipLast.getIP()))
+			throw new UnknownHostException(
+					"Range is not on a network boundary");
+		return new IPNet(ipbase);
+	}
 }

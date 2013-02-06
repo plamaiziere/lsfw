@@ -827,6 +827,11 @@ public final class IPNet implements Comparable, IPRangeable {
 				lastOther.isBetweenIP(first, last);
 	}
 
+	@Override
+	public IPNet toIPNet() throws UnknownHostException {
+		return this;
+	}
+
 	/**
 	 * Checks if this {@link IPNet} instance is between two another
 	 * {@link IPNet} objects.<br/>
