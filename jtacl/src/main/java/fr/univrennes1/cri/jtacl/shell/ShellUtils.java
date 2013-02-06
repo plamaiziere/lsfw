@@ -217,16 +217,9 @@ public class ShellUtils {
 				/*
 				 * by source IP address
 				 */
-				try {
-					if (link.getIp().equals(sourceIP) ||
-							link.getNetwork().contains(sourceIP))
-						resLinks.add(link);
-
-					} catch (UnknownHostException ex) {
-						// should not happen, just in case.
-						throw new JtaclInternalException("Invalid network in " +
-							link.getNetwork().toString());
-					}
+				if (link.getIp().equals(sourceIP) ||
+						link.getNetwork().contains(sourceIP))
+					resLinks.add(link);
 				continue;
 			}
 		}
