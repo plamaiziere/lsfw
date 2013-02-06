@@ -14,7 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
 /**
  * Checkpoint network object left unhandled by lsfw
@@ -39,7 +39,7 @@ public class CpUnhandledNetwork extends CpNetworkObject {
 	}
 
 	@Override
-	public MatchResult matches(IPNet ip) {
+	public MatchResult matches(IPRangeable ip) {
 		return MatchResult.UNKNOWN;
 	}
 

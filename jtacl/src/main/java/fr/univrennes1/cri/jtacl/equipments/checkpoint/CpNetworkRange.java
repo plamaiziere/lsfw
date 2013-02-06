@@ -14,8 +14,8 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
 /**
  * Checkpoint IP network range
@@ -52,7 +52,7 @@ public class CpNetworkRange extends CpNetworkObject {
 	}
 
 	@Override
-	public MatchResult matches(IPNet ip) {
+	public MatchResult matches(IPRangeable ip) {
 		if (_ipRange.contains(ip))
 			return MatchResult.ALL;
 		if (_ipRange.overlaps(ip))

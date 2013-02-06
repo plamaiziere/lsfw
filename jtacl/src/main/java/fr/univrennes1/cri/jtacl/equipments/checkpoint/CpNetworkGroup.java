@@ -14,7 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -90,7 +90,7 @@ public class CpNetworkGroup extends CpNetworkObject {
 	}
 
 	@Override
-	public MatchResult matches(IPNet ip) {
+	public MatchResult matches(IPRangeable ip) {
 		/*
 		 * excluded items
 		 */

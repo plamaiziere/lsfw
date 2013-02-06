@@ -14,7 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -70,5 +70,5 @@ public abstract class CpNetworkObject {
 	 * @param ip IP address to test.
 	 * @return the MatchResult of the given IP address.
 	 */
-	public abstract MatchResult matches(IPNet ip);
+	public abstract MatchResult matches(IPRangeable ip);
 }
