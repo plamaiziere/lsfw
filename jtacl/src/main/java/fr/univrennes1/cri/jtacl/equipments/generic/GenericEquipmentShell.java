@@ -14,13 +14,14 @@
 package fr.univrennes1.cri.jtacl.equipments.generic;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.io.*;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -75,7 +76,7 @@ public abstract class GenericEquipmentShell {
 		}
 	}
 
-	protected void printContext(PrintStream output, IPNet ip,
+	protected void printContext(PrintStream output, IPRangeable ip,
 		CrossRefContext ctx, String format) {
 
 		List<String> fmts = GenericEquipmentShellParser.expandFormat(format);
@@ -109,25 +110,27 @@ public abstract class GenericEquipmentShell {
 					output.print(ctx.getFilename());
 					continue;
 				}
-				// host using ptr
-				if (fmt.equals("%h")) {
-					try {
-						String hostname = ip.getHostname();
-						output.print(hostname);
-					} catch (UnknownHostException ex) {
-						output.print("nohost");
+				if (ip.isHost()) {
+					// host using ptr
+					if (fmt.equals("%h")) {
+						try {
+							String hostname = ip.toIPNet().getHostname();
+							output.print(hostname);
+						} catch (UnknownHostException ex) {
+							output.print("nohost");
+						}
+						continue;
 					}
-					continue;
-				}
-				// host using java resolver
-				if (fmt.equals("%H")) {
-					try {
-						String hostname = ip.getCannonicalHostname();
-						output.print(hostname);
-					} catch (UnknownHostException ex) {
-						output.print("nohost");
+					// host using java resolver
+					if (fmt.equals("%H")) {
+						try {
+							String hostname = ip.toIPNet().getCannonicalHostname();
+							output.print(hostname);
+						} catch (UnknownHostException ex) {
+							output.print("nohost");
+						}
+						continue;
 					}
-					continue;
 				}
 				// ip short
 				if (fmt.equals("%i")) {
@@ -171,8 +174,7 @@ public abstract class GenericEquipmentShell {
 	 * @param netCrossRef Map of IPNetCrossRef.
 	 * @param parser Generic equipment parser.
 	 */
-	public void printXrefIp(PrintStream output,
-				Map<IPNet, IPNetCrossRef> netCrossRef,
+	public void printXrefIp(PrintStream output, IPCrossRefMap netCrossRef,
 				GenericEquipmentShellParser parser) {
 
 		IPNet ipreq = null;
@@ -202,7 +204,7 @@ public abstract class GenericEquipmentShell {
 			if (format.contains("l"))
 				fmt += "; %L";
 		}
-		for (IPNet ip: netCrossRef.keySet()) {
+		for (IPRangeable ip: netCrossRef.keySet()) {
 			IPNetCrossRef crossref = netCrossRef.get(ip);
 			if (ipreq != null && !ipreq.overlaps(ip))
 				continue;
