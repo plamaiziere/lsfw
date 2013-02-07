@@ -115,6 +115,18 @@ public class IPRange implements IPRangeable {
 		return _ipFirst.toString(format) + "-" + _ipLast.toString(format);
 	}
 
+	public String toNetString(String format) {
+		IPNet ip;
+		String r;
+		try {
+			ip = toIPNet();
+			r = ip.toString("i::");
+		} catch (UnknownHostException ex) {
+			r = toString("i::");
+		}
+		return r;
+	}
+
 	@Override
 	public IPNet toIPNet() throws UnknownHostException {
 
