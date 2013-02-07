@@ -134,12 +134,12 @@ public abstract class GenericEquipmentShell {
 				}
 				// ip short
 				if (fmt.equals("%i")) {
-					output.print(ip.toString("::i"));
+					output.print(ip.toNetString("::i"));
 					continue;
 				}
 				// ip long
 				if (fmt.equals("%I")) {
-					output.print(ip.toString("i"));
+					output.print(ip.toNetString("i"));
 					continue;
 				}
 				// line short
