@@ -13,20 +13,20 @@
 
 package fr.univrennes1.cri.jtacl.analysis;
 
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Cross reference of an IPNet.
+ * Cross reference of an IP.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IPNetCrossRef {
-	protected IPNet _ip;
+	protected IPRangeable _ip;
 
 	protected List<CrossRefContext> _contexts;
 
-	public IPNetCrossRef(IPNet ip) {
+	public IPNetCrossRef(IPRangeable ip) {
 		_ip = ip;
 		_contexts = new ArrayList<CrossRefContext>();
 	}
@@ -37,6 +37,10 @@ public class IPNetCrossRef {
 
 	public void addContext(CrossRefContext context) {
 		_contexts.add(context);
+	}
+
+	public IPRangeable getIP() {
+		return _ip;
 	}
 
 	@Override
