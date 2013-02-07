@@ -26,7 +26,6 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 public class CpNetworkIP extends CpNetworkObject {
 
 	/* ip/network address */
-	protected IPNet _ipAddress;
 	protected IPRange _ipRange;
 
 	protected boolean _allowBroadcast;
@@ -43,13 +42,8 @@ public class CpNetworkIP extends CpNetworkObject {
 			boolean allowBroadcast) {
 
 		super(name, className, comment, CpNetworkType.IP);
-		_ipAddress = ip;
 		_allowBroadcast = allowBroadcast;
 		_ipRange = new IPRange(ip, _allowBroadcast);
-	}
-
-	public IPNet getIpAddress() {
-		return _ipAddress;
 	}
 
 	public boolean broadcastAllowed() {
@@ -59,7 +53,7 @@ public class CpNetworkIP extends CpNetworkObject {
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
-				+ ", IPNet=" + _ipAddress.toString("i::") + ", allow_broadcast="
+				+ ", range=" + _ipRange.toNetString("i::") + ", allow_broadcast="
 				+ _allowBroadcast;
 	}
 
