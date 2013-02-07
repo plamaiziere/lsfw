@@ -24,6 +24,12 @@ public class IPRangeableComparator implements Comparator<IPRangeable> {
 
 	@Override
 	public int compare(IPRangeable ip1, IPRangeable ip2) {
-		return ip1.getIpFirst().compareTo(ip2.getIpFirst());
+		/*
+		 * compare first by base ip, then by range
+		 */
+		int comp = ip1.getIpFirst().compareTo(ip2.getIpFirst());
+		if (comp != 0)
+			return comp;
+		return ip1.getIpLast().compareTo(ip2.getIpLast());
 	}
 }
