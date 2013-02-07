@@ -439,7 +439,7 @@ public class IPNetTest extends TestCase {
 	/**
 	 * Test of contains, of class IPNet.
 	 */
-	public void testNetworkContains() throws UnknownHostException  {
+	public void testContains() throws UnknownHostException  {
 		System.out.println("networkContains");
 
 		IPNet ip1 = new IPNet("127.0.0.1");
@@ -449,6 +449,10 @@ public class IPNetTest extends TestCase {
 		ip1 = new IPNet("127.0.0.1");
 		ip2 = new IPNet("127.0.0.2");
 		assertFalse(ip1.contains(ip2));
+
+		ip1 = new IPNet("127.0.0.2/24");
+		ip2 = new IPNet("127.0.0.1/24");
+		assertTrue(ip1.contains(ip2));
 
 		ip1 = new IPNet("::1");
 		ip2 = new IPNet("::1");
