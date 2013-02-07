@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
@@ -48,7 +49,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.BasicParseRunner;
@@ -196,10 +196,9 @@ public class CiscoRouter extends GenericEquipment {
 	protected HashMap<String, CiscoIface> _ciscoIfaces = new HashMap<String, CiscoIface>();
 
 	/**
-	 * IPNet cross references
+	 * IP cross references map
 	 */
-	protected Map<IPNet, IPNetCrossRef> _netCrossRef =
-			new HashMap<IPNet, IPNetCrossRef>();
+	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
 	/**
 	 * parse context
@@ -212,9 +211,9 @@ public class CiscoRouter extends GenericEquipment {
 	protected ArrayList<AccessList> _accessLists = new ArrayList<AccessList>();
 
 	/**
-	 * IPNet cross references
+	 * IP cross references map
 	 */
-	Map<IPNet, IPNetCrossRef> getNetCrossRef() {
+	IPCrossRefMap getNetCrossRef() {
 		return _netCrossRef;
 	}
 
@@ -873,7 +872,7 @@ public class CiscoRouter extends GenericEquipment {
 		IPNetCrossRef ref = _netCrossRef.get(ipnet);
 		if (ref == null) {
 			ref = new IPNetCrossRef(ipnet);
-			_netCrossRef.put(ipnet, ref);
+			_netCrossRef.put(ref);
 		}
 		return ref;
 	}
