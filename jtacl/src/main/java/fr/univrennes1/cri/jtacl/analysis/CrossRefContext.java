@@ -13,8 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.analysis;
 
-import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
-
 /**
  * Context of a cross reference
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
