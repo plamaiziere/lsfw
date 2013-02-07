@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
@@ -261,10 +262,9 @@ public class PacketFilter extends GenericEquipment {
 	protected List<PfRule> _refRules = new ArrayList<PfRule>();
 
 	/**
-	 * IPNet cross references
+	 * IP cross references map
 	 */
-	protected Map<IPNet, IPNetCrossRef> _netCrossRef =
-			new HashMap<IPNet, IPNetCrossRef>();
+	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
 	/**
 	 * the next anchor uid that will be generated.
@@ -360,9 +360,9 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	/*
-	 * IPNet cross reference
+	 * IP cross references map
 	 */
-	public Map<IPNet, IPNetCrossRef> getNetCrossRef() {
+	public IPCrossRefMap getNetCrossRef() {
 		return _netCrossRef;
 	}
 
@@ -2011,7 +2011,7 @@ public class PacketFilter extends GenericEquipment {
 		IPNetCrossRef ref = _netCrossRef.get(ipnet);
 		if (ref == null) {
 			ref = new IPNetCrossRef(ipnet);
-			_netCrossRef.put(ipnet, ref);
+			_netCrossRef.put(ref);
 		}
 		return ref;
 	}
