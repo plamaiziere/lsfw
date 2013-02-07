@@ -232,8 +232,8 @@ public class GenericEquipment extends NetworkEquipment {
 			throw new JtaclConfigurationException("Invalid route metric: " + s);
 		}
 
-		Iface iface = null;
-		IfaceLink link = null;
+		Iface iface;
+		IfaceLink link;
 
 		/*
 		 * If no link was specified, use the directly connected network
