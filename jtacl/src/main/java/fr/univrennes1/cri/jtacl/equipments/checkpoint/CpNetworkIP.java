@@ -57,6 +57,10 @@ public class CpNetworkIP extends CpNetworkObject {
 				+ _allowBroadcast;
 	}
 
+	public IPRange getIpRange() {
+		return _ipRange;
+	}
+
 	@Override
 	public MatchResult matches(IPRangeable ip) {
 		if (_ipRange.contains(ip))
@@ -65,5 +69,4 @@ public class CpNetworkIP extends CpNetworkObject {
 			return MatchResult.MATCH;
 		return MatchResult.NOT;
 	}
-
 }
