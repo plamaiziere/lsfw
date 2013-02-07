@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
@@ -31,6 +32,7 @@ import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -41,7 +43,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.BasicParseRunner;
@@ -102,10 +103,9 @@ public class CpFw extends GenericEquipment {
 		= new HashMap<String, CPfwIface>();
 
 	/**
-	 * IPNet cross references
+	 * IP cross references map
 	 */
-	protected Map<IPNet, IPNetCrossRef> _netCrossRef
-			= new HashMap<IPNet, IPNetCrossRef>();
+	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
 	/**
 	 * parse context
@@ -130,9 +130,9 @@ public class CpFw extends GenericEquipment {
 	protected LinkedList <CpFwRule> _fwRules = new LinkedList<CpFwRule>();
 
 	/**
-	 * IPNet cross references
+	 * IP cross references map
 	 */
-	Map<IPNet, IPNetCrossRef> getNetCrossRef() {
+	IPCrossRefMap getNetCrossRef() {
 		return _netCrossRef;
 	}
 
@@ -916,11 +916,11 @@ public class CpFw extends GenericEquipment {
 		ipNetCrossReference();
 	}
 
-	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
-		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+	protected IPNetCrossRef getIPNetCrossRef(IPRangeable iprange) {
+		IPNetCrossRef ref = _netCrossRef.get(iprange);
 		if (ref == null) {
-			ref = new IPNetCrossRef(ipnet);
-			_netCrossRef.put(ipnet, ref);
+			ref = new IPNetCrossRef(iprange);
+			_netCrossRef.put(ref);
 		}
 		return ref;
 	}
@@ -958,16 +958,16 @@ public class CpFw extends GenericEquipment {
 			if (nobj.getType() != CpNetworkType.IP &&
 					nobj.getType() != CpNetworkType.RANGE)
 				continue;
-			IPNet ipnet = null;
+			IPRangeable ip = null;
 			switch (nobj.getType()) {
 				case IP	:	CpNetworkIP nip = (CpNetworkIP) nobj;
-							ipnet = nip.getIpAddress();
+							ip = nip.getIpRange();
 							break;
 				case RANGE: CpNetworkRange nrange = (CpNetworkRange) nobj;
-							ipnet = nrange.getIpRange().getIpFirst();
+							ip = nrange.getIpRange();
 							break;
 			}
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ipnet);
+			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
 			crossRefNetworkLink(ipNetRef, nobj);
 		}
 	}
