@@ -26,7 +26,7 @@ public class IPRange implements IPRangeable {
 	protected IPNet _ipLast;
 
 	/**
-	 * Constructs a new range using the two IP addresses in argument
+	 * Constructs a new range using the two IP network addresses in argument
 	 * @param ipFirst first IP address
 	 * @param ipLast last IP address
 	 */
@@ -37,7 +37,7 @@ public class IPRange implements IPRangeable {
 
 	/**
 	 * Constructs a new range using the IPNet address in argument.
-	 * The new range is between the host ip address of the given ipnet address
+	 * The new range is between the network ip address of the given ipnet address
 	 * and the lastNetworkAddress of the given ipnet address.
 	 * @param ipnet ipnet address to use.
 	 */
@@ -48,7 +48,7 @@ public class IPRange implements IPRangeable {
 
 	/**
 	 * Constructs a new range using the IPNet address in argument.
-	 * The new range is between the host ip address of the given ipnet address
+	 * The new range is between the network ip address of the given ipnet address
 	 * and the lastNetworkAddress of the given ipnet address. If
 	 * includeLastAddress is true, the last network address is included.
 	 * @param ipnet ipnet address to use.
