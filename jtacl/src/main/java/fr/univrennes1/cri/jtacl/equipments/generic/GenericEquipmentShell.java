@@ -19,8 +19,11 @@ import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeableComparator;
 import java.io.*;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -204,7 +207,9 @@ public abstract class GenericEquipmentShell {
 			if (format.contains("l"))
 				fmt += "; %L";
 		}
-		for (IPRangeable ip: netCrossRef.keySet()) {
+		List<IPRangeable> list = new LinkedList<IPRangeable>(netCrossRef.keySet());
+		Collections.sort(list, new IPRangeableComparator());
+		for (IPRangeable ip: list) {
 			IPNetCrossRef crossref = netCrossRef.get(ip);
 			if (ipreq != null && !ipreq.overlaps(ip))
 				continue;
