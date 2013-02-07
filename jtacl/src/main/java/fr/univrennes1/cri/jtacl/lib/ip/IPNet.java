@@ -908,10 +908,7 @@ public final class IPNet implements Comparable, IPRangeable {
 		return new IPNet(_ip.getIP(), _ip.getIpVersion(), mask);
 	}
 
-	/**
-	 * Tests if this {@link IPNet} instance is a single host IP address.
-	 * @return true if this {@link IPNet} instance is a single host IP address.
-	 */
+	@Override
 	public final boolean isHost() {
 		return _ip.getPrefixlen() == IP.maxPrefixLen(_ip.getIpVersion());
 	}
@@ -1009,19 +1006,7 @@ public final class IPNet implements Comparable, IPRangeable {
 		return toString("");
 	}
 
-	/**
-	 * Returns a {@link String} representation of this {@link IPNet} instance
-	 * according to the {@link String} format.<br/><br/>
-	 * Formats:<ul>
-	 * <li>'i': (ip) do not output the prefix length if this a host.</li>
-	 * <li>'n': (netmask use a netmask representation to output the prefix
-	 * length (IPv4 only).</li>
-	 * <li>'s': (short) never output the prefix length.</li>
-	 * <li>'::' (compress) compress the output for IPv6 address.</li>
-	 * </ul>
-	 * @param format Format string
-	 * @return a {@link String} representation of this {@link IPNet} instance.
-	 */
+	@Override
 	public final String toString(String format) {
 		boolean fshort = format.contains("s");
 		boolean fcompress = format.contains("::");
@@ -1048,6 +1033,11 @@ public final class IPNet implements Comparable, IPRangeable {
 				(fip && _ip.getPrefixlen() == IP.maxPrefixLen(_ip.getIpVersion()))))
 			result = result + "/" + s[1];
 		return result;
+	}
+
+	@Override
+	public String toNetString(String format) {
+		return toString(format);
 	}
 
 	@Override
