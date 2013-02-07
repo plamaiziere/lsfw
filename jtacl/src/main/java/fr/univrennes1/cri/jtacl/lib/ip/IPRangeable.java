@@ -74,4 +74,17 @@ public interface IPRangeable {
 	 */
 	public String toString(String format);
 
+	/**
+	 * Tests if this instance is a single host IP address.
+	 * @return true if this instance is a single host IP address.
+	 */
+	public boolean isHost();
+
+	/**
+	 * Returns a String representation of this range according
+	 * to the String format. If this range is a network, displays it as a
+	 * network.
+	 */
+	public String toNetString(String format);
+
 }
