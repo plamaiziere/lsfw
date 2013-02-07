@@ -115,6 +115,7 @@ public class IPRange implements IPRangeable {
 		return _ipFirst.toString(format) + "-" + _ipLast.toString(format);
 	}
 
+	@Override
 	public String toNetString(String format) {
 		IPNet ip;
 		String r;
@@ -159,4 +160,10 @@ public class IPRange implements IPRangeable {
 					"Range is not on a network boundary");
 		return new IPNet(ipbase);
 	}
+
+	@Override
+	public boolean isHost() {
+		return _ipFirst.getIP().compareTo(_ipLast.getIP()) == 0;
+	}
+
 }
