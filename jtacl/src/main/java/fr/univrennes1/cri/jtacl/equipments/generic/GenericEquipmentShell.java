@@ -14,8 +14,8 @@
 package fr.univrennes1.cri.jtacl.equipments.generic;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
-import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
