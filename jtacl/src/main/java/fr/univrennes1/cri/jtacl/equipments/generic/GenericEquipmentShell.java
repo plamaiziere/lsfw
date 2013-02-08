@@ -16,10 +16,20 @@ package fr.univrennes1.cri.jtacl.equipments.generic;
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclParameterException;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeableComparator;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRangeComparator;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.shell.ShellUtils;
 import java.io.*;
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -79,7 +89,7 @@ public abstract class GenericEquipmentShell {
 		}
 	}
 
-	protected void printContext(PrintStream output, IPRangeable ip,
+	protected void printIpContext(PrintStream output, IPRangeable ip,
 		CrossRefContext ctx, String format) {
 
 		List<String> fmts = GenericEquipmentShellParser.expandFormat(format);
@@ -171,6 +181,87 @@ public abstract class GenericEquipmentShell {
 		output.println();
 	}
 
+	protected void printServiceContext(PrintStream output, PortRange portrange,
+		ServiceCrossRefContext ctx, String format) {
+
+		List<String> fmts = GenericEquipmentShellParser.expandFormat(format);
+		for (String fmt: fmts) {
+			if (!fmt.startsWith("%"))
+				output.print(fmt);
+			else {
+				// context name
+				if (fmt.equals("%c")) {
+					output.print(ctx.getContextName());
+					continue;
+				}
+				// context comnent
+				if (fmt.equals("%C")) {
+					output.print(ctx.getComment());
+					continue;
+				}
+				// equipment name
+				if (fmt.equals("%e")) {
+					output.print(getEquipment().getName());
+					continue;
+				}
+				// filename without path
+				if (fmt.equals("%f")) {
+					File f = new File(ctx.getFilename());
+					output.print(f.getName());
+					continue;
+				}
+				// filename with path
+				if (fmt.equals("%F")) {
+					output.print(ctx.getFilename());
+					continue;
+				}
+				// line short
+				if (fmt.equals("%l")) {
+					String line = ctx.getContextString().trim();
+					Scanner sc = new Scanner(line);
+					if (sc.hasNextLine())
+						output.print(sc.nextLine());
+					else
+						output.print(line);
+					continue;
+				}
+				// line long
+				if (fmt.equals("%L")) {
+					String line = ctx.getContextString().trim();
+					output.print(line);
+					continue;
+				}
+				// line number
+				if (fmt.equals("%N")) {
+					output.print(ctx.getLinenumber());
+					continue;
+				}
+				if (fmt.equals("%r")) {
+					output.print(portrange.toText());
+					continue;
+				}
+				if (fmt.equals("%t")) {
+					output.print(ctx.getType());
+					continue;
+				}
+				if (fmt.equals("%p")) {
+					boolean first = true;
+					for (Integer proto: ctx.getProtoSpec()) {
+						if (!first)
+							output.print("/");
+						first = false;
+						if (proto == Protocols.UDP)
+							output.print("UDP");
+						if (proto == Protocols.TCP)
+							output.print("TCP");
+					}
+					continue;
+				}
+			}
+		}
+		output.println();
+	}
+
 	/**
 	 * Print IP cross references
 	 * @param output output stream.
@@ -216,9 +307,76 @@ public abstract class GenericEquipmentShell {
 			if (parser.getXrefHost() != null && !ip.isHost())
 				continue;
 			for (CrossRefContext ctx: crossref.getContexts()) {
-				printContext(output, ip, ctx, fmt);
+				printIpContext(output, ip, ctx, fmt);
 			}
 		}
 	}
 
+	/**
+	 * Print services cross references
+	 * @param output output stream.
+	 * @param serviceCrossRef Map of ServiceCrossRef.
+	 * @param parser Generic equipment parser.
+	 */
+	public void printXrefService(PrintStream output,
+					ServiceCrossRefMap serviceCrossRef,
+					GenericEquipmentShellParser parser) {
+
+		/*
+		 * protocols
+		 */
+		Integer protoreq = null;
+		String sprotoreq = parser.getXrefProto();
+		if (sprotoreq != null) {
+			if (sprotoreq.equals("tcp"))
+				protoreq = Protocols.TCP;
+			if (sprotoreq.equals("udp"))
+				protoreq = Protocols.UDP;
+		}
+
+		/*
+		 * type
+		 */
+		String sdirection = parser.getXrefType();
+
+		/*
+		 * port range
+		 */
+		String sportreq = parser.getXrefService();
+		PortRange portreq = null;
+		if (sportreq != null) {
+			try {
+				PortSpec portSpecReq = ShellUtils.parsePortSpec(sportreq, sprotoreq);
+				portreq = portSpecReq.getRanges().get(0);
+			} catch (JtaclParameterException ex) {
+				output.println(ex.getMessage());
+				return;
+			}
+		}
+		String fmt = parser.getXrefFmt();
+		if (fmt == null) {
+			fmt = "%r; %p; %t; %c; %C; %l;";
+		}
+		List<PortRange> list = new LinkedList<PortRange>(serviceCrossRef.keySet());
+		Collections.sort(list, new PortRangeComparator());
+
+		for (PortRange portrange: list) {
+			ServiceCrossRef crossref = serviceCrossRef.get(portrange);
+			if (portreq != null && !portreq.overlaps(portrange))
+				continue;
+			for (ServiceCrossRefContext ctx: crossref.getContexts()) {
+				if (protoreq != null && !ctx.getProtoSpec().contains(protoreq))
+					continue;
+				if (sdirection != null) {
+					if (sdirection.equals("from")
+							&& ctx.getType() != ServiceCrossRefType.FROM)
+						continue;
+					if (sdirection.equals("to")
+							&& ctx.getType() != ServiceCrossRefType.TO)
+						continue;
+				}
+				printServiceContext(output, portrange, ctx, fmt);
+			}
+		}
+	}
 }
