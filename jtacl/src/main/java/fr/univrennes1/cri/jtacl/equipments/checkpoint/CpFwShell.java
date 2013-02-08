@@ -116,7 +116,7 @@ public class CpFwShell extends GenericEquipmentShell {
 
 		if (shellCmd.equals("help"))
 			shellHelp(_outStream);
-		if (shellCmd.equals("xref"))
+		if (shellCmd.equals("xref-ip"))
 			printXrefIp(_outStream, _cpfw.getNetCrossRef(), _shellParser);
 		if (shellCmd.equals("show-service"))
 			commandShowService(_outStream, _shellParser);
