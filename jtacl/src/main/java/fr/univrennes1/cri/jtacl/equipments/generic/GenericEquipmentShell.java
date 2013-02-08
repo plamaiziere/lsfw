@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.generic;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
-import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
@@ -174,7 +174,7 @@ public abstract class GenericEquipmentShell {
 	/**
 	 * Print IP cross references
 	 * @param output output stream.
-	 * @param netCrossRef Map of IPNetCrossRef.
+	 * @param netCrossRef Map of IPCrossRef.
 	 * @param parser Generic equipment parser.
 	 */
 	public void printXrefIp(PrintStream output, IPCrossRefMap netCrossRef,
@@ -210,7 +210,7 @@ public abstract class GenericEquipmentShell {
 		List<IPRangeable> list = new LinkedList<IPRangeable>(netCrossRef.keySet());
 		Collections.sort(list, new IPRangeableComparator());
 		for (IPRangeable ip: list) {
-			IPNetCrossRef crossref = netCrossRef.get(ip);
+			IPCrossRef crossref = netCrossRef.get(ip);
 			if (ipreq != null && !ipreq.overlaps(ip))
 				continue;
 			if (parser.getXrefHost() != null && !ip.isHost())

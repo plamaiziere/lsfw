@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
-import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -648,7 +648,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				/*
 				 * cross reference
 				 */
-				IPNetCrossRef ixref = getIPNetCrossRef(ip);
+				IPCrossRef ixref = getIPNetCrossRef(ip);
 				CrossRefContext refctx =
 						new CrossRefContext(_parseContext.getLine(),
 						"network-object-group",
@@ -997,7 +997,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 * cross reference
 		 */
 		IPNet ip = parseIp(IPvalue);
-		IPNetCrossRef ixref = getIPNetCrossRef(ip);
+		IPCrossRef ixref = getIPNetCrossRef(ip);
 		CrossRefContext refctx =
 				new CrossRefContext(_parseContext.getLine(), "name", name,
 					_parseContext.getFileName(),
@@ -1206,10 +1206,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 
-	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
-		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+	protected IPCrossRef getIPNetCrossRef(IPNet ipnet) {
+		IPCrossRef ref = _netCrossRef.get(ipnet);
 		if (ref == null) {
-			ref = new IPNetCrossRef(ipnet);
+			ref = new IPCrossRef(ipnet);
 			_netCrossRef.put(ref);
 		}
 		return ref;
@@ -1224,7 +1224,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			NetworkObjectGroupItem networkGroupItem =
 				(NetworkObjectGroupItem) groupItem;
 			IPNet ip = networkGroupItem.getIpAddress();
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 			ipNetRef.addContext(refContext);
 		}
 	}
@@ -1250,13 +1250,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 
 		IPNet ip = acl.getSourceIp();
 		if (ip != null) {
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 			ipNetRef.addContext(refContext);
 		}
 
 		ip = acl.getDestIp();
 		if (ip != null) {
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 			ipNetRef.addContext(refContext);
 		}
 

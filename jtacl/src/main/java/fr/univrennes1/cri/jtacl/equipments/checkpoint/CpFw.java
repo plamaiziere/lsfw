@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
-import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -916,16 +916,16 @@ public class CpFw extends GenericEquipment {
 		ipNetCrossReference();
 	}
 
-	protected IPNetCrossRef getIPNetCrossRef(IPRangeable iprange) {
-		IPNetCrossRef ref = _netCrossRef.get(iprange);
+	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
+		IPCrossRef ref = _netCrossRef.get(iprange);
 		if (ref == null) {
-			ref = new IPNetCrossRef(iprange);
+			ref = new IPCrossRef(iprange);
 			_netCrossRef.put(ref);
 		}
 		return ref;
 	}
 
-	protected void crossRefNetworkLink(IPNetCrossRef ipNetRef,
+	protected void crossRefNetworkLink(IPCrossRef ipNetRef,
 			Object obj) {
 
 		if (obj instanceof CpNetworkObject) {
@@ -967,7 +967,7 @@ public class CpFw extends GenericEquipment {
 							ip = nrange.getIpRange();
 							break;
 			}
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 			crossRefNetworkLink(ipNetRef, nobj);
 		}
 	}

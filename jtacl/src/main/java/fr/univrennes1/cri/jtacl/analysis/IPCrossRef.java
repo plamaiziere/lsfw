@@ -21,12 +21,12 @@ import java.util.List;
  * Cross reference of an IP.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class IPNetCrossRef {
+public class IPCrossRef {
 	protected IPRangeable _ip;
 
 	protected List<CrossRefContext> _contexts;
 
-	public IPNetCrossRef(IPRangeable ip) {
+	public IPCrossRef(IPRangeable ip) {
 		_ip = ip;
 		_contexts = new ArrayList<CrossRefContext>();
 	}

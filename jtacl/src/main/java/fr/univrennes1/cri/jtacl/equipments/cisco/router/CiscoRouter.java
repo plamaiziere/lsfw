@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
-import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -868,10 +868,10 @@ public class CiscoRouter extends GenericEquipment {
 		ipNetCrossReference();
 	}
 
-	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
-		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+	protected IPCrossRef getIPNetCrossRef(IPNet ipnet) {
+		IPCrossRef ref = _netCrossRef.get(ipnet);
 		if (ref == null) {
-			ref = new IPNetCrossRef(ipnet);
+			ref = new IPCrossRef(ipnet);
 			_netCrossRef.put(ref);
 		}
 		return ref;
@@ -890,13 +890,13 @@ public class CiscoRouter extends GenericEquipment {
 
 		IPNet ip = ace.getSourceIp();
 		if (ip != null) {
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 			ipNetRef.addContext(refContext);
 		}
 
 		ip = ace.getDestIp();
 		if (ip != null) {
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 			ipNetRef.addContext(refContext);
 		}
 

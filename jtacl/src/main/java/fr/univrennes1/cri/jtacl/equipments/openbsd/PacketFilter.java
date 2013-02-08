@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
-import fr.univrennes1.cri.jtacl.analysis.IPNetCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -1752,7 +1752,7 @@ public class PacketFilter extends GenericEquipment {
 					_parseContext.getLine(),
 					"macro", name, _parseContext.getFileName(),
 					_parseContext.getLineNumber());
-				IPNetCrossRef ipNetRef = getIPNetCrossRef(ipnet);
+				IPCrossRef ipNetRef = getIPNetCrossRef(ipnet);
 				ipNetRef.addContext(refContext);
 			}
 		}
@@ -2009,10 +2009,10 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 
-	protected IPNetCrossRef getIPNetCrossRef(IPRangeable ip) {
-		IPNetCrossRef ref = _netCrossRef.get(ip);
+	protected IPCrossRef getIPNetCrossRef(IPRangeable ip) {
+		IPCrossRef ref = _netCrossRef.get(ip);
 		if (ref == null) {
-			ref = new IPNetCrossRef(ip);
+			ref = new IPCrossRef(ip);
 			_netCrossRef.put(ref);
 		}
 		return ref;
@@ -2025,7 +2025,7 @@ public class PacketFilter extends GenericEquipment {
 		for (PfNodeHost nodeHost: ipspec) {
 			if (nodeHost.isAddrMask()) {
 				for (IPNet ip: nodeHost.getAddr()) {
-					IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+					IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 					ipNetRef.addContext(refContext);
 				}
 			}
@@ -2035,7 +2035,7 @@ public class PacketFilter extends GenericEquipment {
 					IPNet ipfirst = nodeHost.getAddr().get(i);
 					IPNet iplast  = nodeHost.getRangeAddr().get(i);
 					IPRange iprange = new IPRange(ipfirst, iplast);
-					IPNetCrossRef ipNetRef = getIPNetCrossRef(iprange);
+					IPCrossRef ipNetRef = getIPNetCrossRef(iprange);
 					ipNetRef.addContext(refContext);
 				}
 			}
@@ -2065,7 +2065,7 @@ public class PacketFilter extends GenericEquipment {
 
 		PfRouteOpts ropts = rule.getRouteOpts();
 		if (ropts != null && ropts.isRouteTo()) {
-			IPNetCrossRef ipNetRef = getIPNetCrossRef(ropts.getNextHop());
+			IPCrossRef ipNetRef = getIPNetCrossRef(ropts.getNextHop());
 			ipNetRef.addContext(refContext);
 		}
 

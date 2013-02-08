@@ -20,13 +20,13 @@ import java.util.HashMap;
  * Map of IP cross references
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class IPCrossRefMap extends HashMap<IPRangeable, IPNetCrossRef> {
+public class IPCrossRefMap extends HashMap<IPRangeable, IPCrossRef> {
 
 	/**
 	 * put a reference into the map
 	 * @param ref reference to put
 	 */
-	public void put(IPNetCrossRef ref) {
+	public void put(IPCrossRef ref) {
 		put(ref.getIP(), ref);
 	}
 }
