@@ -33,7 +33,8 @@ public class IOSShellParser extends GenericEquipmentShellParser {
 				clear(),
 				FirstOf(
 					CommandHelp(),
-					CommandXref()
+					CommandXrefIp(),
+					CommandXrefService()
 				)
 			);
 	}

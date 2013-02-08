@@ -33,7 +33,8 @@ public class PixShellParser extends GenericEquipmentShellParser {
 				clear(),
 				FirstOf(
 					CommandHelp(),
-					CommandXref(),
+					CommandXrefIp(),
+					CommandXrefService(),
 					CommandShow()
 				)
 			);

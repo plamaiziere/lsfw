@@ -57,7 +57,8 @@ public class CpFwShellParser extends GenericEquipmentShellParser {
 				clear(),
 				FirstOf(
 					CommandHelp(),
-					CommandXref(),
+					CommandXrefIp(),
+					CommandXrefService(),
 					CommandShowService(),
 					CommandShowNetwork(),
 					CommandShowRules()
