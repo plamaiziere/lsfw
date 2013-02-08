@@ -65,8 +65,11 @@ public class PacketFilterShell extends GenericEquipmentShell {
 		if (shellCmd.equals("help"))
 			shellHelp(_outStream);
 
-		if (shellCmd.equals("xref"))
+		if (shellCmd.equals("xref-ip"))
 			printXrefIp(_outStream, _pf.getNetCrossRef(), _shellParser);
+		if (shellCmd.equals("xref-service"))
+			printXrefService(_outStream, _pf.getServiceCrossRef(), _shellParser);
+
 	}
 
 	@Override
