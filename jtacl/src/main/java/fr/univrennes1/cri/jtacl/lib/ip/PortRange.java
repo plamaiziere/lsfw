@@ -79,5 +79,63 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 		return "[" + _firstPort + ", " +  _lastPort + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 79 * hash + _firstPort;
+		hash = 79 * hash + _lastPort;
+		return hash;
+	}
 
-}
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final PortRange other = (PortRange) obj;
+		if (_firstPort != other._firstPort) {
+			return false;
+		}
+		if (_lastPort != other._lastPort) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Checks if this range contains the range in argument.
+	 * @param range range to check.
+	 * @return true if this range contains the range in argument.
+	 */
+	public boolean contains(PortRange range) {
+		return _firstPort <= range._firstPort && _lastPort >= range._lastPort;
+	}
+
+	/**
+	 * Checks if this range overlaps the range in argument.
+	 * @param range range to check.
+	 * @return true if this range overlaps the range in argument.
+	 */
+	public boolean overlaps(PortRange range) {
+
+		return _firstPort >= range._firstPort && _lastPort <= range._lastPort
+			|| _lastPort >= range._firstPort && _lastPort <= range._lastPort;
+
+	}
+
+	/**
+	 * Returns a textual representation of this range.
+	 * @return a textual representation of this range.
+	 */
+	public String toText() {
+		if (_firstPort == _lastPort)
+			return "" + _firstPort;
+		else
+			return toString();
+	}
+
+
+ }
