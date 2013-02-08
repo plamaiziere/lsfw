@@ -136,6 +136,10 @@ public class PfPortItem {
 					_operator);
 	}
 
+	public PortSpec getPortSpec() {
+		return _portSpec;
+	}
+
 	/**
 	 * Checks if this {@link PfPortItem} matches the port in argument.
 	 * @param portRequest port to check.
@@ -150,6 +154,5 @@ public class PfPortItem {
 	public String toString() {
 		return _portSpec.toString();
 	}
-
 
 }
