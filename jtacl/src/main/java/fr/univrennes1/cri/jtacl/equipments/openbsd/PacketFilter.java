@@ -14,8 +14,12 @@
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
-import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -37,8 +41,10 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
@@ -269,6 +275,11 @@ public class PacketFilter extends GenericEquipment {
 	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
 	/**
+	 * Services cross reference map;
+	 */
+	protected ServiceCrossRefMap _serviceCrossRef = new ServiceCrossRefMap();
+
+	/**
 	 * the next anchor uid that will be generated.
 	 */
 	protected static int _anchorNextUid = 0;
@@ -366,6 +377,13 @@ public class PacketFilter extends GenericEquipment {
 	 */
 	public IPCrossRefMap getNetCrossRef() {
 		return _netCrossRef;
+	}
+
+	/*
+	 * Service cross reference map
+	 */
+	public ServiceCrossRefMap getServiceCrossRef() {
+		return _serviceCrossRef;
 	}
 
 	protected PacketFilterShell _shell = new PacketFilterShell(this);
@@ -2018,6 +2036,15 @@ public class PacketFilter extends GenericEquipment {
 		return ref;
 	}
 
+	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
+		if (ref == null) {
+			ref = new ServiceCrossRef(portrange);
+			_serviceCrossRef.put(ref);
+		}
+		return ref;
+	}
+
 	/*
 	 * Cross reference for ipspec
 	 */
@@ -2049,10 +2076,29 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	/*
+	 * Cross reference for portspec
+	 */
+	protected void crossRefPortSpec(PfPortSpec portspec,
+			ServiceCrossRefContext refContext) {
+
+		for (PfPortItem portItem: portspec) {
+			for (PortRange portrange: portItem.getPortSpec().getRanges()) {
+				ServiceCrossRef ref = getServiceCrossRef(portrange);
+				ref.addContext(refContext);
+			}
+		}
+	}
+
+	/*
 	 * Cross reference for a rule
 	 */
 	protected void crossRefRule(PfRule rule) {
+
 		ParseContext context = rule.getParseContext();
+
+		/*
+		 * ip
+		 */
 		CrossRefContext refContext = new CrossRefContext(context.getLine(),
 				"rule",
 				rule.getAction(), context.getFileName(), context.getLineNumber());
@@ -2069,6 +2115,33 @@ public class PacketFilter extends GenericEquipment {
 			ipNetRef.addContext(refContext);
 		}
 
+		/*
+		 * services sources
+		 */
+		ProtocolsSpec protoSpec = new ProtocolsSpec();
+		protoSpec.addAll(rule.getProtocols());
+		PfPortSpec portspec = rule.getFromPortSpec();
+		if (portspec != null) {
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.FROM,
+						context.getLine(), "rule", rule.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefPortSpec(portspec, serviceContext);
+		}
+
+		/*
+		 * services destination
+		 */
+		portspec = rule.getToPortSpec();
+		if (portspec != null) {
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.TO,
+						context.getLine(), "rule", rule.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefPortSpec(portspec, serviceContext);
+		}
 	}
 
 	/**
