@@ -64,7 +64,7 @@ public class IOSShell extends GenericEquipmentShell {
 
 		if (shellCmd.equals("help"))
 			shellHelp(_outStream);
-		if (shellCmd.equals("xref"))
+		if (shellCmd.equals("xref-ip"))
 			printXrefIp(_outStream, _router.getNetCrossRef(), _shellParser);
 	}
 
