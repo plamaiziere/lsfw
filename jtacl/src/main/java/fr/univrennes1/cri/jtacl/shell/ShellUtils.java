@@ -122,7 +122,12 @@ public class ShellUtils {
 			Integer portLast = parseService(ports[1], sprotocol);
 			if (portLast == null)
 				return null;
-			PortSpec spec = new PortSpec(PortOperator.RANGE, portFirst, portLast);
+			PortSpec spec = null;
+			try {
+				spec = new PortSpec(PortOperator.RANGE, portFirst, portLast);
+			} catch (IllegalArgumentException ex) {
+				throw new JtaclParameterException(ex.getMessage());
+			}
 			return spec;
 		}
 
@@ -133,7 +138,12 @@ public class ShellUtils {
 		if (port == null)
 			return null;
 
-		PortSpec spec = new PortSpec(PortOperator.EQ, port);
+		PortSpec spec = null;
+		try {
+			spec = new PortSpec(PortOperator.EQ, port);
+		} catch (IllegalArgumentException ex) {
+			throw new JtaclParameterException(ex.getMessage());
+		}
 		return spec;
 	}
 
