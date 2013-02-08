@@ -307,7 +307,7 @@ public class PfNodeHost {
 	 * @return the list of range IP addresses of this instance.
 	 * @throws JtaclInternalException if the type of this host is not a range.
 	 */
-	public List<IPNet> geRangeAddr() {
+	public List<IPNet> getRangeAddr() {
 		if (!isAddrRange())
 			throw new JtaclInternalException("invalid address type");
 		return _rangeAddr;

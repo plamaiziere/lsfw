@@ -35,6 +35,8 @@ import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
@@ -2007,10 +2009,10 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 
-	protected IPNetCrossRef getIPNetCrossRef(IPNet ipnet) {
-		IPNetCrossRef ref = _netCrossRef.get(ipnet);
+	protected IPNetCrossRef getIPNetCrossRef(IPRangeable ip) {
+		IPNetCrossRef ref = _netCrossRef.get(ip);
 		if (ref == null) {
-			ref = new IPNetCrossRef(ipnet);
+			ref = new IPNetCrossRef(ip);
 			_netCrossRef.put(ref);
 		}
 		return ref;
@@ -2029,12 +2031,11 @@ public class PacketFilter extends GenericEquipment {
 			}
 
 			if (nodeHost.isAddrRange()) {
-				for (IPNet ip: nodeHost.getAddr()) {
-					IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
-					ipNetRef.addContext(refContext);
-				}
-				for (IPNet ip: nodeHost.geRangeAddr()) {
-					IPNetCrossRef ipNetRef = getIPNetCrossRef(ip);
+				for (int i = 0; i < nodeHost.getAddr().size(); i++) {
+					IPNet ipfirst = nodeHost.getAddr().get(i);
+					IPNet iplast  = nodeHost.getRangeAddr().get(i);
+					IPRange iprange = new IPRange(ipfirst, iplast);
+					IPNetCrossRef ipNetRef = getIPNetCrossRef(iprange);
 					ipNetRef.addContext(refContext);
 				}
 			}
@@ -2322,11 +2323,11 @@ public class PacketFilter extends GenericEquipment {
 		 * addr range
 		 */
 		if (host.isAddrRange()) {
-			if (host.getAddr().size() != 1 || host.geRangeAddr().size() != 1)
+			if (host.getAddr().size() != 1 || host.getRangeAddr().size() != 1)
 				return MatchResult.UNKNOWN;
 
 			IPNet ipfirst = host.getAddr().get(0);
-			IPNet ipLast = host.geRangeAddr().get(0);
+			IPNet ipLast = host.getRangeAddr().get(0);
 
 			if (!ipfirst.sameIPVersion(ipAddress))
 				return MatchResult.NOT;
