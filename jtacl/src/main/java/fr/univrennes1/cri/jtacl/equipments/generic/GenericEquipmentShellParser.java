@@ -32,6 +32,9 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	protected String _xrefFmt = null;
 	protected String _xrefIp = null;
 	protected String _xrefHost = null;
+	protected String _xrefService = null;
+	protected String _xrefProto = null;
+	protected String _xrefType = null;
 
 	protected boolean clear() {
 		_command = "";
@@ -41,6 +44,9 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		_xrefFmt = null;
 		_xrefIp = null;
 		_xrefHost = null;
+		_xrefService = null;
+		_xrefProto = null;
+		_xrefType = null;
 		return true;
 	}
 
@@ -102,6 +108,33 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 		return true;
 	}
 
+	public String getXrefService() {
+		return _xrefService;
+	}
+
+	public boolean setXrefService(String xrefService) {
+		_xrefService = xrefService;
+		return true;
+	}
+
+	public String getXrefProto() {
+		return _xrefProto;
+	}
+
+	public boolean setXrefProto(String xrefProto) {
+		_xrefProto = xrefProto;
+		return true;
+	}
+
+	public String getXrefType() {
+		return _xrefType;
+	}
+
+	public boolean setXrefType(String xrefType) {
+		_xrefType = xrefType;
+		return true;
+	}
+
 	public static List<String> expandFormat(String format) {
 		LinkedList<String> fmtList = new LinkedList<String>();
 		String fmt = format;
@@ -140,52 +173,109 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	}
 
 	/**
-	 * xref [ip [format STRING|fmt STRING] [host] [IPaddress]]
+	 * xref ip [format STRING|fmt STRING] [host] [IPaddress]
 	 */
-	public Rule CommandXref() {
+	public Rule CommandXrefIp() {
 		return Sequence(
 			IgnoreCase("xref"),
 			WhiteSpaces(),
+			IgnoreCase("ip"),
+			setXrefObject("ip"),
 			Optional(
 				Sequence(
-					IgnoreCase("ip"),
-					setXrefObject("ip"),
-					Optional(
-						Sequence(
-							WhiteSpaces(),
-							IgnoreCase("format"),
-							WhiteSpaces(),
-							StringAtom(),
-							setXrefFormat(match().toLowerCase())
-						)
-					),
-					Optional(
-						Sequence(
-							WhiteSpaces(),
-							IgnoreCase("fmt"),
-							WhiteSpaces(),
-							QuotedString(),
-							setXrefFmt(getLastQuotedString())
-						)
-					),
-					Optional(
-						Sequence(
-							WhiteSpaces(),
-							IgnoreCase("host"),
-							setXrefHost(match().toLowerCase())
-						)
-					),
-					Optional(
-						Sequence(
-							WhiteSpaces(),
-							StringAtom(),
-							setXrefIp(match())
-						)
-					)
+					WhiteSpaces(),
+					IgnoreCase("format"),
+					WhiteSpaces(),
+					StringAtom(),
+					setXrefFormat(match().toLowerCase())
 				)
 			),
-			setCommand("xref"),
-			EOI
+			Optional(
+				Sequence(
+					WhiteSpaces(),
+					IgnoreCase("fmt"),
+					WhiteSpaces(),
+					QuotedString(),
+					setXrefFmt(getLastQuotedString())
+				)
+			),
+			Optional(
+				Sequence(
+					WhiteSpaces(),
+					IgnoreCase("host"),
+					setXrefHost(match().toLowerCase())
+				)
+			),
+			Optional(
+				Sequence(
+					WhiteSpaces(),
+					StringAtom(),
+					setXrefIp(match())
+				)
+			),
+			EOI,
+			setCommand("xref-ip")
+		);
+	}
+
+	/**
+	 * xref ip [format STRING|fmt STRING] [host] [IPaddress]
+	 */
+	public Rule CommandXrefService() {
+		return Sequence(
+			IgnoreCase("xref"),
+			WhiteSpaces(),
+			IgnoreCase("service"),
+			setXrefObject("service"),
+			Optional(
+				Sequence(
+					WhiteSpaces(),
+					IgnoreCase("format"),
+					WhiteSpaces(),
+					StringAtom(),
+					setXrefFormat(match().toLowerCase())
+				)
+			),
+			Optional(
+				Sequence(
+					WhiteSpaces(),
+					IgnoreCase("fmt"),
+					WhiteSpaces(),
+					QuotedString(),
+					setXrefFmt(getLastQuotedString())
+				)
+			),
+			Optional(
+					Sequence(
+					WhiteSpaces(),
+					IgnoreCase("proto"),
+					WhiteSpaces(),
+					FirstOf(
+						IgnoreCase("tcp"),
+						IgnoreCase("udp")
+					),
+					setXrefProto(match().toLowerCase())
+				)
+			),
+			Optional(
+					Sequence(
+					WhiteSpaces(),
+					FirstOf(
+						IgnoreCase("from"),
+						IgnoreCase("to")
+					),
+					setXrefType(match().toLowerCase())
+				)
+			),
+			Optional(
+				Sequence(
+					WhiteSpaces(),
+					StringAtom(),
+					setXrefService(match())
+				)
+			),
+			EOI,
+			setCommand("xref-service")
 		);
 	}
 
