@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) 2013, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
+
+package fr.univrennes1.cri.jtacl.analysis;
+
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+import java.util.HashMap;
+
+/**
+ * Map of services cross references
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ */
+public class ServiceCrossRefMap extends HashMap<PortRange, ServiceCrossRef> {
+
+	/**
+	 * put a reference into the map
+	 * @param ref reference to put
+	 */
+	public void put(ServiceCrossRef ref) {
+		put(ref.getPortRange(), ref);
+	}
+}
