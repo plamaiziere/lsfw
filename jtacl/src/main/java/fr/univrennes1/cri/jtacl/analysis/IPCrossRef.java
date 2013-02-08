@@ -45,7 +45,7 @@ public class IPCrossRef {
 
 	@Override
 	public String toString() {
-		return "IPNetCrossRef [_ip=" + _ip + ", _contexts=" + _contexts + "]";
+		return "IPCrossRef [_ip=" + _ip + ", _contexts=" + _contexts + "]";
 	}
 
 }
