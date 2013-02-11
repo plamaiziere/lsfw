@@ -2023,7 +2023,7 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * compute cross reference
 		 */
-		ipNetCrossReference();
+		CrossReferences();
 	}
 
 
@@ -2145,9 +2145,9 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	/**
-	 * Compute IPNet cross references
+	 * Compute cross references
 	 */
-	protected void ipNetCrossReference() {
+	protected void CrossReferences() {
 		/*
 		 * tables
 		 */
