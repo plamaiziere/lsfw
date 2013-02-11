@@ -18,6 +18,7 @@ import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtoEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * Describes a service object group.
@@ -27,26 +28,27 @@ import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 public class ServiceObjectGroup extends ObjectGroup {
 
 	/**
-	 * the protocol of this group: udp, tcp, tcp-udp
+	 * the protocols of this group.
 	 */
-	protected String _protocol;
+	protected ProtocolsSpec _protocols;
 
 	/**
 	 * Constructs a new {@link ServiceObjectGroup} group with the group Id
 	 * in argument.
 	 * @param groupId the group Id of this group.
+	 * @param protocols protocols of this group.
 	 */
-	public ServiceObjectGroup(String groupId, String protocol) {
+	public ServiceObjectGroup(String groupId, ProtocolsSpec protocols) {
 		super(ObjectGroupType.SERVICE, groupId);
-		_protocol = protocol;
+		_protocols = protocols;
 	}
 
 	/**
-	 * Returns the protocolof this group.
-	 * @return the protocol of this group.
+	 * Returns the protocols of this group.
+	 * @return the protocols of this group.
 	 */
-	public String getProtocol() {
-		return _protocol;
+	public ProtocolsSpec getProtocols() {
+		return _protocols;
 	}
 
 	/**
@@ -58,13 +60,10 @@ public class ServiceObjectGroup extends ObjectGroup {
 	 * argument.
 	 */
 	 public MatchResult matches(int protocol, PortSpec port) {
-		IPProtoEnt ent = IPProtocols.getInstance().getProtoByNumber(protocol);
-		if (ent == null)
-			throw new JtaclInternalException("unknown protocol number: " +
-				protocol);
-
-		// _protocol is tcp-udp or udp or tcp
-		if (!_protocol.contains(ent.getName()))
+		/*
+		 * protocols
+		 */
+		if (!_protocols.contains(protocol))
 			return MatchResult.NOT;
 
 		int match = 0;
@@ -94,9 +93,9 @@ public class ServiceObjectGroup extends ObjectGroup {
 	 * recursively.
 	 */
 	public ServiceObjectGroup expand() {
-		ServiceObjectGroup group = new ServiceObjectGroup(_groupId, _protocol);
+		ServiceObjectGroup group = new ServiceObjectGroup(_groupId, _protocols);
 		group.setDescription(_description);
-		
+
 		for (ObjectGroupItem obj: this) {
 			if (obj.isGroup())
 				group.addAll(((ServiceObjectGroup)obj.getGroup()).expand());
@@ -105,5 +104,4 @@ public class ServiceObjectGroup extends ObjectGroup {
 		}
 		return group;
 	}
-
 }
