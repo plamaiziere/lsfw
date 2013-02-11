@@ -25,8 +25,8 @@ import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 public class EnhancedServiceObjectGroup extends ObjectGroup {
 
 	/**
-	 * Constructs a new {@link ServiceObjectGroup} group with the group Id
-	 * in argument.
+	 * Constructs a new {@link EnhancedServiceObjectGroup} group with the group
+	 * Id in argument.
 	 * @param groupId the group Id of this group.
 	 */
 	public EnhancedServiceObjectGroup(String groupId) {
