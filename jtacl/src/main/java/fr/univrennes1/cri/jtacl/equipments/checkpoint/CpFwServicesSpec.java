@@ -29,6 +29,12 @@ public class CpFwServicesSpec {
 		_services.addReference(name, service);
 	}
 
+	public void linkTo(CpFwRule fwrule) {
+		for (CpService sobj: _services.getServices().values()) {
+			sobj.linkWith(fwrule);
+		}
+	}
+
 	@Override
 	public String toString() {
 		return _services.toString();
