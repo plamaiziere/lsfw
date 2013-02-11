@@ -15,6 +15,8 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Checkpoint service object
@@ -25,6 +27,7 @@ public abstract class CpService {
 	protected String _className;
 	protected String _comment;
 	protected CpServiceType _type;
+	protected List<Object> _linkedTo = new LinkedList<Object>();
 
 	public CpService(String name, String className, String comment,
 			CpServiceType type) {
@@ -33,6 +36,16 @@ public abstract class CpService {
 		_className = className;
 		_comment = comment;
 		_type = type;
+	}
+
+	public List<Object> getLinkedTo() {
+		return _linkedTo;
+	}
+
+	public void linkWith(Object obj) {
+		if (!_linkedTo.contains(obj)) {
+			_linkedTo.add(obj);
+		}
 	}
 
 	public String getName() {
