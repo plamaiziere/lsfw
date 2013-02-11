@@ -53,6 +53,10 @@ public class CpGroupService extends CpService {
 		return list;
 	}
 
+	public HashMap<String, CpService> getServices() {
+		return _services;
+	}
+
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
