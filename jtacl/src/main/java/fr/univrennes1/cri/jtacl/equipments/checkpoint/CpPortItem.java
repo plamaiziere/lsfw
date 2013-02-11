@@ -98,6 +98,14 @@ public class CpPortItem {
 	}
 
 	/**
+	 * Returns the port specification of this instance.
+	 * @return the port specification of this instance.
+	 */
+	public PortSpec getPortSpec() {
+		return _portSpec;
+	}
+
+	/**
 	 * Checks if this {@link CpPortItem} matches the port in argument.
 	 * @param portRequest port to check.
 	 * @return a {@link MatchResult} between the port spec in argument and this
