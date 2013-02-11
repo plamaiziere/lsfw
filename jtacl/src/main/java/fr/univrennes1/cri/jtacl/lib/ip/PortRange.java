@@ -122,8 +122,9 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 	public boolean overlaps(PortRange range) {
 
 		return _firstPort >= range._firstPort && _firstPort <= range._lastPort
-			|| _lastPort >= range._firstPort && _lastPort <= range._lastPort;
-
+			|| _lastPort >= range._firstPort && _lastPort <= range._lastPort
+			|| range._firstPort >= _firstPort && range._firstPort <= _lastPort
+			|| range._lastPort >= _firstPort && range._lastPort <= _lastPort;
 	}
 
 	/**
@@ -136,6 +137,5 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 		else
 			return toString();
 	}
-
 
  }
