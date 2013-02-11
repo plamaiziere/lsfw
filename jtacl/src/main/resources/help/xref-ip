@@ -1,4 +1,7 @@
---- Xref Help ---
+--- Xref-ip Help ---
+
+The command "xref ip" outputs the cross-references of IP adddresses on
+  an equipment.
 
 xref ip [(format formatstring)|(fmt formatstring)] [host] [IpAddress]: Outputs the cross-reference
   of IP addresses on an equipment.
@@ -48,3 +51,4 @@ This command is only available on some equipments via the "equipment"
 
 Example with a PacketFilter equipment named "PF":
   lsfw> equipment PF xref ip format s
+

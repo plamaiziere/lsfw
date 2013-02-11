@@ -19,4 +19,6 @@ Example with a Pix equipment named "PIX":
 
 ---------
 
-xref ip :see help xref.
+xref ip     :see help xref-ip.
+xref service: see help xref-service.
+

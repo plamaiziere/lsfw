@@ -15,6 +15,7 @@ reload       : reloads the configuration of an equipment.
 route        : shows the routes.
 shell        : help for the builtin shell.
 topology     : shows the topology of the network.
-xref         : shows cross-references on an equipment.
+xref-ip      : shows IP cross-references on an equipment.
+xref-service : shows service cross-references on an equipment.
 
 See also https://groupes.renater.fr/wiki/jtacl/index

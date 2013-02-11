@@ -1,0 +1,56 @@
+--- Xref-service Help ---
+
+The command "xref service" outputs the cross-references of services on
+  an equipment.
+
+xref service [fmt formatstring] [proto (TCP|UDP) [from|to|other] [service_port]
+
+service_port specifies the services to output. It can be a service name or a
+  range of ports using the first port and the last port of the
+  range between parenthesis: (first,last). Spaces are not allowed in this
+  notation.
+
+fmt formatstring allows to specify the output using format tags. The formatstring
+should be quoted by " :
+
+  %c context name.
+  %C context comment.
+  %e equipment name.
+  %f filename of the context (without path).
+  %F filename of the context (with path).
+  %h hostname (using PTR like 'p').
+  %H hostname (using DNS resolver like 'h').
+  %i address ip (in short form as ::1).
+  %I address ip (in long form).
+  %l line short (first line of configuration).
+  %L line long (all the lines of configuration).
+  %N line number of the context.
+  %p the protocols of this service.
+  %r port range of this service.
+  %t the type of this reference (FROM/TO/OTHER).
+
+proto (TCP|UDP) allows to filter on the service's protocols.
+
+from|to|other allows to filter on the service's type. The service's type
+  specifies where the service is used:
+    - from: as a source service
+    - to: as a destination service
+    - other: other usages.
+
+examples:
+---------
+
+Output references of the service tcp/ssh
+  xref service proto tcp ssh
+
+output references for "source" service range 22..1024
+xref service from (ssh,1024)
+
+Note:
+-----
+This command is only available on some equipments via the "equipment"
+  command of lsfw.
+
+Example with a PacketFilter equipment named "PF":
+  lsfw> equipment PF xref service
+

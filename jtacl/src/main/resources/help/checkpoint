@@ -10,4 +10,6 @@ show rules: displays the firewall rules set.
 show service [service_name]: without parameter, displays all the checkpoint
   services. Or displays the service 'service_name'.
 
-xref ip : see help xref.
+xref ip     :see help xref-ip.
+xref service: see help xref-service.xref ip : see help xref.
+

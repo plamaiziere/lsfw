@@ -2,4 +2,6 @@
 
 help: this help.
 
-xref ip : see help xref.
+xref ip     :see help xref-ip.
+xref service: see help xref-service.
+
