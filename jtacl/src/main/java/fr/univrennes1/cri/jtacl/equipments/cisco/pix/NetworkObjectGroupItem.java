@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 
 /**
  * An item of a network object group.
@@ -41,20 +42,20 @@ public class NetworkObjectGroupItem extends ObjectGroupItem {
 	/**
 	 * Constructs a new network object item of type "IP address".
 	 */
-	public NetworkObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public NetworkObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			IPNet ipAddress)  {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_ipAddress = ipAddress;
 	}
 
 	/**
 	 * Constructs a new network object item of type "group".
 	 */
-	public NetworkObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public NetworkObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			ObjectGroup group) {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_group = group;
 	}
 

@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 
 /**
  * An item of a protocol object group.
@@ -40,20 +41,20 @@ public class ProtocolObjectGroupItem extends ObjectGroupItem {
 	/**
 	 * Constructs a new protocol object item of type "protocol".
 	 */
-	public ProtocolObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public ProtocolObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			int protocol)  {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_protocol = protocol;
 	}
 
 	/**
 	 * Constructs a new protocol object item of type "group".
 	 */
-	public ProtocolObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public ProtocolObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			ObjectGroup group) {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_group = group;
 		_protocol = -1;
 	}

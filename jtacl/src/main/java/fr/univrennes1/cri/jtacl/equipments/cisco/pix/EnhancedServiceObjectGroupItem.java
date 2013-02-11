@@ -16,6 +16,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 
 /**
  * An item of an enhanced service object group.
@@ -41,20 +42,22 @@ public class EnhancedServiceObjectGroupItem extends ObjectGroupItem {
 	/**
 	 * Constructs a new service object item of type service object.
 	 */
-	public EnhancedServiceObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public EnhancedServiceObjectGroupItem(ObjectGroup owner,
+			ParseContext parseContext,
 			ServiceObject serviceObject)  {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_serviceObject = serviceObject;
 	}
 
 	/**
 	 * Constructs a new service object item of type "group".
 	 */
-	public EnhancedServiceObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public EnhancedServiceObjectGroupItem(ObjectGroup owner,
+			ParseContext parseContext,
 			ObjectGroup group) {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_group = group;
 	}
 

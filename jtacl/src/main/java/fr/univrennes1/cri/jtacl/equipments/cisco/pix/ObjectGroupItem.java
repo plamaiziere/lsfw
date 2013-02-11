@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
+
 /**
  * Ancestor of group item.
  *
@@ -26,16 +28,14 @@ public abstract class ObjectGroupItem {
 	protected ObjectGroup _owner;
 
 	/**
-	 * the line of configuration corresponding to this item (may be null)
+	 * parse context of this item.
 	 */
-	protected String _configurationLine;
-
+	protected ParseContext _parseContext;
 
 	/**
 	 * link to an object group if this item is a group-object, null otherwise.
 	 */
 	protected ObjectGroup _group;
-
 
 	/**
 	 * Returns the object group owning this item.
@@ -43,13 +43,6 @@ public abstract class ObjectGroupItem {
 	 */
 	public ObjectGroup getOwner() {
 		return _owner;
-	}
-
-	/**
-	 * Returns the line of configuration corresponding to this item
-	 */
-	public String getConfigurationLine() {
-		return _configurationLine;
 	}
 
 	/**
@@ -69,5 +62,20 @@ public abstract class ObjectGroupItem {
 		return _group;
 	}
 
+	/**
+	 * Returns the parse context of this item.
+	 * @return the parse context of this rule. May be null.
+	 */
+	public ParseContext getParseContext() {
+		return _parseContext;
+	}
+
+	/**
+	 * Sets the parse context of this item.
+	 * @param parseContext parse context to set.
+	 */
+	public void setParseContext(ParseContext parseContext) {
+		_parseContext = parseContext;
+	}
 
 }

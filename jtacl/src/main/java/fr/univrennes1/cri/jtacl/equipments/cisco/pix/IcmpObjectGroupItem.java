@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
+
 /**
  * An item of an icmp-typen object group.
  *
@@ -38,20 +40,20 @@ public class IcmpObjectGroupItem extends ObjectGroupItem {
 	/**
 	 * Constructs a new Icmp object item of type "icmp-type.
 	 */
-	public IcmpObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public IcmpObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			int icmp)  {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_icmp = icmp;
 	}
 
 	/**
 	 * Constructs a new Icmp object item of type "group".
 	 */
-	public IcmpObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public IcmpObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			ObjectGroup group) {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_group = group;
 	}
 

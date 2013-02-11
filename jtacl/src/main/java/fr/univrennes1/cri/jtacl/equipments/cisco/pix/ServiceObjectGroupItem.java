@@ -15,12 +15,13 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 
 /**
  * An item of a service object group.
  *
  * An item can be a group or a port object.
- * 
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ServiceObjectGroupItem extends ObjectGroupItem {
@@ -41,20 +42,20 @@ public class ServiceObjectGroupItem extends ObjectGroupItem {
 	/**
 	 * Constructs a new service object item of type port object.
 	 */
-	public ServiceObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public ServiceObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			PortObject portObject)  {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_portObject = portObject;
 	}
 
 	/**
 	 * Constructs a new service object item of type "group".
 	 */
-	public ServiceObjectGroupItem(ObjectGroup owner, String configurationLine,
+	public ServiceObjectGroupItem(ObjectGroup owner, ParseContext parseContext,
 			ObjectGroup group) {
 		_owner = owner;
-		_configurationLine = configurationLine;
+		_parseContext = parseContext;
 		_group = group;
 	}
 
@@ -65,7 +66,7 @@ public class ServiceObjectGroupItem extends ObjectGroupItem {
 	 */
 	public MatchResult matches(PortSpec port) {
 		return _portObject.matches(port);
-	}	
+	}
 
 
 }

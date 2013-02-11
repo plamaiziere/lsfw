@@ -620,23 +620,22 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 
 		group.incRefCount();
 
-		String line = _parseContext.getLine();
 		ObjectGroupItem item = null;
 		switch (type) {
 			case NETWORK:
-				item = new NetworkObjectGroupItem(_lastGroup, line, group);
+				item = new NetworkObjectGroupItem(_lastGroup, _parseContext, group);
 				break;
 			case PROTOCOL:
-				item = new ProtocolObjectGroupItem(_lastGroup, line, group);
+				item = new ProtocolObjectGroupItem(_lastGroup, _parseContext, group);
 				break;
 			case SERVICE:
-				item = new ServiceObjectGroupItem(_lastGroup, line, group);
+				item = new ServiceObjectGroupItem(_lastGroup, _parseContext, group);
 				break;
 			case ENHANCED:
-				item = new EnhancedServiceObjectGroupItem(_lastGroup, line, group);
+				item = new EnhancedServiceObjectGroupItem(_lastGroup, _parseContext, group);
 				break;
 			case ICMP:
-				item = new IcmpObjectGroupItem(_lastGroup, line, group);
+				item = new IcmpObjectGroupItem(_lastGroup, _parseContext, group);
 				break;
 		}
 		_lastGroup.add(item);
@@ -665,7 +664,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				else
 					ip = parseIp(sipAddress + "/" + sipNetmask);
 				NetworkObjectGroupItem nobject =
-						new NetworkObjectGroupItem(_lastGroup, line, ip);
+						new NetworkObjectGroupItem(_lastGroup, _parseContext, ip);
 				_lastGroup.add(nobject);
 				/*
 				 * cross reference
@@ -686,7 +685,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			case PROTOCOL:
 				int proto = parseProtocol(parser.getProtocol());
 				ProtocolObjectGroupItem pobject =
-						new ProtocolObjectGroupItem(_lastGroup, line, proto);
+						new ProtocolObjectGroupItem(_lastGroup, _parseContext, proto);
 				_lastGroup.add(pobject);
 				break;
 
@@ -713,7 +712,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				}
 
 				ServiceObjectGroupItem sobject =
-					new ServiceObjectGroupItem(_lastGroup, line, portObject);
+					new ServiceObjectGroupItem(_lastGroup, _parseContext, portObject);
 				_lastGroup.add(sobject);
 				break;
 
@@ -746,7 +745,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 
 				EnhancedServiceObjectGroupItem eobject =
 					new EnhancedServiceObjectGroupItem(_lastGroup,
-					 line, servObject);
+					 _parseContext, servObject);
 
 				_lastGroup.add(eobject);
 				break;
@@ -754,7 +753,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				String sicmp = parser.getProtocol();
 				IPIcmpEnt icmp = parseIcmp4(sicmp);
 				IcmpObjectGroupItem iobject =
-						new IcmpObjectGroupItem(_lastGroup, line, icmp.getIcmp());
+						new IcmpObjectGroupItem(_lastGroup, _parseContext, icmp.getIcmp());
 				_lastGroup.add(iobject);
 				break;
 		}
