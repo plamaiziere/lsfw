@@ -14,7 +14,6 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
-import java.util.List;
 
 /**
  * Describes a protocol object group.
@@ -68,4 +67,19 @@ public class ProtocolObjectGroup extends ObjectGroup {
 		return group;
 	}
 
+	/**
+	 * Returns the protocols contained in this group.
+	 * @return the protocols contained in this group.
+	 */
+	public ProtocolsSpec getProtocols() {
+		ProtocolsSpec protoSpec = new ProtocolsSpec();
+
+		for (ObjectGroupItem obj: this) {
+			if (!obj.isGroup()) {
+				ProtocolObjectGroupItem item = (ProtocolObjectGroupItem) obj;
+				protoSpec.add(item.getProtocol());
+			}
+		}
+		return protoSpec;
+	}
 }
