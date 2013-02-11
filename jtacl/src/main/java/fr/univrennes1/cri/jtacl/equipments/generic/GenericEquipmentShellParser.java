@@ -253,7 +253,8 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 					WhiteSpaces(),
 					FirstOf(
 						IgnoreCase("from"),
-						IgnoreCase("to")
+						IgnoreCase("to"),
+						IgnoreCase("other")
 					),
 					setXrefType(match().toLowerCase())
 				)

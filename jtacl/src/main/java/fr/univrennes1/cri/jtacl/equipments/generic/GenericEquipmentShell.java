@@ -374,6 +374,9 @@ public abstract class GenericEquipmentShell {
 					if (sdirection.equals("to")
 							&& ctx.getType() != ServiceCrossRefType.TO)
 						continue;
+					if (sdirection.equals("other")
+							&& ctx.getType() != ServiceCrossRefType.OTHER)
+						continue;
 				}
 				printServiceContext(output, portrange, ctx, fmt);
 			}
