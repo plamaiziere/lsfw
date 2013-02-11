@@ -14,8 +14,12 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
-import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -33,8 +37,10 @@ import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
@@ -201,6 +207,11 @@ public class CiscoRouter extends GenericEquipment {
 	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
 	/**
+	 * Services cross references map
+	 */
+	protected ServiceCrossRefMap _serviceCrossRef = new ServiceCrossRefMap();
+
+	/**
 	 * parse context
 	 */
 	 protected ParseContext _parseContext = new ParseContext();
@@ -215,6 +226,13 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	IPCrossRefMap getNetCrossRef() {
 		return _netCrossRef;
+	}
+
+	/**
+	 * Services cross references map
+	 */
+	ServiceCrossRefMap getServiceCrossRef() {
+		return _serviceCrossRef;
 	}
 
 	protected IOSShell _shell = new IOSShell(this);
@@ -877,6 +895,23 @@ public class CiscoRouter extends GenericEquipment {
 		return ref;
 	}
 
+	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
+		if (ref == null) {
+			ref = new ServiceCrossRef(portrange);
+			_serviceCrossRef.put(ref);
+		}
+		return ref;
+	}
+
+	protected void crossRefPortObject(PortObject portObject,
+			ServiceCrossRefContext refContext) {
+
+		PortRange range = portObject.getPortSpec().getRanges().get(0);
+		ServiceCrossRef refService = getServiceCrossRef(range);
+		refService.addContext(refContext);
+	}
+
 	/*
 	 * Cross reference for an access list element
 	 */
@@ -900,6 +935,32 @@ public class CiscoRouter extends GenericEquipment {
 			ipNetRef.addContext(refContext);
 		}
 
+
+		/*
+		 * services cross references
+		 */
+		ProtocolsSpec protoSpec = new ProtocolsSpec();
+		if (ace.getProtocol() != null) {
+			protoSpec.add(ace.getProtocol());
+		}
+
+		if (ace.getSourcePortObject() != null) {
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.FROM,
+						context.getLine(), "ace", ace.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefPortObject(ace.getSourcePortObject(), serviceContext);
+		}
+
+		if (ace.getDestPortObject() != null) {
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.TO,
+						context.getLine(), "ace", ace.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefPortObject(ace.getDestPortObject(), serviceContext);
+		}
 	}
 
 	/**
