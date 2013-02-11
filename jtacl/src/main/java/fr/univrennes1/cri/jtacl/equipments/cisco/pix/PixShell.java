@@ -139,6 +139,10 @@ public class PixShell extends GenericEquipmentShell {
 		if (shellCmd.equals("xref-ip")) {
 			printXrefIp(_outStream, _pix.getNetCrossRef(), _shellParser);
 		}
+
+		if (shellCmd.equals("xref-service")) {
+			printXrefService(output, _pix.getServiceCrossRef(), _shellParser);
+		}
 	}
 
 	@Override
