@@ -865,7 +865,7 @@ public class CiscoRouter extends GenericEquipment {
 		/*
 		 * compute cross reference
 		 */
-		ipNetCrossReference();
+		CrossReferences();
 	}
 
 	protected IPCrossRef getIPNetCrossRef(IPNet ipnet) {
@@ -903,9 +903,9 @@ public class CiscoRouter extends GenericEquipment {
 	}
 
 	/**
-	 * Compute IPNet cross references
+	 * Compute cross references
 	 */
-	protected void ipNetCrossReference() {
+	protected void CrossReferences() {
 		/*
 		 * access list
 		 */
