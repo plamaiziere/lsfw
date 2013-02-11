@@ -1215,7 +1215,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * compute cross reference
 		 */
-		ipNetCrossReference();
+		CrossReferences();
 	}
 
 
@@ -1482,9 +1482,9 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	/**
-	 * Compute IPNet cross references
+	 * Compute cross references
 	 */
-	protected void ipNetCrossReference() {
+	protected void CrossReferences() {
 
 		/*
 		 * cross references for network groups
