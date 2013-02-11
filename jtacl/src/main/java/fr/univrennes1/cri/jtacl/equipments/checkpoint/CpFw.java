@@ -913,7 +913,7 @@ public class CpFw extends GenericEquipment {
 		/*
 		 * compute cross reference
 		 */
-		ipNetCrossReference();
+		CrossReferences();
 	}
 
 	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
@@ -948,9 +948,9 @@ public class CpFw extends GenericEquipment {
 	}
 
 	/**
-	 * Compute IPNet cross references
+	 * Compute cross references
 	 */
-	protected void ipNetCrossReference() {
+	protected void CrossReferences() {
 		/*
 		 * network object
 		 */
