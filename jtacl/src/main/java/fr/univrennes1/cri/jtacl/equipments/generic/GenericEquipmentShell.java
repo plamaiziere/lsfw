@@ -294,9 +294,9 @@ public abstract class GenericEquipmentShell {
 				fmt += "; %h";
 			fmt += "; %c; %C; %F #%N";
 			if (format.contains("s"))
-				fmt += "; %l";
+				fmt += ";/##\\ %l";
 			if (format.contains("l"))
-				fmt += "; %L";
+				fmt += ";/##\\ %L";
 		}
 		List<IPRangeable> list = new LinkedList<IPRangeable>(netCrossRef.keySet());
 		Collections.sort(list, new IPRangeableComparator());
@@ -355,7 +355,7 @@ public abstract class GenericEquipmentShell {
 		}
 		String fmt = parser.getXrefFmt();
 		if (fmt == null) {
-			fmt = "%r; %p; %t; %c; %C; %l;";
+			fmt = "%r; %p; %t; %c; %C; %F #%N;/##\\ %l;";
 		}
 		List<PortRange> list = new LinkedList<PortRange>(serviceCrossRef.keySet());
 		Collections.sort(list, new PortRangeComparator());
