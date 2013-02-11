@@ -118,6 +118,8 @@ public class CpFwShell extends GenericEquipmentShell {
 			shellHelp(_outStream);
 		if (shellCmd.equals("xref-ip"))
 			printXrefIp(_outStream, _cpfw.getNetCrossRef(), _shellParser);
+		if (shellCmd.equals("xref-service"))
+			printXrefService(_outStream, _cpfw.getServiceCrossRef(), _shellParser);
 		if (shellCmd.equals("show-service"))
 			commandShowService(_outStream, _shellParser);
 		if (shellCmd.equals("show-network"))

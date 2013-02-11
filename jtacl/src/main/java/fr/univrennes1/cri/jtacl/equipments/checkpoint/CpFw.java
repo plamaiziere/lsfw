@@ -14,8 +14,10 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
-import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -33,6 +35,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -108,6 +111,11 @@ public class CpFw extends GenericEquipment {
 	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
 	/**
+	 * Services cross references map
+	 */
+	protected ServiceCrossRefMap _serviceCrossRef = new ServiceCrossRefMap();
+
+	/**
 	 * parse context
 	 */
 	 protected ParseContext _parseContext = new ParseContext();
@@ -134,6 +142,13 @@ public class CpFw extends GenericEquipment {
 	 */
 	IPCrossRefMap getNetCrossRef() {
 		return _netCrossRef;
+	}
+
+	/**
+	 * service cross references map
+	 */
+	ServiceCrossRefMap getServiceCrossRef() {
+		return _serviceCrossRef;
 	}
 
 	CpFwShell _shell = new CpFwShell(this);
@@ -509,6 +524,7 @@ public class CpFw extends GenericEquipment {
 							+ serviceName + " to member: " + refName, false);
 				} else {
 					group.addReference(refName, ref);
+					ref.linkWith(group);
 				}
 			}
 		}
@@ -694,8 +710,12 @@ public class CpFw extends GenericEquipment {
 		CpFwRule fwrule = new CpFwRule(sName, sClassName, sComment, rNumber,
 				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction);
 
+		/*
+		 * track references
+		 */
 		srcIpSpec.linkTo(fwrule);
 		dstIpSpec.linkTo(fwrule);
+		servicesSpec.linkTo(fwrule);
 
 		return fwrule;
 	}
@@ -921,6 +941,15 @@ public class CpFw extends GenericEquipment {
 		if (ref == null) {
 			ref = new IPCrossRef(iprange);
 			_netCrossRef.put(ref);
+		}
+		return ref;
+	}
+
+	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
+		if (ref == null) {
+			ref = new ServiceCrossRef(portrange);
+			_serviceCrossRef.put(ref);
 		}
 		return ref;
 	}
