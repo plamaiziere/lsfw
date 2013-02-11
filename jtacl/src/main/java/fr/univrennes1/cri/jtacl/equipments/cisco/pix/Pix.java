@@ -666,17 +666,6 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				NetworkObjectGroupItem nobject =
 						new NetworkObjectGroupItem(_lastGroup, _parseContext, ip);
 				_lastGroup.add(nobject);
-				/*
-				 * cross reference
-				 */
-				IPCrossRef ixref = getIPNetCrossRef(ip);
-				CrossRefContext refctx =
-						new CrossRefContext(_parseContext.getLine(),
-						"network-object-group",
-						_lastGroup.getGroupId(),
-						_parseContext.getFileName(),
-						_parseContext.getLineNumber());
-				ixref.addContext(refctx);
 				break;
 
 			/*
@@ -1249,9 +1238,9 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	/*
-	 * Cross reference for used network-group
+	 * Cross reference for used network-group in rule
 	 */
-	protected void crossRefNetworkGroup(NetworkObjectGroup networkGroup,
+	protected void crossRefNetworkGroupSpec(NetworkObjectGroup networkGroup,
 			CrossRefContext refContext) {
 
 		for (ObjectGroupItem groupItem: networkGroup.expand()) {
@@ -1263,37 +1252,108 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		}
 	}
 
-	protected void crossRefServiceGroup(ObjectGroup objectGroup,
+	/*
+	 * Cross reference for network-group
+	 */
+	protected void crossRefNetworkGroup(NetworkObjectGroup networkGroup) {
+
+		for (ObjectGroupItem groupItem: networkGroup.expand()) {
+			NetworkObjectGroupItem networkGroupItem =
+				(NetworkObjectGroupItem) groupItem;
+			IPNet ip = networkGroupItem.getIpAddress();
+			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
+			ParseContext pctx = groupItem.getParseContext();
+			if (pctx == null)
+				continue;
+
+			CrossRefContext refctx =
+				new CrossRefContext(pctx.getLine(),
+				"network-object-group",
+				groupItem.getOwner().getGroupId(),
+				pctx.getFileName(),
+				pctx.getLineNumber());
+			ipNetRef.addContext(refctx);
+		}
+	}
+
+	protected void crossRefServiceGroupSpec(ObjectGroup objectGroup,
 			ServiceCrossRefContext refContext) {
 
 		if (objectGroup.getType() == ObjectGroupType.SERVICE) {
 			ServiceObjectGroup sObject = (ServiceObjectGroup) objectGroup;
-			for (ObjectGroupItem item: sObject) {
-				if (!item.isGroup()) {
-					ServiceObjectGroupItem sitem = (ServiceObjectGroupItem) item;
-					crossRefPortObject(sitem.getPortObject(), refContext);
-				}
+			for (ObjectGroupItem item: sObject.expand()) {
+				ServiceObjectGroupItem sitem = (ServiceObjectGroupItem) item;
+				crossRefPortObject(sitem.getPortObject(), refContext);
 			}
 		}
 
 		if (objectGroup.getType() == ObjectGroupType.ENHANCED) {
 			EnhancedServiceObjectGroup sObject =
 				(EnhancedServiceObjectGroup) objectGroup;
-			for (ObjectGroupItem item: sObject) {
-				if (!item.isGroup()) {
-					EnhancedServiceObjectGroupItem sitem
-						= (EnhancedServiceObjectGroupItem) item;
-					ServiceCrossRefContext nref = new ServiceCrossRefContext(
-						sitem.getServiceObject().getProtocols(),
-						refContext.getType(),
-						refContext.getContextString(),
-						refContext.getContextName(),
-						refContext.getComment(),
-						refContext.getFilename(),
-						refContext.getLinenumber());
-					crossRefPortObject(sitem.getServiceObject().getPortObject(),
-						nref);
-				}
+			for (ObjectGroupItem item: sObject.expand()) {
+				EnhancedServiceObjectGroupItem sitem
+					= (EnhancedServiceObjectGroupItem) item;
+				ServiceCrossRefContext nref = new ServiceCrossRefContext(
+					sitem.getServiceObject().getProtocols(),
+					refContext.getType(),
+					refContext.getContextString(),
+					refContext.getContextName(),
+					refContext.getComment(),
+					refContext.getFilename(),
+					refContext.getLinenumber());
+				crossRefPortObject(sitem.getServiceObject().getPortObject(),
+					nref);
+			}
+		}
+	}
+
+	protected void crossRefServiceGroup(ObjectGroup objectGroup) {
+
+		if (objectGroup.getType() == ObjectGroupType.SERVICE) {
+			ServiceObjectGroup sObject = (ServiceObjectGroup) objectGroup;
+			ProtocolsSpec protoSpec = sObject.getProtocols();
+			for (ObjectGroupItem item: sObject.expand()) {
+				ServiceObjectGroupItem sitem = (ServiceObjectGroupItem) item;
+				ParseContext pctx = item.getParseContext();
+				if (pctx == null)
+					continue;
+				PortRange range = sitem.getPortObject().getPortSpec().getRanges().get(0);
+				ServiceCrossRefContext refctx = new ServiceCrossRefContext(
+					protoSpec,
+					ServiceCrossRefType.OTHER,
+					pctx.getLine(),
+					"service-object-group",
+					item.getOwner().getGroupId(),
+					pctx.getFileName(),
+					pctx.getLineNumber());
+				ServiceCrossRef serv = getServiceCrossRef(range);
+				serv.addContext(refctx);
+			}
+		}
+
+		if (objectGroup.getType() == ObjectGroupType.ENHANCED) {
+			EnhancedServiceObjectGroup sObject =
+				(EnhancedServiceObjectGroup) objectGroup;
+			for (ObjectGroupItem item: sObject.expand()) {
+				EnhancedServiceObjectGroupItem sitem
+					= (EnhancedServiceObjectGroupItem) item;
+				ParseContext pctx = item.getParseContext();
+				if (pctx == null)
+					continue;
+				PortRange range =
+					sitem.getServiceObject().getPortObject().getPortSpec().getRanges().get(0);
+				ProtocolsSpec protoSpec = sitem.getServiceObject().getProtocols();
+
+				ServiceCrossRefContext refctx = new ServiceCrossRefContext(
+					protoSpec,
+					ServiceCrossRefType.OTHER,
+					pctx.getLine(),
+					"enhanced-service-object-group",
+					item.getOwner().getGroupId(),
+					pctx.getFileName(),
+					pctx.getLineNumber());
+				ServiceCrossRef serv = getServiceCrossRef(range);
+				serv.addContext(refctx);
 			}
 		}
 	}
@@ -1320,11 +1380,11 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 
 		NetworkObjectGroup networkGroup = acl.getSourceNetworkGroup();
 		if (networkGroup != null)
-			crossRefNetworkGroup(networkGroup, refContext);
+			crossRefNetworkGroupSpec(networkGroup, refContext);
 
 		networkGroup = acl.getDestNetworkGroup();
 		if (networkGroup != null)
-			crossRefNetworkGroup(networkGroup, refContext);
+			crossRefNetworkGroupSpec(networkGroup, refContext);
 
 		IPNet ip = acl.getSourceIp();
 		if (ip != null) {
@@ -1373,7 +1433,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						ServiceCrossRefType.FROM,
 						context.getLine(), "acl", acl.getAction(),
 						context.getFileName(), context.getLineNumber());
-			crossRefServiceGroup(acl.getSourceServiceGroup(), serviceContext);
+			crossRefServiceGroupSpec(acl.getSourceServiceGroup(), serviceContext);
 		}
 
 		/*
@@ -1402,7 +1462,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						ServiceCrossRefType.TO,
 						context.getLine(), "acl", acl.getAction(),
 						context.getFileName(), context.getLineNumber());
-			crossRefServiceGroup(acl.getDestServiceGroup(), serviceContext);
+			crossRefServiceGroupSpec(acl.getDestServiceGroup(), serviceContext);
 		}
 
 		/*
@@ -1416,7 +1476,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						ServiceCrossRefType.TO,
 						context.getLine(), "acl", acl.getAction(),
 						context.getFileName(), context.getLineNumber());
-			crossRefServiceGroup(acl.getEnhancedDestServiceGroup(),
+			crossRefServiceGroupSpec(acl.getEnhancedDestServiceGroup(),
 				serviceContext);
 		}
 	}
@@ -1425,6 +1485,29 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 * Compute IPNet cross references
 	 */
 	protected void ipNetCrossReference() {
+
+		/*
+		 * cross references for network groups
+		 */
+		for (ObjectGroup ogroup: _networkGroups.values()) {
+			NetworkObjectGroup ngroup = (NetworkObjectGroup) ogroup;
+			crossRefNetworkGroup(ngroup);
+		}
+
+		/*
+		 * cross references for services groups
+		 */
+		for (ObjectGroup ogroup: _serviceGroups.values()) {
+			crossRefServiceGroup(ogroup);
+		}
+
+		/*
+		 * cross references for enhanced-services groups
+		 */
+		for (ObjectGroup ogroup: _enhancedGroups.values()) {
+			crossRefServiceGroup(ogroup);
+		}
+
 		/*
 		 * acl
 		 */
