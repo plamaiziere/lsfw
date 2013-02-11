@@ -14,8 +14,12 @@
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
-import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -31,6 +35,7 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
@@ -216,6 +221,11 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
 	/**
+	 * Services cross references map
+	 */
+	protected ServiceCrossRefMap _serviceCrossRef = new ServiceCrossRefMap();
+
+	/**
 	 * parse context
 	 */
 	protected ParseContext _parseContext = new ParseContext();
@@ -261,6 +271,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 */
 	IPCrossRefMap getNetCrossRef() {
 		return _netCrossRef;
+	}
+
+	/*
+	 * Service cross reference map
+	 */
+	public ServiceCrossRefMap getServiceCrossRef() {
+		return _serviceCrossRef;
 	}
 
 	protected PixShell _shell = new PixShell(this);
@@ -551,7 +568,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 break;
 		 case SERVICE:
 			 String protocol = parser.getProtocol();
-			 newGroup = new ServiceObjectGroup(groupId, protocol);
+			 ProtocolsSpec protoSpec = new ProtocolsSpec();
+			 if (protocol.contains("udp"))
+				 protoSpec.add(Protocols.UDP);
+			 if (protocol.contains("tcp"))
+				 protoSpec.add(Protocols.TCP);
+			 newGroup = new ServiceObjectGroup(groupId, protoSpec);
 			 break;
 		 case ENHANCED:
 			 newGroup = new EnhancedServiceObjectGroup(groupId);
@@ -673,9 +695,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			 */
 			case SERVICE:
 				ServiceObjectGroup group = (ServiceObjectGroup) _lastGroup;
-				String protocol = group.getProtocol();
-				if (protocol.equals("tcp-udp"))
+				ProtocolsSpec protoSpec = group.getProtocols();
+				String protocol;
+				if (protoSpec.contains(Protocols.TCP))
 					protocol = "tcp";
+				else
+					protocol = "udp";
 
 				String operator = parser.getPortOperator();
 				int firstPort = parseService(parser.getFirstPort(), protocol);
@@ -1215,10 +1240,20 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		return ref;
 	}
 
+	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
+		if (ref == null) {
+			ref = new ServiceCrossRef(portrange);
+			_serviceCrossRef.put(ref);
+		}
+		return ref;
+	}
+
 	/*
 	 * Cross reference for used network-group
 	 */
-	protected void crossRefNetworkGroup(NetworkObjectGroup networkGroup, CrossRefContext refContext) {
+	protected void crossRefNetworkGroup(NetworkObjectGroup networkGroup,
+			CrossRefContext refContext) {
 
 		for (ObjectGroupItem groupItem: networkGroup.expand()) {
 			NetworkObjectGroupItem networkGroupItem =
@@ -1228,6 +1263,50 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			ipNetRef.addContext(refContext);
 		}
 	}
+
+	protected void crossRefServiceGroup(ObjectGroup objectGroup,
+			ServiceCrossRefContext refContext) {
+
+		if (objectGroup.getType() == ObjectGroupType.SERVICE) {
+			ServiceObjectGroup sObject = (ServiceObjectGroup) objectGroup;
+			for (ObjectGroupItem item: sObject) {
+				if (!item.isGroup()) {
+					ServiceObjectGroupItem sitem = (ServiceObjectGroupItem) item;
+					crossRefPortObject(sitem.getPortObject(), refContext);
+				}
+			}
+		}
+
+		if (objectGroup.getType() == ObjectGroupType.ENHANCED) {
+			EnhancedServiceObjectGroup sObject =
+				(EnhancedServiceObjectGroup) objectGroup;
+			for (ObjectGroupItem item: sObject) {
+				if (!item.isGroup()) {
+					EnhancedServiceObjectGroupItem sitem
+						= (EnhancedServiceObjectGroupItem) item;
+					ServiceCrossRefContext nref = new ServiceCrossRefContext(
+						sitem.getServiceObject().getProtocols(),
+						refContext.getType(),
+						refContext.getContextString(),
+						refContext.getContextName(),
+						refContext.getComment(),
+						refContext.getFilename(),
+						refContext.getLinenumber());
+					crossRefPortObject(sitem.getServiceObject().getPortObject(),
+						nref);
+				}
+			}
+		}
+	}
+
+	protected void crossRefPortObject(PortObject portObject,
+			ServiceCrossRefContext refContext) {
+
+		PortRange range = portObject.getPortSpec().getRanges().get(0);
+		ServiceCrossRef refService = getServiceCrossRef(range);
+		refService.addContext(refContext);
+	}
+
 
 	/*
 	 * Cross reference for an access list
@@ -1260,6 +1339,87 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			ipNetRef.addContext(refContext);
 		}
 
+		/*
+		 * protocol
+		 */
+		ProtocolsSpec protoSpec = new ProtocolsSpec();
+		if (acl.getProtocol() != null)
+			protoSpec.add(acl.getProtocol());
+		if (acl.getProtocolGroup() != null)
+			protoSpec.addAll(acl.getProtocolGroup().getProtocols());
+
+		/*
+		 * services sources
+		 */
+		/*
+		 * port object
+		 */
+		if (acl.getSourcePortObject() != null) {
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.FROM,
+						context.getLine(), "acl", acl.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefPortObject(acl.getSourcePortObject(), serviceContext);
+		}
+
+		/*
+		 * service group
+		 */
+		if (acl.getSourceServiceGroup() != null) {
+			protoSpec = acl.getSourceServiceGroup().getProtocols();
+
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.FROM,
+						context.getLine(), "acl", acl.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefServiceGroup(acl.getSourceServiceGroup(), serviceContext);
+		}
+
+		/*
+		 * services destination
+		 */
+		/*
+		 * port object
+		 */
+		if (acl.getDestPortObject() != null) {
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.TO,
+						context.getLine(), "acl", acl.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefPortObject(acl.getDestPortObject(), serviceContext);
+		}
+
+		/*
+		 * service group
+		 */
+		if (acl.getDestServiceGroup() != null) {
+			protoSpec = acl.getDestServiceGroup().getProtocols();
+
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.TO,
+						context.getLine(), "acl", acl.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefServiceGroup(acl.getDestServiceGroup(), serviceContext);
+		}
+
+		/*
+		 * enhanced service group
+		 */
+		if (acl.getEnhancedDestServiceGroup() != null) {
+			protoSpec = new ProtocolsSpec();
+
+			ServiceCrossRefContext serviceContext =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.TO,
+						context.getLine(), "acl", acl.getAction(),
+						context.getFileName(), context.getLineNumber());
+			crossRefServiceGroup(acl.getEnhancedDestServiceGroup(),
+				serviceContext);
+		}
 	}
 
 	/**
