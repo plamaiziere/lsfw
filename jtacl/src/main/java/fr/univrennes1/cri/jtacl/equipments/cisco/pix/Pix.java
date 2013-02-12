@@ -1341,7 +1341,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				ParseContext pctx = item.getParseContext();
 				if (pctx == null)
 					continue;
-				for (PortRange range: sitem.getServiceObject().getPortObject().getPortSpec().getRanges()) {
+				PortObject portObj = sitem.getServiceObject().getPortObject();
+				if (portObj == null)
+					continue;
+				for (PortRange range: portObj.getPortSpec().getRanges()) {
 					ProtocolsSpec protoSpec = sitem.getServiceObject().getProtocols();
 
 					ServiceCrossRefContext refctx = new ServiceCrossRefContext(
