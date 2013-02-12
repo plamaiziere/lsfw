@@ -37,10 +37,19 @@ public class ServiceObject {
 		_portObject = portObject;
 	}
 
+	/**
+	 * Returns the portObject of this service (may be null if protocols !=
+	 * udp/tcp)
+	 * @return the portObject of this service
+	 */
 	public PortObject getPortObject() {
 		return _portObject;
 	}
 
+	/**
+	 * Returns the list of protocols of this service
+	 * @return
+	 */
 	public ProtocolsSpec getProtocols() {
 		return _protocols;
 	}
