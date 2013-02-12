@@ -56,7 +56,7 @@ class Xhosts extends ArrayList<Xhost> {
 
 			boolean itest = false || filterNetworks.isEmpty()
 			for (IPNet network: filterNetworks) {
-				if (network.networkContains(xhost.ip)) {
+				if (network.contains(xhost.ip)) {
 					itest = true
 					break
 				}
@@ -83,7 +83,7 @@ class Xhosts extends ArrayList<Xhost> {
 
 			boolean itest = true
 			for (IPNet network: excludeNetworks) {
-				if (network.networkContains(xhost.ip)) {
+				if (network.contains(xhost.ip)) {
 					itest = false
 					break
 				}

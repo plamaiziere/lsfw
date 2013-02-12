@@ -69,7 +69,7 @@ class TestPorts extends ArrayList<TestPort> {
 
 			boolean itest = false || filterNetworks.isEmpty()
 			for (IPNet network: filterNetworks) {
-				if (network.networkContains(port.ip)) {
+				if (network.contains(port.ip)) {
 					itest = true
 					break
 				}
