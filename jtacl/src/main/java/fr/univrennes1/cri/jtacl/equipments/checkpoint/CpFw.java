@@ -17,7 +17,9 @@ import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
@@ -36,6 +38,9 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -954,6 +959,101 @@ public class CpFw extends GenericEquipment {
 		return ref;
 	}
 
+	protected void crossRefOwnerService(PortRange range,
+			ServiceCrossRefContext refctx, Object obj) {
+
+		ProtocolsSpec protoSpec = refctx.getProtoSpec();
+		ServiceCrossRefType xrefType = refctx.getType();
+
+		if (obj instanceof CpGroupService) {
+			CpGroupService group = (CpGroupService) obj;
+			ServiceCrossRefContext nrefctx =
+				new ServiceCrossRefContext(protoSpec,
+						xrefType, group.toString(),
+						group.getType().toString(),
+						group.getName(),
+						null,
+						0);
+			ServiceCrossRef serv = getServiceCrossRef(range);
+			serv.addContext(nrefctx);
+			for (Object owner: group.getLinkedTo())
+				crossRefOwnerService(range, refctx, owner);
+		}
+
+		if (obj instanceof CpFwRule) {
+			CpFwRule rule = (CpFwRule) obj;
+			ServiceCrossRefContext nrefctx =
+				new ServiceCrossRefContext(protoSpec,
+						xrefType, rule.toText(), "rule", "", null, 0);
+			ServiceCrossRef serv = getServiceCrossRef(range);
+			serv.addContext(nrefctx);
+		}
+
+	}
+
+	protected void crossRefTcpUdpService(Object obj) {
+
+		PortSpec sourcePortSpec = null;
+		PortSpec destPortSpec = null;
+		ProtocolsSpec protoSpec = null;
+		String serviceText = null;
+		List<Object> owners = null;
+
+		if (obj instanceof CpTcpService) {
+			CpTcpService sobj = (CpTcpService) obj;
+			protoSpec = new ProtocolsSpec();
+			protoSpec.add(Protocols.TCP);
+			sourcePortSpec = sobj.getSourcePort().getPortSpec();
+			destPortSpec = sobj.getPort().getPortSpec();
+			owners = sobj.getLinkedTo();
+		}
+
+		if (obj instanceof CpUdpService) {
+			CpUdpService sobj = (CpUdpService) obj;
+			protoSpec = new ProtocolsSpec();
+			protoSpec.add(Protocols.UDP);
+			sourcePortSpec = sobj.getSourcePort().getPortSpec();
+			destPortSpec = sobj.getPort().getPortSpec();
+			owners = sobj.getLinkedTo();
+		}
+
+		CpService service = (CpService) obj;
+
+		if (sourcePortSpec != null) {
+			ServiceCrossRefContext refctx =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.FROM, service.toString(),
+						service.getType().toString(),
+						service.getName(),
+						null,
+						0);
+			for (PortRange range: sourcePortSpec.getRanges()) {
+				ServiceCrossRef xref = getServiceCrossRef(range);
+				xref.addContext(refctx);
+				for (Object owner: owners) {
+					crossRefOwnerService(range, refctx, owner);
+				}
+			}
+		}
+
+		if (destPortSpec != null) {
+			ServiceCrossRefContext refctx =
+				new ServiceCrossRefContext(protoSpec,
+						ServiceCrossRefType.TO, service.toString(),
+						service.getType().toString(),
+						service.getName(),
+						null,
+						0);
+			for (PortRange range: destPortSpec.getRanges()) {
+				ServiceCrossRef xref = getServiceCrossRef(range);
+				xref.addContext(refctx);
+				for (Object owner: owners) {
+					crossRefOwnerService(range, refctx, owner);
+				}
+			}
+		}
+	}
+
 	protected void crossRefNetworkLink(IPCrossRef ipNetRef,
 			Object obj) {
 
@@ -998,6 +1098,16 @@ public class CpFw extends GenericEquipment {
 			}
 			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
 			crossRefNetworkLink(ipNetRef, nobj);
+		}
+
+		/*
+		 * services object
+		 */
+		for (CpService sobj: _services.values()) {
+			if (sobj.getType() != CpServiceType.TCP &&
+					sobj.getType() != CpServiceType.UDP)
+				continue;
+			crossRefTcpUdpService(sobj);
 		}
 	}
 
