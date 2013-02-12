@@ -1317,17 +1317,18 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				ParseContext pctx = item.getParseContext();
 				if (pctx == null)
 					continue;
-				PortRange range = sitem.getPortObject().getPortSpec().getRanges().get(0);
-				ServiceCrossRefContext refctx = new ServiceCrossRefContext(
-					protoSpec,
-					ServiceCrossRefType.OTHER,
-					pctx.getLine(),
-					"service-object-group",
-					item.getOwner().getGroupId(),
-					pctx.getFileName(),
-					pctx.getLineNumber());
-				ServiceCrossRef serv = getServiceCrossRef(range);
-				serv.addContext(refctx);
+				for (PortRange range: sitem.getPortObject().getPortSpec().getRanges()) {
+					ServiceCrossRefContext refctx = new ServiceCrossRefContext(
+						protoSpec,
+						ServiceCrossRefType.OTHER,
+						pctx.getLine(),
+						"service-object-group",
+						item.getOwner().getGroupId(),
+						pctx.getFileName(),
+						pctx.getLineNumber());
+					ServiceCrossRef serv = getServiceCrossRef(range);
+					serv.addContext(refctx);
+				}
 			}
 		}
 
@@ -1340,20 +1341,20 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 				ParseContext pctx = item.getParseContext();
 				if (pctx == null)
 					continue;
-				PortRange range =
-					sitem.getServiceObject().getPortObject().getPortSpec().getRanges().get(0);
-				ProtocolsSpec protoSpec = sitem.getServiceObject().getProtocols();
+				for (PortRange range: sitem.getServiceObject().getPortObject().getPortSpec().getRanges()) {
+					ProtocolsSpec protoSpec = sitem.getServiceObject().getProtocols();
 
-				ServiceCrossRefContext refctx = new ServiceCrossRefContext(
-					protoSpec,
-					ServiceCrossRefType.OTHER,
-					pctx.getLine(),
-					"enhanced-service-object-group",
-					item.getOwner().getGroupId(),
-					pctx.getFileName(),
-					pctx.getLineNumber());
-				ServiceCrossRef serv = getServiceCrossRef(range);
-				serv.addContext(refctx);
+					ServiceCrossRefContext refctx = new ServiceCrossRefContext(
+						protoSpec,
+						ServiceCrossRefType.OTHER,
+						pctx.getLine(),
+						"enhanced-service-object-group",
+						item.getOwner().getGroupId(),
+						pctx.getFileName(),
+						pctx.getLineNumber());
+					ServiceCrossRef serv = getServiceCrossRef(range);
+					serv.addContext(refctx);
+				}
 			}
 		}
 	}

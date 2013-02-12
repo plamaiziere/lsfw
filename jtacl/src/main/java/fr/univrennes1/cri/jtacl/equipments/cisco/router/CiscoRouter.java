@@ -907,9 +907,10 @@ public class CiscoRouter extends GenericEquipment {
 	protected void crossRefPortObject(PortObject portObject,
 			ServiceCrossRefContext refContext) {
 
-		PortRange range = portObject.getPortSpec().getRanges().get(0);
-		ServiceCrossRef refService = getServiceCrossRef(range);
-		refService.addContext(refContext);
+		for (PortRange range: portObject.getPortSpec().getRanges()) {
+			ServiceCrossRef refService = getServiceCrossRef(range);
+			refService.addContext(refContext);
+		}
 	}
 
 	/*
