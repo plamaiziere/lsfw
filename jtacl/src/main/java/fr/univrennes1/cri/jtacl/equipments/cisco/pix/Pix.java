@@ -1243,6 +1243,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	protected void crossRefNetworkGroupSpec(NetworkObjectGroup networkGroup,
 			CrossRefContext refContext) {
 
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("xref NetworkGroupSpec: " + networkGroup.getGroupId());
+		}
+
 		for (ObjectGroupItem groupItem: networkGroup.expand()) {
 			NetworkObjectGroupItem networkGroupItem =
 				(NetworkObjectGroupItem) groupItem;
@@ -1256,6 +1260,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 * Cross reference for network-group
 	 */
 	protected void crossRefNetworkGroup(NetworkObjectGroup networkGroup) {
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("xref NetworkGroup: " + networkGroup.getGroupId());
+		}
 
 		for (ObjectGroupItem groupItem: networkGroup.expand()) {
 			NetworkObjectGroupItem networkGroupItem =
@@ -1279,6 +1287,10 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	protected void crossRefServiceGroupSpec(ObjectGroup objectGroup,
 			ServiceCrossRefContext refContext) {
 
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("xref ServiceGroupSpec: " + objectGroup.getGroupId());
+		}
+
 		if (objectGroup.getType() == ObjectGroupType.SERVICE) {
 			ServiceObjectGroup sObject = (ServiceObjectGroup) objectGroup;
 			for (ObjectGroupItem item: sObject.expand()) {
@@ -1293,6 +1305,9 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			for (ObjectGroupItem item: sObject.expand()) {
 				EnhancedServiceObjectGroupItem sitem
 					= (EnhancedServiceObjectGroupItem) item;
+				PortObject portObj = sitem.getServiceObject().getPortObject();
+				if (portObj == null)
+					continue;
 				ServiceCrossRefContext nref = new ServiceCrossRefContext(
 					sitem.getServiceObject().getProtocols(),
 					refContext.getType(),
@@ -1301,13 +1316,16 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 					refContext.getComment(),
 					refContext.getFilename(),
 					refContext.getLinenumber());
-				crossRefPortObject(sitem.getServiceObject().getPortObject(),
-					nref);
+				crossRefPortObject(portObj,	nref);
 			}
 		}
 	}
 
 	protected void crossRefServiceGroup(ObjectGroup objectGroup) {
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("xref ServiceGroup: " + objectGroup.getGroupId());
+		}
 
 		if (objectGroup.getType() == ObjectGroupType.SERVICE) {
 			ServiceObjectGroup sObject = (ServiceObjectGroup) objectGroup;
@@ -1375,7 +1393,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	 * Cross reference for an access list
 	 */
 	protected void crossRefAccessList(AccessList acl) {
+
 		ParseContext context = acl.getParseContext();
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("xref acl: " + context.getLine());
+		}
+
 		CrossRefContext refContext = new CrossRefContext(context.getLine(),
 				"acl",
 				acl.getAction(),
