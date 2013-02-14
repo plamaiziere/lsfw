@@ -967,6 +967,10 @@ public class CpFw extends GenericEquipment {
 
 		if (obj instanceof CpGroupService) {
 			CpGroupService group = (CpGroupService) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref owner service/group: " + group.toString());
+			}
+
 			ServiceCrossRefContext nrefctx =
 				new ServiceCrossRefContext(protoSpec,
 						xrefType, group.toString(),
@@ -982,6 +986,9 @@ public class CpFw extends GenericEquipment {
 
 		if (obj instanceof CpFwRule) {
 			CpFwRule rule = (CpFwRule) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref owner service/rule: " + rule.toString());
+			}
 			ServiceCrossRefContext nrefctx =
 				new ServiceCrossRefContext(protoSpec,
 						xrefType, rule.toText(), "rule", "", null, 0);
@@ -991,7 +998,7 @@ public class CpFw extends GenericEquipment {
 
 	}
 
-	protected void crossRefTcpUdpService(CpService obj) {
+	protected void crossRefTcpUdpService(CpService service) {
 
 		PortSpec sourcePortSpec = null;
 		PortSpec destPortSpec = null;
@@ -1000,28 +1007,30 @@ public class CpFw extends GenericEquipment {
 		List<Object> owners = null;
 
 		if (Log.debug().isLoggable(Level.INFO)) {
-			Log.debug().info("xref tcp/udp service: " + obj.toString());
+			Log.debug().info("xref tcp/udp service: " + service.toString());
 		}
 
-		if (obj instanceof CpTcpService) {
-			CpTcpService sobj = (CpTcpService) obj;
+		if (service instanceof CpTcpService) {
+			CpTcpService sobj = (CpTcpService) service;
 			protoSpec = new ProtocolsSpec();
 			protoSpec.add(Protocols.TCP);
-			sourcePortSpec = sobj.getSourcePort().getPortSpec();
-			destPortSpec = sobj.getPort().getPortSpec();
+			if (sobj.getSourcePort() != null)
+				sourcePortSpec = sobj.getSourcePort().getPortSpec();
+			if (sobj.getPort() != null)
+					destPortSpec = sobj.getPort().getPortSpec();
 			owners = sobj.getLinkedTo();
 		}
 
-		if (obj instanceof CpUdpService) {
-			CpUdpService sobj = (CpUdpService) obj;
+		if (service instanceof CpUdpService) {
+			CpUdpService sobj = (CpUdpService) service;
 			protoSpec = new ProtocolsSpec();
 			protoSpec.add(Protocols.UDP);
-			sourcePortSpec = sobj.getSourcePort().getPortSpec();
-			destPortSpec = sobj.getPort().getPortSpec();
+			if (sobj.getSourcePort() != null)
+				sourcePortSpec = sobj.getSourcePort().getPortSpec();
+			if (sobj.getPort() != null)
+				destPortSpec = sobj.getPort().getPortSpec();
 			owners = sobj.getLinkedTo();
 		}
-
-		CpService service = (CpService) obj;
 
 		if (sourcePortSpec != null) {
 			ServiceCrossRefContext refctx =
@@ -1063,6 +1072,9 @@ public class CpFw extends GenericEquipment {
 
 		if (obj instanceof CpNetworkObject) {
 			CpNetworkObject nobj = (CpNetworkObject) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref NetworkLink/Network: " + nobj.toString());
+			}
 			CrossRefContext refContext =
 				new CrossRefContext(nobj.toString(), nobj.getType().toString(),
 					nobj.getName(), null, 0);
@@ -1073,6 +1085,9 @@ public class CpFw extends GenericEquipment {
 		}
 		if (obj instanceof CpFwRule) {
 			CpFwRule rule = (CpFwRule) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref NetworkLink/rule: " + rule.toText());
+			}
 			CrossRefContext refContext =
 				new CrossRefContext(rule.toText(), "rule", "", null, 0);
 			ipNetRef.addContext(refContext);
