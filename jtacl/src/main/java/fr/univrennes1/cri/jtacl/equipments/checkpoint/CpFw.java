@@ -991,13 +991,17 @@ public class CpFw extends GenericEquipment {
 
 	}
 
-	protected void crossRefTcpUdpService(Object obj) {
+	protected void crossRefTcpUdpService(CpService obj) {
 
 		PortSpec sourcePortSpec = null;
 		PortSpec destPortSpec = null;
 		ProtocolsSpec protoSpec = null;
 		String serviceText = null;
 		List<Object> owners = null;
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("xref tcp/udp service: " + obj.toString());
+		}
 
 		if (obj instanceof CpTcpService) {
 			CpTcpService sobj = (CpTcpService) obj;
