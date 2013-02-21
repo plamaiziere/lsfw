@@ -35,6 +35,7 @@ public class ShellParser extends CommonRules<Object> {
 	protected String _groovyScript;
 	protected String _groovyArgs;
 	protected String _addressArg;
+	protected String _filename;
 
 	protected boolean clear() {
 		_command = "";
@@ -46,6 +47,7 @@ public class ShellParser extends CommonRules<Object> {
 		_topologyOption = null;
 		_subCommand = null;
 		_addressArg = null;
+		_filename = null;
 		return true;
 	}
 
@@ -142,7 +144,7 @@ public class ShellParser extends CommonRules<Object> {
 	public ProbeCommandTemplate getProbeCmdTemplate() {
 		return _probeCmdTemplate;
 	}
-	
+
 	public boolean setAddressArg(String addressArg) {
 		_addressArg = addressArg;
 		return true;
@@ -150,6 +152,15 @@ public class ShellParser extends CommonRules<Object> {
 
 	public String getAddressArg() {
 		return _addressArg;
+	}
+
+	public boolean setFileName(String filename) {
+		_filename = filename;
+		return true;
+	}
+
+	public String getFileName() {
+		return _filename;
 	}
 
 	public Rule CommandLine() {
@@ -169,7 +180,8 @@ public class ShellParser extends CommonRules<Object> {
 					CommandGroovy(),
 					CommandGroovyConsole(),
 					CommandHost(),
-					CommandHost6()
+					CommandHost6(),
+					CommandPolicyLoad()
 				)
 			);
 	}
@@ -295,6 +307,22 @@ public class ShellParser extends CommonRules<Object> {
 				EOI,
 				setCommand("define")
 		);
+	}
+
+	/*
+	 * policy load filename
+	 */
+	public Rule CommandPolicyLoad() {
+		return Sequence(
+					IgnoreCase("policy"),
+					WhiteSpaces(),
+					IgnoreCase("load"),
+					WhiteSpaces(),
+					StringOrQuotedString(),
+					setFileName(getLastQuotedString()),
+					EOI,
+					setCommand("policy-load")
+				);
 	}
 
 	/*
@@ -655,8 +683,8 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("g")
 				),
 				WhiteSpaces(),
-				StringAtom(),
-				setGroovyDirectory(match()),
+				StringOrQuotedString(),
+				setGroovyDirectory(getLastQuotedString()),
 				WhiteSpaces(),
 				StringAtom(),
 				setGroovyScript(match()),
