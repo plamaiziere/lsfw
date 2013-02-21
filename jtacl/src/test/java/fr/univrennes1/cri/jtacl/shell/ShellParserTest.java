@@ -150,14 +150,14 @@ public class ShellParserTest extends TestCase {
 		line = "p6       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
-		assertTrue(parser.getProbeCmdTemplate().getProbe6flag());		
+		assertTrue(parser.getProbeCmdTemplate().getProbe6flag());
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 
 		line = "p     expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("probe", parser.getCommand());
-		assertFalse(parser.getProbeCmdTemplate().getProbe6flag());				
+		assertFalse(parser.getProbeCmdTemplate().getProbe6flag());
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -466,4 +466,33 @@ public class ShellParserTest extends TestCase {
 		assertEquals("HOSTNAME HOSTNAME", parser.getAddressArg());
 	}
 
+	public void testGroovy() {
+		System.out.println("groovy");
+
+		String line = "groovy DIRECTORY FILENAME";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("groovy", parser.getCommand());
+		assertEquals("DIRECTORY", parser.getGroovyDirectory());
+		assertEquals("FILENAME", parser.getGroovyScript());
+
+		line = "g \"D I R E C T O R Y\"   \"F I L E N A M E\"";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("groovy", parser.getCommand());
+		assertEquals("D I R E C T O R Y", parser.getGroovyDirectory());
+		assertEquals("F I L E N A M E", parser.getGroovyScript());
+	}
+
+	public void testPolicyLoad() {
+		System.out.println("policy-load");
+
+		String line = "policy    load     FILENAME";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-load", parser.getCommand());
+		assertEquals("FILENAME", parser.getFileName());
+
+		line = "policy    load     \"c:         FILENAME   \"";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-load", parser.getCommand());
+		assertEquals("c:         FILENAME   ", parser.getFileName());
+	}
 }
