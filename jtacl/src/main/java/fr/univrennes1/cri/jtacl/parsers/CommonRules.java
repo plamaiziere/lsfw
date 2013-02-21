@@ -27,6 +27,11 @@ public class CommonRules<T> extends BaseParser<T> {
 	private char _previousChar;
 	private boolean _qtStringEnd = false;
 
+	public boolean setLastQuotedString(String string) {
+		_lastqtString = string;
+		return true;
+	}
+
 	/**
 	 * Matches an atom: a string delimited by white spaces.
 	 * @return a {@link Rule}
@@ -180,6 +185,22 @@ public class CommonRules<T> extends BaseParser<T> {
 					quotedStringContinue(),
 					ANY,
 					quotedString(match())
+				)
+			)
+		);
+	}
+
+	/**
+	 * Matches a String atom or a quoted String
+	 * return a Rule; result in getLastQuotedString()
+	 */
+	public Rule StringOrQuotedString() {
+		return (
+			FirstOf(
+				QuotedString(),
+				Sequence(
+					StringAtom(),
+					setLastQuotedString(match())
 				)
 			)
 		);
