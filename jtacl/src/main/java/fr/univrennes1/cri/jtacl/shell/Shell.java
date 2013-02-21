@@ -30,6 +30,7 @@ import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.policies.PolicyConfig;
 import groovy.lang.Binding;
 import groovy.ui.Console;
 import groovy.util.GroovyScriptEngine;
@@ -43,6 +44,7 @@ import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.logging.Level;
+import org.config4j.ConfigurationException;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
@@ -105,7 +107,7 @@ public class Shell {
 
 	public void helpCommand(ShellParser command) {
 		try {
-			String topic = command.getHelpTopic();
+			String topic = command.getString("HelpTopic");
 			if (topic == null) {
 				topic = "help";
 			}
@@ -150,8 +152,8 @@ public class Shell {
 	}
 
 	public void optionCommand(ShellParser command) {
-	String name = command.getSetValueName();
-	String value = command.getSetValueValue();
+		String name = command.getString("SetValueName");
+		String value = command.getString("SetValueValue");
 
 		if (name != null && value != null)
 			try {
@@ -164,8 +166,8 @@ public class Shell {
 	}
 
 	public void defineCommand(ShellParser command) {
-		String name = command.getSetValueName();
-		String value = command.getSetValueValue();
+		String name = command.getString("SetValueName");
+		String value = command.getString("SetValueValue");
 
 		if (name != null) {
 			String define = _monitor.getDefines().get(name);
@@ -184,8 +186,8 @@ public class Shell {
 
 	public void topologyCommand(ShellParser command) {
 
-		String equipmentName = command.getEquipments();
-		String option = command.getTopologyOption();
+		String equipmentName = command.getString("Equipments");;
+		String option = command.getString("TopologyOption");
 
 		/*
 		 * Try to parse the value as an IP. If ok, display network links
@@ -261,7 +263,7 @@ public class Shell {
 
 	public void routeCommand(ShellParser command) {
 
-		String equipmentName = command.getEquipments();
+		String equipmentName = command.getString("Equipments");
 		if (equipmentName != null) {
 			if (!_monitor.getEquipments().containsKey(equipmentName)) {
 				_outStream.println("No such equipment: " + equipmentName);
@@ -282,19 +284,19 @@ public class Shell {
 
 	public void equipmentCommand(ShellParser command) {
 
-		String equipmentName = command.getEquipments();
+		String equipmentName = command.getString("Equipments");
 		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
 		if (equipment == null) {
 			_outStream.println("No such equipment: " + equipmentName);
 			return;
 		}
 
-		equipment.runShell(command.getSubCommand(), _outStream);
+		equipment.runShell(command.getString("SubCommand"), _outStream);
 	}
 
 	public void reloadCommand(ShellParser command) {
 
-		String equipmentName = command.getEquipments();
+		String equipmentName = command.getString("Equipments");
 
 		if (equipmentName == null) {
 			_monitor.reload();
@@ -422,18 +424,18 @@ public class Shell {
 	public void groovyCommand(ShellParser parser) {
 
 		Binding binding = new Binding();
-		LsfwBinding lsfw = newBinding(parser.getGroovyArgs());
+		LsfwBinding lsfw = newBinding(parser.getString("GroovyArgs"));
 		binding.setVariable("lsfw", lsfw);
 
 		GroovyScriptEngine scriptEngine;
 		try {
-			scriptEngine = new GroovyScriptEngine(parser.getGroovyDirectory());
+			scriptEngine = new GroovyScriptEngine(parser.getString("GroovyDirectory"));
 		} catch (IOException ex) {
 			_outStream.println(ex.getMessage());
 			return;
 		}
 		try {
-			scriptEngine.run(parser.getGroovyScript(), binding);
+			scriptEngine.run(parser.getString("GroovyScript"), binding);
 		} catch (Exception ex) {
 			_outStream.println();
 			_outStream.println("Error: " + ex.getMessage());
@@ -442,7 +444,7 @@ public class Shell {
 
 	public void groovyConsoleCommand(ShellParser parser) {
 		Binding binding = new Binding();
-		LsfwBinding lsfw = newBinding(parser.getGroovyArgs());
+		LsfwBinding lsfw = newBinding(parser.getString("GroovyArgs"));
 		binding.setVariable("lsfw", lsfw);
 		Console console = new Console(binding);
 		console.run();
@@ -451,13 +453,13 @@ public class Shell {
 	public void hostCommand(ShellParser parser) {
 
 		IPversion ipversion;
-		if (parser.getCommand().equals("host6"))
+		if (parser.getString("Command").equals("host6"))
 			ipversion = IPversion.IPV6;
 		else
 			ipversion = IPversion.IPV4;
 
 		IPNet ip;
-		String hostname = parser.getAddressArg();
+		String hostname = parser.getString("AddressArg");
 		try {
 			ip = IPNet.getByName(hostname, ipversion);
 		} catch (UnknownHostException ex) {
@@ -465,6 +467,20 @@ public class Shell {
 			return;
 		}
 		_outStream.println(hostname + " has address " + ip.toString("::i"));
+	}
+
+	public void policyLoadCommand(ShellParser parser) {
+
+		PolicyConfig config = null;
+		try {
+			config = new PolicyConfig(parser.getString("FileName"));
+		} catch (ConfigurationException ex) {
+			_outStream.println("Error: " + ex.getMessage());
+			return;
+		}
+
+		config.loadPolicies();
+
 	}
 
 	public void parseShellCommand(String commandLine) {
@@ -526,7 +542,7 @@ public class Shell {
 			}
 		}
 
-		String command = _parser.getCommand();
+		String command = _parser.getString("Command");
 		if (command.equals("quit")) {
 			if (_interactive)
 				_outStream.println("Goodbye!");
@@ -563,6 +579,8 @@ public class Shell {
 			groovyConsoleCommand(_parser);
 		if (command.equals("host") || command.equals("host6"))
 			hostCommand(_parser);
+		if (command.equals("policy-load"))
+			policyLoadCommand(_parser);
 
 		/*
 		 * 'untee' stdout

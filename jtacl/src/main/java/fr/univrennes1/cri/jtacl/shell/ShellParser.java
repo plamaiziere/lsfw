@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.shell;
 
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.parsers.CommonRules;
+import java.util.HashMap;
 import org.parboiled.Rule;
 
 /**
@@ -23,144 +24,26 @@ import org.parboiled.Rule;
  */
 public class ShellParser extends CommonRules<Object> {
 
-	protected String _command = "";
-	protected String _equipments;
+	protected HashMap <String, String> _strings = new HashMap<String, String>();
 	protected ProbeCommandTemplate _probeCmdTemplate;
-	protected String _setValueName;
-	protected String _setValueValue;
-	protected String _helpTopic;
-	protected String _topologyOption;
-	protected String _subCommand;
-	protected String _groovyDirectory;
-	protected String _groovyScript;
-	protected String _groovyArgs;
-	protected String _addressArg;
-	protected String _filename;
 
 	protected boolean clear() {
-		_command = "";
+		_strings.clear();
 		_probeCmdTemplate = new ProbeCommandTemplate();
-		_equipments = null;
-		_setValueName = null;
-		_setValueValue = null;
-		_helpTopic = null;
-		_topologyOption = null;
-		_subCommand = null;
-		_addressArg = null;
-		_filename = null;
 		return true;
 	}
 
-	public String getCommand() {
-		return _command;
-	}
-
-	public boolean setCommand(String command) {
-		_command = command;
+	public boolean setString(String key, String value) {
+		_strings.put(key, value);
 		return true;
 	}
 
-	public String getEquipments() {
-		return _equipments;
-	}
-
-	public boolean setEquipments(String equipments) {
-		_equipments = equipments;
-		return true;
-	}
-
-	public String getSetValueName() {
-		return _setValueName;
-	}
-
-	public boolean setSetValueName(String setValueName) {
-		_setValueName = setValueName;
-		return true;
-	}
-
-	public String getSetValueValue() {
-		return _setValueValue;
-	}
-
-	public boolean setSetValueValue(String setValueValue) {
-		_setValueValue = setValueValue;
-		return true;
-	}
-
-	public String getHelpTopic() {
-		return _helpTopic;
-	}
-
-	public boolean setHelpTopic(String helpTopic) {
-		_helpTopic = helpTopic;
-		return true;
-	}
-
-	public String getTopologyOption() {
-		return _topologyOption;
-	}
-
-	public boolean setTopologyOption(String topologyOption) {
-		_topologyOption = topologyOption;
-		return true;
-	}
-
-	public String getSubCommand() {
-		return _subCommand;
-	}
-
-	public boolean setSubCommand(String subCommand) {
-		_subCommand = subCommand;
-		return true;
-	}
-
-	public boolean setGroovyDirectory(String directory) {
-		_groovyDirectory = directory;
-		return true;
-	}
-
-	public String getGroovyDirectory() {
-		return _groovyDirectory;
-	}
-
-	public boolean setGroovyScript(String script) {
-		_groovyScript = script;
-		return true;
-	}
-
-	public String getGroovyScript() {
-		return _groovyScript;
-	}
-
-	public String getGroovyArgs() {
-		return _groovyArgs;
-	}
-
-	public boolean setGroovyArgs(String groovyArgs) {
-		_groovyArgs = groovyArgs;
-		return true;
+	public String getString(String key) {
+		return _strings.get(key);
 	}
 
 	public ProbeCommandTemplate getProbeCmdTemplate() {
 		return _probeCmdTemplate;
-	}
-
-	public boolean setAddressArg(String addressArg) {
-		_addressArg = addressArg;
-		return true;
-	}
-
-	public String getAddressArg() {
-		return _addressArg;
-	}
-
-	public boolean setFileName(String filename) {
-		_filename = filename;
-		return true;
-	}
-
-	public String getFileName() {
-		return _filename;
 	}
 
 	public Rule CommandLine() {
@@ -195,7 +78,7 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("e")
 				),
 				EOI,
-				setCommand("quit")
+				setString("Command", "quit")
 		);
 	}
 
@@ -216,18 +99,18 @@ public class ShellParser extends CommonRules<Object> {
 								IgnoreCase("connected"),
 								IgnoreCase("!connected")
 							),
-							setTopologyOption(match())
+							setString("TopologyOption", match())
 						)
 					),
 					Optional(
 						Sequence(
 							WhiteSpaces(),
 							StringAtom(),
-							setEquipments(match())
+							setString("Equipments", match())
 						)
 					),
 					EOI,
-					setCommand("topology")
+					setString("Command", "topology")
 			);
 	}
 
@@ -241,10 +124,10 @@ public class ShellParser extends CommonRules<Object> {
 						Sequence(
 							WhiteSpaces(),
 							StringAtom(),
-							setEquipments(match())
+							setString("Equipments", match())
 						)
 					),
-					setCommand("route")
+					setString("Command", "route")
 			);
 	}
 
@@ -261,20 +144,20 @@ public class ShellParser extends CommonRules<Object> {
 					Sequence(
 						WhiteSpaces(),
 						Identifier(),
-						setSetValueName(match()),
+						setString("SetValueName", match()),
 						Optional(
 							Sequence(
 								SkipSpaces(),
 								IgnoreCase('='),
 								SkipSpaces(),
 								StringAtom(),
-								setSetValueValue(match())
+								setString("SetValueValue", match())
 							)
 						)
 					)
 				),
 				EOI,
-				setCommand("option")
+				setString("Command", "option")
 		);
 	}
 
@@ -292,20 +175,20 @@ public class ShellParser extends CommonRules<Object> {
 					Sequence(
 						WhiteSpaces(),
 						Identifier(),
-						setSetValueName(match()),
+						setString("SetValueName", match()),
 						Optional(
 							Sequence(
 								SkipSpaces(),
 								IgnoreCase('='),
 								SkipSpaces(),
 								UntilEOI(),
-								setSetValueValue(match())
+								setString("SetValueValue", match())
 							)
 						)
 					)
 				),
 				EOI,
-				setCommand("define")
+				setString("Command", "define")
 		);
 	}
 
@@ -319,9 +202,9 @@ public class ShellParser extends CommonRules<Object> {
 					IgnoreCase("load"),
 					WhiteSpaces(),
 					StringOrQuotedString(),
-					setFileName(getLastQuotedString()),
+					setString("FileName", getLastQuotedString()),
 					EOI,
-					setCommand("policy-load")
+					setString("Command", "policy-load")
 				);
 	}
 
@@ -335,11 +218,11 @@ public class ShellParser extends CommonRules<Object> {
 						Sequence(
 							WhiteSpaces(),
 							StringAtom(),
-							setHelpTopic(match())
+							setString("HelpTopic", match())
 						)
 					),
 					EOI,
-					setCommand("help")
+					setString("Command", "help")
 				);
 	}
 
@@ -368,11 +251,11 @@ public class ShellParser extends CommonRules<Object> {
 			),
 			WhiteSpaces(),
 			StringAtom(),
-			setEquipments(match()),
+			setString("Equipments", match()),
 			SkipSpaces(),
 			UntilEOI(),
-			setSubCommand(match()),
-			setCommand("equipment")
+			setString("SubCommand", match()),
+			setString("Command", "equipment")
 		);
 	}
 
@@ -386,11 +269,11 @@ public class ShellParser extends CommonRules<Object> {
 					Sequence(
 						WhiteSpaces(),
 						StringAtom(),
-						setEquipments(match())
+						setString("Equipments", match())
 					)
 				),
 				EOI,
-				setCommand("reload")
+				setString("Command", "reload")
 		);
 	}
 
@@ -427,7 +310,7 @@ public class ShellParser extends CommonRules<Object> {
 					)
 				),
 				EOI,
-				setCommand("probe")
+				setString("Command", "probe")
 		);
 	}
 
@@ -684,14 +567,14 @@ public class ShellParser extends CommonRules<Object> {
 				),
 				WhiteSpaces(),
 				StringOrQuotedString(),
-				setGroovyDirectory(getLastQuotedString()),
+				setString("GroovyDirectory", getLastQuotedString()),
 				WhiteSpaces(),
 				StringOrQuotedString(),
-				setGroovyScript(getLastQuotedString()),
+				setString("GroovyScript", getLastQuotedString()),
 				SkipSpaces(),
 				UntilEOI(),
-				setGroovyArgs(match()),
-				setCommand("groovy")
+				setString("GroovyArgs",match()),
+				setString("Command", "groovy")
 			);
 	}
 
@@ -707,8 +590,8 @@ public class ShellParser extends CommonRules<Object> {
 				),
 				SkipSpaces(),
 				UntilEOI(),
-				setGroovyArgs(match()),
-				setCommand("groovyconsole")
+				setString("GroovyArgs", match()),
+				setString("Command", "groovyconsole")
 			);
 	}
 
@@ -718,8 +601,8 @@ public class ShellParser extends CommonRules<Object> {
 				IgnoreCase("host"),
 				WhiteSpaces(),
 				UntilEOI(),
-				setAddressArg(match()),
-				setCommand("host")
+				setString("AddressArg", match()),
+				setString("Command", "host")
 			);
 	}
 
@@ -729,8 +612,8 @@ public class ShellParser extends CommonRules<Object> {
 				IgnoreCase("host6"),
 				WhiteSpaces(),
 				UntilEOI(),
-				setAddressArg(match()),
-				setCommand("host6")
+				setString("AddressArg", match()),
+				setString("Command", "host6")
 			);
 	}
 

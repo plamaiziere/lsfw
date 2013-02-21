@@ -45,84 +45,84 @@ public class ShellParserTest extends TestCase {
 		System.out.println("define");
 		String line = "define";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("define", parser.getCommand());
+		assertEquals("define", parser.getString("Command"));
 
 		line = "define     NAME     =    VALUE";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("define", parser.getCommand());
-		assertEquals("NAME", parser.getSetValueName());
-		assertEquals("VALUE", parser.getSetValueValue());
+		assertEquals("define", parser.getString("Command"));
+		assertEquals("NAME", parser.getString("SetValueName"));
+		assertEquals("VALUE", parser.getString("SetValueValue"));
 
 		line = "d     NAME     =    VALUE";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("define", parser.getCommand());
-		assertEquals("NAME", parser.getSetValueName());
-		assertEquals("VALUE", parser.getSetValueValue());
+		assertEquals("define", parser.getString("Command"));
+		assertEquals("NAME", parser.getString("SetValueName"));
+		assertEquals("VALUE", parser.getString("SetValueValue"));
 	}
 
 	public void testEquipment() {
 		System.out.println("equiment");
 		String line = "equipment NAME ABCD EFGH";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("equipment", parser.getCommand());
-		assertEquals("NAME", parser.getEquipments());
-		assertEquals("ABCD EFGH", parser.getSubCommand());
+		assertEquals("equipment", parser.getString("Command"));
+		assertEquals("NAME", parser.getString("Equipments"));
+		assertEquals("ABCD EFGH", parser.getString("SubCommand"));
 
 		line = "eq NAME ABCD EFGH";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("equipment", parser.getCommand());
-		assertEquals("NAME", parser.getEquipments());
-		assertEquals("ABCD EFGH", parser.getSubCommand());
+		assertEquals("equipment", parser.getString("Command"));
+		assertEquals("NAME", parser.getString("Equipments"));
+		assertEquals("ABCD EFGH", parser.getString("SubCommand"));
 	}
 
 	public void testExit() {
 		System.out.println("exit");
 		String line = "exit";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("quit", parser.getCommand());
+		assertEquals("quit", parser.getString("Command"));
 
 		line = "e";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("quit", parser.getCommand());
+		assertEquals("quit", parser.getString("Command"));
 
 		line = "quit";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("quit", parser.getCommand());
+		assertEquals("quit", parser.getString("Command"));
 
 		line = "q";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("quit", parser.getCommand());
+		assertEquals("quit", parser.getString("Command"));
 	}
 
 	public void testHelp() {
 		System.out.println("help");
 		String line = "help";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("help", parser.getCommand());
+		assertEquals("help", parser.getString("Command"));
 
 		line = "help     TOPIC";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("help", parser.getCommand());
-		assertEquals("TOPIC", parser.getHelpTopic());
+		assertEquals("help", parser.getString("Command"));
+		assertEquals("TOPIC", parser.getString("HelpTopic"));
 	}
 
 	public void testOption() {
 		System.out.println("option");
 		String line = "option";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("option", parser.getCommand());
+		assertEquals("option", parser.getString("Command"));
 
 		line = "option     NAME     =    VALUE";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("option", parser.getCommand());
-		assertEquals("NAME", parser.getSetValueName());
-		assertEquals("VALUE", parser.getSetValueValue());
+		assertEquals("option", parser.getString("Command"));
+		assertEquals("NAME", parser.getString("SetValueName"));
+		assertEquals("VALUE", parser.getString("SetValueValue"));
 
 		line = "o     NAME     =    VALUE";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("option", parser.getCommand());
-		assertEquals("NAME", parser.getSetValueName());
-		assertEquals("VALUE", parser.getSetValueValue());
+		assertEquals("option", parser.getString("Command"));
+		assertEquals("NAME", parser.getString("SetValueName"));
+		assertEquals("VALUE", parser.getString("SetValueValue"));
 	}
 
 	public void testProbe() {
@@ -130,33 +130,33 @@ public class ShellParserTest extends TestCase {
 
 		String line = "probe       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 
 		line = "p       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 
 		line = "probe6       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertTrue(parser.getProbeCmdTemplate().getProbe6flag());
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 
 		line = "p6       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertTrue(parser.getProbeCmdTemplate().getProbe6flag());
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 
 		line = "p     expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertFalse(parser.getProbeCmdTemplate().getProbe6flag());
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
@@ -164,7 +164,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p     expect    EXPECT     on    ON   SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -172,7 +172,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    on    ON   expect    EXPECT        SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -181,7 +181,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    on    ON   expect    EXPECT   no-action       SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -190,7 +190,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    on    ON   na expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -199,7 +199,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    on    ON   verbose  na expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -209,7 +209,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    on    ON   verbose  na act expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -220,7 +220,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    active on    ON  verbose  na expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -231,7 +231,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    active on    ON  match verbose  na expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -243,7 +243,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p    active  learn on    ON  match verbose  na expect    EXPECT     SOURCE     DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -256,7 +256,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p active learn on ON match verbose na expect EXPECT   qd   SOURCE DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -270,7 +270,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p active learn on ON match verbose na expect EXPECT   quick-deny   SOURCE DEST";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
@@ -284,7 +284,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   tcp";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals(null, parser.getProbeCmdTemplate().getProbeExpect());
@@ -298,7 +298,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   tcp      PORT";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("tcp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -307,7 +307,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   tcp    PORT1:";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("tcp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -316,7 +316,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   tcp    PORT1:PORT2";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("tcp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -325,7 +325,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   udp    PORT1:PORT2";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("udp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -334,7 +334,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   udp    (PORT1,PORT1)";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("udp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -343,7 +343,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   udp    (PORT1,PORT1):PORT2";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("udp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -352,7 +352,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   udp   (PORT1,PORT1):(PORT2,PORT2)";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("udp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -361,7 +361,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   tcp    flags S SA";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("tcp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -373,7 +373,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   tcp  PORT  flags S SA";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("tcp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -385,7 +385,7 @@ public class ShellParserTest extends TestCase {
 
 		line = "p   SOURCE     DEST   tcp  (PORT1,PORT1)  flags S SA";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("probe", parser.getCommand());
+		assertEquals("probe", parser.getString("Command"));
 		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
 		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
 		assertEquals("tcp", parser.getProbeCmdTemplate().getProtoSpecification());
@@ -402,12 +402,12 @@ public class ShellParserTest extends TestCase {
 
 		String line = "reload";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("reload", parser.getCommand());
+		assertEquals("reload", parser.getString("Command"));
 
 		line = "reload     EQ";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("reload", parser.getCommand());
-		assertEquals("EQ", parser.getEquipments());
+		assertEquals("reload", parser.getString("Command"));
+		assertEquals("EQ", parser.getString("Equipments"));
 	}
 
 	public void testRoute() {
@@ -415,12 +415,12 @@ public class ShellParserTest extends TestCase {
 
 		String line = "route";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("route", parser.getCommand());
+		assertEquals("route", parser.getString("Command"));
 
 		line = "route     EQ";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("route", parser.getCommand());
-		assertEquals("EQ", parser.getEquipments());
+		assertEquals("route", parser.getString("Command"));
+		assertEquals("EQ", parser.getString("Equipments"));
 	}
 
 	public void testTopology() {
@@ -428,24 +428,24 @@ public class ShellParserTest extends TestCase {
 
 		String line = "topology";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("topology", parser.getCommand());
+		assertEquals("topology", parser.getString("Command"));
 
 		line = "topology   EQ";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("topology", parser.getCommand());
-		assertEquals("EQ", parser.getEquipments());
+		assertEquals("topology", parser.getString("Command"));
+		assertEquals("EQ", parser.getString("Equipments"));
 
 		line = "topology   connected  EQ";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("topology", parser.getCommand());
-		assertEquals("EQ", parser.getEquipments());
-		assertEquals("connected", parser.getTopologyOption());
+		assertEquals("topology", parser.getString("Command"));
+		assertEquals("EQ", parser.getString("Equipments"));
+		assertEquals("connected", parser.getString("TopologyOption"));
 
 		line = "topology   !connected";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("topology", parser.getCommand());
-		assertEquals(null, parser.getEquipments());
-		assertEquals("!connected", parser.getTopologyOption());
+		assertEquals("topology", parser.getString("Command"));
+		assertEquals(null, parser.getString("Equipments"));
+		assertEquals("!connected", parser.getString("TopologyOption"));
 	}
 
 	public void testHost() {
@@ -453,8 +453,8 @@ public class ShellParserTest extends TestCase {
 
 		String line = "host HOSTNAME HOSTNAME";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("host", parser.getCommand());
-		assertEquals("HOSTNAME HOSTNAME", parser.getAddressArg());
+		assertEquals("host", parser.getString("Command"));
+		assertEquals("HOSTNAME HOSTNAME", parser.getString("AddressArg"));
 	}
 
 	public void testHost6() {
@@ -462,8 +462,8 @@ public class ShellParserTest extends TestCase {
 
 		String line = "host6 HOSTNAME HOSTNAME";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("host6", parser.getCommand());
-		assertEquals("HOSTNAME HOSTNAME", parser.getAddressArg());
+		assertEquals("host6", parser.getString("Command"));
+		assertEquals("HOSTNAME HOSTNAME", parser.getString("AddressArg"));
 	}
 
 	public void testGroovy() {
@@ -471,15 +471,15 @@ public class ShellParserTest extends TestCase {
 
 		String line = "groovy DIRECTORY FILENAME";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("groovy", parser.getCommand());
-		assertEquals("DIRECTORY", parser.getGroovyDirectory());
-		assertEquals("FILENAME", parser.getGroovyScript());
+		assertEquals("groovy", parser.getString("Command"));
+		assertEquals("DIRECTORY", parser.getString("GroovyDirectory"));
+		assertEquals("FILENAME", parser.getString("GroovyScript"));
 
 		line = "g \"D I R E C T O R Y\"   \"F I L E N A M E\"";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("groovy", parser.getCommand());
-		assertEquals("D I R E C T O R Y", parser.getGroovyDirectory());
-		assertEquals("F I L E N A M E", parser.getGroovyScript());
+		assertEquals("groovy", parser.getString("Command"));
+		assertEquals("D I R E C T O R Y", parser.getString("GroovyDirectory"));
+		assertEquals("F I L E N A M E", parser.getString("GroovyScript"));
 	}
 
 	public void testPolicyLoad() {
@@ -487,12 +487,12 @@ public class ShellParserTest extends TestCase {
 
 		String line = "policy    load     FILENAME";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-load", parser.getCommand());
-		assertEquals("FILENAME", parser.getFileName());
+		assertEquals("policy-load", parser.getString("Command"));
+		assertEquals("FILENAME", parser.getString("FileName"));
 
 		line = "policy    load     \"c:         FILENAME   \"";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-load", parser.getCommand());
-		assertEquals("c:         FILENAME   ", parser.getFileName());
+		assertEquals("policy-load", parser.getString("Command"));
+		assertEquals("c:         FILENAME   ", parser.getString("FileName"));
 	}
 }
