@@ -495,4 +495,34 @@ public class ShellParserTest extends TestCase {
 		assertEquals("policy-load", parser.getString("Command"));
 		assertEquals("c:         FILENAME   ", parser.getString("FileName"));
 	}
+
+	public void testPolicyProbe() {
+		System.out.println("policy-probe");
+
+		String line = "policy    probe    POLICYNAME";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-probe", parser.getString("Command"));
+		assertEquals("POLICYNAME", parser.getString("PolicyName"));
+
+		line = "policy    probe    POLICYNAME  to    TO";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-probe", parser.getString("Command"));
+		assertEquals("POLICYNAME", parser.getString("PolicyName"));
+		assertEquals("TO", parser.getString("PolicyTo"));
+
+		line = "policy    probe    POLICYNAME  from    FROM";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-probe", parser.getString("Command"));
+		assertEquals("POLICYNAME", parser.getString("PolicyName"));
+		assertEquals("FROM", parser.getString("PolicyFrom"));
+
+		line = "policy    probe    POLICYNAME  from    FROM   to    TO";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-probe", parser.getString("Command"));
+		assertEquals("POLICYNAME", parser.getString("PolicyName"));
+		assertEquals("FROM", parser.getString("PolicyFrom"));
+		assertEquals("TO", parser.getString("PolicyTo"));
+	}
+
+
 }

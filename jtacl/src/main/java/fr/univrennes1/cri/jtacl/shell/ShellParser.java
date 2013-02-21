@@ -64,7 +64,8 @@ public class ShellParser extends CommonRules<Object> {
 					CommandGroovyConsole(),
 					CommandHost(),
 					CommandHost6(),
-					CommandPolicyLoad()
+					CommandPolicyLoad(),
+					CommandPolicyProbe()
 				)
 			);
 	}
@@ -205,6 +206,40 @@ public class ShellParser extends CommonRules<Object> {
 					setString("FileName", getLastQuotedString()),
 					EOI,
 					setString("Command", "policy-load")
+				);
+	}
+
+	/*
+	 * policy probe policyname [from ip] [to ip]
+	 */
+	public Rule CommandPolicyProbe() {
+		return Sequence (
+					IgnoreCase("policy"),
+					WhiteSpaces(),
+					IgnoreCase("probe"),
+					WhiteSpaces(),
+					StringAtom(),
+					setString("PolicyName", match()),
+					Optional(
+						Sequence(
+							WhiteSpaces(),
+							IgnoreCase("from"),
+							WhiteSpaces(),
+							StringAtom(),
+							setString("PolicyFrom", match())
+						)
+					),
+					Optional(
+						Sequence(
+							WhiteSpaces(),
+							IgnoreCase("to"),
+							WhiteSpaces(),
+							StringAtom(),
+							setString("PolicyTo", match())
+						)
+					),
+					EOI,
+					setString("Command", "policy-probe")
 				);
 	}
 
