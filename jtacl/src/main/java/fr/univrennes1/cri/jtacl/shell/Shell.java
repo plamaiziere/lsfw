@@ -30,7 +30,12 @@ import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.policies.NetworkPolicy;
+import fr.univrennes1.cri.jtacl.policies.Policies;
+import fr.univrennes1.cri.jtacl.policies.PoliciesMap;
+import fr.univrennes1.cri.jtacl.policies.Policy;
 import fr.univrennes1.cri.jtacl.policies.PolicyConfig;
+import fr.univrennes1.cri.jtacl.policies.ServicePolicy;
 import groovy.lang.Binding;
 import groovy.ui.Console;
 import groovy.util.GroovyScriptEngine;
@@ -66,6 +71,7 @@ public class Shell {
 	protected Probing _lastProbing;
 	protected boolean _testResult;
 	protected PrintStream _outStream = System.out;
+	protected PoliciesMap _policies = Policies.getInstance();
 
 	public Shell() {
 		_interactive = false;
@@ -186,7 +192,7 @@ public class Shell {
 
 	public void topologyCommand(ShellParser command) {
 
-		String equipmentName = command.getString("Equipments");;
+		String equipmentName = command.getString("Equipments");
 		String option = command.getString("TopologyOption");
 
 		/*
@@ -316,9 +322,9 @@ public class Shell {
 		}
 	}
 
-	public boolean probeCommand(String commandLine, ShellParser command) {
+	public boolean probeCommand(String commandLine, ProbeCommandTemplate probeCmd) {
 
-		ProbeCommandTemplate probeCmd = command.getProbeCmdTemplate();
+//		ProbeCommandTemplate probeCmd = command.getProbeCmdTemplate();
 		boolean testMode = probeCmd.getProbeExpect() != null;
 		boolean learnMode = probeCmd.getProbeOptLearn();
 		boolean silent = testMode || learnMode;
@@ -471,7 +477,7 @@ public class Shell {
 
 	public void policyLoadCommand(ShellParser parser) {
 
-		PolicyConfig config = null;
+		PolicyConfig config;
 		try {
 			config = new PolicyConfig(parser.getString("FileName"));
 		} catch (ConfigurationException ex) {
@@ -479,8 +485,91 @@ public class Shell {
 			return;
 		}
 
-		config.loadPolicies();
+		PoliciesMap pm = config.loadPolicies();
 
+		/*
+		 * link policies
+		 */
+		for (Policy p: pm.values()) {
+			if (p instanceof ServicePolicy) {
+				ServicePolicy sp = (ServicePolicy) p;
+				for (String pname: sp.getPolicies().keySet()) {
+					Policy ref = pm.get(pname);
+					if (ref == null) {
+						_outStream.print("Warning: In policy " + sp.getName()
+							+ " : Cannot find policy: " + pname);
+					} else {
+						sp.getPolicies().put(ref);
+					}
+				}
+			}
+		}
+
+		_policies.clear();
+		_policies.putAll(pm);
+		for (Policy p: _policies.values())
+			System.out.println(p);
+
+	}
+
+	public boolean policyProbe(Policy policy, String from, String to) {
+
+		String nfrom = from;
+		if (policy.getFrom() != null)
+			nfrom = policy.getFrom();
+		String nto = to;
+		if (policy.getTo() != null)
+			nto = policy.getTo();
+
+		if (policy instanceof ServicePolicy) {
+			ServicePolicy sp = (ServicePolicy) policy;
+
+			boolean result = true;
+			for (Policy p: sp.getPolicies().values()) {
+				if (!policyProbe(p, nfrom, nto))
+					result = false;
+			}
+			return result;
+		}
+
+		if (!(policy instanceof NetworkPolicy))
+			return false;
+
+		NetworkPolicy np = (NetworkPolicy) policy;
+		ProbeCommandTemplate ptpt = new ProbeCommandTemplate();
+		String expect = np.getAction().toUpperCase();
+		if (expect.equals("DENY"))
+			expect = "UNACCEPTED";
+
+		ptpt.setProbeExpect(expect);
+		ptpt.setPortSource(np.getSourcePort());
+		ptpt.setPortDest(np.getPort());
+		ptpt.setSrcAddress(nfrom);
+		ptpt.setDestAddress(nto);
+		ptpt.setProtoSpecification(np.getProtocol());
+		ptpt.setProbeOptQuickDeny(true);
+
+		ProbeCommand pc = new ProbeCommand();
+		pc.buildRequest(ptpt);
+		pc.runCommand();
+
+		ExpectedProbing ep = new ExpectedProbing(false, expect);
+		Probing probing = pc.getProbing();
+		return probing.checkExpectedResult(ep);
+	}
+
+	public void policyProbeCommand(ShellParser parser) {
+
+		String from = parser.getString("PolicyFrom");
+		String to = parser.getString("PolicyTo");
+		String pname = parser.getString("PolicyName");
+
+		Policy policy = _policies.get(pname);
+		if (policy == null) {
+			_outStream.println("Error: cannot find policy: " + pname);
+			return;
+		}
+		policyProbe(policy, from, to);
 	}
 
 	public void parseShellCommand(String commandLine) {
@@ -542,45 +631,49 @@ public class Shell {
 			}
 		}
 
-		String command = _parser.getString("Command");
-		if (command.equals("quit")) {
-			if (_interactive)
-				_outStream.println("Goodbye!");
-			System.exit(0);
-		}
-
-		if (_interactive && _monitor.getOptions().getAutoReload())
-			autoReload();
-
-		if (command.equals("probe") || command.equals("probe6")) {
-			boolean test = probeCommand(commandLine, _parser);
-			if (_parser.getProbeCmdTemplate().getProbeExpect() != null) {
-				if (!test)
-					_testResult = false;
+		if (result.matched) {
+			String command = _parser.getString("Command");
+			if (command.equals("quit")) {
+				if (_interactive)
+					_outStream.println("Goodbye!");
+				System.exit(0);
 			}
+
+			if (_interactive && _monitor.getOptions().getAutoReload())
+				autoReload();
+
+			if (command.equals("probe") || command.equals("probe6")) {
+				boolean test = probeCommand(commandLine, _parser.getProbeCmdTemplate());
+				if (_parser.getProbeCmdTemplate().getProbeExpect() != null) {
+					if (!test)
+						_testResult = false;
+				}
+			}
+			if (command.equals("option"))
+				optionCommand(_parser);
+			if (command.equals("topology"))
+				topologyCommand(_parser);
+			if (command.equals("route"))
+				routeCommand(_parser);
+			if (command.equals("help"))
+				helpCommand(_parser);
+			if (command.equals("define"))
+				defineCommand(_parser);
+			if (command.equals("equipment"))
+				equipmentCommand(_parser);
+			if (command.equals("reload"))
+				reloadCommand(_parser);
+			if (command.equals("groovy"))
+				groovyCommand(_parser);
+			if (command.equals("groovyconsole"))
+				groovyConsoleCommand(_parser);
+			if (command.equals("host") || command.equals("host6"))
+				hostCommand(_parser);
+			if (command.equals("policy-load"))
+				policyLoadCommand(_parser);
+			if (command.equals("policy-probe"))
+				policyProbeCommand(_parser);
 		}
-		if (command.equals("option"))
-			optionCommand(_parser);
-		if (command.equals("topology"))
-			topologyCommand(_parser);
-		if (command.equals("route"))
-			routeCommand(_parser);
-		if (command.equals("help"))
-			helpCommand(_parser);
-		if (command.equals("define"))
-			defineCommand(_parser);
-		if (command.equals("equipment"))
-			equipmentCommand(_parser);
-		if (command.equals("reload"))
-			reloadCommand(_parser);
-		if (command.equals("groovy"))
-			groovyCommand(_parser);
-		if (command.equals("groovyconsole"))
-			groovyConsoleCommand(_parser);
-		if (command.equals("host") || command.equals("host6"))
-			hostCommand(_parser);
-		if (command.equals("policy-load"))
-			policyLoadCommand(_parser);
 
 		/*
 		 * 'untee' stdout
