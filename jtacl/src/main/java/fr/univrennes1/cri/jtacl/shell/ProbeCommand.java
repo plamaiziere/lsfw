@@ -291,6 +291,7 @@ public class ProbeCommand {
 		ProbeOptions options = request.getProbeOptions();
 		options.setNoAction(probeCmd.getProbeOptNoAction());
 		options.setQuickDeny(probeCmd.getProbeOptQuickDeny());
+		options.setState(probeCmd.getProbeOptState());
 
 		_ilink = ilinks.get(0);
 		_request = request;
