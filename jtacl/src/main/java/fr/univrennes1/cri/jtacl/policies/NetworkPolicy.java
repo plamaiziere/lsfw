@@ -19,46 +19,15 @@ package fr.univrennes1.cri.jtacl.policies;
  */
 public class NetworkPolicy extends Policy {
 
-	protected String _protocol;
-	protected String _port;
-	protected String _sourcePort;
-	protected String _flags;
+	protected PoliciesMap _policies = new PoliciesMap();
 	protected String _action;
 
 	public NetworkPolicy(String name, String comment) {
 		super(name, comment);
 	}
 
-	public String getProtocol() {
-		return _protocol;
-	}
-
-	public void setProtocol(String protocol) {
-		_protocol = protocol;
-	}
-
-	public String getPort() {
-		return _port;
-	}
-
-	public void setPort(String port) {
-		_port = port;
-	}
-
-	public String getSourcePort() {
-		return _sourcePort;
-	}
-
-	public void setSourcePort(String sourcePort) {
-		_sourcePort = sourcePort;
-	}
-
-	public String getFlags() {
-		return _flags;
-	}
-
-	public void setFlags(String flags) {
-		_flags = flags;
+	public PoliciesMap getPolicies() {
+		return _policies;
 	}
 
 	public String getAction() {
@@ -72,10 +41,8 @@ public class NetworkPolicy extends Policy {
 	@Override
 	public String toString() {
 		return "NetworkPolicy{" + "_name=" + _name + ", _comment=" + _comment
-			+ ", _from=" + _from + ", _to=" + _to
-			+ ", _protocol=" + _protocol + ", _port=" + _port
-			+ ", _sourcePort=" + _sourcePort + ", _flags=" + _flags
-			+ ", _action=" + _action + '}';
+			+ ", _from=" + _from + ", _to=" + _to + ", _policies=" + _policies
+			+ "}";
 	}
 
 }
