@@ -17,7 +17,7 @@ import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 
 /**
  * Template for the probe command.
- * 
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ProbeCommandTemplate {
@@ -37,6 +37,7 @@ public class ProbeCommandTemplate {
 	protected boolean _probeOptVerbose;
 	protected boolean _probeOptLearn;
 	protected boolean _probeOptQuickDeny;
+	protected boolean _probeOptState;
 	protected StringsList _tcpFlags;
 
 	public String getDestAddress() {
@@ -175,6 +176,15 @@ public class ProbeCommandTemplate {
 
 	public boolean setProbeOptQuickDeny(boolean probeOptQuickDeny) {
 		_probeOptQuickDeny = probeOptQuickDeny;
+		return true;
+	}
+
+	public boolean getProbeOptState() {
+		return _probeOptState;
+	}
+	
+	public boolean setProbeOptState(boolean probeOptState) {
+		_probeOptState = probeOptState;
 		return true;
 	}
 
