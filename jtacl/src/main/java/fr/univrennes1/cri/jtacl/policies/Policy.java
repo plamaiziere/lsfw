@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.policies;
 
+import java.util.List;
+
 /**
  * Base class for security policy
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -20,8 +22,8 @@ package fr.univrennes1.cri.jtacl.policies;
 public class Policy {
 	String _name;
 	String _comment;
-	String _from;
-	String _to;
+	List<String> _from;
+	List<String> _to;
 
 	public Policy(String name, String comment) {
 		_name = name;
@@ -36,20 +38,19 @@ public class Policy {
 		return _comment;
 	}
 
-	public String getFrom() {
+	public List<String> getFrom() {
 		return _from;
 	}
 
-	public void setFrom(String from) {
+	public void setFrom(List<String> from) {
 		_from = from;
 	}
 
-	public String getTo() {
+	public List<String> getTo() {
 		return _to;
 	}
 
-	public void setTo(String to) {
+	public void setTo(List<String> to) {
 		_to = to;
 	}
-
 }
