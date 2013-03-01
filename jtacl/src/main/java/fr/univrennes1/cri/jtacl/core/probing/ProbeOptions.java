@@ -19,6 +19,8 @@ package fr.univrennes1.cri.jtacl.core.probing;
  * <li>NOACTION: Do not make any action on the probe (like routing or packet
  * transformation).</li>
  * <li>QUICKDENY: Stop probing if the probe is certainly denied.</li>
+ * <li>STATE: For a stateful firewall, pass the probe as a state for this probe
+ * is already present.</li>
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
@@ -27,6 +29,7 @@ public class ProbeOptions {
 
 	public static final int NOACTION = 1;
 	public static final int QUICKDENY = 2;
+	public static final int STATE = 4;
 
 	protected static final int _msk = 0xFF;
 
@@ -141,6 +144,39 @@ public class ProbeOptions {
 			clearQuickDeny();
 	}
 
+	/**
+	 * Returns true if the STATE flag is set.
+	 * @return true if the STATE flag is set.
+	 */
+	public boolean hasState() {
+		return (_flags & STATE) != 0;
+	}
+
+	/**
+	 * Sets the STATE flag.
+	 */
+	public void setState() {
+		_flags |= STATE;
+	}
+
+	/**
+	 * Clears the STATE flag.
+	 */
+	public void clearState() {
+		_flags = (~STATE & _flags) & _msk;
+	}
+
+	/**
+	 * Sets the STATE flag according to the value in argument.
+	 * @param flag value to set.
+	 */
+	public void setState(boolean flag) {
+		if (flag)
+			setState();
+		else
+			clearState();
+	}
+
 	@Override
 	public String toString() {
 		String r = "";
@@ -154,6 +190,11 @@ public class ProbeOptions {
 			r += "QUICKDENY";
 		}
 
+		if (hasState()) {
+			if (!r.isEmpty())
+				r += ", ";
+			r += "STATE";
+		}
 		return r;
 	}
 
