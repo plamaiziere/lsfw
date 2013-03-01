@@ -364,7 +364,8 @@ public class ShellParser extends CommonRules<Object> {
 					OptActive(),
 					OptMatching(),
 					OptLearn(),
-					OptQuickDeny()
+					OptQuickDeny(),
+					OptState()
 				),
 				Optional(
 					ProbeOptions()
@@ -476,6 +477,18 @@ public class ShellParser extends CommonRules<Object> {
 				),
 				WhiteSpaces(),
 				_probeCmdTemplate.setProbeOptQuickDeny(true)
+			);
+	}
+
+	/*
+	 * OptState: state
+	 */
+	public Rule OptState() {
+		return
+			Sequence(
+				IgnoreCase("state"),
+				WhiteSpaces(),
+				_probeCmdTemplate.setProbeOptState(true)
 			);
 	}
 

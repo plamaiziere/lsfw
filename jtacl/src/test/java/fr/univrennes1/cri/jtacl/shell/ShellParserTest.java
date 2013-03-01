@@ -395,6 +395,19 @@ public class ShellParserTest extends TestCase {
 		assertEquals("S", parser.getProbeCmdTemplate().getTcpFlags().get(0));
 		assertEquals("SA", parser.getProbeCmdTemplate().getTcpFlags().get(1));
 
+		line = "p    active  learn   state   on    ON  match verbose  na expect    EXPECT     SOURCE     DEST";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getString("Command"));
+		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
+		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
+		assertEquals("EXPECT", parser.getProbeCmdTemplate().getProbeExpect());
+		assertEquals("ON", parser.getProbeCmdTemplate().getEquipments());
+		assertTrue(parser.getProbeCmdTemplate().getProbeOptNoAction());
+		assertTrue(parser.getProbeCmdTemplate().getProbeOptVerbose());
+		assertTrue(parser.getProbeCmdTemplate().getProbeOptActive());
+		assertTrue(parser.getProbeCmdTemplate().getProbeOptMatching());
+		assertTrue(parser.getProbeCmdTemplate().getProbeOptLearn());
+		assertTrue(parser.getProbeCmdTemplate().getProbeOptState());
 	}
 
 	public void testReload() {
