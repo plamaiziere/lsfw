@@ -1898,6 +1898,15 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		ProbeResults results = probe.getResults();
 
 		/*
+		 * Accept the probe if probe request "state option" is set.
+		 */
+		if (probe.getRequest().getProbeOptions().hasState()) {
+			results.setAclResult(direction, new AclResult(AclResult.ACCEPT));
+			results.setInterface(direction, ifaceName + " # STATE MATCH");
+			return;
+		}
+
+		/*
 		 * retrieve access groups associated in direction with the interface.
 		 */
 		List<AccessGroup> agroups = new ArrayList<AccessGroup>();

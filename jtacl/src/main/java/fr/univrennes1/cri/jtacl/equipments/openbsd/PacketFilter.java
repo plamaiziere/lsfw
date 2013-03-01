@@ -2902,13 +2902,22 @@ public class PacketFilter extends GenericEquipment {
 			link.getIface().getComment() + ")";
 		ProbeResults probeResults = probe.getResults();
 
+		/*
+		 * Accept the probe if probe request "state option" is set.
+		 */
+		if (probe.getRequest().getProbeOptions().hasState()) {
+			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
+			probeResults.setInterface(direction, interfaceDesc + " # STATE MATCH");
+			return;
+		}
+
 		_filteringDone = false;
 		/*
 		 * skipped interface
 		 */
 		if (_skippedIfaces.containsKey(link.getIfaceName())) {
 			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
-			probeResults.setInterface(direction, interfaceDesc + " SKIPPED");
+			probeResults.setInterface(direction, interfaceDesc + " # SKIPPED");
 			return;
 		}
 
