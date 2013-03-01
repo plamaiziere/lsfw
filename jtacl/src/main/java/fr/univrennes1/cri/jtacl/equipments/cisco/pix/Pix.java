@@ -32,6 +32,7 @@ import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
@@ -39,6 +40,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
@@ -1645,6 +1647,21 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	/**
+	 * tcp flags filter
+	 */
+	protected boolean tcpFlagsFilter(ProbeTcpFlags reqFlags) {
+
+		TcpFlags flags = new TcpFlags("S");
+		TcpFlags flagset = new TcpFlags("SA");
+
+		if (flagset == null) {
+			return reqFlags.matchAll(flags);
+		} else {
+			return reqFlags.matchAllWithout(flags, flagset);
+		}
+	}
+
+	/**
 	 *
 	 */
 	protected MatchResult probeFilter(Probe probe, AccessList acl, Direction direction) {
@@ -1851,6 +1868,15 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			}
 			if (reqProto != null && !egroup.matches(reqProto))
 					return MatchResult.NOT;
+		}
+
+		/*
+		 * check tcp flags
+		 */
+		ProbeTcpFlags pflags = request.getTcpFlags();
+		if (pflags != null) {
+			if (!tcpFlagsFilter(pflags))
+				return MatchResult.NOT;
 		}
 
 		if (mIpSource == MatchResult.MATCH ||
