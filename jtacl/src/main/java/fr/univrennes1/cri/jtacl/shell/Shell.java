@@ -30,11 +30,15 @@ import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
+import fr.univrennes1.cri.jtacl.policies.HostPolicy;
 import fr.univrennes1.cri.jtacl.policies.NetworkPolicy;
 import fr.univrennes1.cri.jtacl.policies.Policies;
 import fr.univrennes1.cri.jtacl.policies.PoliciesMap;
 import fr.univrennes1.cri.jtacl.policies.Policy;
 import fr.univrennes1.cri.jtacl.policies.PolicyConfig;
+import fr.univrennes1.cri.jtacl.policies.PolicyFlow;
+import fr.univrennes1.cri.jtacl.policies.PolicyProbe;
 import fr.univrennes1.cri.jtacl.policies.ServicePolicy;
 import groovy.lang.Binding;
 import groovy.ui.Console;
@@ -485,77 +489,205 @@ public class Shell {
 			return;
 		}
 
-		PoliciesMap pm = config.loadPolicies();
-
-		/*
-		 * link policies
-		 */
-		for (Policy p: pm.values()) {
-			if (p instanceof ServicePolicy) {
-				ServicePolicy sp = (ServicePolicy) p;
-				for (String pname: sp.getPolicies().keySet()) {
-					Policy ref = pm.get(pname);
-					if (ref == null) {
-						_outStream.print("Warning: In policy " + sp.getName()
-							+ " : Cannot find policy: " + pname);
-					} else {
-						sp.getPolicies().put(ref);
-					}
-				}
-			}
+		PoliciesMap pm;
+		try {
+			pm = config.loadPolicies();
+			config.linkPolicies(pm);
+			_policies.clear();
+			_policies.putAll(pm);
+			for (Policy p: _policies.values())
+				System.out.println(p);
+		} catch (JtaclConfigurationException ex) {
+			_outStream.println("Error: " + ex.getMessage());
 		}
-
-		_policies.clear();
-		_policies.putAll(pm);
-		for (Policy p: _policies.values())
-			System.out.println(p);
 
 	}
 
-	public boolean policyProbe(Policy policy, String from, String to) {
+	protected boolean probeFlow(PolicyProbe policyProbe, PolicyFlow flow) {
 
-		String nfrom = from;
+		/*
+		 * build the probe command
+		 */
+		ProbeCommandTemplate ptpt = new ProbeCommandTemplate();
+		String expect = policyProbe.getAction().toUpperCase();
+		if (expect.equals("DENY"))
+			expect = "UNACCEPTED";
+		ptpt.setProbeExpect(expect);
+		ptpt.setPortSource(flow.getSourcePort());
+		ptpt.setPortDest(flow.getPort());
+		ptpt.setSrcAddress(policyProbe.getFrom().get(0));
+		ptpt.setDestAddress(policyProbe.getTo().get(0));
+		ptpt.setProtoSpecification(flow.getProtocol());
+		if (flow.getFlags() != null) {
+			StringsList tcpflags = new StringsList();
+			tcpflags.add(flow.getFlags());
+			ptpt.setTcpFlags(tcpflags);
+		}
+		ptpt.setProbeOptQuickDeny(true);
+
+		ProbeCommand pc = new ProbeCommand();
+		pc.buildRequest(ptpt);
+
+		/*
+		 * probe
+		 */
+		pc.runCommand();
+
+		/*
+		 * store the probe and result into the policy probe
+		 */
+		Probing probing = pc.getProbing();
+		policyProbe.setProbing(probing);
+		String sprobe = "proto " + ptpt.getProtoSpecification() + " "
+			+ ptpt.getPortSource() + ":"
+			+ ptpt.getPortDest() + " "
+			+ "flags " + ptpt.getTcpFlags();
+		policyProbe.setProbe(sprobe);
+		ExpectedProbing ep = new ExpectedProbing(false, expect);
+		policyProbe.setResult(probing.checkExpectedResult(ep));
+		return policyProbe.isResultOk();
+	}
+
+	public boolean policyProbe(PolicyProbe policyProbe) {
+
+		Policy policy = policyProbe.getPolicy();
+
+		/*
+		 * ovveride from / destination if unset
+		 */
+		List<String> nfrom = policyProbe.getFrom();
 		if (policy.getFrom() != null)
 			nfrom = policy.getFrom();
-		String nto = to;
+		List<String> nto = policyProbe.getTo();
 		if (policy.getTo() != null)
 			nto = policy.getTo();
+		String naction = policyProbe.getAction();
 
+		/*
+		 * host policy
+		 */
+		if (policy instanceof HostPolicy) {
+			HostPolicy hp = (HostPolicy) policy;
+
+			boolean result = true;
+			for (Policy p: hp.getPolicies().values()) {
+				PolicyProbe pprobe = new PolicyProbe(p);
+				policyProbe.getPolicyProbes().add(pprobe);
+				pprobe.setAddress(hp.getAddress());
+				pprobe.setFrom(nfrom);
+				pprobe.setTo(nto);
+				pprobe.setAction(naction);
+
+				if (!policyProbe(pprobe))
+					result = false;
+			}
+			policyProbe.setResult(result);
+			return result;
+		}
+
+		/*
+		 * service policy
+		 */
 		if (policy instanceof ServicePolicy) {
 			ServicePolicy sp = (ServicePolicy) policy;
 
 			boolean result = true;
 			for (Policy p: sp.getPolicies().values()) {
-				if (!policyProbe(p, nfrom, nto))
+				PolicyProbe pprobe = new PolicyProbe(p);
+				policyProbe.getPolicyProbes().add(pprobe);
+				pprobe.setAddress(policyProbe.getAddress());
+				pprobe.setFrom(nfrom);
+				pprobe.setTo(nto);
+				pprobe.setAction(naction);
+
+				if (!policyProbe(pprobe))
 					result = false;
 			}
+			policyProbe.setResult(result);
 			return result;
 		}
 
-		if (!(policy instanceof NetworkPolicy))
+		/*
+		 * network policy
+		 */
+		if (policy instanceof NetworkPolicy) {
+			NetworkPolicy np = (NetworkPolicy) policy;
+
+			if (np.getAction() != null)
+				naction = np.getAction();
+
+			boolean result = true;
+			for (Policy p: np.getPolicies().values()) {
+				PolicyProbe pprobe = new PolicyProbe(p);
+				policyProbe.getPolicyProbes().add(pprobe);
+				pprobe.setAddress(policyProbe.getAddress());
+				pprobe.setFrom(nfrom);
+				pprobe.setTo(nto);
+				pprobe.setAction(naction);
+
+				if (!policyProbe(pprobe))
+					result = false;
+			}
+			policyProbe.setResult(result);
+			return result;
+		}
+
+		/*
+		 * flow policy
+		 */
+		if (!(policy instanceof PolicyFlow))
 			return false;
 
-		NetworkPolicy np = (NetworkPolicy) policy;
-		ProbeCommandTemplate ptpt = new ProbeCommandTemplate();
-		String expect = np.getAction().toUpperCase();
-		if (expect.equals("DENY"))
-			expect = "UNACCEPTED";
+		PolicyFlow flow = (PolicyFlow) policy;
 
-		ptpt.setProbeExpect(expect);
-		ptpt.setPortSource(np.getSourcePort());
-		ptpt.setPortDest(np.getPort());
-		ptpt.setSrcAddress(nfrom);
-		ptpt.setDestAddress(nto);
-		ptpt.setProtoSpecification(np.getProtocol());
-		ptpt.setProbeOptQuickDeny(true);
+		if (nfrom == null) {
+			nfrom = policyProbe.getAddress();
+		}
+		if (nto == null) {
+			nto = policyProbe.getAddress();
+		}
 
-		ProbeCommand pc = new ProbeCommand();
-		pc.buildRequest(ptpt);
-		pc.runCommand();
+		/*
+		 * probe from each source address to each destination address
+		 */
+		boolean result = true;
+		for (String from: nfrom) {
+			for (String to: nto) {
+				PolicyProbe nprobe = new PolicyProbe(flow);
+				List<String> lfrom = new ArrayList<String>();
+				lfrom.add(from);
+				nprobe.setFrom(lfrom);
+				List<String> lto = new ArrayList<String>();
+				lto.add(to);
+				nprobe.setTo(lto);
+				nprobe.setAction(naction);
+				policyProbe.getPolicyProbes().add(nprobe);
+				if (!probeFlow(nprobe, flow)) {
+					result = false;
+				}
+			}
+		}
+		policyProbe.setResult(result);
+		return result;
+	}
 
-		ExpectedProbing ep = new ExpectedProbing(false, expect);
-		Probing probing = pc.getProbing();
-		return probing.checkExpectedResult(ep);
+	public void printPolicyProbe(PolicyProbe pprobe, int indent) {
+
+		String sresult = pprobe.isResultOk() ? "[OK]" : "[FAILED]" ;
+		for (int i = 0; i < indent; i++)
+			_outStream.print(" ");
+
+		_outStream.print(pprobe.getPolicy().getName());
+		_outStream.println("("
+				+ "address: " + pprobe.getAddress()
+				+ "; from: " + pprobe.getFrom()
+				+ "; to: " + pprobe.getTo()
+				+ "; probe: " + pprobe.getProbe() + ")"
+				+ "; " + sresult);
+
+		for (PolicyProbe p: pprobe.getPolicyProbes()) {
+			printPolicyProbe(p, indent + 2);
+		}
 	}
 
 	public void policyProbeCommand(ShellParser parser) {
@@ -569,7 +701,20 @@ public class Shell {
 			_outStream.println("Error: cannot find policy: " + pname);
 			return;
 		}
-		policyProbe(policy, from, to);
+
+		PolicyProbe pprobe = new PolicyProbe(policy);
+		if (from != null) {
+			List<String> flist = new ArrayList<String>();
+			flist.add(from);
+			pprobe.setFrom(flist);
+		}
+		if (to != null) {
+			List<String> flist = new ArrayList<String>();
+			flist.add(to);
+			pprobe.setTo(flist);
+		}
+		policyProbe(pprobe);
+		printPolicyProbe(pprobe, 0);
 	}
 
 	public void parseShellCommand(String commandLine) {
