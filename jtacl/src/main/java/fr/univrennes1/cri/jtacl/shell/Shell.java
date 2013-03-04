@@ -37,6 +37,7 @@ import fr.univrennes1.cri.jtacl.policies.Policies;
 import fr.univrennes1.cri.jtacl.policies.PoliciesMap;
 import fr.univrennes1.cri.jtacl.policies.Policy;
 import fr.univrennes1.cri.jtacl.policies.PolicyConfig;
+import fr.univrennes1.cri.jtacl.policies.PolicyExpect;
 import fr.univrennes1.cri.jtacl.policies.PolicyFlow;
 import fr.univrennes1.cri.jtacl.policies.PolicyProbe;
 import fr.univrennes1.cri.jtacl.policies.ServicePolicy;
@@ -510,10 +511,9 @@ public class Shell {
 		 * build the probe command
 		 */
 		ProbeCommandTemplate ptpt = new ProbeCommandTemplate();
-		String expect = policyProbe.getAction().toUpperCase();
-		if (expect.equals("DENY"))
-			expect = "UNACCEPTED";
-		ptpt.setProbeExpect(expect);
+		PolicyExpect expect = policyProbe.getExpect();
+		String sexpect = expect == PolicyExpect.ACCEPT ? "accept" : "unaccepted";
+		ptpt.setProbeExpect(sexpect);
 		ptpt.setPortSource(flow.getSourcePort());
 		ptpt.setPortDest(flow.getPort());
 		ptpt.setSrcAddress(policyProbe.getFrom().get(0));
@@ -546,7 +546,7 @@ public class Shell {
 			+ ptpt.getPortDest() + " "
 			+ "flags " + ptpt.getTcpFlags();
 		policyProbe.setProbe(sprobe);
-		ExpectedProbing ep = new ExpectedProbing(false, expect);
+		ExpectedProbing ep = new ExpectedProbing(false, sexpect);
 		policyProbe.setResult(probing.checkExpectedResult(ep));
 		return policyProbe.isResultOk();
 	}
@@ -564,7 +564,7 @@ public class Shell {
 		List<String> nto = policyProbe.getTo();
 		if (policy.getTo() != null)
 			nto = policy.getTo();
-		String naction = policyProbe.getAction();
+		PolicyExpect nexpect = policyProbe.getExpect();
 
 		/*
 		 * host policy
@@ -579,7 +579,7 @@ public class Shell {
 				pprobe.setAddress(hp.getAddress());
 				pprobe.setFrom(nfrom);
 				pprobe.setTo(nto);
-				pprobe.setAction(naction);
+				pprobe.setExpect(nexpect);
 
 				if (!policyProbe(pprobe))
 					result = false;
@@ -601,7 +601,7 @@ public class Shell {
 				pprobe.setAddress(policyProbe.getAddress());
 				pprobe.setFrom(nfrom);
 				pprobe.setTo(nto);
-				pprobe.setAction(naction);
+				pprobe.setExpect(nexpect);
 
 				if (!policyProbe(pprobe))
 					result = false;
@@ -616,8 +616,8 @@ public class Shell {
 		if (policy instanceof NetworkPolicy) {
 			NetworkPolicy np = (NetworkPolicy) policy;
 
-			if (np.getAction() != null)
-				naction = np.getAction();
+			if (np.getExpect() != null)
+				nexpect = np.getExpect();
 
 			boolean result = true;
 			for (Policy p: np.getPolicies().values()) {
@@ -626,7 +626,7 @@ public class Shell {
 				pprobe.setAddress(policyProbe.getAddress());
 				pprobe.setFrom(nfrom);
 				pprobe.setTo(nto);
-				pprobe.setAction(naction);
+				pprobe.setExpect(nexpect);
 
 				if (!policyProbe(pprobe))
 					result = false;
@@ -666,7 +666,7 @@ public class Shell {
 				List<String> lto = new ArrayList<String>();
 				lto.add(to);
 				nprobe.setTo(lto);
-				nprobe.setAction(naction);
+				nprobe.setExpect(nexpect);
 				policyProbe.getPolicyProbes().add(nprobe);
 
 					/*
@@ -690,7 +690,7 @@ public class Shell {
 						rflow.setFlags("A");
 					}
 					PolicyProbe rprobe = new PolicyProbe(rflow);
-					rprobe.setAction("accept");
+					rprobe.setExpect(PolicyExpect.ACCEPT);
 					rprobe.setFrom(nprobe.getTo());
 					rprobe.setTo(nprobe.getFrom());
 					policyProbe.getPolicyProbes().add(rprobe);
