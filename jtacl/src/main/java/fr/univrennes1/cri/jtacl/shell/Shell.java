@@ -520,8 +520,10 @@ public class Shell {
 		ptpt.setSrcAddress(policyProbe.getFrom().get(0));
 		ptpt.setDestAddress(policyProbe.getTo().get(0));
 		Integer protocol = flow.getProtocol();
-		if (protocol != null)
-			ptpt.setProtoSpecification(flow.getProtocol().toString());
+		if (protocol != null) {
+			String p = flow.getProtocol() == Protocols.TCP ? "tcp" : "udp";
+			ptpt.setProtoSpecification(p);
+		}
 		if (flow.getFlags() != null) {
 			StringsList tcpflags = new StringsList();
 			tcpflags.add(flow.getFlags());
