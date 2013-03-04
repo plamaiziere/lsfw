@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.policies;
 
-import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
