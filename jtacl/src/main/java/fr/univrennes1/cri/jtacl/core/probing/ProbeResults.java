@@ -13,8 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.core.probing;
 
-import java.util.ArrayList;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
+import java.util.ArrayList;
 
 /**
  * This class is responsible to track all events and results associated to one
