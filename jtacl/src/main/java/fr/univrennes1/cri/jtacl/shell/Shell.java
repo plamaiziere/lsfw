@@ -30,6 +30,7 @@ import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.policies.HostPolicy;
 import fr.univrennes1.cri.jtacl.policies.NetworkPolicy;
@@ -518,7 +519,9 @@ public class Shell {
 		ptpt.setPortDest(flow.getPort());
 		ptpt.setSrcAddress(policyProbe.getFrom().get(0));
 		ptpt.setDestAddress(policyProbe.getTo().get(0));
-		ptpt.setProtoSpecification(flow.getProtocol());
+		Integer protocol = flow.getProtocol();
+		if (protocol != null)
+			ptpt.setProtoSpecification(flow.getProtocol().toString());
 		if (flow.getFlags() != null) {
 			StringsList tcpflags = new StringsList();
 			tcpflags.add(flow.getFlags());
@@ -684,9 +687,9 @@ public class Shell {
 					PolicyFlow rflow = new PolicyFlow(fname, fcomment);
 					rflow.setPort(flow.getSourcePort());
 					rflow.setSourcePort(flow.getPort());
-					String proto = flow.getProtocol();
+					Integer proto = flow.getProtocol();
 					rflow.setProtocol(proto);
-					if (proto.equalsIgnoreCase("tcp")) {
+					if (proto != null && proto == Protocols.TCP) {
 						rflow.setFlags("A");
 					}
 					PolicyProbe rprobe = new PolicyProbe(rflow);
