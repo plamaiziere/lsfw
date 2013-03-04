@@ -13,13 +13,16 @@
 
 package fr.univrennes1.cri.jtacl.policies;
 
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+
 /**
  * "flow" security policy
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PolicyFlow extends Policy {
 
-	protected String _protocol;
+	protected ProtocolsSpec _protocol = new ProtocolsSpec();
 	protected String _port;
 	protected String _sourcePort;
 	protected String _flags;
@@ -27,14 +30,15 @@ public class PolicyFlow extends Policy {
 
 	public PolicyFlow(String name, String comment) {
 		super(name, comment);
+		_protocol.add(0, null);
 	}
 
-	public String getProtocol() {
-		return _protocol;
+	public Integer getProtocol() {
+		return _protocol.get(0);
 	}
 
-	public void setProtocol(String protocol) {
-		_protocol = protocol;
+	public void setProtocol(Integer protocol) {
+		_protocol.add(0, protocol) ;
 	}
 
 	public String getPort() {
@@ -73,7 +77,7 @@ public class PolicyFlow extends Policy {
 	public String toString() {
 		return "Flow{" + "_name=" + _name + ", _comment=" + _comment
 			+ ", _from=" + _from + ", _to=" + _to
-			+ ", _protocol=" + _protocol + ", _port=" + _port
+			+ ", _protocol=" + _protocol.get(0) + ", _port=" + _port
 			+ ", _sourcePort=" + _sourcePort + ", _flags=" + _flags
 			+ ", _connected=" + _connected
 			+ '}';
