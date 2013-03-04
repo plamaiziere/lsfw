@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.policies;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -93,14 +94,17 @@ public class PolicyConfig {
 		List<String> to = lookupStringOrList(pscope, "to");
 		flow.setTo(to);
 
-		String proto = lookupString(pscope, "proto");
-		if (proto.equalsIgnoreCase("udp") || proto.equalsIgnoreCase("tcp") ||
-				proto.equalsIgnoreCase("ip")) {
-			flow.setProtocol(proto);
-		} else {
-			throw new JtaclConfigurationException("Policy: " + name
-				+ ", invalid protocol: " + proto);
-		}
+		String sproto = lookupString(pscope, "proto");
+		Integer protocol = null;
+		if (sproto.equalsIgnoreCase("udp"))
+			protocol = Protocols.UDP;
+		else if (sproto.equalsIgnoreCase("tcp"))
+			protocol = Protocols.TCP;
+		else if (sproto.equalsIgnoreCase("any"))
+			protocol = null;
+		else throw new JtaclConfigurationException("Policy: " + name
+				+ ", invalid protocol: " + sproto);
+		flow.setProtocol(protocol);
 
 		String sport = lookupString(pscope, "source_port");
 		flow.setSourcePort(sport);
@@ -142,14 +146,12 @@ public class PolicyConfig {
 		 */
 		String sexpect = lookupString(pscope, "expect");
 		PolicyExpect expect = null;
-		if (sexpect == null) {
+		if (sexpect == null)
 			sexpect = "ACCEPT";
-		} else {
-			if (sexpect.equalsIgnoreCase("ACCEPT"))
-				expect = PolicyExpect.ACCEPT;
-			if (sexpect.equalsIgnoreCase("DENY"))
-				expect = PolicyExpect.DENY;
-		}
+		if (sexpect.equalsIgnoreCase("ACCEPT"))
+			expect = PolicyExpect.ACCEPT;
+		if (sexpect.equalsIgnoreCase("DENY"))
+			expect = PolicyExpect.DENY;
 		if (expect == null)
 			throw new JtaclConfigurationException("Policy: " + name
 				+ ", invalid expect " + sexpect);
@@ -322,15 +324,21 @@ public class PolicyConfig {
 				 */
 				String[] ss = pname.split("/");
 				if (ss.length == 2) {
-					if (ss[0].equalsIgnoreCase("tcp")
-							|| ss[0].equalsIgnoreCase("udp")) {
-						PolicyFlow flow = new PolicyFlow(pname,
-							pname);
-						flow.setProtocol(ss[0].toLowerCase());
-						flow.setPort(ss[1].toLowerCase());
-						if (flow.getProtocol().equals("tcp"))
-							flow.setFlags(_defaultTcpFlags);
+					PolicyFlow flow = new PolicyFlow(pname,	"(auto) " + pname);
+					String sproto = ss[0];
+					String sport = ss[1];
+					Integer protocol = null;
+					if (sproto.equalsIgnoreCase("udp"))
+						protocol = Protocols.UDP;
+					if (sproto.equalsIgnoreCase("tcp")) {
+						protocol = Protocols.TCP;
+						flow.setFlags(_defaultTcpFlags);
+
+					}
+					if (protocol != null) {
 						flow.setConnected(true);
+						flow.setProtocol(protocol);
+						flow.setPort(sport);
 						globalPolicies.put(flow);
 						ref = flow;
 					}
