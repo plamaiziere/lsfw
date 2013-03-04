@@ -29,7 +29,7 @@ public class PolicyProbe {
 	protected boolean _result;
 	protected List<String> _from;
 	protected List<String> _to;
-	protected String _action;
+	protected PolicyExpect _expect;
 	protected List<String> _address;
 	protected List<PolicyProbe> _policyProbes = new LinkedList<PolicyProbe>();
 
@@ -89,12 +89,12 @@ public class PolicyProbe {
 		_to = to;
 	}
 
-	public String getAction() {
-		return _action;
+	public PolicyExpect getExpect() {
+		return _expect;
 	}
 
-	public void setAction(String action) {
-		_action = action;
+	public void setExpect(PolicyExpect expect) {
+		_expect = expect;
 	}
 
 	public List<String> getAddress() {
