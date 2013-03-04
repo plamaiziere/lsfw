@@ -23,6 +23,7 @@ public class PolicyFlow extends Policy {
 	protected String _port;
 	protected String _sourcePort;
 	protected String _flags;
+	protected boolean _connected;
 
 	public PolicyFlow(String name, String comment) {
 		super(name, comment);
@@ -60,11 +61,21 @@ public class PolicyFlow extends Policy {
 		_flags = flags;
 	}
 
+	public boolean isConnected() {
+		return _connected;
+	}
+
+	public void setConnected(boolean connected) {
+		_connected = connected;
+	}
+
 	@Override
 	public String toString() {
 		return "Flow{" + "_name=" + _name + ", _comment=" + _comment
 			+ ", _from=" + _from + ", _to=" + _to
 			+ ", _protocol=" + _protocol + ", _port=" + _port
-			+ ", _sourcePort=" + _sourcePort + ", _flags=" + _flags + '}';
+			+ ", _sourcePort=" + _sourcePort + ", _flags=" + _flags
+			+ ", _connected=" + _connected
+			+ '}';
 	}
 }

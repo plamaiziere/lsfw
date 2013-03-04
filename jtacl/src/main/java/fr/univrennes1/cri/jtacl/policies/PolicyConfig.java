@@ -111,6 +111,9 @@ public class PolicyConfig {
 		String flags = lookupString(pscope, "flags");
 		flow.setFlags(flags);
 
+		String connected = lookupString(pscope, "connected");
+		flow.setConnected(Boolean.parseBoolean(connected));
+		
 		return flow;
 	}
 
@@ -312,6 +315,7 @@ public class PolicyConfig {
 						flow.setPort(ss[1].toLowerCase());
 						if (flow.getProtocol().equals("tcp"))
 							flow.setFlags(_defaultTcpFlags);
+						flow.setConnected(true);
 						globalPolicies.put(flow);
 						ref = flow;
 					}
