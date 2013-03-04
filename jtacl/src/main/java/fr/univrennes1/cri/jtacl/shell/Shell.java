@@ -503,7 +503,8 @@ public class Shell {
 
 	}
 
-	protected boolean probeFlow(PolicyProbe policyProbe, PolicyFlow flow) {
+	protected boolean probeFlow(PolicyProbe policyProbe, PolicyFlow flow,
+			boolean state) {
 
 		/*
 		 * build the probe command
@@ -524,6 +525,7 @@ public class Shell {
 			ptpt.setTcpFlags(tcpflags);
 		}
 		ptpt.setProbeOptQuickDeny(true);
+		ptpt.setProbeOptState(state);
 
 		ProbeCommand pc = new ProbeCommand();
 		pc.buildRequest(ptpt);
@@ -538,7 +540,8 @@ public class Shell {
 		 */
 		Probing probing = pc.getProbing();
 		policyProbe.setProbing(probing);
-		String sprobe = "proto " + ptpt.getProtoSpecification() + " "
+		String sprobe = "state " + state
+			+ "; proto " + ptpt.getProtoSpecification() + " "
 			+ ptpt.getPortSource() + ":"
 			+ ptpt.getPortDest() + " "
 			+ "flags " + ptpt.getTcpFlags();
@@ -653,6 +656,9 @@ public class Shell {
 		boolean result = true;
 		for (String from: nfrom) {
 			for (String to: nto) {
+				/*
+				 * add a policy probe for each source / destination address
+				 */
 				PolicyProbe nprobe = new PolicyProbe(flow);
 				List<String> lfrom = new ArrayList<String>();
 				lfrom.add(from);
@@ -662,8 +668,35 @@ public class Shell {
 				nprobe.setTo(lto);
 				nprobe.setAction(naction);
 				policyProbe.getPolicyProbes().add(nprobe);
-				if (!probeFlow(nprobe, flow)) {
-					result = false;
+
+					/*
+					 * probe
+					 */
+					if (!probeFlow(nprobe, flow, false)) {
+						result = false;
+					}
+				/*
+				 * check the reply
+				 */
+				if (flow.isConnected()) {
+					String fname = flow.getName();
+					String fcomment = flow.getComment();
+					PolicyFlow rflow = new PolicyFlow(fname, fcomment);
+					rflow.setPort(flow.getSourcePort());
+					rflow.setSourcePort(flow.getPort());
+					String proto = flow.getProtocol();
+					rflow.setProtocol(proto);
+					if (proto.equalsIgnoreCase("tcp")) {
+						rflow.setFlags("A");
+					}
+					PolicyProbe rprobe = new PolicyProbe(rflow);
+					rprobe.setAction("accept");
+					rprobe.setFrom(nprobe.getTo());
+					rprobe.setTo(nprobe.getFrom());
+					policyProbe.getPolicyProbes().add(rprobe);
+					if (!probeFlow(rprobe, rflow, true)) {
+						result = false;
+					}
 				}
 			}
 		}
