@@ -20,7 +20,7 @@ package fr.univrennes1.cri.jtacl.policies;
 public class NetworkPolicy extends Policy {
 
 	protected PoliciesMap _policies = new PoliciesMap();
-	protected String _action;
+	protected PolicyExpect _expect;
 
 	public NetworkPolicy(String name, String comment) {
 		super(name, comment);
@@ -30,18 +30,19 @@ public class NetworkPolicy extends Policy {
 		return _policies;
 	}
 
-	public String getAction() {
-		return _action;
+	public PolicyExpect getExpect() {
+		return _expect;
 	}
 
-	public void setAction(String action) {
-		_action = action;
+	public void setExpect(PolicyExpect expect) {
+		_expect = expect;
 	}
 
 	@Override
 	public String toString() {
 		return "NetworkPolicy{" + "_name=" + _name + ", _comment=" + _comment
 			+ ", _from=" + _from + ", _to=" + _to + ", _policies=" + _policies
+			+ ", _expect=" + _expect
 			+ "}";
 	}
 
