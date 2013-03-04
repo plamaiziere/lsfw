@@ -113,7 +113,7 @@ public class PolicyConfig {
 
 		String connected = lookupString(pscope, "connected");
 		flow.setConnected(Boolean.parseBoolean(connected));
-		
+
 		return flow;
 	}
 
@@ -137,8 +137,23 @@ public class PolicyConfig {
 		List<String> to = lookupStringOrList(pscope, "to");
 		policy.setTo(to);
 
-		String action = lookupString(pscope, "action");
-		policy.setAction(action);
+		/*
+		 * expect default to ACCEPT
+		 */
+		String sexpect = lookupString(pscope, "expect");
+		PolicyExpect expect = null;
+		if (sexpect == null) {
+			sexpect = "ACCEPT";
+		} else {
+			if (sexpect.equalsIgnoreCase("ACCEPT"))
+				expect = PolicyExpect.ACCEPT;
+			if (sexpect.equalsIgnoreCase("DENY"))
+				expect = PolicyExpect.DENY;
+		}
+		if (expect == null)
+			throw new JtaclConfigurationException("Policy: " + name
+				+ ", invalid expect " + sexpect);
+		policy.setExpect(expect);
 
 		List<String> include = lookupStringOrList(pscope, "policies");
 		if (include != null) {
