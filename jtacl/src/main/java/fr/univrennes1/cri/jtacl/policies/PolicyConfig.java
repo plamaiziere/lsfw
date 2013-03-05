@@ -298,9 +298,13 @@ public class PolicyConfig {
 
 	public void loadFlows(PoliciesMap policies) {
 
-		String[] ls = _config.listLocallyScopedNames("flows", "",
-			Configuration.CFG_SCOPE_AND_VARS, false);
-
+		String[] ls = null;
+		try {
+			ls = _config.listLocallyScopedNames("flows", "",
+				Configuration.CFG_SCOPE_AND_VARS, false);
+		} catch (ConfigurationException ex) {
+			throw new JtaclConfigurationException(ex.getMessage());
+		}
 		for (String s: ls) {
 			PolicyFlow nflow = getFlow("flows", s);
 			if (nflow != null)
@@ -310,9 +314,13 @@ public class PolicyConfig {
 
 	public void loadNetworkPolicies(PoliciesMap policies) {
 
-		String[] ls = _config.listLocallyScopedNames("networks", "",
-			Configuration.CFG_SCOPE_AND_VARS, false);
-
+		String[] ls = null;
+		try {
+			ls = _config.listLocallyScopedNames("networks", "",
+				Configuration.CFG_SCOPE_AND_VARS, false);
+		} catch (ConfigurationException ex)	{
+			throw new JtaclConfigurationException(ex.getMessage());
+		}
 		for (String s: ls) {
 			NetworkPolicy npolicy = getNetworkPolicy("networks", s);
 			if (npolicy != null)
@@ -322,9 +330,13 @@ public class PolicyConfig {
 
 	public void loadServicePolicies(PoliciesMap policies) {
 
-		String[] ls = _config.listLocallyScopedNames("services", "",
-			Configuration.CFG_SCOPE_AND_VARS, false);
-
+		String[] ls = null;
+		try {
+			ls = _config.listLocallyScopedNames("services", "",
+				Configuration.CFG_SCOPE_AND_VARS, false);
+		} catch (ConfigurationException ex)	{
+			throw new JtaclConfigurationException(ex.getMessage());
+		}
 		for (String s: ls) {
 			ServicePolicy spolicy = getServicePolicy("services", s);
 			if (spolicy != null)
@@ -334,9 +346,13 @@ public class PolicyConfig {
 
 	public void loadHostPolicies(PoliciesMap policies) {
 
-		String[] ls = _config.listLocallyScopedNames("hosts", "",
-			Configuration.CFG_SCOPE_AND_VARS, false);
-
+		String[] ls = null;
+		try {
+			ls = _config.listLocallyScopedNames("hosts", "",
+				Configuration.CFG_SCOPE_AND_VARS, false);
+		} catch (ConfigurationException ex)	{
+			throw new JtaclConfigurationException(ex.getMessage());
+		}
 		for (String s: ls) {
 			HostPolicy hpolicy = getHostPolicy("hosts", s);
 			if (hpolicy != null)
