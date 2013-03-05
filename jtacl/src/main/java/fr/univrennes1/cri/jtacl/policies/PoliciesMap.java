@@ -13,7 +13,10 @@
 
 package fr.univrennes1.cri.jtacl.policies;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Map of policies keyed by name
@@ -24,5 +27,11 @@ public class PoliciesMap extends HashMap <String, Policy> {
 
 	public void put(Policy policy) {
 		put(policy.getName(), policy);
+	}
+
+	public List<String> getKeysSorted() {
+		List list = new LinkedList(keySet());
+		Collections.sort(list);
+		return list;
 	}
 }
