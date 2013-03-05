@@ -220,7 +220,6 @@ public class PolicyConfig {
 			throw new JtaclConfigurationException("Policy: " + name +
 				" does not specify any policy");
 		}
-		System.out.println(policy);
 		Log.debug().info("policy: " + policy);
 		return policy;
 	}
@@ -258,7 +257,6 @@ public class PolicyConfig {
 				" does not specify any policy");
 		}
 
-		System.out.println(policy);
 		Log.debug().info("policy: " + policy);
 		return policy;
 	}
@@ -294,7 +292,6 @@ public class PolicyConfig {
 				" does not specify any policy");
 		}
 
-		System.out.println(policy);
 		Log.debug().info("policy: " + policy);
 		return policy;
 	}
