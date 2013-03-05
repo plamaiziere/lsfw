@@ -497,8 +497,6 @@ public class Shell {
 			config.linkPolicies(pm);
 			_policies.clear();
 			_policies.putAll(pm);
-			for (Policy p: _policies.values())
-				System.out.println(p);
 		} catch (JtaclConfigurationException ex) {
 			_outStream.println("Error: " + ex.getMessage());
 		}
