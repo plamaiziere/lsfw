@@ -302,7 +302,6 @@ public class PolicyConfig {
 			Configuration.CFG_SCOPE_AND_VARS, false);
 
 		for (String s: ls) {
-			System.out.println(s);
 			PolicyFlow nflow = getFlow("flows", s);
 			if (nflow != null)
 				policies.put(nflow);
