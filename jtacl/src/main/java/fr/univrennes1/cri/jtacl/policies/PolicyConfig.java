@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.policies;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclParameterException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.shell.ShellUtils;
@@ -344,6 +345,15 @@ public class PolicyConfig {
 
 					}
 					if (protocol != null) {
+						/*
+						 * check validity of the service
+						 */
+						try {
+							ShellUtils.parseService(sport, sproto);
+						} catch (JtaclParameterException ex) {
+							throw new JtaclConfigurationException("Policy: "
+								+ pname + ", " + ex.getMessage());
+						}
 						flow.setConnected(true);
 						flow.setProtocol(protocol);
 						flow.setPort(sport);
