@@ -114,7 +114,7 @@ public class PolicyConfig {
 		flow.setPort(port);
 
 		String flags = lookupString(pscope, "flags");
-		if (!ShellUtils.checkTcpFlags(flags))
+		if (flags != null && !ShellUtils.checkTcpFlags(flags))
 			throw new JtaclConfigurationException("Policy: " + name
 				+ ", invalid tcp flags: " + flags);
 		flow.setFlags(flags);
@@ -308,7 +308,11 @@ public class PolicyConfig {
 
 		PoliciesMap policies = new PoliciesMap();
 
-		_defaultTcpFlags = lookupString("", "default_tcp_flags");
+		String flags = lookupString("", "default_tcp_flags");
+		if (flags != null && !ShellUtils.checkTcpFlags(flags))
+			throw new JtaclConfigurationException("default_tcp_flags: "
+				+ " invalid tcp flags: " + flags);
+		_defaultTcpFlags = flags;
 		loadFlows(policies);
 		loadNetworkPolicies(policies);
 		loadServicePolicies(policies);
