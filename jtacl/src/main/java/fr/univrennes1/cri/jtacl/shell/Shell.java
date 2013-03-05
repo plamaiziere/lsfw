@@ -578,7 +578,8 @@ public class Shell {
 			HostPolicy hp = (HostPolicy) policy;
 
 			boolean result = true;
-			for (Policy p: hp.getPolicies().values()) {
+			for (String n: hp.getPolicies().getKeysSorted()) {
+				Policy p = hp.getPolicies().get(n);
 				PolicyProbe pprobe = new PolicyProbe(p);
 				policyProbe.getPolicyProbes().add(pprobe);
 				pprobe.setAddress(hp.getAddress());
@@ -600,7 +601,8 @@ public class Shell {
 			ServicePolicy sp = (ServicePolicy) policy;
 
 			boolean result = true;
-			for (Policy p: sp.getPolicies().values()) {
+			for (String n: sp.getPolicies().getKeysSorted()) {
+				Policy p = sp.getPolicies().get(n);
 				PolicyProbe pprobe = new PolicyProbe(p);
 				policyProbe.getPolicyProbes().add(pprobe);
 				pprobe.setAddress(policyProbe.getAddress());
@@ -625,7 +627,8 @@ public class Shell {
 				nexpect = np.getExpect();
 
 			boolean result = true;
-			for (Policy p: np.getPolicies().values()) {
+			for (String n: np.getPolicies().getKeysSorted()) {
+				Policy p = np.getPolicies().get(n);
 				PolicyProbe pprobe = new PolicyProbe(p);
 				policyProbe.getPolicyProbes().add(pprobe);
 				pprobe.setAddress(policyProbe.getAddress());
