@@ -16,6 +16,7 @@ package fr.univrennes1.cri.jtacl.policies;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.shell.ShellUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -113,6 +114,9 @@ public class PolicyConfig {
 		flow.setPort(port);
 
 		String flags = lookupString(pscope, "flags");
+		if (!ShellUtils.checkTcpFlags(flags))
+			throw new JtaclConfigurationException("Policy: " + name
+				+ ", invlaid tcp flags: " + flags);
 		flow.setFlags(flags);
 
 		String connected = lookupString(pscope, "connected");
