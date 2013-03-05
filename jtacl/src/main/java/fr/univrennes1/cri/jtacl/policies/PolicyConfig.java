@@ -96,6 +96,9 @@ public class PolicyConfig {
 		List<String> to = lookupStringOrList(pscope, "to");
 		flow.setTo(to);
 
+		/*
+		 * protocol
+		 */
 		String sproto = lookupString(pscope, "proto");
 		Integer protocol = null;
 		if (sproto.equalsIgnoreCase("udp"))
@@ -109,20 +112,63 @@ public class PolicyConfig {
 		flow.setProtocol(protocol);
 
 		String sport = lookupString(pscope, "source_port");
+		String port = lookupString(pscope, "port");
+		if (protocol == null && (sport != null || port != null))
+			throw new JtaclConfigurationException("Policy: " + name
+				+ ", protocol must be TCP or UDP when a port is specified");
+
+		/*
+		 * check source port
+		 */
+		if (sport != null) {
+			try {
+				ShellUtils.parsePortSpec(sport, sproto);
+			} catch (JtaclParameterException ex) {
+				throw new JtaclConfigurationException("Policy: " + name
+					+ ", invalid port: " + sport);
+			}
+		}
 		flow.setSourcePort(sport);
 
-		String port = lookupString(pscope, "port");
+		/*
+		 * check destination port
+		 */
+		if (port != null) {
+			try {
+				ShellUtils.parsePortSpec(port, sproto);
+			} catch (JtaclParameterException ex) {
+				throw new JtaclConfigurationException("Policy: " + name
+					+ ", invalid port: " + port);
+			}
+		}
 		flow.setPort(port);
 
+		/*
+		 * tcp flags
+		 */
 		String flags = lookupString(pscope, "flags");
-		if (flags != null && !ShellUtils.checkTcpFlags(flags))
-			throw new JtaclConfigurationException("Policy: " + name
-				+ ", invalid tcp flags: " + flags);
+		if (flags != null) {
+			if (protocol != Protocols.TCP)
+				throw new JtaclConfigurationException("Policy: " + name
+					+ ", protocol must be TCP when tcp flags are specified");
+
+			if (!ShellUtils.checkTcpFlags(flags))
+				throw new JtaclConfigurationException("Policy: " + name
+					+ ", invalid tcp flags: " + flags);
+		}
 		flow.setFlags(flags);
 
+		/*
+		 * connected flag
+		 */
 		String connected = lookupString(pscope, "connected");
+		if (connected != null
+				&& !connected.equalsIgnoreCase("false")
+				&& !connected.equalsIgnoreCase("true")) {
+			throw new JtaclConfigurationException("Policy: " + name
+					+ ", invalid connected flag: " + connected);
+		}
 		flow.setConnected(Boolean.parseBoolean(connected));
-
 		return flow;
 	}
 
