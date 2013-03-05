@@ -116,7 +116,7 @@ public class PolicyConfig {
 		String flags = lookupString(pscope, "flags");
 		if (!ShellUtils.checkTcpFlags(flags))
 			throw new JtaclConfigurationException("Policy: " + name
-				+ ", invlaid tcp flags: " + flags);
+				+ ", invalid tcp flags: " + flags);
 		flow.setFlags(flags);
 
 		String connected = lookupString(pscope, "connected");
