@@ -314,7 +314,6 @@ public class PolicyConfig {
 			Configuration.CFG_SCOPE_AND_VARS, false);
 
 		for (String s: ls) {
-			System.out.println(s);
 			NetworkPolicy npolicy = getNetworkPolicy("networks", s);
 			if (npolicy != null)
 				policies.put(npolicy);
@@ -327,7 +326,6 @@ public class PolicyConfig {
 			Configuration.CFG_SCOPE_AND_VARS, false);
 
 		for (String s: ls) {
-			System.out.println(s);
 			ServicePolicy spolicy = getServicePolicy("services", s);
 			if (spolicy != null)
 				policies.put(spolicy);
@@ -340,7 +338,6 @@ public class PolicyConfig {
 			Configuration.CFG_SCOPE_AND_VARS, false);
 
 		for (String s: ls) {
-			System.out.println(s);
 			HostPolicy hpolicy = getHostPolicy("hosts", s);
 			if (hpolicy != null)
 				policies.put(hpolicy);
