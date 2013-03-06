@@ -84,7 +84,16 @@ public interface IPRangeable {
 	 * Returns a String representation of this range according
 	 * to the String format. If this range is a network, displays it as a
 	 * network.
+	 * @return a String representation of this range according
+	 * to the String format.
 	 */
 	public String toNetString(String format);
 
+	/**
+	 * Returns the nearest network including this range.
+	 * to the String format. If this range is a network, displays it as a
+	 * network.
+	 * @return the nearest network including this range.
+	 */
+	public IPNet nearestNetwork();
 }
