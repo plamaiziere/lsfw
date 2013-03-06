@@ -345,11 +345,57 @@ public class IPNetTest extends TestCase {
 			IPversion.IPV4
 		);
 
+		// test range
+		testConstructorNetIP(
+			"::1-::1",
+			"0",
+			128,
+			IPversion.IPV6
+		);
+
+		// test range
+		testConstructorNetIP(
+			"::0-::ff",
+			"0",
+			120,
+			IPversion.IPV6
+		);
+
 		// invalid range
 		f = false;
 		try {
 			testConstructorNetIP(
 				"192.168.0.0-192.168.191.255",
+				"0",
+				24,
+				IPversion.IPV4
+			);
+		} catch (UnknownHostException e) {
+			f = true;
+			System.out.println("check : " + e.getMessage());
+		}
+		assertTrue(f);
+
+		// invalid range
+		f = false;
+		try {
+			testConstructorNetIP(
+				"192.168.0.0-::1",
+				"0",
+				24,
+				IPversion.IPV4
+			);
+		} catch (UnknownHostException e) {
+			f = true;
+			System.out.println("check : " + e.getMessage());
+		}
+		assertTrue(f);
+
+		// invalid range
+		f = false;
+		try {
+			testConstructorNetIP(
+				"::1-192.168.0.0",
 				"0",
 				24,
 				IPversion.IPV4

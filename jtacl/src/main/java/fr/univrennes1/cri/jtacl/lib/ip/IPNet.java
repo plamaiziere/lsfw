@@ -399,9 +399,10 @@ public final class IPNet implements Comparable, IPRangeable {
 
 		first = parseAddress(sfirst);
 		last = parseAddress(slast);
-		if (!first.isIPv4() || !last.isIPv4())
+		if ((first.isIPv4() && !last.isIPv4())
+				|| (first.isIPv6() && ! last.isIPv6()))
 			throw new UnknownHostException(
-					"First-last notation only allowed for IPv4: " + data);
+					"First-last notation must have the same address family: " + data);
 		if (first.getIP().compareTo(last.getIP()) > 0)
 			throw new UnknownHostException(
 					"Last address must be greater than first: " + data);
@@ -410,10 +411,10 @@ public final class IPNet implements Comparable, IPRangeable {
 		BigInteger size = last.getIP();
 		size = size.subtract(first.getIP());
 
-		// IPV4 only
 		BigInteger ip = first.getIP();
-		int prefixLen = 31 - IP.highest1Bits(size);
-		IPBase ipbase = new IPBase(ip, prefixLen, IPversion.IPV4);
+		int len = IP.maxPrefixLen(first.getIpVersion()) - 1;
+		int prefixLen = len - IP.highest1Bits(size);
+		IPBase ipbase = new IPBase(ip, prefixLen, first.getIpVersion());
 		/*
 		 *  make sure the broadcast is the same as the last ip
 		 * otherwise it will return /16 for something like:
