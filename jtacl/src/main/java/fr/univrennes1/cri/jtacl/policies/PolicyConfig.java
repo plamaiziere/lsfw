@@ -376,7 +376,7 @@ public class PolicyConfig {
 		return policies;
 	}
 
-	protected void linkPolicyRef(PoliciesMap globalPolicies,
+	protected void linkPolicyRef(Policy p, PoliciesMap globalPolicies,
 			PoliciesMap localPolicies) {
 
 		for (String pname: localPolicies.keySet()) {
@@ -420,6 +420,33 @@ public class PolicyConfig {
 			if (ref == null)
 				throw new JtaclConfigurationException(
 						"Cannot find policy: " + pname);
+			/*
+			 * check the type of included policies
+			 */
+			boolean badtype = false;
+			if (p instanceof HostPolicy) {
+				if (!(ref instanceof HostPolicy)
+						&& !(ref instanceof ServicePolicy)) {
+					badtype = true;
+				}
+			}
+			if (p instanceof ServicePolicy) {
+				if (!(ref instanceof ServicePolicy)
+						&& !(ref instanceof NetworkPolicy)) {
+					badtype = true;
+				}
+			}
+			if (p instanceof NetworkPolicy) {
+				if (!(ref instanceof NetworkPolicy)
+						&& !(ref instanceof PolicyFlow)) {
+					badtype = true;
+				}
+			}
+			if (badtype) {
+					throw new JtaclConfigurationException("Policy: "
+						+ p.getName()
+						+ ", invalid included policy: " + ref.getName());
+			}
 			localPolicies.put(ref);
 		}
 	}
@@ -435,17 +462,17 @@ public class PolicyConfig {
 			if (p instanceof ServicePolicy) {
 				ServicePolicy sp = (ServicePolicy) p;
 				PoliciesMap lpolicies = sp.getPolicies();
-				linkPolicyRef(policies, lpolicies);
+				linkPolicyRef(p, policies, lpolicies);
 			}
 			if (p instanceof NetworkPolicy) {
 				NetworkPolicy np = (NetworkPolicy) p;
 				PoliciesMap lpolicies = np.getPolicies();
-				linkPolicyRef(policies, lpolicies);
+				linkPolicyRef(p, policies, lpolicies);
 			}
 			if (p instanceof HostPolicy) {
 				HostPolicy hp = (HostPolicy) p;
 				PoliciesMap lpolicies = hp.getPolicies();
-				linkPolicyRef(policies, lpolicies);
+				linkPolicyRef(p, policies, lpolicies);
 			}
 		}
 	}
