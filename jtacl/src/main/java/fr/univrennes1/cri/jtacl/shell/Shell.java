@@ -39,7 +39,7 @@ import fr.univrennes1.cri.jtacl.policies.PoliciesMap;
 import fr.univrennes1.cri.jtacl.policies.Policy;
 import fr.univrennes1.cri.jtacl.policies.PolicyConfig;
 import fr.univrennes1.cri.jtacl.policies.PolicyExpect;
-import fr.univrennes1.cri.jtacl.policies.PolicyFlow;
+import fr.univrennes1.cri.jtacl.policies.FlowPolicy;
 import fr.univrennes1.cri.jtacl.policies.PolicyProbe;
 import fr.univrennes1.cri.jtacl.policies.ServicePolicy;
 import groovy.lang.Binding;
@@ -503,7 +503,7 @@ public class Shell {
 
 	}
 
-	protected boolean probeFlow(PolicyProbe policyProbe, PolicyFlow flow,
+	protected boolean probeFlow(PolicyProbe policyProbe, FlowPolicy flow,
 			boolean state) {
 
 		/*
@@ -644,10 +644,10 @@ public class Shell {
 		/*
 		 * flow policy
 		 */
-		if (!(policy instanceof PolicyFlow))
+		if (!(policy instanceof FlowPolicy))
 			return false;
 
-		PolicyFlow flow = (PolicyFlow) policy;
+		FlowPolicy flow = (FlowPolicy) policy;
 
 		if (nfrom == null) {
 			nfrom = policyProbe.getAddress();
@@ -687,7 +687,7 @@ public class Shell {
 				if (flow.isConnected()) {
 					String fname = flow.getName();
 					String fcomment = flow.getComment();
-					PolicyFlow rflow = new PolicyFlow(fname, fcomment);
+					FlowPolicy rflow = new FlowPolicy(fname, fcomment);
 					rflow.setPort(flow.getSourcePort());
 					rflow.setSourcePort(flow.getPort());
 					Integer proto = flow.getProtocol();

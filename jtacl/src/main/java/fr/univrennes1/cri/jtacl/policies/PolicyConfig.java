@@ -71,13 +71,13 @@ public class PolicyConfig {
 	}
 
 	/**
-	 * Gets a PolicyFlow from the configuration
+	 * Gets a FlowPolicy from the configuration
 	 * @param scope configuration scope.
-	 * @param name name of the PolicyFlow
-	 * @return a PolicyFlow
+	 * @param name name of the FlowPolicy
+	 * @return a FlowPolicy
 	 * @throws JtaclConfigurationException if the configuration is invalid.
 	 */
-	public PolicyFlow getFlow(String scope, String name) {
+	public FlowPolicy getFlow(String scope, String name) {
 		// TODO: sanity checks
 
 		/*
@@ -89,7 +89,7 @@ public class PolicyConfig {
 		if (comment == null)
 			comment = "";
 
-		PolicyFlow flow = new PolicyFlow(name, comment);
+		FlowPolicy flow = new FlowPolicy(name, comment);
 
 		List<String> from = lookupStringOrList(pscope, "from");
 		flow.setFrom(from);
@@ -306,7 +306,7 @@ public class PolicyConfig {
 			throw new JtaclConfigurationException(ex.getMessage());
 		}
 		for (String s: ls) {
-			PolicyFlow nflow = getFlow("flows", s);
+			FlowPolicy nflow = getFlow("flows", s);
 			if (nflow != null)
 				policies.put(nflow);
 		}
@@ -388,7 +388,7 @@ public class PolicyConfig {
 				 */
 				String[] ss = pname.split("/");
 				if (ss.length == 2) {
-					PolicyFlow flow = new PolicyFlow(pname,	"(auto) " + pname);
+					FlowPolicy flow = new FlowPolicy(pname,	"(auto) " + pname);
 					String sproto = ss[0];
 					String sport = ss[1];
 					Integer protocol = null;
@@ -438,7 +438,7 @@ public class PolicyConfig {
 			}
 			if (p instanceof NetworkPolicy) {
 				if (!(ref instanceof NetworkPolicy)
-						&& !(ref instanceof PolicyFlow)) {
+						&& !(ref instanceof FlowPolicy)) {
 					badtype = true;
 				}
 			}

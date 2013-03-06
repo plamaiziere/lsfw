@@ -19,7 +19,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
  * "flow" security policy
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PolicyFlow extends Policy {
+public class FlowPolicy extends Policy {
 
 	protected ProtocolsSpec _protocol = new ProtocolsSpec();
 	protected String _port;
@@ -27,7 +27,7 @@ public class PolicyFlow extends Policy {
 	protected String _flags;
 	protected boolean _connected;
 
-	public PolicyFlow(String name, String comment) {
+	public FlowPolicy(String name, String comment) {
 		super(name, comment);
 		_protocol.add(0, null);
 	}
@@ -74,7 +74,7 @@ public class PolicyFlow extends Policy {
 
 	@Override
 	public String toString() {
-		return "Flow{" + "_name=" + _name + ", _comment=" + _comment
+		return "FlowPolicy{" + "_name=" + _name + ", _comment=" + _comment
 			+ ", _from=" + _from + ", _to=" + _to
 			+ ", _protocol=" + _protocol.get(0) + ", _port=" + _port
 			+ ", _sourcePort=" + _sourcePort + ", _flags=" + _flags
