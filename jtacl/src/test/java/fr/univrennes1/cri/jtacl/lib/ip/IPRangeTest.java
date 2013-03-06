@@ -185,4 +185,45 @@ public class IPRangeTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Test of nearestNework()
+	 */
+	public void testNearestNetwork() throws UnknownHostException, IOException  {
+		System.out.println("nearestNetwork");
+
+		IPNet ip1;
+		IPNet ip2;
+		IPRange range;
+		IPNet net;
+
+		ip1 = new IPNet("127.0.0.1");
+		ip2 = new IPNet("127.0.0.1");
+		range = new IPRange(ip1, ip2);
+
+		net = range.nearestNetwork();
+		assertEquals("127.0.0.1/32", net.toString("::"));
+
+		ip1 = new IPNet("127.0.0.1");
+		ip2 = new IPNet("127.0.0.252");
+		range = new IPRange(ip1, ip2);
+
+		net = range.nearestNetwork();
+		assertEquals("127.0.0.1/24", net.toString("::"));
+
+
+		ip1 = new IPNet("::1");
+		ip2 = new IPNet("::1");
+		range = new IPRange(ip1, ip2);
+
+		net = range.nearestNetwork();
+		assertEquals("::1/128", net.toString("::"));
+
+		ip1 = new IPNet("::1");
+		ip2 = new IPNet("::ff");
+		range = new IPRange(ip1, ip2);
+
+		net = range.nearestNetwork();
+		assertEquals("::1/120", net.toString("::"));
+
+	}
 }

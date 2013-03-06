@@ -166,4 +166,22 @@ public class IPRange implements IPRangeable {
 		return _ipFirst.getIP().compareTo(_ipLast.getIP()) == 0;
 	}
 
+	@Override
+	public IPNet nearestNetwork() {
+		int len = IP.maxPrefixLen(_ipFirst.getIpVersion());
+
+		for (int l = len; l > 0; l--) {
+			IPNet ip = null;
+			try {
+				ip = new IPNet(_ipFirst.getIP(), _ipFirst.getIpVersion(), l);
+			} catch (UnknownHostException ex) {
+				// should not happen
+			}
+			if (ip.contains(_ipFirst) && ip.contains(_ipLast))
+				return ip;
+		}
+		// not reached
+		return null;
+	}
+
 }
