@@ -1873,12 +1873,13 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * check tcp flags
 		 */
-		ProbeTcpFlags pflags = request.getTcpFlags();
-		if (pflags != null) {
-			if (!tcpFlagsFilter(pflags))
-				return MatchResult.NOT;
+		if (acl.getAction().equals("permit")) {
+			ProbeTcpFlags pflags = request.getTcpFlags();
+			if (pflags != null) {
+				if (!tcpFlagsFilter(pflags))
+					return MatchResult.NOT;
+			}
 		}
-
 		if (mIpSource == MatchResult.MATCH ||
 				mIpDest == MatchResult.MATCH ||
 				mSourcePort == MatchResult.MATCH ||
