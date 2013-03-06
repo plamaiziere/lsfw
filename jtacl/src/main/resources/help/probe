@@ -21,6 +21,10 @@ ProbeOptions
  match                 : display matching access lists. This is the default.
  on equipment-spec     : specification of the equipment to start the probing.
  quick-deny | qd       : stop the probing if the probe is certainly denied.
+ state                 : this probe is a reply of a connection, as if stateful
+                            equipments already have a connection state for this
+                            probe. The probe is only routed on stateful
+                            equipments.
  verbose               : verbose reports.
 
 on equipment-spec
