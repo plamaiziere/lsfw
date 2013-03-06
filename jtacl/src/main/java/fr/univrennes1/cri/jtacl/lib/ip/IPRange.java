@@ -136,7 +136,7 @@ public class IPRange implements IPRangeable {
 		size = size.subtract(_ipFirst.getIP());
 
 		BigInteger ip = _ipFirst.getIP();
-		int len = _ipFirst.isIPv4() ? 31:127;
+		int len = IP.maxPrefixLen(_ipFirst.getIpVersion()) - 1;
 		int prefixLen = len - IP.highest1Bits(size);
 		IPBase ipbase = new IPBase(ip, prefixLen, _ipFirst.getIpVersion());
 
