@@ -1042,6 +1042,11 @@ public final class IPNet implements Comparable, IPRangeable {
 	}
 
 	@Override
+	public IPNet nearestNetwork() {
+		return this;
+	}
+
+	@Override
 	public final int compareTo(Object o) {
 		IPNet obj = (IPNet) o;
 		if (equals(obj))
