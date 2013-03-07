@@ -13,8 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
 /**
  * Describes a network object group.
@@ -33,12 +33,12 @@ public class NetworkObjectGroup extends ObjectGroup {
 	}
 
 	/**
-	 * Checks if at least one item of this group matches the IP address
+	 * Checks if at least one item of this group matches the IP range addresses
 	 * in argument.
-	 * @param ip IP address to check.
+	 * @param ip IP range addresses to check.
 	 * @return a {@link MatchResult} according to the test.
 	 */
-	public MatchResult matches(IPNet ip) {
+	public MatchResult matches(IPRangeable ip) {
 		for (ObjectGroupItem item: this) {
 			NetworkObjectGroupItem nitem = (NetworkObjectGroupItem) item;
 			if (nitem.isGroup())

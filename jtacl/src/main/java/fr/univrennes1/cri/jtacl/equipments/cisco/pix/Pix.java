@@ -36,6 +36,7 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
@@ -1568,14 +1569,17 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * Check if the destination of the probe is on this equipment.
 		 */
-		IfaceLink ilink = getIfaceLink(probe.getDestinationAddress());
-		if (ilink != null) {
-			/*
-			 * Set the probe's final position and notify the monitor
-			 */
-			probe.setOutgoingLink(ilink, probe.getDestinationAddress());
-			probe.destinationReached("destination reached");
-			return;
+		IPNet ipdest = probe.getDestinationAddress().toIPNet();
+		if (ipdest != null) {
+			IfaceLink ilink = getIfaceLink(ipdest);
+			if (ilink != null) {
+				/*
+				 * Set the probe's final position and notify the monitor
+				 */
+				probe.setOutgoingLink(ilink, ipdest);
+				probe.destinationReached("destination reached");
+				return;
+			}
 		}
 
 		/*
@@ -1672,7 +1676,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 * check ip source
 		 */
 		IPNet aclIpSource = acl.getSourceIp();
-		IPNet probeIpSource = probe.getSourceAddress();
+		IPRangeable probeIpSource = probe.getSourceAddress();
 
 		NetworkObjectGroup aclSourceNetwork = acl.getSourceNetworkGroup();
 
@@ -1697,7 +1701,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 * check ip destination
 		 */
 		IPNet aclIpDest = acl.getDestIp();
-		IPNet probeIpDest = probe.getDestinationAddress();
+		IPRangeable probeIpDest = probe.getDestinationAddress();
 
 		NetworkObjectGroup aclDestNetwork = acl.getDestNetworkGroup();
 		MatchResult mIpDest = MatchResult.ALL;
