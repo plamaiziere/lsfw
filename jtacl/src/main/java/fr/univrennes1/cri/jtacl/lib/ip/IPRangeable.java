@@ -119,4 +119,12 @@ public interface IPRangeable {
 	 */
 	public boolean isIPv6();
 
+	/**
+	 * Compares the {@link IPversion} IP version of this instance to another
+	 * range.
+	 * @param range the range object to compare.
+	 * @return true if the {@link IPversion} IP versions are equal.
+	 */
+	public boolean sameIPVersion(IPRangeable range);
+
 }

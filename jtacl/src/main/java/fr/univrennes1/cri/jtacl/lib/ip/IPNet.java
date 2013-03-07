@@ -773,14 +773,9 @@ public final class IPNet implements Comparable, IPRangeable {
 		return _ip.hashCode();
 	}
 
-	/**
-	 * Compares the {@link IPversion} IP version of this instance to another
-	 * {@link IPNet} object.
-	 * @param ipnet the {@link IPNet} object to compare.
-	 * @return true if the {@link IPversion} IP versions are equal.
-	 */
-	public final boolean sameIPVersion(IPNet ipnet) {
-		return getIpVersion().equals(ipnet.getIpVersion());
+	@Override
+	public final boolean sameIPVersion(IPRangeable range) {
+		return getIpVersion().equals(range.getIpVersion());
 	}
 
 	@Override

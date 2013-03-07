@@ -222,4 +222,9 @@ public class IPRange implements IPRangeable {
 	public final boolean isIPv6() {
 		return _ipFirst.isIPv6();
 	}
+
+	@Override
+	public final boolean sameIPVersion(IPRangeable range) {
+		return getIpVersion().equals(range.getIpVersion());
+	}
 }
