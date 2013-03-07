@@ -407,8 +407,9 @@ public final class IPNet implements Comparable, IPRangeable {
 			throw new UnknownHostException(
 					"Last address must be greater than first: " + data);
 
-		IPNet iFirst = new IPNet(first);
-		IPNet iLast = new IPNet(last);
+		int prefixlen = IP.maxPrefixLen(first.getIpVersion());
+		IPNet iFirst = new IPNet(first.getIP(), first.getIpVersion(), prefixlen);
+		IPNet iLast = new IPNet(last.getIP(), last.getIpVersion(), prefixlen);
 		IPRange range = new IPRange(iFirst, iLast);
 		return new IPBase(range.toIPNet());
 	}
