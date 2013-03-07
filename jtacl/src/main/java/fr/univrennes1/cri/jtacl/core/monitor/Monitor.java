@@ -567,7 +567,7 @@ public class Monitor {
 		 * its destination
 		 */
 		if (nextHop.equals(nlink.getNetwork())) {
-			hostLink = nlink.getIfaceLink(probe.getDestinationAddress());
+			hostLink = nlink.getIfaceLink(probe.getDestinationAddress().nearestNetwork());
 			if (hostLink == null) {
 				probe.destinationReached("destination reached");
 				return;
