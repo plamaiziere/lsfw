@@ -31,6 +31,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import java.io.FileInputStream;
@@ -717,12 +718,12 @@ public class Monitor {
 	/**
 	 * Queues a new probing.
 	 * @param link link to use.
-	 * @param sourceAddress source IP address of the probing.
-	 * @param destinationAddress destination of the probing.
+	 * @param sourceAddress source IP range addresses of the probing.
+	 * @param destinationAddress destination IP range addresses of the probing.
 	 * @param request the request of the probing.
 	 */
-	public void newProbing(IfaceLink link, IPNet sourceAddress,
-			IPNet destinationAddress, ProbeRequest request) {
+	public void newProbing(IfaceLink link, IPRangeable sourceAddress,
+			IPRangeable destinationAddress, ProbeRequest request) {
 
 		ProbesTracker tracker = new ProbesTracker();
 		Probe probe = new Probe(tracker, sourceAddress, destinationAddress, request);
