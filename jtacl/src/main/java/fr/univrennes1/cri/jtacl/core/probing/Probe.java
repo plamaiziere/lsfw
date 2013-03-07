@@ -132,7 +132,7 @@ public class Probe {
 
 	/**
 	 * Creates a new {@link Probe} root probe. The TimeToLive is set to its default
-	 * value (32).
+	 * value (64).
 	 * @param probesTracker {@link ProbesTracker} tracker associated with this probe
 	 * and its children.
 	 * @param sourceAddress the {@link IPRangeable} source IP range addresses
