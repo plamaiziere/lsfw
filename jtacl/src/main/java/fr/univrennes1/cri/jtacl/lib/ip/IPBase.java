@@ -21,15 +21,21 @@ import java.math.BigInteger;
  */
 
 public final class IPBase {
-	
+
 	private final BigInteger _ip;
 	private final int _prefixlen;
 	private final IPversion _ipVersion;
-	
+
 	public IPBase(BigInteger ip, int prefixlen, IPversion ipVersion) {
 		_ip = ip;
 		_prefixlen = prefixlen;
 		_ipVersion = ipVersion;
+	}
+
+	public IPBase(IPNet ip) {
+		_ip = ip.getIP();
+		_prefixlen = ip.getPrefixLen();
+		_ipVersion = ip.getIpVersion();
 	}
 
 	public BigInteger getIP() {
