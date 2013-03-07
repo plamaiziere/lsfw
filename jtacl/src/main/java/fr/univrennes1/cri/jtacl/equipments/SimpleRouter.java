@@ -194,20 +194,22 @@ public class SimpleRouter extends GenericEquipment {
 		 * Check if the destination of the probe is on this equipment or if
 		 * this link is a border.
 		 */
-		IfaceLink ilink = getIfaceLink(probe.getDestinationAddress());
-		SimpleRouterLink srlink = _srlinks.get(link);
-		if (srlink.isBorder() && ilink == null)
-			ilink = srlink.getLink();
+		IPNet ipdest = probe.getDestinationAddress().toIPNet();
+		if (ipdest != null) {
+			IfaceLink ilink = getIfaceLink(ipdest);
+			SimpleRouterLink srlink = _srlinks.get(link);
+			if (srlink.isBorder() && ilink == null)
+				ilink = srlink.getLink();
 
-		if (ilink != null) {
-			/*
-			 * Set the probe's final position and notify the monitor
-			 */
-			probe.setOutgoingLink(ilink, probe.getDestinationAddress());
-			probe.destinationReached("destination reached");
-			return;
+			if (ilink != null) {
+				/*
+				 * Set the probe's final position and notify the monitor
+				 */
+				probe.setOutgoingLink(ilink, ipdest);
+				probe.destinationReached("destination reached");
+				return;
+			}
 		}
-
 		/*
 		 * Route the probe.
 		 */
