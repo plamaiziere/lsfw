@@ -334,10 +334,10 @@ public class ShellParser extends CommonRules<Object> {
 				WhiteSpaces(),
 				Optional(ProbeOptions()),
 				SourceSpecification(),
-				_probeCmdTemplate.setSrcAddress(match()),
+				_probeCmdTemplate.setSrcAddress(getLastQuotedString()),
 				WhiteSpaces(),
 				DestinationSpecification(),
-				_probeCmdTemplate.setDestAddress(match()),
+				_probeCmdTemplate.setDestAddress(getLastQuotedString()),
 				Optional(
 					Sequence(
 						WhiteSpaces(),
@@ -493,11 +493,11 @@ public class ShellParser extends CommonRules<Object> {
 	}
 
 	public Rule SourceSpecification() {
-		return StringAtom();
+		return StringOrQuotedString();
 	}
 
 	public Rule DestinationSpecification() {
-		return StringAtom();
+		return StringOrQuotedString();
 	}
 
 	/*

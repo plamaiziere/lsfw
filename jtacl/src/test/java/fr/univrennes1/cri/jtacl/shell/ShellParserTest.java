@@ -408,6 +408,18 @@ public class ShellParserTest extends TestCase {
 		assertTrue(parser.getProbeCmdTemplate().getProbeOptMatching());
 		assertTrue(parser.getProbeCmdTemplate().getProbeOptLearn());
 		assertTrue(parser.getProbeCmdTemplate().getProbeOptState());
+
+		line = "p  \"SOURCE\"     \"DEST\"";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getString("Command"));
+		assertEquals("SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
+		assertEquals("DEST", parser.getProbeCmdTemplate().getDestAddress());
+
+		line = "p  \"SOURCE - SOURCE\"     \"DEST - DEST\"";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("probe", parser.getString("Command"));
+		assertEquals("SOURCE - SOURCE", parser.getProbeCmdTemplate().getSrcAddress());
+		assertEquals("DEST - DEST", parser.getProbeCmdTemplate().getDestAddress());
 	}
 
 	public void testReload() {
