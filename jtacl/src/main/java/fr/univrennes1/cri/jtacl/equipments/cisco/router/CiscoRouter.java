@@ -36,6 +36,7 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
@@ -1002,14 +1003,17 @@ public class CiscoRouter extends GenericEquipment {
 		/*
 		 * Check if the destination of the probe is on this equipment.
 		 */
-		IfaceLink ilink = getIfaceLink(probe.getDestinationAddress());
-		if (ilink != null) {
-			/*
-			 * Set the probe's final position and notify the monitor
-			 */
-			probe.setOutgoingLink(ilink, probe.getDestinationAddress());
-			probe.destinationReached("destination reached");
-			return;
+		IPNet ipdest = probe.getDestinationAddress().toIPNet();
+		if (ipdest != null) {
+			IfaceLink ilink = getIfaceLink(ipdest);
+			if (ilink != null) {
+				/*
+				 * Set the probe's final position and notify the monitor
+				 */
+				probe.setOutgoingLink(ilink, ipdest);
+				probe.destinationReached("destination reached");
+				return;
+			}
 		}
 
 		/*
@@ -1072,7 +1076,7 @@ public class CiscoRouter extends GenericEquipment {
 		}
 	}
 
-	protected MatchResult compareIpIpNetmask(IPNet ip, IPNet aceIp,
+	protected MatchResult compareIpIpNetmask(IPRangeable ip, IPNet aceIp,
 			IPNet aceNetmask) {
 
 		/*
@@ -1095,7 +1099,7 @@ public class CiscoRouter extends GenericEquipment {
 		 * compare IP
 		 */
 		if (ip.isHost()) {
-			BigInteger res = ip.getIP().and(aceNetmask.getIP());
+			BigInteger res = ip.toIPNet().getIP().and(aceNetmask.getIP());
 			int comp = res.compareTo(aceIp.getIP());
 			if (comp == 0)
 				return MatchResult.ALL;
@@ -1153,7 +1157,7 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	IPNet aceIpSource = ace.getSourceIp();
 	IPNet aceSourceNetmask = ace.getSourceNetmask();
-	IPNet probeIpSource = probe.getSourceAddress();
+	IPRangeable probeIpSource = probe.getSourceAddress();
 
 	MatchResult mIpSource = MatchResult.ALL;
 	if (aceIpSource != null) {
@@ -1169,7 +1173,7 @@ public class CiscoRouter extends GenericEquipment {
 	 */
 	IPNet aceIpDest = ace.getDestIp();
 	IPNet aceDestNetmask = ace.getDestNetmask();
-	IPNet probeIpDest = probe.getDestinationAddress();
+	IPRangeable probeIpDest = probe.getDestinationAddress();
 	MatchResult mIpDest = MatchResult.ALL;
 
 	if (aceIpDest != null) {
