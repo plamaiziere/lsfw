@@ -191,4 +191,9 @@ public class IPRange implements IPRangeable {
 		return null;
 	}
 
+	@Override
+	public IPversion getIpVersion() {
+		return _ipFirst.getIpVersion();
+	}
+
 }

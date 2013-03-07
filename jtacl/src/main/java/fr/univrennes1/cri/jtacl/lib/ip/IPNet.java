@@ -950,10 +950,8 @@ public final class IPNet implements Comparable, IPRangeable {
 		return _ip.isIPv6();
 	}
 
-	/**
-	 * Returns the {@link IPversion} IP version of this {@link IPNet} instance.
-	 * @return the {@link IPversion} IP version of this {@link IPNet} instance.
-	 */
+
+	@Override
 	public final IPversion getIpVersion() {
 		return _ip.getIpVersion();
 	}

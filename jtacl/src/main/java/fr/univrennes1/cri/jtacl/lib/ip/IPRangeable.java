@@ -96,4 +96,11 @@ public interface IPRangeable {
 	 * @return the nearest network including this range.
 	 */
 	public IPNet nearestNetwork();
+
+	/**
+	 * Returns the IP version of this range.
+	 * @return the IP version of this range.
+	 */
+	public IPversion getIpVersion();
+
 }
