@@ -2199,16 +2199,18 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * Check if the destination of the probe is on this equipment.
 		 */
-		IfaceLink ilink = getIfaceLink(probe.getDestinationAddress());
-		if (ilink != null) {
-			/*
-			 * Set the probe's final position and notify the monitor
-			 */
-			probe.setOutgoingLink(ilink, probe.getDestinationAddress());
-			probe.destinationReached("destination reached");
-			return;
+		IPNet ipdest = probe.getDestinationAddress().toIPNet();
+		if (ipdest != null) {
+			IfaceLink ilink = getIfaceLink(ipdest);
+			if (ilink != null) {
+				/*
+				 * Set the probe's final position and notify the monitor
+				 */
+				probe.setOutgoingLink(ilink, ipdest);
+				probe.destinationReached("destination reached");
+				return;
+			}
 		}
-
 		/*
 		 * Route the probe.
 		 */
@@ -2277,7 +2279,7 @@ public class PacketFilter extends GenericEquipment {
 	/**
 	 * family filter
  	 */
-	protected boolean familyFilter(IPNet ipAddress, AddressFamily af) {
+	protected boolean familyFilter(IPRangeable ipAddress, AddressFamily af) {
 		return af == AddressFamily.NONE ||
 				(af == AddressFamily.INET && ipAddress.isIPv4()) ||
 				(af == AddressFamily.INET6 && ipAddress.isIPv6());
@@ -2287,7 +2289,7 @@ public class PacketFilter extends GenericEquipment {
 	 * host filter
 	 */
 	protected MatchResult hostFilter(FilterContext context, PfNodeHost host,
-			IPNet ipAddress, AddressFamily af)
+			IPRangeable ipAddress, AddressFamily af)
 		 {
 
 		/*
@@ -2401,28 +2403,19 @@ public class PacketFilter extends GenericEquipment {
 
 			IPNet ipfirst = host.getAddr().get(0);
 			IPNet ipLast = host.getRangeAddr().get(0);
+			IPRange iprange = new IPRange(ipfirst, ipLast);
 
-			if (!ipfirst.sameIPVersion(ipAddress))
+			if (!iprange.sameIPVersion(ipAddress))
 				return MatchResult.NOT;
 
 			int mAll = 0;
 			int mMatch = 0;
 
-			if (ipAddress.isHost()) {
-				if (ipAddress.isBetweenIP(ipfirst, ipLast))
-					mAll++;
+			if (iprange.contains(ipAddress)) {
+				mAll++;
 			} else {
-				IPNet ipAddressFirst = ipAddress.networkAddress();
-				IPNet ipAddressLast = ipAddress.lastNetworkAddress();
-				if (ipAddressFirst.isBetweenIP(ipfirst, ipLast)) {
-					if (ipAddressLast.isBetweenIP(ipfirst, ipLast))
-						mAll++;
-					else
-						mMatch++;
-				} else {
-					if (ipAddressLast.isBetweenIP(ipfirst, ipLast))
-						mMatch++;
-				}
+				if (iprange.overlaps(ipAddress))
+					mMatch++;
 			}
 
 			MatchResult res = MatchResult.NOT;
@@ -2452,7 +2445,7 @@ public class PacketFilter extends GenericEquipment {
 	 * ippsec filter
 	 */
 	protected MatchResult ipspecFilter(FilterContext context, PfIpSpec ipspec,
-			IPNet ipAddress, AddressFamily af) {
+			IPRangeable ipAddress, AddressFamily af) {
 
 		if (ipspec.isEmpty())
 			return MatchResult.ALL;
@@ -2690,7 +2683,7 @@ public class PacketFilter extends GenericEquipment {
 				request.getProbeOptions().hasNoAction())
 			return mResult;
 
-		Route<IfaceLink> route = new Route(probe.getDestinationAddress(),
+		Route<IfaceLink> route = new Route(probe.getDestinationAddress().nearestNetwork(),
 				routeOpts.getNextHop(), 0, routeOpts.getLink());
 		_routeToEngine = new RoutingEngine();
 		_routeToEngine.addRoute(route);
