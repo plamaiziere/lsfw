@@ -749,8 +749,8 @@ https		443/udp
 snpp		444/tcp	   #Simple Network Paging Protocol
 snpp		444/udp	   #Simple Network Paging Protocol
 #			   [RFC1568]
-microsoft-ds	445/tcp
-microsoft-ds	445/udp
+microsoft-ds	445/tcp	cifs
+microsoft-ds	445/udp	cifs
 ddm-rdb		446/tcp
 ddm-rdb		446/udp
 ddm-dfm		447/tcp
