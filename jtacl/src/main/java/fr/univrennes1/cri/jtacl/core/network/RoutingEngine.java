@@ -16,6 +16,7 @@ package fr.univrennes1.cri.jtacl.core.network;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRoutingException;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import java.io.CharArrayWriter;
 import java.io.PrintWriter;
@@ -204,29 +205,31 @@ public class RoutingEngine implements ShowableRoutes {
 	}
 
 	/**
-	 * Returns the routes that match this destination.
-	 * @param destination the {@link IPNet} IP address of the destination.
+	 * Returns the routes that match the nearest network including this
+	 * destination range.
+	 * @param destination the {@link IPRangeable} IP range of the destination.
 	 * @return a {@link Routes} list containing the routes. The list could be
 	 * empty but not null.
 	 * @throws JtaclRoutingException if problem occurs.
 	 */
-	public Routes getRoutes(IPNet destination) {
+	public Routes getRoutes(IPRangeable destination) {
 
 		RoutingTable table = routingTable(destination.getIpVersion());
-		return getRoutes(destination, table);
+		return getRoutes(destination.nearestNetwork(), table);
 	}
 
 	/**
-	 * Returns the source routes that match this source address.
-	 * @param source the {@link IPNet} IP address of the source.
+	 * Returns the source routes that match the nearest network including this
+	 * source range.
+	 * @param source the {@link IPRangeable} IP range of the source.
 	 * @return a {@link Routes} list containing the routes. The list could be
 	 * empty but not null.
 	 * @throws JtaclRoutingException if problem occurs.
 	 */
-	public Routes getSourceRoutes(IPNet source) {
+	public Routes getSourceRoutes(IPRangeable source) {
 
 		RoutingTable table = sourceRoutingTable(source.getIpVersion());
-		return getRoutes(source, table);
+		return getRoutes(source.nearestNetwork(), table);
 	}
 
 	/**
