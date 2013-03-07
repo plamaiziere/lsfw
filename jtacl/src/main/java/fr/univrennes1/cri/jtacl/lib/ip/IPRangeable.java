@@ -103,4 +103,16 @@ public interface IPRangeable {
 	 */
 	public IPversion getIpVersion();
 
+	/**
+	 * Checks if the {@link IPversion} IP version of this range is IPv4.
+	 * @return true if this range is an IPv6 range.
+	 */
+	public boolean isIPv4();
+
+	/**
+	 * Checks if the {@link IPversion} IP version of this range is IPv6.
+	 * @return true if this range is an IPv6 range.
+	 */
+	public boolean isIPv6();
+
 }

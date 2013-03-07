@@ -924,10 +924,7 @@ public final class IPNet implements Comparable, IPRangeable {
 		_collector.start();
 	}
 
-	/**
-	 * Checks if the {@link IPversion} IP version of this {@link IPNet} instance is IPv4.
-	 * @return true if this {@link IPNet} instance is an IPv4 address.
-	 */
+	@Override
 	public final boolean isIPv4() {
 		return _ip.isIPv4();
 	}
@@ -942,10 +939,7 @@ public final class IPNet implements Comparable, IPRangeable {
 			equals(NULL_IPV4) : equals(NULL_IPV6);
 	}
 
-	/**
-	 * Checks if the {@link IPversion} IP version of this {@link IPNet} instance is IPv6.
-	 * @return true if this {@link IPNet} instance is an IPv6 address.
-	 */
+	@Override
 	public final boolean isIPv6() {
 		return _ip.isIPv6();
 	}

@@ -196,4 +196,13 @@ public class IPRange implements IPRangeable {
 		return _ipFirst.getIpVersion();
 	}
 
+	@Override
+	public final boolean isIPv4() {
+		return _ipFirst.isIPv4();
+	}
+
+	@Override
+	public final boolean isIPv6() {
+		return _ipFirst.isIPv6();
+	}
 }
