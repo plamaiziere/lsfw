@@ -407,24 +407,10 @@ public final class IPNet implements Comparable, IPRangeable {
 			throw new UnknownHostException(
 					"Last address must be greater than first: " + data);
 
-		// size = last - first
-		BigInteger size = last.getIP();
-		size = size.subtract(first.getIP());
-
-		BigInteger ip = first.getIP();
-		int len = IP.maxPrefixLen(first.getIpVersion()) - 1;
-		int prefixLen = len - IP.highest1Bits(size);
-		IPBase ipbase = new IPBase(ip, prefixLen, first.getIpVersion());
-		/*
-		 *  make sure the broadcast is the same as the last ip
-		 * otherwise it will return /16 for something like:
-		 * 192.168.0.0-192.168.191.255
-		 */
-		IPNet checkboundary = new IPNet(ipbase).lastNetworkAddress();
-		if (!checkboundary.getIP().equals(last.getIP()))
-			throw new UnknownHostException(
-					"Range is not on a network boundary: " + data);
-		return ipbase;
+		IPNet iFirst = new IPNet(first);
+		IPNet iLast = new IPNet(last);
+		IPRange range = new IPRange(iFirst, iLast);
+		return new IPBase(range.toIPNet());
 	}
 
 	protected static int getPrefixFromNetmask(String smask, IPversion ipVersion)
