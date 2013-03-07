@@ -136,8 +136,7 @@ public class NetworkEquipment {
 		/*
 		 * each iface
 		 */
-		for (String name: _ifaces.keySet()) {
-			Iface iface = _ifaces.get(name);
+		for (Iface iface: _ifaces.values()) {
 			IfaceLinksByIp ifacelinks = iface.getLinks();
 			/*
 			 * each link in the iface
@@ -157,8 +156,7 @@ public class NetworkEquipment {
 	 * does not contain any link with this IP address.
 	 */
 	public IfaceLink getIfaceLink(IPNet ip) {
-		for (String name: _ifaces.keySet()) {
-			Iface iface = _ifaces.get(name);
+		for (Iface iface: _ifaces.values()) {
 			IfaceLink link = iface.getLink(ip);
 			if (link != null)
 				return link;
@@ -175,8 +173,7 @@ public class NetworkEquipment {
 	 * to this IP address.
 	 */
 	public Iface getIfaceConnectedTo(IPNet ip) {
-		for (String name: _ifaces.keySet()) {
-			Iface iface = _ifaces.get(name);
+		for (Iface iface: _ifaces.values()) {
 			if (iface.getLinkConnectedTo(ip) != null)
 				return iface;
 		}
