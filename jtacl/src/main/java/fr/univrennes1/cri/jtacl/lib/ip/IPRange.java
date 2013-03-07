@@ -25,6 +25,8 @@ public class IPRange implements IPRangeable {
 	protected IPNet _ipFirst;
 	protected IPNet _ipLast;
 	protected IPNet _nearestNetwork;
+	protected Boolean _isNetwork;
+	protected IPNet _toIpNet;
 
 	/**
 	 * Constructs a new range using the two IP network addresses in argument
@@ -120,17 +122,21 @@ public class IPRange implements IPRangeable {
 	public String toNetString(String format) {
 		IPNet ip;
 		String r;
-		try {
+		if (isNetwork()) {
 			ip = toIPNet();
 			r = ip.toString("i::");
-		} catch (UnknownHostException ex) {
+		} else {
 			r = toString("i::");
 		}
 		return r;
 	}
 
 	@Override
-	public IPNet toIPNet() throws UnknownHostException {
+	public IPNet toIPNet() {
+
+		if (_isNetwork != null) {
+			return _toIpNet;
+		}
 
 		// size = last - first
 		BigInteger size = _ipLast.getIP();
@@ -147,24 +153,35 @@ public class IPRange implements IPRangeable {
 		 * 192.168.0.1-192.168.1.255
 		 */
 		IPNet checkboundary = new IPNet(ipbase).networkAddress();
-		if (!checkboundary.getIP().equals(_ipFirst.getIP()))
-			throw new UnknownHostException(
-					"Range is not on a network boundary");
+		if (!checkboundary.getIP().equals(_ipFirst.getIP())) {
+			_isNetwork = false;
+			return null;
+		}
 		/*
 		 *  make sure the broadcast is the same as the last ip
 		 * otherwise it will return /16 for something like:
 		 * 192.168.0.0-192.168.191.255
 		 */
 		checkboundary = new IPNet(ipbase).lastNetworkAddress();
-		if (!checkboundary.getIP().equals(_ipLast.getIP()))
-			throw new UnknownHostException(
-					"Range is not on a network boundary");
-		return new IPNet(ipbase);
+		if (!checkboundary.getIP().equals(_ipLast.getIP())) {
+			_isNetwork = false;
+			return null;
+		}
+		_isNetwork = true;
+		_toIpNet = new IPNet(ipbase);
+		return _toIpNet;
 	}
 
 	@Override
-	public boolean isHost() {
+	public final boolean isHost() {
 		return _ipFirst.getIP().compareTo(_ipLast.getIP()) == 0;
+	}
+
+	@Override
+	public final boolean isNetwork() {
+		if (_isNetwork == null)
+			return toIPNet() != null;
+		return _isNetwork;
 	}
 
 	@Override

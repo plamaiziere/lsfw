@@ -411,6 +411,9 @@ public final class IPNet implements Comparable, IPRangeable {
 		IPNet iFirst = new IPNet(first.getIP(), first.getIpVersion(), prefixlen);
 		IPNet iLast = new IPNet(last.getIP(), last.getIpVersion(), prefixlen);
 		IPRange range = new IPRange(iFirst, iLast);
+		if (!range.isNetwork())
+			throw new UnknownHostException("Range is not on a network boundary");
+
 		return new IPBase(range.toIPNet());
 	}
 
@@ -816,7 +819,7 @@ public final class IPNet implements Comparable, IPRangeable {
 	}
 
 	@Override
-	public IPNet toIPNet() throws UnknownHostException {
+	public IPNet toIPNet() {
 		return this;
 	}
 
@@ -899,6 +902,14 @@ public final class IPNet implements Comparable, IPRangeable {
 	@Override
 	public final boolean isHost() {
 		return _ip.getPrefixlen() == IP.maxPrefixLen(_ip.getIpVersion());
+	}
+
+	@Override
+	public final boolean isNetwork() {
+		/*
+		 * true by design
+		 */
+		return true;
 	}
 
 	/**

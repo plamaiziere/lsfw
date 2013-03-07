@@ -13,8 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
-import java.net.UnknownHostException;
-
 /**
  * interface for IP range. A range of ip addresses
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -53,11 +51,11 @@ public interface IPRangeable {
 	boolean overlaps(IPRangeable iprange);
 
 	/**
-	 * Returns an IPNet representation of this range.
+	 * Returns an IPNet representation of this range or null if the range
+	 * is not on a network boundary.
 	 * @return an IPNet representation of this range.
-	 * @throws UnknownHostException if the range is not on a network boundary
 	 */
-	IPNet toIPNet() throws UnknownHostException;
+	IPNet toIPNet();
 
 	/**
 	 * Returns a {@link String} representation of this range
@@ -79,6 +77,12 @@ public interface IPRangeable {
 	 * @return true if this instance is a single host IP address.
 	 */
 	public boolean isHost();
+
+	/**
+	 * Tests if this instance can be expressed as a network.
+	 * @return if this instance can be expressed as a network.
+	 */
+	public boolean isNetwork();
 
 	/**
 	 * Returns a String representation of this range according
