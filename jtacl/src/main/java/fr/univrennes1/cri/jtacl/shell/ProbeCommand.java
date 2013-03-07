@@ -29,6 +29,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
@@ -47,8 +48,8 @@ public class ProbeCommand {
 	protected ProbeRequest _request;
 	protected IfaceLink _ilink;
 	protected Probing _probing;
-	protected IPNet _sourceAddress;
-	protected IPNet _destinationAddress;
+	protected IPRangeable _sourceAddress;
+	protected IPRangeable _destinationAddress;
 
 	public void buildRequest(ProbeCommandTemplate probeCmd) {
 
@@ -321,11 +322,11 @@ public class ProbeCommand {
 		return _probing;
 	}
 
-	public IPNet getSourceAddress() {
+	public IPRangeable getSourceAddress() {
 		return _sourceAddress;
 	}
 
-	public IPNet getDestinationAddress() {
+	public IPRangeable getDestinationAddress() {
 		return _destinationAddress;
 	}
 
