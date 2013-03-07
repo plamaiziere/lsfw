@@ -17,6 +17,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.util.logging.Level;
 
 /**
@@ -43,12 +44,12 @@ public class Probe {
 	/**
 	 * the source IP address
 	 */
-	protected IPNet _sourceAddress;
+	protected IPRangeable _sourceAddress;
 
 	/**
 	 * the destination IP address
 	 */
-	protected IPNet _destinationAddress;
+	protected IPRangeable _destinationAddress;
 
 	/**
 	 * The probe's request
@@ -185,35 +186,35 @@ public class Probe {
 	}
 
     /**
-     * Returns the {@link IPNet} source address of this {@link Probe} probe.
+     * Returns the {@link IPRangeable} source address of this {@link Probe} probe.
      * @return the source address.
      */
-    public IPNet getSourceAddress() {
+    public IPRangeable getSourceAddress() {
 		return _sourceAddress;
 	}
 
     /**
-     * Sets the {@link IPNet} source address of this {@link Probe} probe.
-	 * @param address the {@link IPNet} source address.
+     * Sets the {@link IPRangeablet} source address of this {@link Probe} probe.
+	 * @param address the source address.
 	 */
-    public void setSourceAddress(IPNet address) {
+    public void setSourceAddress(IPRangeable address) {
 		_sourceAddress = address;
 	}
 
     /**
-     * Returns the {@link IPNet} destination address of this {@link Probe}
+     * Returns the {@link IPRangeable} destination address of this {@link Probe}
 	 * probe.
      * @return the destination address.
      */
-    public IPNet getDestinationAddress() {
+    public IPRangeable getDestinationAddress() {
 		return _destinationAddress;
 	}
 
     /**
-     * Sets the {@link IPNet} destination address of this {@link Probe} probe.
-	 * @param address the {@link IPNet} destination address.
+     * Sets the {@link IPRangeable} destination address of this {@link Probe} probe.
+	 * @param address the destination address.
 	 */
-    public void setDestinationAddress(IPNet address) {
+    public void setDestinationAddress(IPRangeable address) {
 		_destinationAddress = address;
 	}
 
