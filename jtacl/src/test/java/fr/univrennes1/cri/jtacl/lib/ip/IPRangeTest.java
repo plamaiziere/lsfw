@@ -167,22 +167,14 @@ public class IPRangeTest extends TestCase {
 		ip1 = new IPNet("127.0.0.1");
 		ip2 = new IPNet("127.0.0.255");
 		range = new IPRange(ip1, ip2);
-		try {
-			rip = range.toIPNet();
-			assertTrue("should be unreached (not a network boundary)", false);
-		} catch (UnknownHostException ex) {
-			assertTrue("Exception raided ok", true);
-		}
+		rip = range.toIPNet();
+		assertEquals(null, rip);
 
 		ip1 = new IPNet("::1");
 		ip2 = new IPNet("::ffff");
 		range = new IPRange(ip1, ip2);
-		try {
-			rip = range.toIPNet();
-			assertTrue("should be unreached (not a network boundary)", false);
-		} catch (UnknownHostException ex) {
-			assertTrue("Exception raided ok", true);
-		}
+		rip = range.toIPNet();
+		assertEquals(null, rip);
 	}
 
 	/**
