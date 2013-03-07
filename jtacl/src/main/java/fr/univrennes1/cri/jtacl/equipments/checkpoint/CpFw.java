@@ -1150,16 +1150,18 @@ public class CpFw extends GenericEquipment {
 		/*
 		 * Check if the destination of the probe is on this equipment.
 		 */
-		IfaceLink ilink = getIfaceLink(probe.getDestinationAddress());
-		if (ilink != null) {
-			/*
-			 * Set the probe's final position and notify the monitor
-			 */
-			probe.setOutgoingLink(ilink, probe.getDestinationAddress());
-			probe.destinationReached("destination reached");
-			return;
+		IPNet ipdest = probe.getDestinationAddress().toIPNet();
+		if (ipdest != null) {
+			IfaceLink ilink = getIfaceLink(ipdest);
+			if (ilink != null) {
+				/*
+				 * Set the probe's final position and notify the monitor
+				 */
+				probe.setOutgoingLink(ilink, ipdest);
+				probe.destinationReached("destination reached");
+				return;
+			}
 		}
-
 		/*
 		 * Route the probe.
 		 */
