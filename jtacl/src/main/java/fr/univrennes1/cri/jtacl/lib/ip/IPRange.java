@@ -24,6 +24,7 @@ public class IPRange implements IPRangeable {
 
 	protected IPNet _ipFirst;
 	protected IPNet _ipLast;
+	protected IPNet _nearestNetwork;
 
 	/**
 	 * Constructs a new range using the two IP network addresses in argument
@@ -168,6 +169,10 @@ public class IPRange implements IPRangeable {
 
 	@Override
 	public IPNet nearestNetwork() {
+
+		if (_nearestNetwork != null)
+			return _nearestNetwork;
+
 		int len = IP.maxPrefixLen(_ipFirst.getIpVersion());
 
 		for (int l = len; l > 0; l--) {
@@ -177,8 +182,10 @@ public class IPRange implements IPRangeable {
 			} catch (UnknownHostException ex) {
 				// should not happen
 			}
-			if (ip.contains(_ipFirst) && ip.contains(_ipLast))
-				return ip;
+			if (ip.contains(_ipFirst) && ip.contains(_ipLast)) {
+				_nearestNetwork = ip;
+				return _nearestNetwork;
+			}
 		}
 		// not reached
 		return null;
