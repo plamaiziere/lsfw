@@ -141,8 +141,8 @@ public class Probe {
 	 * addresses of the probe.
 	 * @param request the {@link ProbeRequest} associated to this probe.
 	 */
-	public Probe(ProbesTracker probesTracker, IPNet sourceAddress,
-			IPNet destinationAddress, ProbeRequest request) {
+	public Probe(ProbesTracker probesTracker, IPRangeable sourceAddress,
+			IPRangeable destinationAddress, ProbeRequest request) {
 		initialize();
 		_parentProbe = null;
 		_probesTracker = probesTracker;
