@@ -135,8 +135,10 @@ public class Probe {
 	 * value (32).
 	 * @param probesTracker {@link ProbesTracker} tracker associated with this probe
 	 * and its children.
-	 * @param sourceAddress the {@link IPNet} source IP address of the probe.
-	 * @param destinationAddress the {@link IPNet} destination IP address of the probe.
+	 * @param sourceAddress the {@link IPRangeable} source IP range addresses
+	 * of the probe.
+	 * @param destinationAddress the {@link IPRangeable} destination IP range
+	 * addresses of the probe.
 	 * @param request the {@link ProbeRequest} associated to this probe.
 	 */
 	public Probe(ProbesTracker probesTracker, IPNet sourceAddress,
@@ -156,13 +158,15 @@ public class Probe {
 	 * Creates a new {@link Probe} root probe.
 	 * @param probesTracker a {@link ProbesTracker} tracker to be associated with
 	 * this probe and its children.
-	 * @param sourceAddress the {@link IPNet} source IP address of the probe.
-	 * @param destinationAddress the {@link IPNet} destination IP address of the probe.
+	 * @param sourceAddress the {@link IPRangeable} source IP range addresses
+	 * of the probe.
+	 * @param destinationAddress the {@link IPRangeable} destination IP range
+	 * addresses of the probe.
 	 * @param request the {@link ProbeRequest} associated to this probe.	 *
 	 * @param timeToLive the TimeToLive of the probe.
 	 */
-	public Probe(ProbesTracker probesTracker, IPNet sourceAddress,
-			IPNet destinationAddress, ProbeRequest request, int timeToLive) {
+	public Probe(ProbesTracker probesTracker, IPRangeable sourceAddress,
+			IPRangeable destinationAddress, ProbeRequest request, int timeToLive) {
 
 		initialize();
 		_parentProbe = null;
