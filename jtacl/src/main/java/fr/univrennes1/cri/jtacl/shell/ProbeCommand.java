@@ -29,6 +29,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
@@ -75,9 +76,23 @@ public class ProbeCommand {
 			equalSourceAddress = false;
 		}
 
-		IPNet sourceAddress;
+		IPRangeable sourceAddress;
+		IPNet isourceAddress = null;
+		if (equalSourceAddress) {
+			try {
+				isourceAddress = new IPNet(sSourceAddress);
+			} catch (UnknownHostException ex) {
+				try {
+					// not an IP try to resolve as a host.
+					isourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
+				} catch (UnknownHostException ex1) {
+					throw new JtaclParameterException("Error in source address: " +
+							sSourceAddress + " " +  ex1.getMessage());
+				}
+			}
+		}
 		try {
-			sourceAddress = new IPNet(sSourceAddress);
+			sourceAddress = new IPRange(sSourceAddress);
 		} catch (UnknownHostException ex) {
 			try {
 				// not an IP try to resolve as a host.
@@ -89,9 +104,9 @@ public class ProbeCommand {
 		}
 
 		String sDestAddress = probeCmd.getDestAddress();
-		IPNet destAddress;
+		IPRangeable destAddress;
 		try {
-			destAddress = new IPNet(sDestAddress);
+			destAddress = new IPRange(sDestAddress);
 		} catch (UnknownHostException ex) {
 			try {
 				// not an IP try to resolve as a host.
@@ -116,7 +131,7 @@ public class ProbeCommand {
 		 */
 		IfaceLinks ilinks;
 		if (probeCmd.getEquipments() != null) {
-			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress,
+			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress.nearestNetwork(),
 					probeCmd.getEquipments());
 			// error
 			if (ilinks == null)
@@ -128,9 +143,9 @@ public class ProbeCommand {
 			NetworkLinks nlinks;
 			Topology topology = _monitor.getTopology();
 			if (!equalSourceAddress) {
-				nlinks = topology.getNetworkLinksByIP(sourceAddress);
+				nlinks = topology.getNetworkLinksByIP(sourceAddress.nearestNetwork());
 			} else {
-				nlinks = topology.getNetworkLinksByIP(sourceAddress.hostAddress());
+				nlinks = topology.getNetworkLinksByIP(isourceAddress.hostAddress());
 			}
 			if (nlinks.isEmpty()) {
 				/*
@@ -143,7 +158,7 @@ public class ProbeCommand {
 					defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT6");
 				if (defaultEquipment != null) {
 					ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(
-							sourceAddress, defaultEquipment);
+							sourceAddress.nearestNetwork(), defaultEquipment);
 					// error
 					if (ilinks == null)
 						throw new JtaclParameterException("no links found");
