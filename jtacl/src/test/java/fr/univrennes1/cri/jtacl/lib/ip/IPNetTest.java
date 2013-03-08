@@ -720,6 +720,17 @@ public class IPNetTest extends TestCase {
 		//ip = new IPNet("::1");
 		//f = ip.isReachable(1000);
 		//assertTrue(f);
+	}
 
+	public void testGetByName() throws UnknownHostException {
+		System.out.println("testGetByName");
+
+		boolean f = false;
+		try {
+			IPNet ip = IPNet.getByName("127.0.0.1 - 127.0.0.2", IPversion.IPV4);
+		} catch (UnknownHostException ex) {
+			f = true;
+		}
+		assertTrue(f);
 	}
 }
