@@ -32,6 +32,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
+import fr.univrennes1.cri.jtacl.policies.FlowPolicy;
 import fr.univrennes1.cri.jtacl.policies.HostPolicy;
 import fr.univrennes1.cri.jtacl.policies.NetworkPolicy;
 import fr.univrennes1.cri.jtacl.policies.Policies;
@@ -39,7 +40,6 @@ import fr.univrennes1.cri.jtacl.policies.PoliciesMap;
 import fr.univrennes1.cri.jtacl.policies.Policy;
 import fr.univrennes1.cri.jtacl.policies.PolicyConfig;
 import fr.univrennes1.cri.jtacl.policies.PolicyExpect;
-import fr.univrennes1.cri.jtacl.policies.FlowPolicy;
 import fr.univrennes1.cri.jtacl.policies.PolicyProbe;
 import fr.univrennes1.cri.jtacl.policies.ServicePolicy;
 import groovy.lang.Binding;
@@ -330,7 +330,6 @@ public class Shell {
 
 	public boolean probeCommand(String commandLine, ProbeCommandTemplate probeCmd) {
 
-//		ProbeCommandTemplate probeCmd = command.getProbeCmdTemplate();
 		boolean testMode = probeCmd.getProbeExpect() != null;
 		boolean learnMode = probeCmd.getProbeOptLearn();
 		boolean silent = testMode || learnMode;
@@ -345,8 +344,8 @@ public class Shell {
 
 		if (!silent) {
 			_outStream.println("probe from: " +
-				cmd.getSourceAddress().toString("::i") +
-				" to: " + cmd.getDestinationAddress().toString("::i"));
+				cmd.getSourceAddress().toNetString("::i") +
+				" to: " + cmd.getDestinationAddress().toNetString("::i"));
 		}
 
 		/*
