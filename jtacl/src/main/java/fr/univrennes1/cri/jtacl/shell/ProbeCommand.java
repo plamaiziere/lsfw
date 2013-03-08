@@ -54,10 +54,6 @@ public class ProbeCommand {
 
 	public void buildRequest(ProbeCommandTemplate probeCmd) {
 
-		boolean testMode = probeCmd.getProbeExpect() != null;
-		boolean learnMode = probeCmd.getProbeOptLearn();
-		boolean silent = testMode || learnMode;
-
 		IPversion ipVersion;
 		if (probeCmd.getProbe6flag())
 			ipVersion = IPversion.IPV6;
