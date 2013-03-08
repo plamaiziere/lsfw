@@ -77,6 +77,68 @@ public class IPRange implements IPRangeable {
 		}
 	}
 
+	/**
+	 * Constructs a new range object according to the string data.
+	 * <br/><br/>
+	 * Several notations are supported:
+	 * <ul>
+	 *	<li>Decimal: IPNet("n")<br/>
+	 *		n &lt= 255 -> assumed to be the IPv4 address n.0.0.0<br/>
+	 *			example 127 -> 127.0.0.0</li>
+	 * <li> n &gt= 256 -> assumed to be the address 'n'.<br/>
+	 *		If n is less than 2^32 theIPversion is set to IPv4, else to IPv6.</li>
+	 * <li>
+	 *	Hexadecimal: IPNet("0xn")<br/>
+	 *		the number n is converted to the address ip as a number<br/></li>
+	 *<li>
+	 *  Dot notation (IPv4) : 'IPNet("x.y.w.z")<br/>
+	 *		if less than 4 bytes are specified, it is padded with some "0"<br/>
+	 *			ex: 127.0 -> 127.0.0.0</li>
+	 *<li>
+	 * Ipv6:
+	 *		IPv6 notation is supported, as well as an IPv4 address specified<br/>
+	 *		at the tail of the string<br/>
+	 *			ex: IPNet("::1:127.0.0.1")</li>
+	 * <li>
+	 *  Netmask and prefix<br/>
+	 *		IPv4: /n or /w.x.y.z<br/>
+	 *		IPv6: /n only</li>
+	 * <li>
+	 *	Range<br/>
+	 *		a range between two addresses can be specified, the first IP address
+	 * is used as the address of the {@link IPNet} ip and the second is used
+	 * to compute the prefixlen.<br/>
+	 *			ex: IPNet("0.0.0.0-255.255.255.255)
+	 * </li>
+	 * <li>
+	 * Name resolution<br/>
+	 *   A data string starting with '@' or '@@' specifies a host name to
+	 *   resolve using dns. The number of '@' characters specifies the address
+	 *   family to use (IPv4 or IPv6). <br/>
+	 *		ex : @localhost/34 (returns 127.0.0.1/24). <br/>
+	 *		ex : @@localhost (returns ::1/128). <br/>
+	 * </ul>
+	 * @param data The {@link String} string to parse.
+	 * @throws UnknownHostException if some parameters are invalid or if we
+	 * can't parse the string.
+	 */
+	public IPRange(String data) throws UnknownHostException {
+
+		// splitting of a string into IP and prefixlen et. al.
+		String[] split = data.split("-");
+        if (split.length > 2)
+			throw new UnknownHostException(
+				"Only one '-' allowed in IP Address: " + data);
+
+		if (split.length == 2) {
+			_ipFirst = new IPNet(split[0].trim());
+			_ipLast = new IPNet(split[1].trim());
+		} else {
+			_ipFirst = new IPNet(data).networkAddress();
+			_ipLast = _ipFirst.lastNetworkAddress();
+		}
+	}
+
 	@Override
 	public IPNet getIpFirst() {
 		return _ipFirst;
