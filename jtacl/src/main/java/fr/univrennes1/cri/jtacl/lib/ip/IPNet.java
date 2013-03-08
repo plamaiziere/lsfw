@@ -611,6 +611,15 @@ public final class IPNet implements Comparable, IPRangeable {
 	public static List<IPNet> getAllByName(String hostname, IPversion ipVersion)
 			throws UnknownHostException {
 
+		/*
+		 * XXX: this required because Java handle hostname like "127.0.0.1 foo"
+		 * as "127.0.0.1"
+		 */
+		int idx = hostname.indexOf(' ');
+		if (idx >= 0)
+			throw new UnknownHostException("hostname can not contain spaces: "
+				+ hostname);
+
 		String split [] = hostname.split("/");
 		String hname = split[0];
 		int prefix = -1;
