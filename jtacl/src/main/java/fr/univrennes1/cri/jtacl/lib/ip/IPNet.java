@@ -612,6 +612,7 @@ public final class IPNet implements Comparable, IPRangeable {
 			throws UnknownHostException {
 
 		String split [] = hostname.split("/");
+		String hname = split[0];
 		int prefix = -1;
 
 		// netmask specification ?
@@ -623,18 +624,18 @@ public final class IPNet implements Comparable, IPRangeable {
 			prefix = getPrefixFromNetmask(split[1], ipVersion);
 
 		InetAddress inet [] = null;
-		DnsCacheEntry entry = _dnsCache.get(split[0]);
+		DnsCacheEntry entry = _dnsCache.get(hname);
 		long date = new Date().getTime();
 		if (entry != null) {
 			if (date - entry.getDate() < _dnsCacheTtl)
 				inet = entry.getIps();
 			else
-				_dnsCache.remove(split[0]);
+				_dnsCache.remove(hname);
 		}
 		if (inet == null) {
-			inet = InetAddress.getAllByName(split[0]);
-			entry = new DnsCacheEntry(split[0], inet, date);
-			_dnsCache.put(split[0], entry);
+			inet = InetAddress.getAllByName(hname);
+			entry = new DnsCacheEntry(hname, inet, date);
+			_dnsCache.put(hname, entry);
 		}
 
 		ArrayList<IPNet> addresses = new ArrayList<IPNet>();
@@ -648,7 +649,7 @@ public final class IPNet implements Comparable, IPRangeable {
 			}
 		}
 		if (addresses.isEmpty())
-			throw new UnknownHostException("No IP Address found for: " + split[0]);
+			throw new UnknownHostException("No IP Address found for: " + hname);
 		return addresses;
 	}
 
