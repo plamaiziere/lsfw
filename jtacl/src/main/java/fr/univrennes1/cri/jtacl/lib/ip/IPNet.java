@@ -522,7 +522,7 @@ public final class IPNet implements Comparable, IPRangeable {
 	 *	Range<br/>
 	 *		a range between two addresses can be specified, the first IP address
 	 * is used as the address of the {@link IPNet} ip and the second is used
-	 * to compute the prefixlen. This is only supported for IPv4.<br/>
+	 * to compute the prefixlen.<br/>
 	 *			ex: IPNet("0.0.0.0-255.255.255.255)
 	 * </li>
 	 * <li>
@@ -563,7 +563,7 @@ public final class IPNet implements Comparable, IPRangeable {
 
 		if (split.length == 2) {
 			// a.b.c.0-a.b.c.255 specification ?
-			_ip = makeFromRange(data, split[0], split[1]);
+			_ip = makeFromRange(data, split[0].trim(), split[1].trim());
 			return;
 		}
 		if (split.length == 1) {
