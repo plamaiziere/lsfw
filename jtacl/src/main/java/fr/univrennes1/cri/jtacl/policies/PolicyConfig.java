@@ -26,7 +26,7 @@ import org.config4j.Configuration;
 import org.config4j.ConfigurationException;
 
 /**
- * flow configuration
+ * Policies configuration
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PolicyConfig {
