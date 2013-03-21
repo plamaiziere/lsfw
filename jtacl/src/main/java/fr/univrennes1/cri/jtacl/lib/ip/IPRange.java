@@ -256,7 +256,6 @@ public class IPRange implements IPRangeable {
 
 		for (int l = len; l > 0; l--) {
 			IPNet ip = null;
-			IPNet net = null;
 			try {
 				ip = new IPNet(_ipFirst.getIP(), _ipFirst.getIpVersion(), l);
 			} catch (UnknownHostException ex) {
