@@ -1,0 +1,28 @@
+--- ip ---
+ip | ip6 address | range
+
+  Display informations about the IP address or range in argument.
+
+examples:
+---------
+
+  lsfw> ip 1.2.3.4/21
+  ip      : 1.2.3.4
+  network : 1.2.0.0 - 1.2.7.255
+  netmask : 255.255.248.0
+  prefix  : 21
+  length  : 2048
+
+  lsfw> ip 1.2.3.4 - 1.2.3.255
+  range  : 1.2.3.4-1.2.3.255
+  length : 251
+  nearest network : 1.2.3.0 - 1.2.3.255
+  netmask : 255.255.255.0
+  prefix : 24
+  network length : 256
+
+  lsfw> ip6 afnic.fr
+  ip      : 2001:660:3003:2:0:0:4:20
+  network : 2001:660:3003:2:0:0:4:20 - 2001:660:3003:2:0:0:4:20
+  prefix  : 128
+  length  : 1
