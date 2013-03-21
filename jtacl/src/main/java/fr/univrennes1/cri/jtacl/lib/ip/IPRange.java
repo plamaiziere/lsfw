@@ -256,13 +256,14 @@ public class IPRange implements IPRangeable {
 
 		for (int l = len; l > 0; l--) {
 			IPNet ip = null;
+			IPNet net = null;
 			try {
 				ip = new IPNet(_ipFirst.getIP(), _ipFirst.getIpVersion(), l);
 			} catch (UnknownHostException ex) {
 				// should not happen
 			}
 			if (ip.contains(_ipFirst) && ip.contains(_ipLast)) {
-				_nearestNetwork = ip;
+				_nearestNetwork = ip.networkAddress();
 				return _nearestNetwork;
 			}
 		}
@@ -288,5 +289,10 @@ public class IPRange implements IPRangeable {
 	@Override
 	public final boolean sameIPVersion(IPRangeable range) {
 		return getIpVersion().equals(range.getIpVersion());
+	}
+
+	@Override
+	public final BigInteger length() {
+		return _ipLast.getIP().subtract(_ipFirst.getIP()) ;
 	}
 }
