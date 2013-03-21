@@ -137,6 +137,10 @@ public class IPRange implements IPRangeable {
 			_ipFirst = new IPNet(data).networkAddress();
 			_ipLast = _ipFirst.lastNetworkAddress();
 		}
+
+		if (_ipFirst.getIP().compareTo(_ipLast.getIP()) > 0)
+			throw new UnknownHostException(
+				"last address must be greater than the first: " + data);
 	}
 
 	@Override
