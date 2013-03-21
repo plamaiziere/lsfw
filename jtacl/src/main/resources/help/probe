@@ -84,9 +84,10 @@ transformation or routing.
 
 Addresses
 ---------
-  Source and destination addresses can be a hostname, an IP address or a
-network. If a hostname is specified, it is resolved using DNS. The probe command
-uses IPv4 resolution and the probe6 command uses IPv6 resolution.
+  Source and destination addresses can be a hostname, an IP address, a
+network or a range of addresses. If a hostname is specified, it is resolved
+using DNS. The probe command uses IPv4 resolution and the probe6 command uses
+IPv6 resolution.
 
   By default, lsfw tries to find a network equipment where the probe will be
 injected using the source IP address of the probe. If there is zero or more than
@@ -95,6 +96,10 @@ one candidate, lsfw rejects the command with an error.
   The "=host/mask" notation in the source address of the probe specifies to
 use the host address (instead the network address) when looking for the
 equipment where the probe will be injected.
+
+  A range of addresses is specified by the "first address - last address" of
+the range, between quotes: "first - last". lsfw uses the nearest network
+including this range for routing.
 
 Protocol
 --------
