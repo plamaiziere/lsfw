@@ -736,12 +736,12 @@ public class Shell {
 				nprobe.setExpect(nexpect);
 				policyProbe.getPolicyProbes().add(nprobe);
 
-					/*
-					 * probe
-					 */
-					if (!probeFlow(nprobe, flow, false)) {
-						result = false;
-					}
+				/*
+				 * probe
+				 */
+				if (!probeFlow(nprobe, flow, false)) {
+					result = false;
+				}
 				/*
 				 * check the reply
 				 */
