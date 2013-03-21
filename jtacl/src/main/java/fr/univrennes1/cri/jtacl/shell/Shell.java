@@ -503,8 +503,7 @@ public class Shell {
 					// not an IP try to resolve as a host.
 					ipn = IPNet.getByName(sip, ipversion);
 				} catch (UnknownHostException ex2) {
-					throw new JtaclParameterException("Error in ip address: " +
-							sip + " " +  ex2.getMessage());
+					_outStream.println("Error: " + ex2.getMessage());
 				}
 			}
 		}
