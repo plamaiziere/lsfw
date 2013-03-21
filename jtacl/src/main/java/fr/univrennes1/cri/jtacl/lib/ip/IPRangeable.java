@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
+import java.math.BigInteger;
+
 /**
  * interface for IP range. A range of ip addresses
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -127,4 +129,9 @@ public interface IPRangeable {
 	 */
 	public boolean sameIPVersion(IPRangeable range);
 
+	/**
+	 * Returns the length of this range.
+	 * @return the length of this range.
+	 */
+	public BigInteger length();
 }
