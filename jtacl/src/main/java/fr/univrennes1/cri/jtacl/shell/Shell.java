@@ -29,6 +29,8 @@ import fr.univrennes1.cri.jtacl.core.probing.RoutingResult;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
@@ -480,6 +482,67 @@ public class Shell {
 		_outStream.println(hostname + " has address " + ip.toString("::i"));
 	}
 
+	public void ipCommand(ShellParser parser) {
+
+		IPversion ipversion;
+		if (parser.getString("Command").equals("ip6"))
+			ipversion = IPversion.IPV6;
+		else
+			ipversion = IPversion.IPV4;
+
+		IPNet ipn = null;
+		IPRangeable ip = null;
+		String sip = parser.getString("AddressArg");
+		try {
+			ipn = new IPNet(sip);
+		} catch(UnknownHostException ex) {
+			try {
+				ip = new IPRange(sip);
+			} catch (UnknownHostException ex1) {
+				try {
+					// not an IP try to resolve as a host.
+					ipn = IPNet.getByName(sip, ipversion);
+				} catch (UnknownHostException ex2) {
+					throw new JtaclParameterException("Error in ip address: " +
+							sip + " " +  ex2.getMessage());
+				}
+			}
+		}
+
+		/*
+		 * IPNet
+		 */
+		if (ipn != null) {
+			_outStream.println("ip      : " + ipn.toString("is"));
+			_outStream.println("network : " + ipn.networkAddress().toString("is")
+					+ " - " + ipn.lastNetworkAddress().toString("is"));
+			if (ipn.isIPv4()) {
+				String [] s = ipn.toString("n").split("/");
+				_outStream.println("netmask : " + s[1]);
+			}
+			_outStream.println("prefix  : " + ipn.getPrefixLen());
+
+			_outStream.println("length  : " + ipn.networkLength());
+		}
+
+		/*
+		 * IPRange
+		 */
+		if (ip != null) {
+			ipn = ip.nearestNetwork();
+			_outStream.println("range  : " + ip.toString("is"));
+			_outStream.println("length : " + ip.length());
+			_outStream.println("nearest network : " + ipn.toString("is")
+					+ " - " + ipn.lastNetworkAddress().toString("is"));
+			if (ip.isIPv4()) {
+				String [] s = ipn.toString("n").split("/");
+				_outStream.println("netmask : " + s[1]);
+			}
+			_outStream.println("prefix : " + ipn.getPrefixLen());
+			_outStream.println("network length : " + ipn.networkLength());
+		}
+	}
+
 	public void policyLoadCommand(ShellParser parser) {
 
 		PolicyConfig config;
@@ -852,6 +915,8 @@ public class Shell {
 				groovyConsoleCommand(_parser);
 			if (command.equals("host") || command.equals("host6"))
 				hostCommand(_parser);
+			if (command.equals("ip") || command.equals("ip6"))
+				ipCommand(_parser);
 			if (command.equals("policy-load"))
 				policyLoadCommand(_parser);
 			if (command.equals("policy-probe"))
