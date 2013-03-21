@@ -65,7 +65,9 @@ public class ShellParser extends CommonRules<Object> {
 					CommandHost(),
 					CommandHost6(),
 					CommandPolicyLoad(),
-					CommandPolicyProbe()
+					CommandPolicyProbe(),
+					CommandIp6(),
+					CommandIp()
 				)
 			);
 	}
@@ -662,6 +664,28 @@ public class ShellParser extends CommonRules<Object> {
 				UntilEOI(),
 				setString("AddressArg", match()),
 				setString("Command", "host6")
+			);
+	}
+
+	public Rule CommandIp() {
+		return
+			Sequence(
+				IgnoreCase("ip"),
+				WhiteSpaces(),
+				UntilEOI(),
+				setString("AddressArg", match()),
+				setString("Command", "ip")
+			);
+	}
+
+	public Rule CommandIp6() {
+		return
+			Sequence(
+				IgnoreCase("ip6"),
+				WhiteSpaces(),
+				UntilEOI(),
+				setString("AddressArg", match()),
+				setString("Command", "ip6")
 			);
 	}
 
