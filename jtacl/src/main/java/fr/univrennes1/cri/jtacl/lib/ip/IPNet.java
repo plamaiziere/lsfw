@@ -998,6 +998,11 @@ public final class IPNet implements Comparable, IPRangeable {
 	}
 
 	@Override
+	public final BigInteger length() {
+		return networkLength();
+	}
+
+	@Override
 	public String toString() {
 		return toString("");
 	}
