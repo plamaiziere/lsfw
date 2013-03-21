@@ -200,7 +200,7 @@ public class IPRangeTest extends TestCase {
 		range = new IPRange(ip1, ip2);
 
 		net = range.nearestNetwork();
-		assertEquals("127.0.0.1/24", net.toString("::"));
+		assertEquals("127.0.0.0/24", net.toString("::"));
 
 
 		ip1 = new IPNet("::1");
@@ -215,7 +215,7 @@ public class IPRangeTest extends TestCase {
 		range = new IPRange(ip1, ip2);
 
 		net = range.nearestNetwork();
-		assertEquals("::1/120", net.toString("::"));
+		assertEquals("::0/120", net.toString("::"));
 
 	}
 }
