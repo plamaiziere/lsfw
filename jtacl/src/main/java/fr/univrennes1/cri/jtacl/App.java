@@ -17,6 +17,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.shell.Shell;
+import fr.univrennes1.cri.jtacl.shell.ShellConsole;
 import java.io.IOException;
 import static java.util.Arrays.*;
 import java.util.List;
@@ -153,7 +154,7 @@ public class App
 			Monitor.getInstance().init();
 
 			boolean verbose = optionSet.has("verbose");
-
+			ShellConsole.install();
 			Shell shell;
 			int ret;
 			/*
