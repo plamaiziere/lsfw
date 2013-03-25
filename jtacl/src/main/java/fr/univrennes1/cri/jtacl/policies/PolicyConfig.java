@@ -376,78 +376,107 @@ public class PolicyConfig {
 		return policies;
 	}
 
+	protected boolean checkPolicyRef(Policy p, Policy ref) {
+		/*
+		 * check the type of included policies
+		 */
+		boolean badtype = false;
+		if (p instanceof HostPolicy) {
+			if (!(ref instanceof HostPolicy)
+					&& !(ref instanceof ServicePolicy)) {
+				badtype = true;
+			}
+		}
+		if (p instanceof ServicePolicy) {
+			if (!(ref instanceof ServicePolicy)
+					&& !(ref instanceof NetworkPolicy)) {
+				badtype = true;
+			}
+		}
+		if (p instanceof NetworkPolicy) {
+			if (!(ref instanceof NetworkPolicy)
+					&& !(ref instanceof FlowPolicy)) {
+				badtype = true;
+			}
+		}
+		return !badtype;
+	}
+
 	protected void linkPolicyRef(Policy p, PoliciesMap globalPolicies,
 			PoliciesMap localPolicies) {
 
-		for (String pname: localPolicies.keySet()) {
-			Policy ref = globalPolicies.get(pname);
-			if (ref == null) {
-				/*
-				 * auto-create a FlowPolicy if the name starts with UDP/
-				 * or TCP/
-				 */
-				String[] ss = pname.split("/");
-				if (ss.length == 2) {
-					FlowPolicy flow = new FlowPolicy(pname,	"(auto) " + pname);
-					String sproto = ss[0];
-					String sport = ss[1];
-					Integer protocol = null;
-					if (sproto.equalsIgnoreCase("udp"))
-						protocol = Protocols.UDP;
-					if (sproto.equalsIgnoreCase("tcp")) {
-						protocol = Protocols.TCP;
-						flow.setFlags(_defaultTcpFlags);
-
+		boolean retry = true;
+		while (retry) {
+			for (String pname: localPolicies.keySet()) {
+				retry = false;
+				Policy ref = globalPolicies.get(pname);
+				if (ref != null) {
+					if (!checkPolicyRef(p, ref)) {
+						throw new JtaclConfigurationException("Policy: "
+							+ p.getName()
+							+ ", invalid included policy: " + ref.getName());
 					}
-					if (protocol != null) {
-						/*
-						 * check validity of the service
-						 */
-						try {
-							ShellUtils.parseService(sport, sproto);
-						} catch (JtaclParameterException ex) {
-							throw new JtaclConfigurationException("Policy: "
-								+ pname + ", " + ex.getMessage());
+					localPolicies.put(ref);
+					continue;
+				}
+				if (ref == null) {
+					String[] ss = pname.split("\\\\");
+					String expect = ss[0];
+					if (ss.length == 2) {
+						String flowname = ss[1];
+						if (expect.equalsIgnoreCase("ACCEPT")
+							|| expect.equalsIgnoreCase("DENY")) {
+							NetworkPolicy npolicy = new NetworkPolicy(pname, "(auto) " + pname);
+							if (expect.equalsIgnoreCase(expect))
+								npolicy.setExpect(PolicyExpect.ACCEPT);
+							else
+								npolicy.setExpect(PolicyExpect.DENY);
+							npolicy.getPolicies().put(flowname, null);
+							globalPolicies.put(npolicy);
+							retry = true;
+							break;
 						}
-						flow.setConnected(true);
-						flow.setProtocol(protocol);
-						flow.setPort(sport);
-						globalPolicies.put(flow);
-						ref = flow;
+					}
+
+					/*
+					 * auto-create a FlowPolicy if the name starts with UDP/
+					 * or TCP/
+					 */
+					ss = pname.split("/");
+					if (ss.length == 2) {
+						String sproto = ss[0];
+						String sport = ss[1];
+						Integer protocol = null;
+						FlowPolicy flow = new FlowPolicy(pname,	"(auto) " + pname);
+						if (sproto.equalsIgnoreCase("udp"))
+							protocol = Protocols.UDP;
+						if (sproto.equalsIgnoreCase("tcp")) {
+							protocol = Protocols.TCP;
+							flow.setFlags(_defaultTcpFlags);
+
+						}
+						if (protocol != null) {
+							/*
+							 * check validity of the service
+							 */
+							try {
+								ShellUtils.parseService(sport, sproto);
+							} catch (JtaclParameterException ex) {
+								throw new JtaclConfigurationException("Policy: "
+									+ pname + ", " + ex.getMessage());
+							}
+							flow.setConnected(true);
+							flow.setProtocol(protocol);
+							flow.setPort(sport);
+							globalPolicies.put(flow);
+							retry = true;
+							break;
+						}
 					}
 				}
-			}
-			if (ref == null)
 				throw new JtaclConfigurationException(
-						"Cannot find policy: " + pname);
-			/*
-			 * check the type of included policies
-			 */
-			boolean badtype = false;
-			if (p instanceof HostPolicy) {
-				if (!(ref instanceof HostPolicy)
-						&& !(ref instanceof ServicePolicy)) {
-					badtype = true;
-				}
+					"Cannot find policy: " + pname);
 			}
-			if (p instanceof ServicePolicy) {
-				if (!(ref instanceof ServicePolicy)
-						&& !(ref instanceof NetworkPolicy)) {
-					badtype = true;
-				}
-			}
-			if (p instanceof NetworkPolicy) {
-				if (!(ref instanceof NetworkPolicy)
-						&& !(ref instanceof FlowPolicy)) {
-					badtype = true;
-				}
-			}
-			if (badtype) {
-					throw new JtaclConfigurationException("Policy: "
-						+ p.getName()
-						+ ", invalid included policy: " + ref.getName());
-			}
-			localPolicies.put(ref);
 		}
 	}
 
