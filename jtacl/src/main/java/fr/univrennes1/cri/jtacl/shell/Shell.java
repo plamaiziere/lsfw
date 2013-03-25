@@ -564,6 +564,79 @@ public class Shell {
 
 	}
 
+	public void itStream(int indent) {
+		for (int i = 0; i < indent; i++) {
+			_outStream.print(" ");
+		}
+	}
+	public void printPolicy(Policy policy, int indent) {
+		if (policy instanceof FlowPolicy) {
+			FlowPolicy flow = (FlowPolicy) policy;
+			itStream(indent); _outStream.println("name: " + flow.getName());
+			itStream(indent + 2); _outStream.println("comment: " + flow.getComment());
+			itStream(indent + 2); _outStream.println("from: " + flow.getFrom());
+			itStream(indent + 2); _outStream.println("to: " + flow.getTo());
+			itStream(indent + 2); _outStream.println("proto: " + flow.getProtocol());
+			itStream(indent + 2); _outStream.println("source port: " + flow.getSourcePort());
+			itStream(indent + 2); _outStream.println("port: " + flow.getPort());
+			itStream(indent + 2); _outStream.println("flags: " + flow.getFlags());
+			itStream(indent + 2); _outStream.println("connected: " + flow.isConnected());
+		}
+
+		if (policy instanceof NetworkPolicy) {
+			NetworkPolicy p = (NetworkPolicy) policy;
+			itStream(indent); _outStream.println("name: " + p.getName());
+			itStream(indent + 2); _outStream.println("comment: " + p.getComment());
+			itStream(indent + 2); _outStream.println("from: " + p.getFrom());
+			itStream(indent + 2); _outStream.println("to: " + p.getTo());
+			itStream(indent + 2); _outStream.println("expect: " + p.getExpect());
+			itStream(indent + 2); _outStream.println("policies: ");
+			for (String s: p.getPolicies().getKeysSorted()) {
+				printPolicy(_policies.get(s), indent + 4);
+			}
+		}
+
+		if (policy instanceof ServicePolicy) {
+			ServicePolicy p = (ServicePolicy) policy;
+			itStream(indent); _outStream.println("name: " + p.getName());
+			itStream(indent + 2); _outStream.println("comment: " + p.getComment());
+			itStream(indent + 2); _outStream.println("from: " + p.getFrom());
+			itStream(indent + 2); _outStream.println("to: " + p.getTo());
+			itStream(indent + 2); _outStream.println("policies: ");
+			for (String s: p.getPolicies().getKeysSorted()) {
+				printPolicy(_policies.get(s), indent + 4);
+			}
+		}
+
+		if (policy instanceof HostPolicy) {
+			HostPolicy p = (HostPolicy) policy;
+			itStream(indent); _outStream.println("name: " + p.getName());
+			itStream(indent + 2); _outStream.println("comment:" + p.getComment());
+			itStream(indent + 2); _outStream.println("address: " + p.getAddress());
+			itStream(indent + 2); _outStream.println("policies: ");
+			for (String s: p.getPolicies().getKeysSorted()) {
+				printPolicy(_policies.get(s), indent + 2);
+			}
+		}
+	}
+
+	public void policyListCommand(ShellParser parser) {
+
+		String pname = parser.getString("PolicyName");
+		if (pname != null) {
+			Policy p = _policies.get(pname);
+			if (p == null) {
+				_outStream.println("Error: cannot find policy: " + pname);
+			} else {
+				printPolicy(p, 0);
+			}
+			return;
+		}
+		for (String s: _policies.getKeysSorted()) {
+			printPolicy(_policies.get(s), 0);
+		}
+	}
+
 	protected boolean probeFlow(PolicyProbe policyProbe, FlowPolicy flow,
 			boolean state) {
 
@@ -916,6 +989,8 @@ public class Shell {
 				hostCommand(_parser);
 			if (command.equals("ip") || command.equals("ip6"))
 				ipCommand(_parser);
+			if (command.equals("policy-list"))
+				policyListCommand(_parser);
 			if (command.equals("policy-load"))
 				policyLoadCommand(_parser);
 			if (command.equals("policy-probe"))
