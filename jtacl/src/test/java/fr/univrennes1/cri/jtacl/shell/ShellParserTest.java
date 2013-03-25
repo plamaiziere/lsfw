@@ -563,5 +563,19 @@ public class ShellParserTest extends TestCase {
 		assertEquals("ADDRESS1 ADDRESS2", parser.getString("AddressArg"));
 	}
 
+	public void testPolicyList() {
+		System.out.println("policy-list");
+
+		String line = "policy list";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-list", parser.getString("Command"));
+		assertEquals(null, parser.getString("PolicyName"));
+
+		line = "policy list POLICYNAME";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("policy-list", parser.getString("Command"));
+		assertEquals("POLICYNAME", parser.getString("PolicyName"));
+
+	}
 
 }

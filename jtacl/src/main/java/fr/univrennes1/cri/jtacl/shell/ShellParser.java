@@ -64,6 +64,7 @@ public class ShellParser extends CommonRules<Object> {
 					CommandGroovyConsole(),
 					CommandHost(),
 					CommandHost6(),
+					CommandPolicyList(),
 					CommandPolicyLoad(),
 					CommandPolicyProbe(),
 					CommandIp6(),
@@ -193,6 +194,24 @@ public class ShellParser extends CommonRules<Object> {
 				EOI,
 				setString("Command", "define")
 		);
+	}
+
+	/*
+	 * policy list [policy]
+	 */
+	public Rule CommandPolicyList() {
+		return Sequence(
+					IgnoreCase("policy"),
+					WhiteSpaces(),
+					IgnoreCase("list"),
+					Optional(
+						WhiteSpaces(),
+						StringAtom(),
+						setString("PolicyName", match())
+					),
+					EOI,
+					setString("Command", "policy-list")
+				);
 	}
 
 	/*
