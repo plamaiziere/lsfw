@@ -12,6 +12,9 @@
 
  */package fr.univrennes1.cri.jtacl.policies;
 
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
+import org.config4j.ConfigurationException;
+
 /**
  * Policies Map (singleton)
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -23,4 +26,23 @@ public class Policies {
 	public static PoliciesMap getInstance() {
 		return _instance;
 	}
+
+	public static void clear() {
+		getInstance().clear();
+	}
+
+	public static void loadPolicies(String filename) {
+		PolicyConfig config;
+		try {
+			config = new PolicyConfig(filename);
+		} catch (ConfigurationException ex) {
+			throw new JtaclConfigurationException(ex.getMessage());
+		}
+
+		PoliciesMap pm;
+		pm = config.loadPolicies();
+		config.linkPolicies(pm);
+		getInstance().putAll(pm);
+	}
+
 }
