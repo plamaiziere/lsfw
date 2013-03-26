@@ -40,7 +40,6 @@ import fr.univrennes1.cri.jtacl.policies.NetworkPolicy;
 import fr.univrennes1.cri.jtacl.policies.Policies;
 import fr.univrennes1.cri.jtacl.policies.PoliciesMap;
 import fr.univrennes1.cri.jtacl.policies.Policy;
-import fr.univrennes1.cri.jtacl.policies.PolicyConfig;
 import fr.univrennes1.cri.jtacl.policies.PolicyExpect;
 import fr.univrennes1.cri.jtacl.policies.PolicyProbe;
 import fr.univrennes1.cri.jtacl.policies.ServicePolicy;
@@ -57,7 +56,6 @@ import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.logging.Level;
-import org.config4j.ConfigurationException;
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
@@ -544,24 +542,12 @@ public class Shell {
 
 	public void policyLoadCommand(ShellParser parser) {
 
-		PolicyConfig config;
+		Policies.clear();
 		try {
-			config = new PolicyConfig(parser.getString("FileName"));
-		} catch (ConfigurationException ex) {
-			_outStream.println("Error: " + ex.getMessage());
-			return;
-		}
-
-		PoliciesMap pm;
-		try {
-			pm = config.loadPolicies();
-			config.linkPolicies(pm);
-			_policies.clear();
-			_policies.putAll(pm);
+			Policies.loadPolicies(parser.getString("FileName"));
 		} catch (JtaclConfigurationException ex) {
 			_outStream.println("Error: " + ex.getMessage());
 		}
-
 	}
 
 	public void itStream(int indent) {
