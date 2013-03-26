@@ -420,6 +420,10 @@ public class PolicyConfig {
 					continue;
 				}
 				if (ref == null) {
+					/*
+					 * auto-create a NetworkPolicy if the name starts with
+					 * ACCEPT| or DENY|
+					 */			
 					String[] ss = pname.split("\\|");
 					String expect = ss[0];
 					if (ss.length == 2) {
