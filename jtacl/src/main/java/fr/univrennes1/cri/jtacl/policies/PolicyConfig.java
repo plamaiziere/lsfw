@@ -420,7 +420,7 @@ public class PolicyConfig {
 					continue;
 				}
 				if (ref == null) {
-					String[] ss = pname.split("\\\\");
+					String[] ss = pname.split("\\|");
 					String expect = ss[0];
 					if (ss.length == 2) {
 						String flowname = ss[1];
