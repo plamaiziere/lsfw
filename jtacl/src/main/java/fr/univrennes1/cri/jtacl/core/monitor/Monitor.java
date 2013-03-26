@@ -34,6 +34,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
+import fr.univrennes1.cri.jtacl.policies.Policies;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -245,6 +246,24 @@ public class Monitor {
 			readIcmp(icmp, stream);
 		}
 
+		list = doc.getElementsByTagName("policies");
+		Policies.clear();
+		if (list.getLength() > 0) {
+			Element e = (Element) list.item(0);
+			String fileName = e.getAttribute("filename");
+
+			if (fileName.isEmpty())
+				throw new JtaclConfigurationException("Missing policies filename");
+
+			InputStream stream =null;
+			try {
+				stream = new FileInputStream(fileName);
+			} catch (FileNotFoundException ex) {
+				throw new JtaclConfigurationException("Policies file not found: " +
+						fileName);
+			}
+			Policies.loadPolicies(fileName);
+		}
 	}
 
 	protected void loadTopology(Document doc, Topology topology) {
