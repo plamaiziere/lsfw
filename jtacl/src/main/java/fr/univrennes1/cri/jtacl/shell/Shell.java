@@ -572,11 +572,16 @@ public class Shell {
 	public void printPolicy(Policy policy, int indent) {
 		if (policy instanceof FlowPolicy) {
 			FlowPolicy flow = (FlowPolicy) policy;
+			String sproto = "any";
+			if (flow.getProtocol() == Protocols.TCP)
+				sproto = "TCP";
+			if (flow.getProtocol() == Protocols.UDP)
+				sproto = "UDP";
 			itStream(indent); _outStream.println("name: " + flow.getName());
 			itStream(indent + 2); _outStream.println("comment: " + flow.getComment());
 			itStream(indent + 2); _outStream.println("from: " + flow.getFrom());
 			itStream(indent + 2); _outStream.println("to: " + flow.getTo());
-			itStream(indent + 2); _outStream.println("proto: " + flow.getProtocol());
+			itStream(indent + 2); _outStream.println("proto: " + sproto);
 			itStream(indent + 2); _outStream.println("source port: " + flow.getSourcePort());
 			itStream(indent + 2); _outStream.println("port: " + flow.getPort());
 			itStream(indent + 2); _outStream.println("flags: " + flow.getFlags());
