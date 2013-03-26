@@ -569,6 +569,7 @@ public class Shell {
 			_outStream.print(" ");
 		}
 	}
+
 	public void printPolicy(Policy policy, int indent) {
 		if (policy instanceof FlowPolicy) {
 			FlowPolicy flow = (FlowPolicy) policy;
