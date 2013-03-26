@@ -423,7 +423,7 @@ public class PolicyConfig {
 					/*
 					 * auto-create a NetworkPolicy if the name starts with
 					 * ACCEPT| or DENY|
-					 */			
+					 */
 					String[] ss = pname.split("\\|");
 					String expect = ss[0];
 					if (ss.length == 2) {
@@ -437,6 +437,8 @@ public class PolicyConfig {
 								npolicy.setExpect(PolicyExpect.DENY);
 							npolicy.getPolicies().put(flowname, null);
 							globalPolicies.put(npolicy);
+							linkPolicyRef(npolicy, globalPolicies,
+								npolicy.getPolicies());
 							retry = true;
 							break;
 						}
