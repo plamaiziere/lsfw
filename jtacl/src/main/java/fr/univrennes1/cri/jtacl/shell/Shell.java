@@ -698,6 +698,9 @@ public class Shell {
 
 		Policy policy = policyProbe.getPolicy();
 
+		if (Log.debug().isLoggable(Level.INFO))
+			Log.debug().info("probing policy: " + policy.getName());
+
 		/*
 		 * ovveride from / destination if unset
 		 */
