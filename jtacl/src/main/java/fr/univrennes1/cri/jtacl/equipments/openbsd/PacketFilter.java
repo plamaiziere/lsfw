@@ -1127,6 +1127,16 @@ public class PacketFilter extends GenericEquipment {
 		return ipspec;
 	}
 
+	protected PfIpSpec parseTableIpSpec(List<Xhost> xhostList) {
+		PfIpSpec ipspec;
+		ipspec = parseIpSpec(xhostList);
+		for (PfNodeHost node: ipspec) {
+			if (!node.isAddrMask())
+				throwCfgException("table can contain only IP addresses");
+		}
+		return ipspec;
+	}
+
 	protected PfPortSpec parsePortSpec(List<PortItemTemplate> portsList) {
 		PfPortSpec portspec = new PfPortSpec();
 
@@ -1296,7 +1306,7 @@ public class PacketFilter extends GenericEquipment {
 			throwCfgException("cannot parse table's file:  " + fileName);
 
 		famAdd(fileName);
-		return parseIpSpec(_parser.getPfTable().getHosts());
+		return parseTableIpSpec(_parser.getPfTable().getHosts());
 	}
 
 	/*
@@ -1607,7 +1617,7 @@ public class PacketFilter extends GenericEquipment {
 		 * use rule's ip
 		 */
 		if (ipspec.isEmpty()) {
-			PfIpSpec ip = parseIpSpec(tableTpl.getHosts());
+			PfIpSpec ip = parseTableIpSpec(tableTpl.getHosts());
 			ipspec.addAll(ip);
 		}
 
