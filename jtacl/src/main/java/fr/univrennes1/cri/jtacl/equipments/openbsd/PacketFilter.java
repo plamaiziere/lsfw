@@ -21,6 +21,7 @@ import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
@@ -2370,7 +2371,8 @@ public class PacketFilter extends GenericEquipment {
 			/*
 			 * get the result for the table
 			 */
-			MatchResult res = ipspecFilter(context, table.getIpspec(), ipAddress, af);
+			MatchResult res = tableIpspecFilter(context, table.getIpspec(),
+				ipAddress, af);
 			if (host.isNot())
 				res = res.not();
 			return res;
@@ -2449,6 +2451,41 @@ public class PacketFilter extends GenericEquipment {
 		if (portspec.isEmpty())
 			return MatchResult.ALL;
 		return portspec.matches(portRequest);
+	}
+
+	protected MatchResult tableIpspecFilter(FilterContext context,
+			PfIpSpec ipspec, IPRangeable ipAddress, AddressFamily af) {
+
+		for (PfNodeHost host: ipspec) {
+			/*
+			 * addr mask
+			 */
+			if (!host.isAddrMask())
+				throw new JtaclInternalException("invalid address in table");
+			int mAll = 0;
+			int mMatch = 0;
+
+			for (IPNet ip: host.getAddr()) {
+				if (!ip.sameIPVersion(ipAddress))
+					continue;
+
+				if (ip.contains(ipAddress)) {
+					mAll++;
+				} else {
+					if (ip.overlaps(ipAddress))
+						mMatch++;
+				}
+			}
+			MatchResult res = MatchResult.NOT;
+			if (mAll > 0)
+				res = MatchResult.ALL;
+			if (mMatch > 0)
+				res = MatchResult.MATCH;
+			if (host.isNot())
+				res = res.not();
+			return res;
+		}
+		return MatchResult.MATCH;
 	}
 
 	/**
