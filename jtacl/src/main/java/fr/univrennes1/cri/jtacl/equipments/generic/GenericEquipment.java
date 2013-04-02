@@ -22,6 +22,7 @@ import fr.univrennes1.cri.jtacl.core.network.IfaceLinksByIp;
 import fr.univrennes1.cri.jtacl.core.network.IfacesByName;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.Route;
+import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.network.RoutingEngine;
 import fr.univrennes1.cri.jtacl.core.network.ShowableRoutes;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
@@ -29,6 +30,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.misc.FilesMonitor;
 import fr.univrennes1.cri.jtacl.lib.misc.KeyValue;
@@ -422,5 +424,10 @@ public class GenericEquipment extends NetworkEquipment {
 	public boolean hasChanged() {
 		List<String> files = _fam.checkFiles();
 		return !files.isEmpty();
+	}
+
+	@Override
+	public Routes getRoutes(IPRangeable destination) {
+		return _routingEngine.getRoutes(destination);
 	}
 }

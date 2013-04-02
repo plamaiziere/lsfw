@@ -16,6 +16,7 @@ package fr.univrennes1.cri.jtacl.core.network;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.io.PrintStream;
 
 /**
@@ -238,4 +239,15 @@ public class NetworkEquipment {
 		return false;
 	}
 
+	/**
+	 * Returns the routes on this equipment that match the nearest network
+	 * including this destination range.
+	 * @param destination the {@link IPRangeable} IP range of the destination.
+	 * @return a {@link Routes} list containing the routes. The list could be
+	 * empty but not null.
+	 * @throws JtaclRoutingException if problem occurs.
+	 */
+	public Routes getRoutes(IPRangeable destination) {
+		return null;
+	}
 }
