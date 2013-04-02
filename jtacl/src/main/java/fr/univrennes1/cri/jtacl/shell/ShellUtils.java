@@ -259,6 +259,7 @@ public class ShellUtils {
 	public static IfaceLink findOnRouteIfaceLink(NetworkLink link,
 		IPRangeable destination) {
 
+		IfaceLinks res = new IfaceLinks();
 		IfaceLinks ilinks = link.getIfaceLinks();
 		/*
 		 * for each equipment, try to route the destination ip address, if the
@@ -272,10 +273,13 @@ public class ShellUtils {
 			for (Route<IfaceLink> r: routes) {
 				IfaceLink rilink = r.getLink();
 				if (rilink != null && rilink.getNetworkLink() != link)
-					return l;
+					res.add(l);
 			}
 		}
-		return null;
+		if (res.size() != 1)
+			return null;
+		else
+			return res.get(0);
 	}
 
 }
