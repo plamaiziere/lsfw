@@ -21,6 +21,7 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeOptions;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.core.probing.Probing;
+import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.core.topology.Topology;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
@@ -125,10 +126,13 @@ public class ProbeCommand {
 		/*
 		 * We can specify where we want to inject the probes.
 		 */
+		NetworkLink nlink = null;
 		IfaceLinks ilinks;
-		if (probeCmd.getEquipments() != null) {
+		String onEquipment = probeCmd.getEquipments();
+		boolean autolink = onEquipment != null && onEquipment.equalsIgnoreCase("auto");
+		if (onEquipment != null && !autolink) {
 			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress.nearestNetwork(),
-					probeCmd.getEquipments());
+					onEquipment);
 			// error
 			if (ilinks == null)
 				throw new JtaclParameterException("no links found");
@@ -166,7 +170,8 @@ public class ProbeCommand {
 					throw new JtaclParameterException(
 						"Too many networks match this source IP address");
 				}
-				ilinks = nlinks.get(0).getIfaceLinks();
+				nlink = nlinks.get(0);
+				ilinks = nlink.getIfaceLinks();
 			}
 		}
 
@@ -175,7 +180,18 @@ public class ProbeCommand {
 		}
 
 		if (ilinks.size() > 1) {
-			throw new JtaclParameterException("Too many links");
+			if (autolink) {
+				/*
+				 * try to find a suitable link to reach the destination
+				 */
+				IfaceLink ilink = ShellUtils.findOnRouteIfaceLink(nlink, destAddress);
+				if (ilink == null)
+					throw new JtaclParameterException("Too many links");
+				ilinks.clear();
+				ilinks.add(ilink);
+			} else {
+				throw new JtaclParameterException("Too many links");
+			}
 		}
 
 		/*

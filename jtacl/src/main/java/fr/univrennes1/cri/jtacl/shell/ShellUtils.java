@@ -20,8 +20,12 @@ import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLinks;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
+import fr.univrennes1.cri.jtacl.core.network.Route;
+import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.probing.ExpectedProbing;
+import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
@@ -250,6 +254,28 @@ public class ShellUtils {
 		}
 
 		return ep;
+	}
+
+	public static IfaceLink findOnRouteIfaceLink(NetworkLink link,
+		IPRangeable destination) {
+
+		IfaceLinks ilinks = link.getIfaceLinks();
+		/*
+		 * for each equipment, try to route the destination ip address, if the
+		 * networklink returned (via the ifacelink) is not the same as 'link',
+		 * it means that the equipment routes to another network. So we can
+		 * use the ifacelink on this equipment to reach the destination.
+		 */
+		for (IfaceLink l: ilinks) {
+			NetworkEquipment eq = l.getEquipment();
+			Routes routes = eq.getRoutes(destination);
+			for (Route<IfaceLink> r: routes) {
+				IfaceLink rilink = r.getLink();
+				if (rilink != null && rilink.getNetworkLink() != link)
+					return l;
+			}
+		}
+		return null;
 	}
 
 }
