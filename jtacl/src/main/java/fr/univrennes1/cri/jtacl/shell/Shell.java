@@ -656,14 +656,19 @@ public class Shell {
 		ptpt.setProbeOptQuickDeny(true);
 		ptpt.setProbeOptState(state);
 
+		boolean probeError = false;
+		String probeMsg = "";
 		ProbeCommand pc = new ProbeCommand();
-		pc.buildRequest(ptpt);
-
-		/*
-		 * probe
-		 */
-		pc.runCommand();
-
+		try {
+			pc.buildRequest(ptpt);
+			/*
+			 * probe
+			 */
+			pc.runCommand();
+		} catch (JtaclParameterException ex) {
+			probeError = true;
+			probeMsg = ex.getMessage();
+		}
 		/*
 		 * store the probe and result into the policy probe
 		 */
@@ -674,9 +679,14 @@ public class Shell {
 			+ ptpt.getPortSource() + ":"
 			+ ptpt.getPortDest() + " "
 			+ "flags " + ptpt.getTcpFlags();
+		if (probeError)
+			sprobe += " (Error: " + probeMsg + ")";
 		policyProbe.setProbe(sprobe);
-		ExpectedProbing ep = new ExpectedProbing(false, sexpect);
-		policyProbe.setResult(probing.checkExpectedResult(ep));
+		if (!probeError) {
+			ExpectedProbing ep = new ExpectedProbing(false, sexpect);
+			policyProbe.setResult(probing.checkExpectedResult(ep));
+		} else
+			policyProbe.setResult(false);
 		return policyProbe.isResultOk();
 	}
 
