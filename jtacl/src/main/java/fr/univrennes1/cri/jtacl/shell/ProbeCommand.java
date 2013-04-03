@@ -187,7 +187,7 @@ public class ProbeCommand {
 				IfaceLink ilink = ShellUtils.findOnRouteIfaceLink(nlink, destAddress);
 				if (ilink == null)
 					throw new JtaclParameterException("Too many links");
-				ilinks.clear();
+				ilinks = new IfaceLinks();
 				ilinks.add(ilink);
 			} else {
 				throw new JtaclParameterException("Too many links");
