@@ -311,7 +311,11 @@ public class Shell {
 		String equipmentName = command.getString("Equipments");
 
 		if (equipmentName == null) {
-			_monitor.reload();
+			try {
+				_monitor.reload();
+			} catch (JtaclRuntimeException ex) {
+				System.err.println("Error: " + ex.getMessage());
+			}
 			return;
 		}
 
@@ -655,6 +659,7 @@ public class Shell {
 		}
 		ptpt.setProbeOptQuickDeny(true);
 		ptpt.setProbeOptState(state);
+		ptpt.setEquipments("auto");
 
 		boolean probeError = false;
 		String probeMsg = "";
