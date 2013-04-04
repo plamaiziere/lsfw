@@ -466,7 +466,7 @@ public class PolicyConfig {
 							 * check validity of the service
 							 */
 							try {
-								ShellUtils.parseService(sport, sproto);
+								ShellUtils.parsePortSpec(sport, sproto);
 							} catch (JtaclParameterException ex) {
 								throw new JtaclConfigurationException("Policy: "
 									+ pname + ", " + ex.getMessage());
