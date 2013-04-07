@@ -2459,7 +2459,7 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	/*
-	 * XXX: FIX This to handle 'not' int table
+	 * XXX: FIX this to handle 'not' in table
 	 */
 	protected MatchResult tableIpspecFilter(FilterContext context,
 			PfIpSpec ipspec, IPRangeable ipAddress, AddressFamily af) {
