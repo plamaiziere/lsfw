@@ -2371,8 +2371,13 @@ public class PacketFilter extends GenericEquipment {
 			/*
 			 * get the result for the table
 			 */
-			MatchResult res = tableIpspecFilter(context, table.getIpspec(),
+			MatchResult res = ipspecFilter(context, table.getIpspec(),
 				ipAddress, af);
+			/*
+			 * XXX: FIX this.
+				MatchResult res = tableIpspecFilter(context, table.getIpspec(),
+		    	ipAddress, af);
+			*/
 			if (host.isNot())
 				res = res.not();
 			return res;
