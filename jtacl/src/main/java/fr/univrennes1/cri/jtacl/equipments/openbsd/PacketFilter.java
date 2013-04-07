@@ -2458,6 +2458,9 @@ public class PacketFilter extends GenericEquipment {
 		return portspec.matches(portRequest);
 	}
 
+	/*
+	 * XXX: FIX This to handle 'not' int table
+	 */
 	protected MatchResult tableIpspecFilter(FilterContext context,
 			PfIpSpec ipspec, IPRangeable ipAddress, AddressFamily af) {
 
