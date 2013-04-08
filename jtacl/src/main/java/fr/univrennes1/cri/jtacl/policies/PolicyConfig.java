@@ -405,84 +405,80 @@ public class PolicyConfig {
 	protected void linkPolicyRef(Policy p, PoliciesMap globalPolicies,
 			PoliciesMap localPolicies) {
 
-		boolean retry = true;
-		while (retry) {
-			for (String pname: localPolicies.keySet()) {
-				retry = false;
-				Policy ref = globalPolicies.get(pname);
-				if (ref != null) {
-					if (!checkPolicyRef(p, ref)) {
-						throw new JtaclConfigurationException("Policy: "
-							+ p.getName()
-							+ ", invalid included policy: " + ref.getName());
-					}
-					localPolicies.put(ref);
-					continue;
+		for (String pname: localPolicies.getKeysSorted()) {
+			Policy ref = globalPolicies.get(pname);
+			if (ref != null) {
+				if (!checkPolicyRef(p, ref)) {
+					throw new JtaclConfigurationException("Policy: "
+						+ p.getName()
+						+ ", invalid included policy: " + ref.getName());
 				}
-				if (ref == null) {
-					/*
-					 * auto-create a NetworkPolicy if the name starts with
-					 * ACCEPT| or DENY|
-					 */
-					String[] ss = pname.split("\\|");
-					String expect = ss[0];
-					if (ss.length == 2) {
-						String flowname = ss[1];
-						if (expect.equalsIgnoreCase("ACCEPT")
-							|| expect.equalsIgnoreCase("DENY")) {
-							NetworkPolicy npolicy = new NetworkPolicy(pname, "(auto) " + pname);
-							if (expect.equalsIgnoreCase(expect))
-								npolicy.setExpect(PolicyExpect.ACCEPT);
-							else
-								npolicy.setExpect(PolicyExpect.DENY);
-							npolicy.getPolicies().put(flowname, null);
-							globalPolicies.put(npolicy);
-							linkPolicyRef(npolicy, globalPolicies,
-								npolicy.getPolicies());
-							retry = true;
-							break;
-						}
-					}
-
-					/*
-					 * auto-create a FlowPolicy if the name starts with UDP/
-					 * or TCP/
-					 */
-					ss = pname.split("/");
-					if (ss.length == 2) {
-						String sproto = ss[0];
-						String sport = ss[1];
-						Integer protocol = null;
-						FlowPolicy flow = new FlowPolicy(pname,	"(auto) " + pname);
-						if (sproto.equalsIgnoreCase("udp"))
-							protocol = Protocols.UDP;
-						if (sproto.equalsIgnoreCase("tcp")) {
-							protocol = Protocols.TCP;
-							flow.setFlags(_defaultTcpFlags);
-
-						}
-						if (protocol != null) {
-							/*
-							 * check validity of the service
-							 */
-							try {
-								ShellUtils.parsePortSpec(sport, sproto);
-							} catch (JtaclParameterException ex) {
-								throw new JtaclConfigurationException("Policy: "
-									+ pname + ", " + ex.getMessage());
-							}
-							flow.setConnected(true);
-							flow.setProtocol(protocol);
-							flow.setPort(sport);
-							globalPolicies.put(flow);
-							retry = true;
-							break;
-						}
-					}
-				}
-				throw new JtaclConfigurationException(
-					"Cannot find policy: " + pname);
+				localPolicies.put(ref);
+				continue;
 			}
+			if (ref == null) {
+				/*
+				 * auto-create a NetworkPolicy if the name starts with
+				 * ACCEPT| or DENY|
+				 */
+				String[] ss = pname.split("\\|");
+				String expect = ss[0];
+				if (ss.length == 2) {
+					String flowname = ss[1];
+					if (expect.equalsIgnoreCase("ACCEPT")
+						|| expect.equalsIgnoreCase("DENY")) {
+						NetworkPolicy npolicy = new NetworkPolicy(pname, "(auto) " + pname);
+						if (expect.equalsIgnoreCase(expect))
+							npolicy.setExpect(PolicyExpect.ACCEPT);
+						else
+							npolicy.setExpect(PolicyExpect.DENY);
+						npolicy.getPolicies().put(flowname, null);
+						globalPolicies.put(npolicy);
+						localPolicies.put(npolicy);
+						linkPolicyRef(npolicy, globalPolicies,
+							npolicy.getPolicies());
+						continue;
+					}
+				}
+
+				/*
+				 * auto-create a FlowPolicy if the name starts with UDP/
+				 * or TCP/
+				 */
+				ss = pname.split("/");
+				if (ss.length == 2) {
+					String sproto = ss[0];
+					String sport = ss[1];
+					Integer protocol = null;
+					FlowPolicy flow = new FlowPolicy(pname,	"(auto) " + pname);
+					if (sproto.equalsIgnoreCase("udp"))
+						protocol = Protocols.UDP;
+					if (sproto.equalsIgnoreCase("tcp")) {
+						protocol = Protocols.TCP;
+						flow.setFlags(_defaultTcpFlags);
+
+					}
+					if (protocol != null) {
+						/*
+						 * check validity of the service
+						 */
+						try {
+							ShellUtils.parsePortSpec(sport, sproto);
+						} catch (JtaclParameterException ex) {
+							throw new JtaclConfigurationException("Policy: "
+								+ pname + ", " + ex.getMessage());
+						}
+						flow.setConnected(true);
+						flow.setProtocol(protocol);
+						flow.setPort(sport);
+						globalPolicies.put(flow);
+						localPolicies.put(flow);
+						continue;
+					}
+				}
+			}
+			throw new JtaclConfigurationException(
+				"Cannot find policy: " + pname);
 		}
 	}
 
