@@ -691,8 +691,8 @@ public class ShellParser extends CommonRules<Object> {
 			Sequence(
 				IgnoreCase("ip"),
 				WhiteSpaces(),
-				UntilEOI(),
-				setString("AddressArg", match()),
+				StringOrQuotedString(),
+				setString("AddressArg", getLastQuotedString()),
 				setString("Command", "ip")
 			);
 	}
@@ -702,8 +702,8 @@ public class ShellParser extends CommonRules<Object> {
 			Sequence(
 				IgnoreCase("ip6"),
 				WhiteSpaces(),
-				UntilEOI(),
-				setString("AddressArg", match()),
+				StringOrQuotedString(),
+				setString("AddressArg", getLastQuotedString()),
 				setString("Command", "ip6")
 			);
 	}
