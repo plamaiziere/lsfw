@@ -693,6 +693,8 @@ public class ShellParser extends CommonRules<Object> {
 				WhiteSpaces(),
 				StringOrQuotedString(),
 				setString("AddressArg", getLastQuotedString()),
+				SkipSpaces(),
+				EOI,
 				setString("Command", "ip")
 			);
 	}
@@ -704,6 +706,8 @@ public class ShellParser extends CommonRules<Object> {
 				WhiteSpaces(),
 				StringOrQuotedString(),
 				setString("AddressArg", getLastQuotedString()),
+				SkipSpaces(),
+				EOI,
 				setString("Command", "ip6")
 			);
 	}
