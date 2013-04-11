@@ -13,7 +13,7 @@ examples:
   prefix  : 21
   length  : 2048
 
-  lsfw> ip 1.2.3.4 - 1.2.3.255
+  lsfw> ip "1.2.3.4 - 1.2.3.255"
   range  : 1.2.3.4-1.2.3.255
   length : 251
   nearest network : 1.2.3.0 - 1.2.3.255
