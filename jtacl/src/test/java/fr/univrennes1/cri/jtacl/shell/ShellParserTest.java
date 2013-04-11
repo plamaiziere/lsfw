@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.shell;
 
+import static junit.framework.Assert.assertEquals;
 import junit.framework.TestCase;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -552,12 +553,17 @@ public class ShellParserTest extends TestCase {
 	public void testIp() {
 		System.out.println("ip");
 
-		String line = "ip ADDRESS1 ADDRESS2";
+		String line = "ip \"ADDRESS1 ADDRESS2\"";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("ip", parser.getString("Command"));
 		assertEquals("ADDRESS1 ADDRESS2", parser.getString("AddressArg"));
 
-		line = "ip6 ADDRESS1 ADDRESS2";
+		line = "ip ADDRESS1";
+		result = new ReportingParseRunner(parser.CommandLine()).run(line);
+		assertEquals("ip", parser.getString("Command"));
+		assertEquals("ADDRESS1", parser.getString("AddressArg"));
+
+		line = "ip6 \"ADDRESS1 ADDRESS2\"";
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("ip6", parser.getString("Command"));
 		assertEquals("ADDRESS1 ADDRESS2", parser.getString("AddressArg"));
