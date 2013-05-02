@@ -18,9 +18,9 @@ import junit.framework.TestCase;
  * tests for FwResult
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class AclResultTest extends TestCase {
+public class FwResultTest extends TestCase {
 
-	public AclResultTest(String testName) {
+	public FwResultTest(String testName) {
 		super(testName);
 	}
 
