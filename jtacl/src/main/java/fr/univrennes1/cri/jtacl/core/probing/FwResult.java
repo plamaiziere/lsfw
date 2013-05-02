@@ -14,10 +14,10 @@
 package fr.univrennes1.cri.jtacl.core.probing;
 
 /**
- * The result of an ACL (accept, deny, match) : a set of flags.
+ * The result of a firewalling rule (accept, deny, match) : a set of flags.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class AclResult {
+public class FwResult {
 
 	/**
 	 * the result
@@ -27,7 +27,7 @@ public class AclResult {
 	/**
 	 * Constructs a new and empty instance.
 	 */
-	public AclResult() {
+	public FwResult() {
 		super();
 	}
 
@@ -35,21 +35,21 @@ public class AclResult {
 	 * Constructs a new instance using OR-ing the flags in argument.
 	 * @param flags array of flags to set.
 	 */
-	public AclResult(int ... flags) {
+	public FwResult(int ... flags) {
 		super();
 		addResult(flags);
 	}
 
 	/**
-	 * the acl permits the access.
+	 * the firewalling rule permits the access.
 	 */
 	public static final int ACCEPT = 1;
 	/**
-	 * the acl denies the access.
+	 * the firewalling rule denies the access.
 	 */
 	public static final int DENY = 2;
 	/**
-	 * the acl matches but does not accepts nor denies.
+	 * the firewalling rule matches but does not accepts nor denies.
 	 */
 	public static final int MATCH = 4;
 	/**
@@ -58,41 +58,41 @@ public class AclResult {
 	public static final int MAY = 128;
 
 	/**
-	 * Returns true if the acl result has the ACCEPT flag set.
-	 * @return true if the acl result has the ACCEPT flag set.
+	 * Returns true if the firewalling rule result has the ACCEPT flag set.
+	 * @return true if the firewalling rule result has the ACCEPT flag set.
 	 */
 	public boolean hasAccept() {
 		return (_result & ACCEPT) != 0;
 	}
 
 	/**
-	 * Returns true if the acl result has the DENY flag set.
-	 * @return true if the acl result has the DENY flag set.
+	 * Returns true if the firewalling rule result has the DENY flag set.
+	 * @return true if the firewalling rule result has the DENY flag set.
 	 */
 	public boolean hasDeny() {
 		return (_result & DENY) != 0;
 	}
 
 	/**
-	 * Returns true if the acl result has the MATCH flag set.
-	 * @return true if the acl result has the MATCH flag set.
+	 * Returns true if the firewalling rule result has the MATCH flag set.
+	 * @return true if the firewalling rule result has the MATCH flag set.
 	 */
 	public boolean hasMatch() {
 		return (_result & MATCH) != 0;
 	}
 
 	/**
-	 * Returns true if the acl result has the MAY flag set.
-	 * @return true if the acl result has the MAY flag set.
+	 * Returns true if the firewalling rule result has the MAY flag set.
+	 * @return true if the firewalling rule result has the MAY flag set.
 	 */
 	public boolean hasMay() {
 		return (_result & MAY) != 0;
 	}
 
 	/**
-	 * Returns true if the acl result contains all the flags in argument.
+	 * Returns true if the firewalling rule result contains all the flags in argument.
 	 * @param flags array of flags to test.
-	 * @return true if the acl result contains all the flags in argument.
+	 * @return true if the firewalling rule result contains all the flags in argument.
 	 */
 	public boolean hasFlags(int ... flags) {
 		for (int f: flags) {
@@ -131,8 +131,8 @@ public class AclResult {
 	 * Returns a new instance of this result.
 	 * @return a new instance of this result.
 	 */
-	public AclResult newInstance() {
-		return new AclResult(_result);
+	public FwResult newInstance() {
+		return new FwResult(_result);
 	}
 
 	/**
@@ -154,88 +154,88 @@ public class AclResult {
 	}
 
 	/**
-	 * Concats an AclResult with this result. The concatenation is defined by
+	 * Concats an FwResult with this result. The concatenation is defined by
 	 * the first following rules (in order):
 	 * <li>this.isCertainlyDeny || other.isCertainlyDeny returns DENY</li>
 	 * <li>this.isCertainlyAccept && other.isCertainlyAccept returns ACCEPT</li>	 *
 	 * <li>this.hasDeny || other.hasDeny returns MAY DENY</li>
 	 * <li>this.hasAccept || other.hasAccept returns MAY ACCEPT</li>
-	 * @param other AclResult to concat.
+	 * @param other FwResult to concat.
 	 * @return the result of the concatenation.
 	 */
-	public AclResult concat(AclResult other) {
+	public FwResult concat(FwResult other) {
 
 		/*
 		 * deny
 		 */
 		if (isCertainlyDeny() || other.isCertainlyDeny()) {
-			return new AclResult(AclResult.DENY);
+			return new FwResult(FwResult.DENY);
 		}
 
 		/*
 		 * accept
 		 */
 		if (isCertainlyAccept() && other.isCertainlyAccept()) {
-			return new AclResult(AclResult.ACCEPT);
+			return new FwResult(FwResult.ACCEPT);
 		}
 
 		/*
 		 * may deny
 		 */
 		if (hasDeny() || other.hasDeny()) {
-			return new AclResult(AclResult.MAY | AclResult.DENY);
+			return new FwResult(FwResult.MAY | FwResult.DENY);
 		}
 
 		/*
 		 * may accept
 		 */
 		if (hasAccept() || other.hasAccept()) {
-			return new AclResult(AclResult.MAY | AclResult.ACCEPT);
+			return new FwResult(FwResult.MAY | FwResult.ACCEPT);
 		}
 
-		return new AclResult();
+		return new FwResult();
 	}
 
-	/* SumPath of an AclResult with this result. The sumPath is defined by
+	/* SumPath of an FwResult with this result. The sumPath is defined by
 	 * the first following rules (in order):
 	 * <li>this.isCertainlyDeny && other.isCertainlyDeny returns DENY</li>
 	 * <li>this.isCertainlyAccept && other.isCertainlyAccept returns ACCEPT</li>
 	 * <li>this.hasDeny || other.hasDeny returns MAY DENY</li>
 	 * <li>this.hasAccept || other.hasAccept returns MAY ACCEPT</li>
-	 * @param other AclResult to sumPath.
+	 * @param other FwResult to sumPath.
 	 * @return the result of the sumPath.
 	 */
-	public AclResult sumPath(AclResult other) {
+	public FwResult sumPath(FwResult other) {
 
 		/*
 		 * deny
 		 */
 		if (isCertainlyDeny() && other.isCertainlyDeny()) {
-			return new AclResult(AclResult.DENY);
+			return new FwResult(FwResult.DENY);
 		}
 
 		/*
 		 * accept
 		 */
 		if (isCertainlyAccept() && other.isCertainlyAccept()) {
-			return new AclResult(AclResult.ACCEPT);
+			return new FwResult(FwResult.ACCEPT);
 		}
 
 		/*
 		 * may deny
 		 */
 		if (hasDeny() || other.hasDeny()) {
-			return new AclResult(AclResult.MAY | AclResult.DENY);
+			return new FwResult(FwResult.MAY | FwResult.DENY);
 		}
 
 		/*
 		 * may accept
 		 */
 		if (hasAccept() || other.hasAccept()) {
-			return new AclResult(AclResult.MAY | AclResult.ACCEPT);
+			return new FwResult(FwResult.MAY | FwResult.ACCEPT);
 		}
 
-		return new AclResult();
+		return new FwResult();
 	}
 
 	@Override
@@ -246,7 +246,7 @@ public class AclResult {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final AclResult other = (AclResult) obj;
+		final FwResult other = (FwResult) obj;
 		if (this._result != other._result) {
 			return false;
 		}

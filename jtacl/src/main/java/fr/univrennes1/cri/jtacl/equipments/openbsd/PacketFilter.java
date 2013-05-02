@@ -30,7 +30,7 @@ import fr.univrennes1.cri.jtacl.core.network.IfaceLinksByIp;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.network.RoutingEngine;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
@@ -2954,7 +2954,7 @@ public class PacketFilter extends GenericEquipment {
 		 * Accept the probe if probe request "state option" is set.
 		 */
 		if (probe.getRequest().getProbeOptions().hasState()) {
-			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
+			probeResults.setAclResult(direction, new FwResult(FwResult.ACCEPT));
 			probeResults.setInterface(direction, interfaceDesc + " # STATE MATCH");
 			return;
 		}
@@ -2964,7 +2964,7 @@ public class PacketFilter extends GenericEquipment {
 		 * skipped interface
 		 */
 		if (_skippedIfaces.containsKey(link.getIfaceName())) {
-			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
+			probeResults.setAclResult(direction, new FwResult(FwResult.ACCEPT));
 			probeResults.setInterface(direction, interfaceDesc + " # SKIPPED");
 			return;
 		}
@@ -2982,13 +2982,13 @@ public class PacketFilter extends GenericEquipment {
 		 * rule results
 		 */
 		for (RuleResult ruleResult: anchorResult.getRuleResults()) {
-			AclResult aclResult = new AclResult();
+			FwResult aclResult = new FwResult();
 			if (ruleResult.getAction().equals(PfRule.BLOCK))
-				aclResult.addResult(AclResult.DENY);
+				aclResult.addResult(FwResult.DENY);
 			else
-				aclResult.addResult(AclResult.ACCEPT);
+				aclResult.addResult(FwResult.ACCEPT);
 			if (ruleResult.getMatch() != MatchResult.ALL)
-				aclResult.addResult(AclResult.MAY);
+				aclResult.addResult(FwResult.MAY);
 			probeResults.addMatchingAcl(direction,
 				ruleResult.getText(),
 				aclResult);
@@ -2999,17 +2999,17 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		RuleResult lastResult = anchorResult.getLastResult();
 		if (lastResult != null) {
-			AclResult aclResult = new AclResult();
+			FwResult aclResult = new FwResult();
 			if (lastResult.getAction().equals(PfRule.BLOCK))
-				aclResult.addResult(AclResult.DENY);
+				aclResult.addResult(FwResult.DENY);
 			else
-				aclResult.addResult(AclResult.ACCEPT);
+				aclResult.addResult(FwResult.ACCEPT);
 			if (lastResult.getMatch() != MatchResult.ALL)
-				aclResult.addResult(AclResult.MAY);
+				aclResult.addResult(FwResult.MAY);
 			probeResults.addActiveAcl(direction, lastResult.getText(), aclResult);
 			probeResults.setAclResult(direction, aclResult);
 		} else {
-			probeResults.setAclResult(direction, new AclResult(AclResult.ACCEPT));
+			probeResults.setAclResult(direction, new FwResult(FwResult.ACCEPT));
 		}
 
 		probeResults.setInterface(direction, interfaceDesc);

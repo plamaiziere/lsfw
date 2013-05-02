@@ -39,10 +39,10 @@ public class ProbeResults {
 	protected ArrayList<AccessControlList> _activesAclsOut;
 
 	// the global result in input (accept, deny)
-	protected AclResult _resultIn;
+	protected FwResult _resultIn;
 
 	// the global result in output (accept, deny)
-	protected AclResult _resultOut;
+	protected FwResult _resultOut;
 
 	// the routing result
 	protected RoutingResult _routingResult;
@@ -65,8 +65,8 @@ public class ProbeResults {
 		_interfaceIn = "";
 		_interfaceOut = "";
 
-		_resultIn = new AclResult(AclResult.ACCEPT);
-		_resultOut = new AclResult(AclResult.ACCEPT);
+		_resultIn = new FwResult(FwResult.ACCEPT);
+		_resultOut = new FwResult(FwResult.ACCEPT);
 		_routingResult = RoutingResult.UNKNOWN;
 		_routingMessage = "";
 	}
@@ -75,53 +75,53 @@ public class ProbeResults {
 		_strEvents.add(message);
 	}
 
-	public void addMatchingAclIn(String aclString, AclResult result) {
+	public void addMatchingAclIn(String aclString, FwResult result) {
 		AccessControlList acl = new AccessControlList(aclString, result);
 		_matchingAclsIn.add(acl);
 	}
 
-	public void addMatchingAclOut(String aclString, AclResult result) {
+	public void addMatchingAclOut(String aclString, FwResult result) {
 		AccessControlList acl = new AccessControlList(aclString, result);
 		_matchingAclsOut.add(acl);
 	}
 
-	public void addMatchingAcl(Direction direction, String aclString, AclResult result) {
+	public void addMatchingAcl(Direction direction, String aclString, FwResult result) {
 		if (direction == Direction.IN)
 			addMatchingAclIn(aclString, result);
 		else
 			addMatchingAclOut(aclString, result);
 	}
 
-	public void addActiveAclIn(String aclString, AclResult result) {
+	public void addActiveAclIn(String aclString, FwResult result) {
 		AccessControlList acl = new AccessControlList(aclString, result);
 		_activesAclsIn.add(acl);
 	}
 
-	public void addActiveAclOut(String aclString, AclResult result) {
+	public void addActiveAclOut(String aclString, FwResult result) {
 		AccessControlList acl = new AccessControlList(aclString, result);
 		_activesAclsOut.add(acl);
 	}
 
-	public void addActiveAcl(Direction direction, String aclString, AclResult result) {
+	public void addActiveAcl(Direction direction, String aclString, FwResult result) {
 		if (direction == Direction.IN)
 			addActiveAclIn(aclString, result);
 		else
 			addActiveAclOut(aclString, result);
 	}
 
-	public AclResult getAclResultIn() {
+	public FwResult getAclResultIn() {
 		return _resultIn;
 	}
 
-	public void setAclResultIn(AclResult result) {
+	public void setAclResultIn(FwResult result) {
 		_resultIn = result;
 	}
 
-	public void setAclResultOut(AclResult result) {
+	public void setAclResultOut(FwResult result) {
 		_resultOut = result;
 	}
 
-	public void setAclResult(Direction direction, AclResult result) {
+	public void setAclResult(Direction direction, FwResult result) {
 		if (direction == Direction.IN)
 			setAclResultIn(result);
 		else
@@ -133,7 +133,7 @@ public class ProbeResults {
 		_routingMessage = message;
 	}
 
-	public AclResult getAclResultOut() {
+	public FwResult getAclResultOut() {
 		return _resultOut;
 	}
 
@@ -157,7 +157,7 @@ public class ProbeResults {
 		return _matchingAclsOut;
 	}
 
-	public AclResult getAclResult() {
+	public FwResult getAclResult() {
 		return _resultIn.concat(_resultOut);
 	}
 

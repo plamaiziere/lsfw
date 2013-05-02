@@ -27,7 +27,7 @@ import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
@@ -1297,11 +1297,11 @@ public class CpFw extends GenericEquipment {
 				/*
 				 * store the result in the probe
 				 */
-				AclResult aclResult = new AclResult();
+				FwResult aclResult = new FwResult();
 				aclResult.setResult(rule.getAction().equals("accept_action") ?
-					AclResult.ACCEPT : AclResult.DENY);
+					FwResult.ACCEPT : FwResult.DENY);
 				if (match != MatchResult.ALL)
-					aclResult.addResult(AclResult.MAY);
+					aclResult.addResult(FwResult.MAY);
 
 				results.addMatchingAcl(direction, rule.toText(),
 					aclResult);

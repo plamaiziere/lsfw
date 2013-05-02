@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.core.probing;
 import junit.framework.TestCase;
 
 /**
- * tests for AclResult
+ * tests for FwResult
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class AclResultTest extends TestCase {
@@ -35,137 +35,137 @@ public class AclResultTest extends TestCase {
 	}
 
 	/**
-	 * Test of concat method, of class AclResult.
+	 * Test of concat method, of class FwResult.
 	 */
 	public void testConcat() {
 
-		AclResult r;
-		AclResult a1;
-		AclResult a2;
+		FwResult r;
+		FwResult a1;
+		FwResult a2;
 
 		/*
 		 * DENY + X
 		 */
-		a1 = new AclResult(AclResult.DENY);
-		a2 = new AclResult();
+		a1 = new FwResult(FwResult.DENY);
+		a2 = new FwResult();
 		r = a1.concat(a2);
-		assertEquals(new AclResult(AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.DENY), r);
 
 		/*
 		 * X + DENY
 		 */
 		r = a2.concat(a1);
-		assertEquals(new AclResult(AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.DENY), r);
 
 		/*
 		 * ACCEPT + ACCEPT
 		 */
-		a1 = new AclResult(AclResult.ACCEPT);
-		a2 = new AclResult(AclResult.ACCEPT);
+		a1 = new FwResult(FwResult.ACCEPT);
+		a2 = new FwResult(FwResult.ACCEPT);
 		r = a1.concat(a2);
-		assertEquals(new AclResult(AclResult.ACCEPT), r);
+		assertEquals(new FwResult(FwResult.ACCEPT), r);
 
 		/*
 		 * MAY DENY + X
 		 */
-		a1 = new AclResult(AclResult.MAY | AclResult.DENY);
-		a2 = new AclResult();
+		a1 = new FwResult(FwResult.MAY | FwResult.DENY);
+		a2 = new FwResult();
 		r = a1.concat(a2);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * X + MAY DENY
 		 */
 		r = a2.concat(a1);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * MAY DENY + ACCEPT
 		 */
-		a1 = new AclResult(AclResult.MAY | AclResult.DENY);
-		a2 = new AclResult(AclResult.ACCEPT);
+		a1 = new FwResult(FwResult.MAY | FwResult.DENY);
+		a2 = new FwResult(FwResult.ACCEPT);
 		r = a1.concat(a2);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * ACCEPT + MAY DENY
 		 */
 		r = a2.concat(a1);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 	}
 
 	/**
-	 * Test of sumPath method, of class AclResult.
+	 * Test of sumPath method, of class FwResult.
 	 */
 	public void testSumPath() {
 
-		AclResult r;
-		AclResult a1;
-		AclResult a2;
+		FwResult r;
+		FwResult a1;
+		FwResult a2;
 
 		/*
 		 * DENY + X
 		 */
-		a1 = new AclResult(AclResult.DENY);
-		a2 = new AclResult();
+		a1 = new FwResult(FwResult.DENY);
+		a2 = new FwResult();
 		r = a1.sumPath(a2);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * X + DENY
 		 */
 		r = a2.sumPath(a1);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * ACCEPT + ACCEPT
 		 */
-		a1 = new AclResult(AclResult.ACCEPT);
-		a2 = new AclResult(AclResult.ACCEPT);
+		a1 = new FwResult(FwResult.ACCEPT);
+		a2 = new FwResult(FwResult.ACCEPT);
 		r = a1.sumPath(a2);
-		assertEquals(new AclResult(AclResult.ACCEPT), r);
+		assertEquals(new FwResult(FwResult.ACCEPT), r);
 
 		/*
 		 * MAY DENY + X
 		 */
-		a1 = new AclResult(AclResult.MAY | AclResult.DENY);
-		a2 = new AclResult();
+		a1 = new FwResult(FwResult.MAY | FwResult.DENY);
+		a2 = new FwResult();
 		r = a1.sumPath(a2);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * X + MAY DENY
 		 */
 		r = a2.sumPath(a1);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * MAY DENY + ACCEPT
 		 */
-		a1 = new AclResult(AclResult.MAY | AclResult.DENY);
-		a2 = new AclResult(AclResult.ACCEPT);
+		a1 = new FwResult(FwResult.MAY | FwResult.DENY);
+		a2 = new FwResult(FwResult.ACCEPT);
 		r = a1.sumPath(a2);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * ACCEPT + MAY DENY
 		 */
 		r = a2.sumPath(a1);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.DENY), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.DENY), r);
 
 		/*
 		 * ACCEPT + X
 		 */
-		a1 = new AclResult(AclResult.ACCEPT);
-		a2 = new AclResult();
+		a1 = new FwResult(FwResult.ACCEPT);
+		a2 = new FwResult();
 		r = a1.sumPath(a2);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.ACCEPT), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.ACCEPT), r);
 
 		/*
 		 * X + ACCEPT
 		 */
 		r = a2.sumPath(a1);
-		assertEquals(new AclResult(AclResult.MAY | AclResult.ACCEPT), r);
+		assertEquals(new FwResult(FwResult.MAY | FwResult.ACCEPT), r);
 
 	}
 

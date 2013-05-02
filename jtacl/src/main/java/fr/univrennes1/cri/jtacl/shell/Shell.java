@@ -21,7 +21,7 @@ import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.ExpectedProbing;
 import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.probing.Probing;
@@ -387,7 +387,7 @@ public class Shell {
 		/*
 		 * Global ACL result
 		 */
-		AclResult aclResult = _lastProbing.getAclResult();
+		FwResult aclResult = _lastProbing.getAclResult();
 
 		/*
 		 * Global routing result

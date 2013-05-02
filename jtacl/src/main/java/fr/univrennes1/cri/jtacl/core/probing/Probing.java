@@ -23,10 +23,10 @@ import java.util.ArrayList;
 public class Probing extends ArrayList<ProbesTracker> {
 
 	/**
-	 * Returns the global AclResult of this probing.
+	 * Returns the global FwResult of this probing.
 	 * @return the global AclResultRoutingResult of this probing.
 	 */
-	public AclResult getAclResult() {
+	public FwResult getAclResult() {
 		/*
 		 * acl counters
 		 */
@@ -39,7 +39,7 @@ public class Probing extends ArrayList<ProbesTracker> {
 		 * each tracker
 		 */
 		for (ProbesTracker tracker: this) {
-			AclResult aclResult = tracker.getAclResult();
+			FwResult aclResult = tracker.getAclResult();
 			if (aclResult.hasAccept())
 				accepted++;
 			if (aclResult.hasDeny())
@@ -53,37 +53,37 @@ public class Probing extends ArrayList<ProbesTracker> {
 		/*
 		 * Global ACL result
 		 */
-		AclResult aclResult = new AclResult();
+		FwResult aclResult = new FwResult();
 		/*
 		 * one result was MAY
 		 */
 		if (may > 0 || match > 0)
-			aclResult.addResult(AclResult.MAY);
+			aclResult.addResult(FwResult.MAY);
 
 		/*
 		 * some probes were accepted and some were denied => MAY
 		 */
 		if (match == 0 && accepted > 0 && denied > 0)
-			aclResult.addResult(AclResult.MAY);
+			aclResult.addResult(FwResult.MAY);
 
 		/*
 		 * all probes were accepted => ACCEPT
 		 */
 		if (match == 0 && accepted > 0 && denied == 0)
-			aclResult.addResult(AclResult.ACCEPT);
+			aclResult.addResult(FwResult.ACCEPT);
 
 		/*
 		 * all probes were denied => DENY
 		 */
 		if (match == 0 && denied > 0 && accepted == 0) {
-			aclResult.addResult(AclResult.DENY);
+			aclResult.addResult(FwResult.DENY);
 		}
 
 		/*
 		 * some probes were matching => MATCH
 		 */
 		if (match > 0) {
-			aclResult.setResult(AclResult.MATCH);
+			aclResult.setResult(FwResult.MATCH);
 		}
 
 		return aclResult;
@@ -154,7 +154,7 @@ public class Probing extends ArrayList<ProbesTracker> {
 		 */
 		boolean testExpect = false;
 		RoutingResult routingResult = getRoutingResult();
-		AclResult aclResult = getAclResult();
+		FwResult aclResult = getAclResult();
 		
 		if (expect.isRouted() &&
 				routingResult == RoutingResult.ROUTED)

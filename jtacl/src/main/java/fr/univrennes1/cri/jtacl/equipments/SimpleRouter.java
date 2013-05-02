@@ -21,7 +21,7 @@ import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.probing.AccessControlList;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
@@ -322,8 +322,8 @@ public class SimpleRouter extends GenericEquipment {
 				if (!toIP.contains(probe.getDestinationAddress())) {
 					continue;
 				}
-				AclResult aclResult = new AclResult(raction.equals("accept") ?
-					AclResult.ACCEPT : AclResult.DENY);
+				FwResult aclResult = new FwResult(raction.equals("accept") ?
+					FwResult.ACCEPT : FwResult.DENY);
 
 				result.addMatchingAcl(input ? Direction.IN : Direction.OUT, acl, aclResult);
 				/*
@@ -338,7 +338,7 @@ public class SimpleRouter extends GenericEquipment {
 		if (lastAcl == null) {
 			// default policy is accept
 			result.setAclResult(input ? Direction.IN : Direction.OUT,
-					new AclResult(AclResult.ACCEPT));
+					new FwResult(FwResult.ACCEPT));
 			return;
 		}
 		/*

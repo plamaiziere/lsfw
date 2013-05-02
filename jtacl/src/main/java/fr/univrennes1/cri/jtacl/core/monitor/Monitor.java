@@ -18,7 +18,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbesByUid;
@@ -624,7 +624,7 @@ public class Monitor {
 		 * quick deny: stop if the probe is denied
 		 */
 		if (probe.getRequest().getProbeOptions().hasQuickDeny()) {
-			AclResult aclresult = probe.getResults().getAclResult();
+			FwResult aclresult = probe.getResults().getAclResult();
 			if (aclresult.isCertainlyDeny()) {
 				probe.destinationReached("quick denied");
 				return;

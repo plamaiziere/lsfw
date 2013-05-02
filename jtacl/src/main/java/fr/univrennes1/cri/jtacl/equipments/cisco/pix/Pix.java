@@ -27,7 +27,7 @@ import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
-import fr.univrennes1.cri.jtacl.core.probing.AclResult;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
@@ -1906,7 +1906,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 * Accept the probe if probe request "state option" is set.
 		 */
 		if (probe.getRequest().getProbeOptions().hasState()) {
-			results.setAclResult(direction, new AclResult(AclResult.ACCEPT));
+			results.setAclResult(direction, new FwResult(FwResult.ACCEPT));
 			results.setInterface(direction, ifaceName + " # STATE MATCH");
 			return;
 		}
@@ -1946,12 +1946,12 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 						/*
 						 * store the result in the probe
 						 */
-						AclResult aclResult = new AclResult();
+						FwResult aclResult = new FwResult();
 						aclResult.addResult(acl.getAction().equals("permit") ?
-							AclResult.ACCEPT : AclResult.DENY);
+							FwResult.ACCEPT : FwResult.DENY);
 
 						if (match != MatchResult.ALL)
-							aclResult.addResult(AclResult.MAY);
+							aclResult.addResult(FwResult.MAY);
 
 						results.addMatchingAcl(direction,
 							acl.getConfigurationLine(),

@@ -253,14 +253,14 @@ public class ProbesTracker {
 	 * If at least one probe's result is MAY or the routing result is not ROUTED,
 	 * then the global result is MAY.<br/>
 	 *
-	 * @return the {@link AclResult} of this tracker.
+	 * @return the {@link FwResult} of this tracker.
 	 */
-	public AclResult getAclResult() {
+	public FwResult getAclResult() {
 
 		/*
 		 * AclResults on each path.
 		 */
-		List<AclResult> pathResults = new ArrayList<AclResult>();
+		List<FwResult> pathResults = new ArrayList<FwResult>();
 
 		/*
 		 * each path
@@ -271,20 +271,20 @@ public class ProbesTracker {
 			 */
 			ProbesList probes = finalProbe.getParentProbes();
 			probes.add(finalProbe);
-			AclResult pathResult = new AclResult(AclResult.ACCEPT);
+			FwResult pathResult = new FwResult(FwResult.ACCEPT);
 			for (Probe probe : probes) {
-				AclResult probeResult = probe.getResults().getAclResult();
+				FwResult probeResult = probe.getResults().getAclResult();
 				pathResult = pathResult.concat(probeResult);
 			}
 			pathResults.add(pathResult);
 		}
 
-		AclResult result = null;
+		FwResult result = null;
 
 		/*
 		 * result for all pathes
 		 */
-		for (AclResult probeResult: pathResults) {
+		for (FwResult probeResult: pathResults) {
 			if (result == null)
 				result = probeResult;
 			else
@@ -292,10 +292,10 @@ public class ProbesTracker {
 		}
 
 		if (result == null)
-			result = new AclResult(AclResult.DENY | AclResult.MAY);
+			result = new FwResult(FwResult.DENY | FwResult.MAY);
 
 		if (getRoutingResult() != RoutingResult.ROUTED)
-			result.addResult(AclResult.MAY);
+			result.addResult(FwResult.MAY);
 
 		return result;
 	}
