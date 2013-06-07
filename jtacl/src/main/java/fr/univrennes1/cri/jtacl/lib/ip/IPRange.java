@@ -258,7 +258,7 @@ public class IPRange implements IPRangeable {
 
 		int len = IP.maxPrefixLen(_ipFirst.getIpVersion());
 
-		for (int l = len; l > 0; l--) {
+		for (int l = len; l >= 0; l--) {
 			IPNet ip = null;
 			try {
 				ip = new IPNet(_ipFirst.getIP(), _ipFirst.getIpVersion(), l);
