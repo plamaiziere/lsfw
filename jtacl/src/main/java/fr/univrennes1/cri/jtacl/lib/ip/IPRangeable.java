@@ -97,8 +97,6 @@ public interface IPRangeable {
 
 	/**
 	 * Returns the nearest network including this range.
-	 * to the String format. If this range is a network, displays it as a
-	 * network.
 	 * @return the nearest network including this range.
 	 */
 	public IPNet nearestNetwork();
