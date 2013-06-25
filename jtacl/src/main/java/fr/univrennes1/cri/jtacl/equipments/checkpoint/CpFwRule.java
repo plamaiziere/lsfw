@@ -131,7 +131,7 @@ public class CpFwRule {
 		if (isImplicitDrop())
 			return "*** implicit drop ***";
 
-		String s = "N°: " + _number;
+		String s = "# " + _number;
 		if (_name != null)
 			s+= ", name: " + _name;
 
