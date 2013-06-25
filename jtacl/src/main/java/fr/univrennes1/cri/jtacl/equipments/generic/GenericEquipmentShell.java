@@ -114,13 +114,21 @@ public abstract class GenericEquipmentShell {
 				}
 				// filename without path
 				if (fmt.equals("%f")) {
-					File f = new File(ctx.getFilename());
-					output.print(f.getName());
+					if (ctx.getFilename() != null) {
+						File f = new File(ctx.getFilename());
+						output.print(f.getName());
+					} else {
+						output.printf("none");
+					}
 					continue;
 				}
 				// filename with path
 				if (fmt.equals("%F")) {
-					output.print(ctx.getFilename());
+					if (ctx.getFilename() != null) {
+						output.print(ctx.getFilename());
+					} else {
+						output.printf("none");
+					}
 					continue;
 				}
 				if (ip.isHost()) {
