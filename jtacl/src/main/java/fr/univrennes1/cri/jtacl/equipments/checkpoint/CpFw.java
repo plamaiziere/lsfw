@@ -501,8 +501,13 @@ public class CpFw extends GenericEquipment {
 			}
 			i++;
 
-			if (service != null)
+			if (service != null) {
+				String name = service.getName();
+				if (_services.get(name) != null)
+					warnConfig("service object: " + name
+						+ " overrides previous definition", false);
 				_services.put(service.getName(), service);
+			}
 
 			if (service != null && Log.debug().isLoggable(Level.INFO)) {
 			Log.debug().info("CpService: " + service.toString());
@@ -572,8 +577,13 @@ public class CpFw extends GenericEquipment {
 
 			i++;
 
-			if (networkObj != null)
+			if (networkObj != null) {
+				String name = networkObj.getName();
+				if (_networkObjects.get(name) != null)
+					warnConfig("network object: " + name
+						+ " overrides previous definition", false);
 				_networkObjects.put(networkObj.getName(), networkObj);
+			}
 
 			if (networkObj != null && Log.debug().isLoggable(Level.INFO)) {
 				Log.debug().info("CpNetworkObject: " + networkObj.toString());
