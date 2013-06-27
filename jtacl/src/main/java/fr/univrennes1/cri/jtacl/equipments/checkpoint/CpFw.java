@@ -752,10 +752,23 @@ public class CpFw extends GenericEquipment {
 		int i = 0;
 		for (Element e: rules) {
 			_parseContext.set(filename, i, XMLUtils.elementToText(e));
-			String className = XMLUtils.getTagValue(e, "Class_Name");
+
 			CpFwRule fwRule = null;
-			if (className.equalsIgnoreCase("security_rule"))
-				fwRule = parseFwRule(e);
+			String className = XMLUtils.getTagValue(e, "Class_Name");
+			if (className == null) {
+				/*
+				 * header text
+				 */
+				String headerText = XMLUtils.getTagValue(e, "header_text");
+				if (headerText != null)
+					fwRule = new CpFwRule(null, null, headerText);
+			} else {
+				/*
+				 * security rule
+				 */
+				if (className.equalsIgnoreCase("security_rule"))
+					fwRule = parseFwRule(e);
+			}
 
 			if (fwRule != null ) {
 				_fwRules.add(fwRule);
@@ -1302,6 +1315,11 @@ public class CpFw extends GenericEquipment {
 		 */
 		MatchResult match;
 		for (CpFwRule rule: _fwRules) {
+			/*
+			 * skip the rule if not a security rule
+			 */
+			if (!rule.isSecurityRule())
+				continue;
 			match = ruleFilter(probe, rule);
 			if (match != MatchResult.NOT) {
 				/*

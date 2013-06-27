@@ -24,6 +24,7 @@ public class CpFwRule {
 	protected String _comment;
 	protected Integer _number;
 	protected boolean _disabled;
+	protected boolean _headerText;
 
 	protected String _action;
 
@@ -51,6 +52,14 @@ public class CpFwRule {
 
 	public boolean isDisabled() {
 		return _disabled;
+	}
+
+	public boolean isHeaderText() {
+		return _headerText;
+	}
+
+	public boolean isSecurityRule() {
+		return ! _headerText;
 	}
 
 	public String getAction() {
@@ -118,6 +127,21 @@ public class CpFwRule {
 		_implicitDrop = true;
 	}
 
+	/**
+	 * Construct a new fw rule (headerText)
+	 * @param name name
+	 * @param className class name
+	 * @param comment header text
+	 */
+	public CpFwRule(String name, String className, String comment) {
+		_name = name;
+		_className = "header_text";
+		_comment = comment;
+		_number = 0;
+		_action = "none";
+		_headerText = true;
+	}
+
 	@Override
 	public String toString() {
 		return "rule name=" + _name + ", className=" + _className
@@ -130,6 +154,9 @@ public class CpFwRule {
 	public String toText() {
 		if (isImplicitDrop())
 			return "*** implicit drop ***";
+
+		if (isHeaderText())
+			return "### " + _comment;
 
 		String s = "#" + _number;
 		if (_name != null)
