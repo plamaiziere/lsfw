@@ -19,6 +19,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
  */
 public class CpFwIpSpec {
 	protected CpNetworkGroup _networks = new CpNetworkGroup("", "", "");
+	protected boolean _notIn;
 
 	public CpNetworkGroup getNetworks() {
 		return _networks;
@@ -34,8 +35,19 @@ public class CpFwIpSpec {
 		}
 	}
 
+	public void setNotIn(boolean notIn) {
+		_notIn = notIn;
+	}
+
+	public boolean isNotIn() {
+		return _notIn;
+	}
+
 	@Override
 	public String toString() {
-		return "" + _networks.getBaseReferencesName();
+		String s = "";
+		if (_notIn)
+			s= "!";
+		return s + _networks.getBaseReferencesName();
 	}
 }

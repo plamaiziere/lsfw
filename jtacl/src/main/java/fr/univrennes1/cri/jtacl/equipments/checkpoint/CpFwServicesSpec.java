@@ -20,6 +20,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 public class CpFwServicesSpec {
 
 	protected CpGroupService _services = new CpGroupService("", "");
+	protected boolean _notIn;
 
 	public CpGroupService getServices() {
 		return _services;
@@ -35,9 +36,20 @@ public class CpFwServicesSpec {
 		}
 	}
 
+	public void setNotIn(boolean notIn) {
+		_notIn = notIn;
+	}
+
+	public boolean isNotIn() {
+		return _notIn;
+	}
+
 	@Override
 	public String toString() {
-		return _services.toString();
+		String s = "";
+		if (_notIn)
+			s= "!";
+		return s + _services.toString();
 	}
 
 }

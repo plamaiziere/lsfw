@@ -649,6 +649,15 @@ public class CpFw extends GenericEquipment {
 			}
 			servicesSpec.addReference(refName, service);
 		}
+
+		/*
+		 * cell negation
+		 */
+		String op = XMLUtils.getTagValue(e, "op");
+		if (op != null && op.equals("not in")) {
+			servicesSpec.setNotIn(true);
+		}
+
 		return servicesSpec;
 	}
 
@@ -671,6 +680,15 @@ public class CpFw extends GenericEquipment {
 			}
 			ipSpec.addReference(refName, nobj);
 		}
+
+		/*
+		 * cell negation
+		 */
+		String op = XMLUtils.getTagValue(e, "op");
+		if (op != null && op.equals("not in")) {
+			ipSpec.setNotIn(true);
+		}
+
 		return ipSpec;
 	}
 
@@ -1245,6 +1263,23 @@ public class CpFw extends GenericEquipment {
 		}
 	}
 
+	protected MatchResult ipSpecFilter(CpFwIpSpec ipSpec, IPRangeable range) {
+
+		MatchResult mres = ipSpec.getNetworks().matches(range);
+		if (ipSpec.isNotIn())
+			mres = mres.not();
+		return mres;
+	}
+
+	protected MatchResult servicesSpecFilter(CpFwServicesSpec servicesSpec,
+			ProbeRequest request) {
+
+		MatchResult mres = servicesSpec.getServices().matches(request);
+		if (servicesSpec.isNotIn())
+			mres = mres.not();
+		return mres;
+	}
+
 	protected MatchResult ruleFilter(Probe probe, CpFwRule rule) {
 
 		ProbeRequest request = probe.getRequest();
@@ -1265,8 +1300,7 @@ public class CpFw extends GenericEquipment {
 		 * check source IP
 		 */
 		CpFwIpSpec ipspec = rule.getSourceIp();
-		MatchResult mIpSource =
-			ipspec.getNetworks().matches(probe.getSourceAddress());
+		MatchResult mIpSource = ipSpecFilter(ipspec, probe.getSourceAddress());
 		if (mIpSource == MatchResult.NOT)
 			return MatchResult.NOT;
 
@@ -1274,8 +1308,7 @@ public class CpFw extends GenericEquipment {
 		 * check destination IP
 		 */
 		ipspec = rule.getDestIp();
-		MatchResult mIpDest =
-			ipspec.getNetworks().matches(probe.getDestinationAddress());
+		MatchResult mIpDest =ipSpecFilter(ipspec, probe.getDestinationAddress());
 		if (mIpDest == MatchResult.NOT)
 			return MatchResult.NOT;
 
@@ -1285,7 +1318,7 @@ public class CpFw extends GenericEquipment {
 		MatchResult mService;
 		if (request.getProtocols() != null) {
 			CpFwServicesSpec services = rule.getServices();
-			mService = services.getServices().matches(request);
+			mService = servicesSpecFilter(services, request);
 			if (mService == MatchResult.NOT)
 				return MatchResult.NOT;
 		} else {

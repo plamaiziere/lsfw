@@ -162,10 +162,16 @@ public class CpFwRule {
 		if (_name != null)
 			s+= ", name: " + _name;
 
-		s += ", from: " +
+		String srcNot = _sourceIp.isNotIn() ? "!" : "";
+		String destNot = _destIp.isNotIn() ? "!" : "";
+		String servicesNot = _services.isNotIn() ? "!" : "";
+
+		s += ", from: " + srcNot +
 			_sourceIp.getNetworks().getBaseReferencesName() +
-			", to: " + _destIp.getNetworks().getBaseReferencesName() +
-			", services: " + _services.getServices().getReferencesName() +
+			", to: " + destNot +
+			_destIp.getNetworks().getBaseReferencesName() +
+			", services: " + servicesNot +
+			_services.getServices().getReferencesName() +
 			", action: " + _action;
 		if (_comment != null)
 			s+= ", # "	+ _comment;
