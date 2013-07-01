@@ -30,7 +30,7 @@ public class CpUnhandledService extends CpService {
 	 */
 	public CpUnhandledService(String name, String className, String comment) {
 
-		super(name, className, comment, CpServiceType.UNHANDLED);
+		super(name, className, comment, CpServiceType.UNHANDLED, null);
 	}
 
 	@Override

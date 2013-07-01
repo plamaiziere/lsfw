@@ -37,7 +37,7 @@ public class CpGroupService extends CpService {
 	 */
 	public CpGroupService(String name, String comment) {
 
-		super(name, "service_group", comment, CpServiceType.GROUP);
+		super(name, "service_group", comment, CpServiceType.GROUP, null);
 	}
 
 	public void addReference(String name, CpService service) {

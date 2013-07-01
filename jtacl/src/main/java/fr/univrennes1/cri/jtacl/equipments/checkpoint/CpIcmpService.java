@@ -49,7 +49,7 @@ public class CpIcmpService extends CpService {
 			int icmpCode) {
 
 		super(name, af == AddressFamily.INET6 ? "icmpv6_service" : "icmp_service",
-			comment, CpServiceType.ICMP);
+			comment, CpServiceType.ICMP, null);
 
 		_icmp = new IPIcmpEnt(name, icmpType, icmpCode);
 		_af = af;

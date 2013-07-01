@@ -54,9 +54,10 @@ public class CpTcpService extends CpService {
 			String comment,
 			CpPortItem port,
 			CpPortItem sourcePort,
+			String protocolTypeName,
 			boolean inAny) {
 
-		super(name, "tcp_service", comment, CpServiceType.TCP);
+		super(name, "tcp_service", comment, CpServiceType.TCP, protocolTypeName);
 		_port = port;
 		_sourcePort = sourcePort;
 		_inAny = inAny;
@@ -78,6 +79,7 @@ public class CpTcpService extends CpService {
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
 				+ ", port=" + _port + ", sourcePort=" + _sourcePort
+				+ ", protocolType= " + _protocolTypeName
 				+ ", inAny=" + _inAny;
 	}
 

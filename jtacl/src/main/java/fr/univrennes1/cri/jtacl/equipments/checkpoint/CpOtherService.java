@@ -44,9 +44,11 @@ public class CpOtherService extends CpService {
 			String comment,
 			Integer protocol,
 			String exp,
+			String protocolTypeName,
 			boolean inAny) {
 
-		super(name, "other_service", comment, CpServiceType.OTHER);
+		super(name, "other_service", comment, CpServiceType.OTHER,
+				protocolTypeName);
 		_protocol = protocol;
 		_exp = exp;
 		_inAny = inAny;
@@ -68,6 +70,7 @@ public class CpOtherService extends CpService {
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
 				+ ", protocol=" + _protocol + ", exp=" + _exp
+				+ ", protocolType= " + _protocolTypeName
 				+ ", inAny=" + _inAny;
 	}
 

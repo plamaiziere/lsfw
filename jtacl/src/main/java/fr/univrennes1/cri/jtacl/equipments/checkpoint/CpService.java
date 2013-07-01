@@ -27,15 +27,17 @@ public abstract class CpService {
 	protected String _className;
 	protected String _comment;
 	protected CpServiceType _type;
+	protected String _protocolTypeName;
 	protected List<Object> _linkedTo = new LinkedList<Object>();
 
 	public CpService(String name, String className, String comment,
-			CpServiceType type) {
+			CpServiceType type, String protocolTypeName) {
 
 		_name = name;
 		_className = className;
 		_comment = comment;
 		_type = type;
+		_protocolTypeName = protocolTypeName;
 	}
 
 	public List<Object> getLinkedTo() {
@@ -62,6 +64,14 @@ public abstract class CpService {
 
 	public CpServiceType getType() {
 		return _type;
+	}
+
+	public String getProtocolTypeName() {
+		return _protocolTypeName;
+	}
+
+	public boolean hasProtocolType() {
+		return _protocolTypeName != null;
 	}
 
 	/**

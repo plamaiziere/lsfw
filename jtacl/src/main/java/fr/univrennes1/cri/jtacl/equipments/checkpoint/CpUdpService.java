@@ -46,9 +46,10 @@ public class CpUdpService extends CpService {
 			String comment,
 			CpPortItem port,
 			CpPortItem sourcePort,
+			String protocolTypeName,
 			boolean inAny) {
 
-		super(name, "udp_service", comment, CpServiceType.UDP);
+		super(name, "udp_service", comment, CpServiceType.UDP, protocolTypeName);
 		_port = port;
 		_sourcePort = sourcePort;
 		_inAny = inAny;
@@ -70,6 +71,7 @@ public class CpUdpService extends CpService {
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
 				+ ", port=" + _port + ", sourcePort=" + _sourcePort
+				+ ", protocolType= " + _protocolTypeName
 				+ ", inAny=" + _inAny;
 	}
 

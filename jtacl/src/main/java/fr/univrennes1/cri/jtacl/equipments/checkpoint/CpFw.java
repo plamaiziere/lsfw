@@ -218,6 +218,15 @@ public class CpFw extends GenericEquipment {
 		String sInAny = XMLUtils.getTagValue(e, "include_in_any");
 
 		/*
+		 * proto type name
+		 */
+		String sProtoTypeName = null;
+		List<Element> protoType = XMLUtils.getDirectChildren(e, "proto_type");
+		if (protoType != null && protoType.size() > 0) {
+			sProtoTypeName = XMLUtils.getTagValue(protoType.get(0), "Name");
+		}
+
+		/*
 		 * ports
 		 */
 		CpPortItem portItem = parsePort(sPorts);
@@ -234,10 +243,10 @@ public class CpFw extends GenericEquipment {
 		CpService service = null;
 		if (sType.equalsIgnoreCase("tcp"))
 			service = new CpTcpService(sName, sComment, portItem, srcPortItem,
-				inAny);
+				sProtoTypeName, inAny);
 		if (sType.equalsIgnoreCase("udp"))
 			service = new CpUdpService(sName, sComment, portItem, srcPortItem,
-				inAny);
+				sProtoTypeName, inAny);
 
 		if (inAny) {
 			CpGroupService any = (CpGroupService) _services.get("Any");
@@ -291,12 +300,22 @@ public class CpFw extends GenericEquipment {
 		Integer proto = sProtocol == null ? null : Integer.parseInt(sProtocol);
 
 		/*
+		 * proto type name
+		 */
+		String sProtoTypeName = null;
+		List<Element> protoType = XMLUtils.getDirectChildren(e, "proto_type");
+		if (protoType != null && protoType.size() > 0) {
+			sProtoTypeName = XMLUtils.getTagValue(protoType.get(0), "Name");
+		}
+
+		/*
 		 * in any
 		 */
 		boolean inAny = Boolean.parseBoolean(sInAny);
 
 		CpService service =
-			new CpOtherService(sName, sComment, proto, sExp, inAny);
+			new CpOtherService(sName, sComment, proto, sExp,
+					sProtoTypeName, inAny);
 
 		if (inAny) {
 			CpGroupService any = (CpGroupService) _services.get("Any");
