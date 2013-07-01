@@ -76,15 +76,18 @@ public class CpUdpService extends CpService {
 	}
 
 	@Override
-	public MatchResult matches(ProbeRequest request) {
+	public CpServicesMatch matches(ProbeRequest request) {
 
 		ProtocolsSpec reqProto = request.getProtocols();
+		CpServicesMatch servicesMatch = new CpServicesMatch();
 
 		/*
 		 * protocol
 		 */
-		if (!reqProto.contains(Protocols.UDP))
-			return MatchResult.NOT;
+		if (!reqProto.contains(Protocols.UDP)) {
+			servicesMatch.setMatchResult(MatchResult.NOT);
+			return servicesMatch;
+		}
 
 		/*
 		 * source port
@@ -97,8 +100,10 @@ public class CpUdpService extends CpService {
 			/*
 			 * does not match at all
 			 */
-			if (mres == MatchResult.NOT)
-				return MatchResult.NOT;
+			if (mres == MatchResult.NOT) {
+				servicesMatch.setMatchResult(MatchResult.NOT);
+				return servicesMatch;
+			}
 		}
 		if (mres != MatchResult.ALL)
 			sourceMay++;
@@ -114,15 +119,24 @@ public class CpUdpService extends CpService {
 			/*
 			 * does not match at all
 			 */
-			if (mres == MatchResult.NOT)
-				return MatchResult.NOT;
+			if (mres == MatchResult.NOT) {
+				servicesMatch.setMatchResult(MatchResult.NOT);
+				return servicesMatch;
+			}
 		}
 		if (mres != MatchResult.ALL)
 			destMay++;
-		if (sourceMay == 0 && destMay == 0)
-			return MatchResult.ALL;
+		if (sourceMay == 0 && destMay == 0) {
+			servicesMatch.setMatchResult(MatchResult.ALL);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+			return servicesMatch;
 
-		return MatchResult.MATCH;
+		}
+
+		servicesMatch.setMatchResult(MatchResult.MATCH);
+		servicesMatch.add(new CpServiceMatch(this, MatchResult.MATCH));
+		return servicesMatch;
+
 	}
 
 }

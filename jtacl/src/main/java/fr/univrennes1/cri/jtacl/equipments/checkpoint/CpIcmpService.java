@@ -70,35 +70,54 @@ public class CpIcmpService extends CpService {
 	}
 
 	@Override
-	public MatchResult matches(ProbeRequest request) {
+	public CpServicesMatch matches(ProbeRequest request) {
 
 		ProtocolsSpec reqProto = request.getProtocols();
+		CpServicesMatch servicesMatch = new CpServicesMatch();
 
 		/*
 		 * address family
 		 */
-		if (_af == AddressFamily.INET && !reqProto.contains(Protocols.ICMP))
-			return MatchResult.NOT;
+		if (_af == AddressFamily.INET && !reqProto.contains(Protocols.ICMP)) {
+			servicesMatch.setMatchResult(MatchResult.NOT);
+			return servicesMatch;
+		}
 
-		if (_af == AddressFamily.INET6 && !reqProto.contains(Protocols.ICMP6))
-			return MatchResult.NOT;
+		if (_af == AddressFamily.INET6 && !reqProto.contains(Protocols.ICMP6)) {
+			servicesMatch.setMatchResult(MatchResult.NOT);
+			return servicesMatch;
+		}
 
 		/*
 		 * icmp type and code
 		 */
 		Integer icmpType = request.getSubType();
-		if (icmpType == null)
-			return MatchResult.ALL;
-		if (icmpType != _icmp.getIcmp())
-			return MatchResult.NOT;
+		if (icmpType == null) {
+			servicesMatch.setMatchResult(MatchResult.ALL);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+			return servicesMatch;
+		}
+
+		if (icmpType != _icmp.getIcmp()) {
+			servicesMatch.setMatchResult(MatchResult.NOT);
+			return servicesMatch;
+		}
 
 		Integer icmpCode = request.getCode();
-		if (icmpCode == null)
-			return MatchResult.ALL;
-		if (icmpCode == _icmp.getCode())
-			return MatchResult.ALL;
+		if (icmpCode == null) {
+			servicesMatch.setMatchResult(MatchResult.ALL);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+			return servicesMatch;
+		}
 
-		return MatchResult.NOT;
+		if (icmpCode == _icmp.getCode()) {
+			servicesMatch.setMatchResult(MatchResult.ALL);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+			return servicesMatch;
+		}
+
+		servicesMatch.setMatchResult(MatchResult.NOT);
+		return servicesMatch;
 	}
 
 

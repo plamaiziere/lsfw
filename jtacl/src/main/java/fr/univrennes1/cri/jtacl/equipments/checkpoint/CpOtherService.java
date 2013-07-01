@@ -75,25 +75,31 @@ public class CpOtherService extends CpService {
 	}
 
 	@Override
-	public MatchResult matches(ProbeRequest request) {
+	public CpServicesMatch matches(ProbeRequest request) {
 
 		ProtocolsSpec reqProto = request.getProtocols();
+		CpServicesMatch servicesMatch = new CpServicesMatch();
 
 		/*
 		 * protocol
 		 */
-		if (!reqProto.contains(_protocol))
-			return MatchResult.NOT;
+		if (!reqProto.contains(_protocol)) {
+			servicesMatch.setMatchResult(MatchResult.NOT);
+			return servicesMatch;
+		}
 
 		/*
 		 * we don't handle the "exp" expression
 		 */
-		if (_exp == null)
-			return MatchResult.ALL;
+		if (_exp == null) {
+			servicesMatch.setMatchResult(MatchResult.ALL);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+			return servicesMatch;
+		}
 
-		return MatchResult.UNKNOWN;
+		servicesMatch.setMatchResult(MatchResult.UNKNOWN);
+		servicesMatch.add(new CpServiceMatch(this, MatchResult.UNKNOWN));
+		return servicesMatch;
 	}
-
-
 
 }

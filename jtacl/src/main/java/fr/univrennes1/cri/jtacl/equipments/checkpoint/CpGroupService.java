@@ -64,26 +64,47 @@ public class CpGroupService extends CpService {
 	}
 
 	@Override
-	public MatchResult matches(ProbeRequest request) {
+	public CpServicesMatch matches(ProbeRequest request) {
+
+		CpServicesMatch servicesMatch = new CpServicesMatch();
+		int mall = 0;
 		int match = 0;
 		int unknown = 0;
 
 		for (CpService service: _services.values()) {
-			MatchResult mres = service.matches(request);
+			CpServicesMatch sMatch = service.matches(request);
+			MatchResult mres = sMatch.getMatchResult();
+			if (mres == MatchResult.NOT)
+				continue;
+			servicesMatch.addAll(sMatch);
 			if (mres == MatchResult.ALL)
-				return MatchResult.ALL;
+				mall++;
 			if (mres == MatchResult.MATCH)
 				match++;
 			if (mres == MatchResult.UNKNOWN)
 				unknown++;
 		}
 
-		if (match > 0 )
-			return MatchResult.MATCH;
-		if (unknown > 0)
-			return MatchResult.UNKNOWN;
+		if (mall > 0) {
+			servicesMatch.setMatchResult(MatchResult.ALL);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+			return servicesMatch;
+		}
+		if (match > 0 ) {
+			servicesMatch.setMatchResult(MatchResult.MATCH);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.MATCH));
+			return servicesMatch;
+		}
 
-		return MatchResult.NOT;
+		if (unknown > 0) {
+			servicesMatch.setMatchResult(MatchResult.UNKNOWN);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.UNKNOWN));
+			return servicesMatch;
+		}
+
+		servicesMatch.setMatchResult(MatchResult.NOT);
+		servicesMatch.add(new CpServiceMatch(this, MatchResult.NOT));
+		return servicesMatch;
 	}
 
 }

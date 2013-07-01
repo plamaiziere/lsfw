@@ -84,23 +84,28 @@ public class CpTcpService extends CpService {
 	}
 
 	@Override
-	public MatchResult matches(ProbeRequest request) {
+	public CpServicesMatch matches(ProbeRequest request) {
 
 		ProtocolsSpec reqProto = request.getProtocols();
+		CpServicesMatch servicesMatch = new CpServicesMatch();
 
 		/*
 		 * protocol
 		 */
-		if (!reqProto.contains(Protocols.TCP))
-			return MatchResult.NOT;
+		if (!reqProto.contains(Protocols.TCP)) {
+			servicesMatch.setMatchResult(MatchResult.NOT);
+			return servicesMatch;
+		}
 
 		/*
 		 * TCP flags
 		 */
 		ProbeTcpFlags reqFlags = request.getTcpFlags();
 
-		if (reqFlags != null && !reqFlags.matchAllWithout(_tcpFlags, _tcpFlagSet))
-			return MatchResult.NOT;
+		if (reqFlags != null && !reqFlags.matchAllWithout(_tcpFlags, _tcpFlagSet)) {
+			servicesMatch.setMatchResult(MatchResult.NOT);
+			return servicesMatch;
+		}
 
 		/*
 		 * source port
@@ -113,8 +118,10 @@ public class CpTcpService extends CpService {
 			/*
 			 * does not match at all
 			 */
-			if (mres == MatchResult.NOT)
-				return MatchResult.NOT;
+			if (mres == MatchResult.NOT) {
+				servicesMatch.setMatchResult(MatchResult.NOT);
+				return servicesMatch;
+			}
 		}
 		if (mres != MatchResult.ALL)
 			sourceMay++;
@@ -130,15 +137,22 @@ public class CpTcpService extends CpService {
 			/*
 			 * does not match at all
 			 */
-			if (mres == MatchResult.NOT)
-				return MatchResult.NOT;
+			if (mres == MatchResult.NOT) {
+				servicesMatch.setMatchResult(MatchResult.NOT);
+				return servicesMatch;
+			}
 		}
 		if (mres != MatchResult.ALL)
 			destMay++;
-		if (sourceMay == 0 && destMay == 0)
-			return MatchResult.ALL;
+		if (sourceMay == 0 && destMay == 0) {
+			servicesMatch.setMatchResult(MatchResult.ALL);
+			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+			return servicesMatch;
+		}
 
-		return MatchResult.MATCH;
+		servicesMatch.setMatchResult(MatchResult.MATCH);
+		servicesMatch.add(new CpServiceMatch(this, MatchResult.MATCH));
+		return servicesMatch;
 	}
 
 }

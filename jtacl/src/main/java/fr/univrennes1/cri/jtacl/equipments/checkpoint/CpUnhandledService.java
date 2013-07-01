@@ -39,8 +39,11 @@ public class CpUnhandledService extends CpService {
 	}
 
 	@Override
-	public MatchResult matches(ProbeRequest request) {
-		return MatchResult.UNKNOWN;
+	public CpServicesMatch matches(ProbeRequest request) {
+		CpServicesMatch servicesMatch = new CpServicesMatch();
+		servicesMatch.setMatchResult(MatchResult.UNKNOWN);
+		servicesMatch.add(new CpServiceMatch(this, MatchResult.UNKNOWN));
+		return servicesMatch;
 	}
 
 }

@@ -99,6 +99,18 @@ public class CpFw extends GenericEquipment {
 		}
 	}
 
+	protected class CpFwFilter {
+		protected boolean _serviceInspected;
+
+		public boolean hasServiceInspected() {
+			return _serviceInspected;
+		}
+
+		public void setServiceInspected(boolean serviceInspected) {
+			_serviceInspected = serviceInspected;
+		}
+	}
+
 	/**
 	 * Parser
 	 */
@@ -1290,16 +1302,20 @@ public class CpFw extends GenericEquipment {
 		return mres;
 	}
 
-	protected MatchResult servicesSpecFilter(CpFwServicesSpec servicesSpec,
+	protected MatchResult servicesSpecFilter(CpFwFilter filter,
+			CpFwServicesSpec servicesSpec,
 			ProbeRequest request) {
 
-		MatchResult mres = servicesSpec.getServices().matches(request);
+		CpServicesMatch smatch = servicesSpec.getServices().matches(request);
+		MatchResult mres = smatch.getMatchResult();
 		if (servicesSpec.isNotIn())
 			mres = mres.not();
+		if (smatch.isInspected())
+			filter.setServiceInspected(true);
 		return mres;
 	}
 
-	protected MatchResult ruleFilter(Probe probe, CpFwRule rule) {
+	protected MatchResult ruleFilter(CpFwFilter filter, Probe probe, CpFwRule rule) {
 
 		ProbeRequest request = probe.getRequest();
 
@@ -1337,7 +1353,7 @@ public class CpFw extends GenericEquipment {
 		MatchResult mService;
 		if (request.getProtocols() != null) {
 			CpFwServicesSpec services = rule.getServices();
-			mService = servicesSpecFilter(services, request);
+			mService = servicesSpecFilter(filter, services, request);
 			if (mService == MatchResult.NOT)
 				return MatchResult.NOT;
 		} else {
@@ -1372,7 +1388,9 @@ public class CpFw extends GenericEquipment {
 			 */
 			if (!rule.isSecurityRule())
 				continue;
-			match = ruleFilter(probe, rule);
+			CpFwFilter filter = new CpFwFilter();
+			String ruleText = rule.toText();
+			match = ruleFilter(filter, probe, rule);
 			if (match != MatchResult.NOT) {
 				/*
 				 * store the result in the probe
@@ -1382,8 +1400,11 @@ public class CpFw extends GenericEquipment {
 					FwResult.ACCEPT : FwResult.DENY);
 				if (match != MatchResult.ALL)
 					aclResult.addResult(FwResult.MAY);
-
-				results.addMatchingAcl(direction, rule.toText(),
+				if (rule.getAction().equals("accept_action")
+						&& filter.hasServiceInspected()) {
+					ruleText += " {I}";
+				}
+				results.addMatchingAcl(direction, ruleText,
 					aclResult);
 
 				results.setInterface(direction,
@@ -1395,8 +1416,8 @@ public class CpFw extends GenericEquipment {
 				 * this is the first ace that match the packet.
 				 */
 				if (first) {
-						results.addActiveAcl(direction,
-								rule.toText(),
+					results.addActiveAcl(direction,
+								ruleText,
 								aclResult);
 					results.setAclResult(direction,
 							aclResult);

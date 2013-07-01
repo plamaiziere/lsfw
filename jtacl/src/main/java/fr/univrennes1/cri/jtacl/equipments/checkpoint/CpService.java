@@ -75,10 +75,10 @@ public abstract class CpService {
 	}
 
 	/**
-	 * Returns the {@link MatchResult} of the given {@link ProbeRequest}.
+	 * Returns the {@link CpServicesMatch} of the given {@link ProbeRequest}.
 	 * @param request request to test.
-	 * @return the MatchResult of the given ProbeRequest.
+	 * @return the CpServicesMatch of the given ProbeRequest.
 	 */
-	public abstract MatchResult matches(ProbeRequest request);
+	public abstract CpServicesMatch matches(ProbeRequest request);
 
 }
