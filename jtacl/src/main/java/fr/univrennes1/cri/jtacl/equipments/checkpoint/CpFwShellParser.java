@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
+import static org.parboiled.BaseParser.EOI;
 import org.parboiled.Rule;
 
 /**
@@ -72,6 +73,10 @@ public class CpFwShellParser extends GenericEquipmentShellParser {
 				IgnoreCase("show"),
 				WhiteSpaces(),
 				IgnoreCase("service"),
+				FirstOf(
+					WhiteSpaces(),
+					EOI
+				),
 				UntilEOI(),
 				setService(match().trim()),
 				setCommand("show-service")
@@ -84,6 +89,10 @@ public class CpFwShellParser extends GenericEquipmentShellParser {
 				IgnoreCase("show"),
 				WhiteSpaces(),
 				IgnoreCase("network"),
+				FirstOf(
+					WhiteSpaces(),
+					EOI
+				),
 				UntilEOI(),
 				setNetwork(match().trim()),
 				setCommand("show-network")
