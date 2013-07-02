@@ -198,7 +198,7 @@ public class Probe {
 	}
 
     /**
-     * Sets the {@link IPRangeablet} source address of this {@link Probe} probe.
+     * Sets the {@link IPRangeable} source address of this {@link Probe} probe.
 	 * @param address the source address.
 	 */
     public void setSourceAddress(IPRangeable address) {
