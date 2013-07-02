@@ -588,6 +588,8 @@ public class CpFw extends GenericEquipment {
 			networkObj = null;
 			if (className.equalsIgnoreCase("host_plain"))
 				networkObj = parseNetworkHost(e);
+			if (className.equalsIgnoreCase("gateway_plain"))
+				networkObj = parseNetworkHost(e);	
 			if (className.equalsIgnoreCase("network"))
 				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("ipv6_object"))
