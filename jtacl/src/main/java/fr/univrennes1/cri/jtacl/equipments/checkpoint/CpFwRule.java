@@ -165,7 +165,8 @@ public class CpFwRule {
 		return "rule name=" + _name + ", className=" + _className
 				+ ", comment=" + _comment + ", number=" + _number +
 				", disabled=" + _disabled + ", implicit= " + _implicitDrop
-				+ ", action=" + _action + ", sourceIp=" + _sourceIp
+				+ ", action=" + _action + ", ruleAction=" + _ruleAction
+				+ ", sourceIp=" + _sourceIp
 				+ ", destIp=" + _destIp	+ " services=" + _services;
 	}
 
@@ -190,7 +191,7 @@ public class CpFwRule {
 			_destIp.getNetworks().getBaseReferencesName() +
 			", services: " + servicesNot +
 			_services.getServices().getReferencesName() +
-			", action: " + _action;
+			", ruleAction: " + _ruleAction;
 		if (_comment != null)
 			s+= ", # "	+ _comment;
 		return s;
