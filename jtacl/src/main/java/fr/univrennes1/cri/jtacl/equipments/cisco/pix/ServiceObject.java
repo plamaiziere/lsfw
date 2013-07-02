@@ -48,7 +48,7 @@ public class ServiceObject {
 
 	/**
 	 * Returns the list of protocols of this service
-	 * @return
+	 * @return the list of protocols of this service
 	 */
 	public ProtocolsSpec getProtocols() {
 		return _protocols;
