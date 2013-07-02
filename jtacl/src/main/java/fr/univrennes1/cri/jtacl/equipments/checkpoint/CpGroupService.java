@@ -30,6 +30,8 @@ public class CpGroupService extends CpService {
 	protected HashMap<String, CpService> _services =
 		new HashMap<String, CpService>();
 
+	boolean _isAny;
+
 	/**
 	 * Construct a new checkpoint service group
 	 * @param name service name
@@ -38,6 +40,8 @@ public class CpGroupService extends CpService {
 	public CpGroupService(String name, String comment) {
 
 		super(name, "service_group", comment, CpServiceType.GROUP, null);
+		if (name.equals("Any"))
+			_isAny = true;
 	}
 
 	public void addReference(String name, CpService service) {
@@ -63,6 +67,10 @@ public class CpGroupService extends CpService {
 				+ ", services=" + getReferencesName();
 	}
 
+	public boolean isAny() {
+		return _isAny;
+	}
+
 	@Override
 	public CpServicesMatch matches(ProbeRequest request) {
 
@@ -84,6 +92,9 @@ public class CpGroupService extends CpService {
 			if (mres == MatchResult.UNKNOWN)
 				unknown++;
 		}
+
+		if (_isAny)
+			mall++;
 
 		if (mall > 0) {
 			servicesMatch.setMatchResult(MatchResult.ALL);
