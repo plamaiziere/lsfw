@@ -767,12 +767,24 @@ public class CpFw extends GenericEquipment {
 		CpFwServicesSpec servicesSpec = parseFwServicesSpec(service);
 
 		String sAction = parseFwAction(actions.get(0));
-
+		if (sAction == null) {
+			warnConfig("invalid rule action (null)", true);
+			return null;
+		}
+		CpFwRuleAction ruleAction = null;
+		if (sAction.equals("accept_action"))
+			ruleAction = CpFwRuleAction.ACCEPT;
+		if (sAction.equals("drop_action"))
+			ruleAction = CpFwRuleAction.DROP;
+		if (sAction.equals("reject_action"))
+			ruleAction = CpFwRuleAction.REJECT;
+		if (ruleAction == null)
+			ruleAction = CpFwRuleAction.AUTH;
 		Integer rNumber = Integer.parseInt(sRuleNumber);
 		Boolean disabled = Boolean.parseBoolean(sDisabled);
 
 		CpFwRule fwrule = new CpFwRule(sName, sClassName, sComment, rNumber,
-				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction);
+				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction, ruleAction);
 
 		/*
 		 * track references
@@ -1396,13 +1408,13 @@ public class CpFw extends GenericEquipment {
 				 * store the result in the probe
 				 */
 				FwResult aclResult = new FwResult();
-				aclResult.setResult(rule.getAction().equals("accept_action") ?
+				aclResult.setResult(rule.ruleActionIsAccept() ?
 					FwResult.ACCEPT : FwResult.DENY);
 				if (match != MatchResult.ALL)
 					aclResult.addResult(FwResult.MAY);
-				if (rule.getAction().equals("accept_action")
+				if (rule.ruleActionIsAccept()
 						&& filter.hasServiceInspected()) {
-					ruleText += " {I}";
+					ruleText += " {inspect}";
 				}
 				results.addMatchingAcl(direction, ruleText,
 					aclResult);

@@ -27,6 +27,7 @@ public class CpFwRule {
 	protected boolean _headerText;
 
 	protected String _action;
+	protected CpFwRuleAction _ruleAction;
 
 	protected CpFwIpSpec _sourceIp;
 	protected CpFwIpSpec _destIp;
@@ -66,8 +67,22 @@ public class CpFwRule {
 		return _action;
 	}
 
-	public void setAction(String _action) {
-		this._action = _action;
+	public void setAction(String action) {
+		_action = action;
+	}
+
+	public CpFwRuleAction getRuleAction() {
+		return _ruleAction;
+	}
+
+	public void setRuleAction(CpFwRuleAction ruleAction) {
+		_ruleAction = ruleAction;
+	}
+
+	public boolean ruleActionIsAccept() {
+		return _ruleAction != null &&
+			(_ruleAction == CpFwRuleAction.ACCEPT
+				|| _ruleAction == CpFwRuleAction.AUTH);
 	}
 
 	public CpFwIpSpec getSourceIp() {
@@ -101,7 +116,8 @@ public class CpFwRule {
 	public CpFwRule(String name, String className, String comment,
 			Integer number, boolean disabled,
 			CpFwIpSpec srcIpSpec, CpFwIpSpec dstIpSpec,
-			CpFwServicesSpec servicesSpec, String action) {
+			CpFwServicesSpec servicesSpec, String action,
+			CpFwRuleAction ruleAction) {
 		_name = name;
 		_className = className;
 		_comment = comment;
@@ -111,6 +127,7 @@ public class CpFwRule {
 		_destIp = dstIpSpec;
 		_services = servicesSpec;
 		_action = action;
+		_ruleAction = ruleAction;
 	}
 
 	/**
@@ -124,6 +141,7 @@ public class CpFwRule {
 		_comment = "implicit drop rule";
 		_number = 999999;
 		_action = "drop_action";
+		_ruleAction = CpFwRuleAction.DROP;
 		_implicitDrop = true;
 	}
 
