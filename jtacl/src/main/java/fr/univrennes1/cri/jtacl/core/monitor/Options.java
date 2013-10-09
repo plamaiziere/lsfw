@@ -240,7 +240,8 @@ public class Options {
 				"debug.level=" + getDebugLevel() + "\n" +
 				"dns.cache.ttl=" + getDnsCacheTTL() + "\n" +
 				"maxhop=" + getMaxHop() + "\n" +
-				"notify.level=" + getNotifyLevel();
+				"notify.level=" + getNotifyLevel() + "\n" +
+				"secureLevel=" + getSecureLevel();
 	}
 
 }
