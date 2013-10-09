@@ -41,6 +41,11 @@ public class Options {
 	private boolean _xref = true;
 
 	/**
+	 * secure level
+	 */
+	private int _secureLevel = 0;
+
+	/**
 	 * Returns the max number of hop while probing.
 	 * @return the max number of hop while probing.
 	 */
@@ -151,6 +156,24 @@ public class Options {
 	}
 
 	/**
+	 * Returns the securelevel.
+	 * @return the securelevel.
+	 */
+	public int getSecureLevel() {
+		return _secureLevel;
+	}
+
+	/**
+	 * Sets the securelevel.
+	 * @param securelevel to set.
+	 */
+	public void setSecureLevel(int secureLevel) {
+		if (secureLevel > _secureLevel);
+			_secureLevel = secureLevel;
+	}
+
+
+	/**
 	 * Sets the option with the specified value.
 	 * @param optionName the name of the option to set.
 	 * @param value value to set.
@@ -194,6 +217,11 @@ public class Options {
 				return;
 			}
 
+			if (optionName.equalsIgnoreCase("securelevel")) {
+				setSecureLevel(Integer.valueOf(value));
+				return;
+			}
+
 		} catch (Exception e) {
 			throw new JtaclConfigurationException(e.getMessage());
 		}
@@ -205,13 +233,14 @@ public class Options {
 	 * @return a textual representation of the options.
 	 */
 	public String getOptionsList() {
-		return "debug.level=" + getDebugLevel() + "\n" +
-				"notify.level=" + getNotifyLevel() + "\n" +
-				"config.level=" + getConfigLevel() + "\n" +
-				"maxhop=" + getMaxHop() + "\n" +
+		return
 				"autoreload=" + getAutoReload() + "\n" +
+				"config.level=" + getConfigLevel() + "\n" +
+				"crossreference=" + getXref() + "\n" +
+				"debug.level=" + getDebugLevel() + "\n" +
 				"dns.cache.ttl=" + getDnsCacheTTL() + "\n" +
-				"crossreference=" + getXref();
+				"maxhop=" + getMaxHop() + "\n" +
+				"notify.level=" + getNotifyLevel();
 	}
 
 }
