@@ -168,7 +168,9 @@ public class Options {
 	 * @param securelevel to set.
 	 */
 	public void setSecureLevel(int secureLevel) {
-		if (secureLevel > _secureLevel);
+		if (secureLevel < _secureLevel)
+			throw new JtaclConfigurationException
+						("secure level can only be raised");
 			_secureLevel = secureLevel;
 	}
 
