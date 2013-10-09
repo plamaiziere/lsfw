@@ -3,12 +3,22 @@ option | o [option-name = value] : Displays or sets lsfw options.
 
   Without parameter, option displays the current value of each option.
 
-lsfw defines six options.
+lsfw defines the options.
+  - autoreload
   - config.level
+  - crossreference
   - debug.level
   - dns.cache.ttl
-  - notify.level
   - maxhop
+  - notify.level
+  - securelevel
+
+* option autoreload <boolean>
+If true, lsfw will reload the configuration of an equipment if a configuration
+file of this equipment has changed. The topology is also rebuilt.
+
+* option crossreference <boolean>
+If true, lsfw will compute the IP addresses and services cross references.
 
 * option config.level:
 The level of the logger used while reading configuration or parsing files.
@@ -25,11 +35,15 @@ The level of the notify logger used when using the application.
 Possible values for logger option are (from less to high):
    ALL, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, OFF.
 
-* option maxhop:
+* option maxhop <integer>:
   The maximum number of probing. This number is decremented each time a probing
 is done. If this number reaches 0, the probing is aborted with an error.
   This option can be useful to abort probing loop. If set to '-1'
 there is no limit.
+
+* option securelevel <integer>:
+The securelevel starts at "0" and can only be raised. If greater than 0, groovy
+and tee redirection are disabled.
 
 Options can be specified on the lsfw command line using the switch
 "--option option-name=value".
