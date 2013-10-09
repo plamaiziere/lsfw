@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.core.network;
 
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
+import fr.univrennes1.cri.jtacl.core.monitor.Options;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
@@ -55,6 +56,11 @@ public class NetworkEquipment {
 	protected Monitor _monitor;
 
 	/**
+	 * a reference to the options
+	 */
+	protected Options _monitorOptions;
+
+	/**
 	 * Create a new {@link NetworkEquipment} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
 	 * @param name the name of the equipment.
@@ -63,6 +69,7 @@ public class NetworkEquipment {
 	 */
 	public NetworkEquipment(Monitor monitor, String name, String comment, String configurationFileName) {
 		_monitor = monitor;
+		_monitorOptions = _monitor.getOptions();
 		_name = name;
 		_comment = comment;
 		_configurationFileName = configurationFileName;

@@ -1776,7 +1776,10 @@ public class PacketFilter extends GenericEquipment {
 			} catch (UnknownHostException ex) {
 				// not an IP
 			}
-			if (ipnet != null) {
+			/*
+			 * cross references
+			 */
+			if (ipnet != null && _monitorOptions.getXref()) {
 				CrossRefContext refContext = new CrossRefContext(
 					_parseContext.getLine(),
 					"macro", name, _parseContext.getFileName(),
@@ -2034,11 +2037,15 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * compute cross reference
 		 */
-		CrossReferences();
+		if (_monitorOptions.getXref())
+			CrossReferences();
 	}
 
 
 	protected IPCrossRef getIPNetCrossRef(IPRangeable ip) {
+		if (!_monitorOptions.getXref())
+			throw new JtaclInternalException(
+					"Cross reference computing without crossreference option set");
 		IPCrossRef ref = _netCrossRef.get(ip);
 		if (ref == null) {
 			ref = new IPCrossRef(ip);
@@ -2048,6 +2055,9 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+		if (!_monitorOptions.getXref())
+			throw new JtaclInternalException(
+					"Cross reference computing without crossreference option set");
 		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
 		if (ref == null) {
 			ref = new ServiceCrossRef(portrange);

@@ -21,6 +21,7 @@ import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
@@ -589,7 +590,7 @@ public class CpFw extends GenericEquipment {
 			if (className.equalsIgnoreCase("host_plain"))
 				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("gateway_plain"))
-				networkObj = parseNetworkHost(e);	
+				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("network"))
 				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("ipv6_object"))
@@ -1024,10 +1025,14 @@ public class CpFw extends GenericEquipment {
 		/*
 		 * compute cross reference
 		 */
-		CrossReferences();
+		if (_monitorOptions.getXref())
+			CrossReferences();
 	}
 
 	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
+		if (!_monitorOptions.getXref())
+			throw new JtaclInternalException(
+					"Cross reference computing without crossreference option set");
 		IPCrossRef ref = _netCrossRef.get(iprange);
 		if (ref == null) {
 			ref = new IPCrossRef(iprange);
@@ -1037,6 +1042,9 @@ public class CpFw extends GenericEquipment {
 	}
 
 	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+		if (!_monitorOptions.getXref())
+			throw new JtaclInternalException(
+					"Cross reference computing without crossreference option set");
 		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
 		if (ref == null) {
 			ref = new ServiceCrossRef(portrange);

@@ -21,6 +21,7 @@ import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
@@ -884,10 +885,14 @@ public class CiscoRouter extends GenericEquipment {
 		/*
 		 * compute cross reference
 		 */
-		CrossReferences();
+		if (_monitorOptions.getXref())
+			CrossReferences();
 	}
 
 	protected IPCrossRef getIPNetCrossRef(IPNet ipnet) {
+		if (!_monitorOptions.getXref())
+			throw new JtaclInternalException(
+					"Cross reference computing without crossreference option set");
 		IPCrossRef ref = _netCrossRef.get(ipnet);
 		if (ref == null) {
 			ref = new IPCrossRef(ipnet);
@@ -897,6 +902,9 @@ public class CiscoRouter extends GenericEquipment {
 	}
 
 	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+		if (!_monitorOptions.getXref())
+			throw new JtaclInternalException(
+					"Cross reference computing without crossreference option set");
 		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
 		if (ref == null) {
 			ref = new ServiceCrossRef(portrange);
