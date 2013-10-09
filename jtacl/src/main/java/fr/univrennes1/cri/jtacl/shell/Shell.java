@@ -19,6 +19,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclParameterException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
+import fr.univrennes1.cri.jtacl.core.monitor.Options;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
 import fr.univrennes1.cri.jtacl.core.probing.FwResult;
@@ -72,7 +73,8 @@ public class Shell {
 	protected ShellParser _parser = Parboiled.createParser(ShellParser.class);
 	protected ReportingParseRunner _parseRunner =
 		new ReportingParseRunner(_parser.CommandLine());
-	protected Monitor _monitor = Monitor.getInstance();;
+	protected Monitor _monitor = Monitor.getInstance();
+	protected Options _monitorOptions = _monitor.getOptions();
 	protected boolean _interactive;
 	protected Probing _lastProbing;
 	protected boolean _testResult;
@@ -438,6 +440,10 @@ public class Shell {
 
 	public void groovyCommand(ShellParser parser) {
 
+		if (_monitorOptions.getSecureLevel() > 0) {
+			_outStream.println("Error: groovy unallowed in secure level > 0");
+			return;
+		}
 		Binding binding = new Binding();
 		LsfwBinding lsfw = newBinding(parser.getString("GroovyArgs"));
 		binding.setVariable("lsfw", lsfw);
@@ -458,6 +464,10 @@ public class Shell {
 	}
 
 	public void groovyConsoleCommand(ShellParser parser) {
+		if (_monitorOptions.getSecureLevel() > 0) {
+			_outStream.println("Error: groovy unallowed in secure level > 0");
+			return;
+		}
 		Binding binding = new Binding();
 		LsfwBinding lsfw = newBinding(parser.getString("GroovyArgs"));
 		binding.setVariable("lsfw", lsfw);
@@ -950,7 +960,7 @@ public class Shell {
 		/*
 		 * tee stdout
 		 */
-		if (teeFile != null) {
+		if (teeFile != null && _monitorOptions.getSecureLevel() == 0) {
 			try {
 				ShellConsole.out().tee(teeFile, teeAppend);
 			} catch (FileNotFoundException ex) {
