@@ -153,7 +153,6 @@ public class App
 			Monitor.getInstance().configure(configFile);
 			Monitor.getInstance().init();
 
-			boolean verbose = optionSet.has("verbose");
 			ShellConsole.install();
 			Shell shell;
 			int ret;
