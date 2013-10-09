@@ -36,6 +36,11 @@ public class Options {
 	private boolean _autoReload = false;
 
 	/**
+	 *  xref option
+	 */
+	private boolean _xref = true;
+
+	/**
 	 * Returns the max number of hop while probing.
 	 * @return the max number of hop while probing.
 	 */
@@ -131,6 +136,20 @@ public class Options {
 		IPNet.setDnsCacheTt(value);
 	}
 
+	/** Gets the xref option value.
+	 * @return the xref option value.
+	 */
+	public boolean getXref() {
+		return _xref;
+	}
+
+	/** Sets the xref option value.
+	 * @param xref value to set.
+	 */
+	public void setXref(boolean xref) {
+		_xref = xref;
+	}
+
 	/**
 	 * Sets the option with the specified value.
 	 * @param optionName the name of the option to set.
@@ -170,6 +189,10 @@ public class Options {
 				return;
 			}
 
+			if (optionName.equalsIgnoreCase("crossreference")) {
+				setXref(Boolean.valueOf(value));
+				return;
+			}
 
 		} catch (Exception e) {
 			throw new JtaclConfigurationException(e.getMessage());
@@ -187,7 +210,8 @@ public class Options {
 				"config.level=" + getConfigLevel() + "\n" +
 				"maxhop=" + getMaxHop() + "\n" +
 				"autoreload=" + getAutoReload() + "\n" +
-				"dns.cache.ttl=" + getDnsCacheTTL();
+				"dns.cache.ttl=" + getDnsCacheTTL() + "\n" +
+				"crossreference=" + getXref();
 	}
 
 }
