@@ -84,6 +84,12 @@ public class App
 		optParser.acceptsAll(asList("o", "option"), "Set option").
 			withRequiredArg().describedAs("option to set (option=value)");
 
+		optParser.acceptsAll(asList("b", "bind"), "bind address").
+			withRequiredArg().describedAs("bind address");
+
+		optParser.acceptsAll(asList("p", "port"), "bind port number").
+			withRequiredArg().describedAs("port number");
+
 		return optParser;
 
 	}
@@ -174,6 +180,14 @@ public class App
 				shell = new Shell(false);
 				ret = shell.runFromFile(fileName);
 				quit(ret);
+			}
+
+			if (optionSet.has("bind") || optionSet.has("port")) {
+				String bind = (String) optionSet.valueOf("bind");
+				Integer port = Integer.valueOf((String)optionSet.valueOf("port"));
+				shell = new Shell(false);
+				shell.runFromSocket(bind, port);
+				quit(0);
 			}
 
 			/*

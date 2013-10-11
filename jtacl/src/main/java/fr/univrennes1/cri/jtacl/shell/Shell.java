@@ -54,6 +54,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.logging.Level;
@@ -78,6 +81,7 @@ public class Shell {
 	protected boolean _interactive;
 	protected Probing _lastProbing;
 	protected boolean _testResult;
+	protected boolean _daemon;
 	protected PrintStream _outStream = System.out;
 	protected PoliciesMap _policies = Policies.getInstance();
 
@@ -974,7 +978,10 @@ public class Shell {
 			if (command.equals("quit")) {
 				if (_interactive)
 					_outStream.println("Goodbye!");
-				System.exit(0);
+				if (_daemon)
+					_outStream.close();
+				else
+					System.exit(0);
 			}
 
 			if (_interactive && _monitor.getOptions().getAutoReload())
@@ -1073,6 +1080,55 @@ public class Shell {
 		if (!_testResult)
 			return App.EXIT_FAILURE;
 		return App.EXIT_SUCCESS;
+	}
+
+	public void runFromSocket(String bind, Integer port)
+			throws UnknownHostException {
+
+		_daemon = true;
+		ServerSocket server = null;
+		if (port == null)
+			port = Integer.valueOf(8010);
+		InetAddress bindAddr = null;
+		if (bind != null)
+			bindAddr = new IPNet(bind).toInetAddress();
+
+		try {
+			server = new ServerSocket(port, 64, bindAddr);
+		} catch (IOException ex) {
+			System.err.println("Can't bind on " + bind + " port: " + port
+				+ "; " + ex.getMessage());
+			System.exit(1);
+		}
+
+		boolean run = true;
+		while (run) {
+			Socket socket;
+			try {
+				socket = server.accept();
+				BufferedReader dataIn =
+					new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				_outStream = new PrintStream(socket.getOutputStream());
+				try {
+					String commandLine = dataIn.readLine();
+					if (commandLine == null) {
+						socket.close();
+					}
+					commandLine = commandLine.trim();
+					parseShellCommand(commandLine);
+					socket.close();
+				} catch (IOException ex) {
+					//
+				}
+			} catch (IOException ex) {
+				run = false;
+			}
+		}
+		try {
+			server.close();
+		} catch (IOException ex) {
+			//
+		}
 	}
 
 	public PrintStream getOutputStream() {
