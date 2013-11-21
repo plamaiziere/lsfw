@@ -94,7 +94,7 @@ public class RoutingEngine implements ShowableRoutes {
 		}
 	}
 
-	private Routes getRoutes(IPNet address, RoutingTable table) {
+	private Routes getRoutes(IPNet address, RoutingTable table, int recursion) {
 
 		/*
 		 * The algorithm used is quite stupid.
@@ -127,7 +127,7 @@ public class RoutingEngine implements ShowableRoutes {
 				for (Route route: routeItem._routes) {
 					/*
 					 * If the link is null for a route, use the route matching
-					 * the nexthop. TODO: control infinite recursion.
+					 * the nexthop.
 					 */
 					if (!route.isNullRoute()) {
 						if (route.getLink() == null) {
@@ -135,7 +135,9 @@ public class RoutingEngine implements ShowableRoutes {
 							/*
 							 * XXX: nexthop is a destination
 							 */
-							Routes resolv = getRoutes(nexthop);
+							if (recursion > 256)
+								throw new JtaclRoutingException("too many routing recursions");
+							Routes resolv = getRoutes(nexthop, recursion + 1);
 							if (resolv != null)
 								routes.addAll(resolv);
 						} else
@@ -161,6 +163,11 @@ public class RoutingEngine implements ShowableRoutes {
 		return new Routes();
 	}
 
+	private Routes getRoutes(IPRangeable destination, int recursion) {
+
+		RoutingTable table = routingTable(destination.getIpVersion());
+		return getRoutes(destination.nearestNetwork(), table, recursion);
+	}
 
 	/**
 	 * Creates a new {@link RoutingEngine} instance.
@@ -215,7 +222,7 @@ public class RoutingEngine implements ShowableRoutes {
 	public Routes getRoutes(IPRangeable destination) {
 
 		RoutingTable table = routingTable(destination.getIpVersion());
-		return getRoutes(destination.nearestNetwork(), table);
+		return getRoutes(destination.nearestNetwork(), table, 0);
 	}
 
 	/**
@@ -229,7 +236,7 @@ public class RoutingEngine implements ShowableRoutes {
 	public Routes getSourceRoutes(IPRangeable source) {
 
 		RoutingTable table = sourceRoutingTable(source.getIpVersion());
-		return getRoutes(source.nearestNetwork(), table);
+		return getRoutes(source.nearestNetwork(), table, 0);
 	}
 
 	/**
