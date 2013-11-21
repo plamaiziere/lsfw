@@ -1113,10 +1113,15 @@ public class Shell {
 					String commandLine = dataIn.readLine();
 					if (commandLine == null) {
 						socket.close();
+					} else {
+						commandLine = commandLine.trim();
+						try {
+							parseShellCommand(commandLine);
+						} catch (JtaclRuntimeException ex) {
+							_outStream.println(ex.getMessage());
+						}
+						socket.close();
 					}
-					commandLine = commandLine.trim();
-					parseShellCommand(commandLine);
-					socket.close();
 				} catch (IOException ex) {
 					//
 				}
