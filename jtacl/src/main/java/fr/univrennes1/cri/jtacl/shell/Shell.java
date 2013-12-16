@@ -984,7 +984,7 @@ public class Shell {
 					System.exit(0);
 			}
 
-			if (_interactive && _monitor.getOptions().getAutoReload())
+			if ((_interactive || _daemon) && _monitor.getOptions().getAutoReload())
 				autoReload();
 
 			if (command.equals("probe") || command.equals("probe6")) {
