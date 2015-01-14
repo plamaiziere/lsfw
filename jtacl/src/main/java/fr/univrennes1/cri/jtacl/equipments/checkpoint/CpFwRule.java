@@ -181,11 +181,12 @@ public class CpFwRule {
 		if (_name != null)
 			s+= ", name: " + _name;
 
+		String senabled = _disabled ? "disabled" : "enabled";
 		String srcNot = _sourceIp.isNotIn() ? "!" : "";
 		String destNot = _destIp.isNotIn() ? "!" : "";
 		String servicesNot = _services.isNotIn() ? "!" : "";
 
-		s += ", from: " + srcNot +
+		s += ", " + senabled +", from: " + srcNot +
 			_sourceIp.getNetworks().getBaseReferencesName() +
 			", to: " + destNot +
 			_destIp.getNetworks().getBaseReferencesName() +
