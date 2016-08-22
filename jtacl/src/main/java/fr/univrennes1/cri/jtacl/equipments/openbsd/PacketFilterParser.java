@@ -1239,6 +1239,13 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 				),
 				SkipSpaces(),
 				/*
+				 * filteropts
+				 */
+				Optional(
+					PfFilterOpts()
+				),
+				SkipSpaces(),
+				/*
 				 * af
 				 */
 				Optional(
