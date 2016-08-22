@@ -13,7 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.shell;
 
-import static junit.framework.Assert.assertEquals;
 import junit.framework.TestCase;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;

@@ -14,7 +14,6 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import static junit.framework.Assert.assertEquals;
 import junit.framework.TestCase;
 
 /**
@@ -200,7 +199,7 @@ public class IPRangeTest extends TestCase {
 		range = new IPRange(ip1, ip2);
 		net = range.nearestNetwork();
 		assertEquals("::0/0", net.toString("::"));
-				
+
 		ip1 = new IPNet("127.0.0.1");
 		ip2 = new IPNet("127.0.0.1");
 		range = new IPRange(ip1, ip2);
