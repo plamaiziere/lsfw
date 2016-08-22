@@ -483,7 +483,7 @@ public class PacketFilter extends GenericEquipment {
 
 	/**
 	 * Loads routes from a file.
-	 * The format of the file should be "route add network nexthop"
+	 * The format of the file should be "network nexthop [-blackhole]"
 	 * @param fileName filename to use.
 	 * @throws JtaclConfigurationException if error occurs.
 	 */
@@ -505,12 +505,10 @@ public class PacketFilter extends GenericEquipment {
 				continue;
 			String[] sparams = sroute.split("\\s+");
 			int nbargs = sparams.length;
-			if (nbargs < 4 || nbargs > 5)
+			if (nbargs < 2 || nbargs > 3)
 				continue;
-			if (!sparams[0].equals("route") || !sparams[1].equals("add"))
-				continue;
-			String sprefix = sparams[2];
-			String snexthop = sparams[3];
+			String sprefix = sparams[0];
+			String snexthop = sparams[1];
 			IPNet prefix;
 			try {
 				prefix = new IPNet(sprefix);
@@ -532,7 +530,7 @@ public class PacketFilter extends GenericEquipment {
 			/*
 			 * null route
 			 */
-			if (nbargs == 5 && sparams[4].equals("-blackhole")) {
+			if (nbargs == 3 && sparams[2].equals("-blackhole")) {
 				route = new Route<IfaceLink>(prefix);
 			} else {
 				Iface iface;
