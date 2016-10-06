@@ -53,8 +53,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				 <showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
@@ -80,7 +80,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.4</version>
 				<configuration>
-					<source>1.8</source>
+					<source>1.7</source>
 					<aggregate>true</aggregate>
 					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
 					<docletArtifact>
