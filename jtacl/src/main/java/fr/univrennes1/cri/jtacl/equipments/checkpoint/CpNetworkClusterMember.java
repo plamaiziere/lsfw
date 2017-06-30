@@ -30,7 +30,7 @@ public class CpNetworkClusterMember extends CpNetworkObject {
 	protected ArrayList<IPRange> _ipRanges;
 
 	/**
-	 * Construct a new checkpoint IP network object
+	 * Construct a new checkpoint cluster member object
 	 * @param name object name name
 	 * @param className checkpoint class name
 	 * @param comment comment
