@@ -1145,7 +1145,6 @@ public class CpFw extends GenericEquipment {
 		PortSpec sourcePortSpec = null;
 		PortSpec destPortSpec = null;
 		ProtocolsSpec protoSpec = null;
-		String serviceText = null;
 		List<Object> owners = null;
 
 		if (Log.debug().isLoggable(Level.INFO)) {
