@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
+import java.util.ArrayList;
+
 /**
  * Checkpoint firewall rule
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -34,6 +36,7 @@ public class CpFwRule {
 	protected CpFwServicesSpec _services;
 
 	protected boolean _implicitDrop;
+	protected ArrayList<String> _installgw;
 
 	public String getName() {
 		return _name;
@@ -112,6 +115,7 @@ public class CpFwRule {
 	 * @param dstIpSpec destination IP specification
 	 * @param servicesSpec services specification
 	 * @param action action class name
+	 * @param ruleAction rule's action (Accept, drop etc)
 	 */
 	public CpFwRule(String name, String className, String comment,
 			Integer number, boolean disabled,
