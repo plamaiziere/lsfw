@@ -24,7 +24,7 @@ import java.util.List;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
-public class CpNetworkClusterMember extends CpNetworkObject {
+public class CpNetworkCluster extends CpNetworkObject {
 
 	/* list of ip addresses */
 	protected ArrayList<IPRange> _ipRanges;
@@ -35,7 +35,7 @@ public class CpNetworkClusterMember extends CpNetworkObject {
 	 * @param className checkpoint class name
 	 * @param comment comment
 	 */
-	public CpNetworkClusterMember(String name,	String className, String comment)
+	public CpNetworkCluster(String name,	String className, String comment)
 	{
 		super(name, className, comment, CpNetworkType.IPS);
 		_ipRanges = new ArrayList();
