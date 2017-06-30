@@ -488,6 +488,48 @@ public class CpFw extends GenericEquipment {
 		return networkobj;
 	}
 
+	protected CpNetworkObject parseNetworkClusterMember(Element e) {
+		String sName = XMLUtils.getTagValue(e, "Name");
+		String sComment = XMLUtils.getTagValue(e, "comments");
+		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
+
+		CpNetworkClusterMember cm =
+				new CpNetworkClusterMember(sName, sClassName, sComment);
+		List<IPRange> ips = cm.getIpRanges();
+
+		List<Element> einterfaces = XMLUtils.getDirectChildren(e, "interfaces");
+		for (Element eiface: einterfaces) {
+			List<Element> interfaces =
+					XMLUtils.getDirectChildren(eiface, "interfaces");
+			for (Element iface: interfaces) {
+				/* ipv4 */
+				String sIp = XMLUtils.getTagValue(iface, "ipaddr");
+				if (sIp != null) {
+					IPRange ip = null;
+					try {
+						ip = new IPRange(sIp);
+						ips.add(ip);
+					} catch (UnknownHostException ex) {
+						throwCfgException("invalid IP address: " + sIp, true);
+					}
+				}
+				/* ipv6 */
+				sIp = XMLUtils.getTagValue(iface, "ipaddr6");
+				if (sIp != null) {
+					IPRange ip = null;
+					try {
+						ip = new IPRange(sIp);
+						ips.add(ip);
+					} catch (UnknownHostException ex) {
+						throwCfgException("invalid IP address: " + sIp, true);
+					}
+				}
+			}
+		}
+
+		return cm;
+	}
+
 	protected CpNetworkObject parseUnhandledNetwork(Element e) {
 		String sName = XMLUtils.getTagValue(e, "Name");
 		String sComment = XMLUtils.getTagValue(e, "comments");
@@ -593,6 +635,8 @@ public class CpFw extends GenericEquipment {
 				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("gateway_plain"))
 				networkObj = parseNetworkHost(e);
+			if (className.equalsIgnoreCase("cluster_member"))
+				networkObj = parseNetworkClusterMember(e);
 			if (className.equalsIgnoreCase("network"))
 				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("ipv6_object"))
@@ -1199,20 +1243,27 @@ public class CpFw extends GenericEquipment {
 		 * network object
 		 */
 		for (CpNetworkObject nobj: _networkObjects.values()) {
-			if (nobj.getType() != CpNetworkType.IP &&
-					nobj.getType() != CpNetworkType.RANGE)
-				continue;
+
 			IPRangeable ip = null;
+			IPCrossRef ipNetRef = null;
 			switch (nobj.getType()) {
 				case IP	:	CpNetworkIP nip = (CpNetworkIP) nobj;
 							ip = nip.getIpRange();
+							ipNetRef = getIPNetCrossRef(ip);
+							crossRefNetworkLink(ipNetRef, nobj);
 							break;
 				case RANGE: CpNetworkRange nrange = (CpNetworkRange) nobj;
 							ip = nrange.getIpRange();
+							ipNetRef = getIPNetCrossRef(ip);
+							crossRefNetworkLink(ipNetRef, nobj);
+							break;
+				case IPS:   CpNetworkClusterMember member = (CpNetworkClusterMember) nobj;
+							for (IPRange ipr : member.getIpRanges()) {
+								ipNetRef = getIPNetCrossRef(ipr);
+								crossRefNetworkLink(ipNetRef, nobj);
+							}
 							break;
 			}
-			IPCrossRef ipNetRef = getIPNetCrossRef(ip);
-			crossRefNetworkLink(ipNetRef, nobj);
 		}
 
 		/*
