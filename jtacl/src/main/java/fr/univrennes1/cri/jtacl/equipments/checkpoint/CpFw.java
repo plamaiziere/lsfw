@@ -488,13 +488,13 @@ public class CpFw extends GenericEquipment {
 		return networkobj;
 	}
 
-	protected CpNetworkObject parseNetworkClusterMember(Element e) {
+	protected CpNetworkObject parseNetworkCluster(Element e) {
 		String sName = XMLUtils.getTagValue(e, "Name");
 		String sComment = XMLUtils.getTagValue(e, "comments");
 		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
 
-		CpNetworkClusterMember cm =
-				new CpNetworkClusterMember(sName, sClassName, sComment);
+		CpNetworkCluster cm =
+				new CpNetworkCluster(sName, sClassName, sComment);
 		List<IPRange> ips = cm.getIpRanges();
 
 		List<Element> einterfaces = XMLUtils.getDirectChildren(e, "interfaces");
@@ -636,7 +636,9 @@ public class CpFw extends GenericEquipment {
 			if (className.equalsIgnoreCase("gateway_plain"))
 				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("cluster_member"))
-				networkObj = parseNetworkClusterMember(e);
+				networkObj = parseNetworkCluster(e);
+			if (className.equalsIgnoreCase("gateway_cluster"))
+				networkObj = parseNetworkCluster(e);
 			if (className.equalsIgnoreCase("network"))
 				networkObj = parseNetworkHost(e);
 			if (className.equalsIgnoreCase("ipv6_object"))
@@ -1257,7 +1259,7 @@ public class CpFw extends GenericEquipment {
 							ipNetRef = getIPNetCrossRef(ip);
 							crossRefNetworkLink(ipNetRef, nobj);
 							break;
-				case IPS:   CpNetworkClusterMember member = (CpNetworkClusterMember) nobj;
+				case IPS:   CpNetworkCluster member = (CpNetworkCluster) nobj;
 							for (IPRange ipr : member.getIpRanges()) {
 								ipNetRef = getIPNetCrossRef(ipr);
 								crossRefNetworkLink(ipNetRef, nobj);
