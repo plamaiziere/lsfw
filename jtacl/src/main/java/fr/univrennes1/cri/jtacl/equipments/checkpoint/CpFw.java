@@ -138,6 +138,11 @@ public class CpFw extends GenericEquipment {
 	 */
 	 protected ParseContext _parseContext = new ParseContext();
 
+	/**
+	 * name of the gateway for rule installation
+	 */
+	protected String _gatewayName;
+
 	/*
 	 * services keyed by name
 	 */
@@ -797,26 +802,32 @@ public class CpFw extends GenericEquipment {
 		List<Element> dsts = XMLUtils.getDirectChildren(e, "dst");
 		List<Element> services = XMLUtils.getDirectChildren(e, "services");
 		List<Element> actions = XMLUtils.getDirectChildren(e, "action");
+		List<Element> install = XMLUtils.getDirectChildren(e, "install");
+
 		/*
 		 * sanity checks
 		 */
 		if (sRuleNumber == null || sDisabled == null ||sources == null
 			|| dsts == null || sources.isEmpty() || dsts.isEmpty()
 			|| services == null || services.isEmpty() || actions == null
-				|| actions.isEmpty()) {
+			|| install == null	|| actions.isEmpty()) {
 			warnConfig("cannot parse rule", true);
 			return null;
 		}
 
+		/* source */
 		Element source = sources.get(0);
 		CpFwIpSpec srcIpSpec = parseFwIpSpec(source);
 
+		/* destination */
 		Element dst = dsts.get(0);
 		CpFwIpSpec dstIpSpec = parseFwIpSpec(dst);
 
+		/* services */
 		Element service = services.get(0);
 		CpFwServicesSpec servicesSpec = parseFwServicesSpec(service);
 
+		/* action */
 		String sAction = parseFwAction(actions.get(0));
 		if (sAction == null) {
 			warnConfig("invalid rule action (null)", true);
@@ -834,8 +845,17 @@ public class CpFw extends GenericEquipment {
 		Integer rNumber = Integer.parseInt(sRuleNumber);
 		Boolean disabled = Boolean.parseBoolean(sDisabled);
 
+		/* install on gateway */
+		List<Element> installmember = XMLUtils.getDirectChildren(install.get(0), "members");
+		List<Element> installref = XMLUtils.getDirectChildren(installmember.get(0), "reference");
+		ArrayList<String> installgw = new ArrayList();
+		for (Element er: installref) {
+			String s = XMLUtils.getTagValue(er, "Name");
+			installgw.add(s);
+		}
+
 		CpFwRule fwrule = new CpFwRule(sName, sClassName, sComment, rNumber,
-				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction, ruleAction);
+				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction, ruleAction, installgw);
 
 		/*
 		 * track references
@@ -873,7 +893,7 @@ public class CpFw extends GenericEquipment {
 				 */
 				String headerText = XMLUtils.getTagValue(e, "header_text");
 				if (headerText != null)
-					fwRule = new CpFwRule(null, null, headerText);
+					fwRule = new CpFwRule(null, null, headerText, null);
 			} else {
 				/*
 				 * security rule
@@ -882,11 +902,18 @@ public class CpFw extends GenericEquipment {
 					fwRule = parseFwRule(e);
 			}
 
-			if (fwRule != null ) {
-				_fwRules.add(fwRule);
-			}
-			if (fwRule != null && Log.debug().isLoggable(Level.INFO)) {
-				Log.debug().info("CpFwRule: " + fwRule);
+			if (fwRule != null) {
+				List<String> igateway = fwRule.getInstallGateway();
+				if (igateway == null) {
+					_fwRules.add(fwRule);
+				} else {
+					if (igateway.contains(_gatewayName)) {
+						_fwRules.add(fwRule);
+					}
+				}
+				if (Log.debug().isLoggable(Level.INFO)) {
+					Log.debug().info("CpFwRule: " + fwRule);
+				}
 			}
 		}
 	}
@@ -935,6 +962,19 @@ public class CpFw extends GenericEquipment {
 			famAdd(filename);
 		}
 
+		/* gateway name (for rule installation) */
+		list = doc.getElementsByTagName("gatewayName");
+		if (list.getLength() == 1) {
+			Element e = (Element) list.item(0);
+			_gatewayName = e.getAttribute("name");
+			if (_gatewayName == null || _gatewayName.isEmpty()) {
+				throw new JtaclConfigurationException(
+					"gateway name must be specified");
+			}
+		} else {
+			_gatewayName = null;
+		}
+
 		/* fwpolicies */
 		list = doc.getElementsByTagName("fwpolicies");
 		if (list.getLength() != 1) {
@@ -949,7 +989,7 @@ public class CpFw extends GenericEquipment {
 		famAdd(filename);
 
 		/* implicit drop rule */
-		CpFwRule fwdrop = new CpFwRule("implicit_drop", "");
+		CpFwRule fwdrop = new CpFwRule("implicit_drop", "", null);
 		_fwRules.add(fwdrop);
 
 		if (Log.debug().isLoggable(Level.INFO)) {

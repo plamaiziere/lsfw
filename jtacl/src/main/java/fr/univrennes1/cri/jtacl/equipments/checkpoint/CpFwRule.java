@@ -13,7 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Checkpoint firewall rule
@@ -36,7 +36,8 @@ public class CpFwRule {
 	protected CpFwServicesSpec _services;
 
 	protected boolean _implicitDrop;
-	protected ArrayList<String> _installgw;
+
+	protected List<String> _installGateway;
 
 	public String getName() {
 		return _name;
@@ -104,6 +105,10 @@ public class CpFwRule {
 		return _implicitDrop;
 	}
 
+	public List<String> getInstallGateway() {
+		return _installGateway;
+	}
+
 	/**
 	 * Construct a new fw rule
 	 * @param name name
@@ -115,13 +120,15 @@ public class CpFwRule {
 	 * @param dstIpSpec destination IP specification
 	 * @param servicesSpec services specification
 	 * @param action action class name
-	 * @param ruleAction rule's action (Accept, drop etc)
+	 * @param ruleAction rule action (Accept, drop etc)
+	 * @param installGateway rule gateway installation
 	 */
 	public CpFwRule(String name, String className, String comment,
 			Integer number, boolean disabled,
 			CpFwIpSpec srcIpSpec, CpFwIpSpec dstIpSpec,
 			CpFwServicesSpec servicesSpec, String action,
-			CpFwRuleAction ruleAction) {
+			CpFwRuleAction ruleAction,
+			List<String> installGateway) {
 		_name = name;
 		_className = className;
 		_comment = comment;
@@ -132,14 +139,16 @@ public class CpFwRule {
 		_services = servicesSpec;
 		_action = action;
 		_ruleAction = ruleAction;
+		_installGateway = installGateway;
 	}
 
 	/**
 	 * Construct a new fw rule (implicit drop)
 	 * @param name name
 	 * @param className class name
+	 * @param installGateway rule gateway installation
 	 */
-	public CpFwRule(String name, String className) {
+	public CpFwRule(String name, String className, List<String> installGateway) {
 		_name = name;
 		_className = className;
 		_comment = "implicit drop rule";
@@ -147,6 +156,7 @@ public class CpFwRule {
 		_action = "drop_action";
 		_ruleAction = CpFwRuleAction.DROP;
 		_implicitDrop = true;
+		_installGateway = installGateway;
 	}
 
 	/**
@@ -154,14 +164,17 @@ public class CpFwRule {
 	 * @param name name
 	 * @param className class name
 	 * @param comment header text
+	 * @param installGateway rule gateway installation
 	 */
-	public CpFwRule(String name, String className, String comment) {
+	public CpFwRule(String name, String className, String comment,
+			List<String> installGateway) {
 		_name = name;
 		_className = "header_text";
 		_comment = comment;
 		_number = 0;
 		_action = "none";
 		_headerText = true;
+		_installGateway = installGateway;
 	}
 
 	@Override
@@ -171,7 +184,8 @@ public class CpFwRule {
 				", disabled=" + _disabled + ", implicit= " + _implicitDrop
 				+ ", action=" + _action + ", ruleAction=" + _ruleAction
 				+ ", sourceIp=" + _sourceIp
-				+ ", destIp=" + _destIp	+ " services=" + _services;
+				+ ", destIp=" + _destIp	+ " services=" + _services
+				+ ", install=" + _installGateway;
 	}
 
 	public String toText() {
@@ -196,7 +210,8 @@ public class CpFwRule {
 			_destIp.getNetworks().getBaseReferencesName() +
 			", services: " + servicesNot +
 			_services.getServices().getReferencesName() +
-			", ruleAction: " + _ruleAction;
+			", ruleAction: " + _ruleAction +
+			", install: " + _installGateway;
 		if (_comment != null)
 			s+= ", # "	+ _comment;
 		return s;
