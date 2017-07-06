@@ -907,7 +907,7 @@ public class CpFw extends GenericEquipment {
 				if (igateway == null) {
 					_fwRules.add(fwRule);
 				} else {
-					if (igateway.contains(_gatewayName)) {
+					if (_gatewayName == null || igateway.contains(_gatewayName)) {
 						_fwRules.add(fwRule);
 					}
 				}
