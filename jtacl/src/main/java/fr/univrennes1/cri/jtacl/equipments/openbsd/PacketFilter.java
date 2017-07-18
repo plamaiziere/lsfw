@@ -2379,13 +2379,9 @@ public class PacketFilter extends GenericEquipment {
 			/*
 			 * get the result for the table
 			 */
-			MatchResult res = ipspecFilter(context, table.getIpspec(),
-				ipAddress, af);
-			/*
-			 * XXX: FIX this.
-				MatchResult res = tableIpspecFilter(context, table.getIpspec(),
+			MatchResult res = tableIpspecFilter(context, table.getIpspec(),
 		    	ipAddress, af);
-			*/
+
 			if (host.isNot())
 				res = res.not();
 			return res;
@@ -2467,10 +2463,17 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	/*
-	 * XXX: FIX this to handle 'not' in table
+	 * table filter
 	 */
 	protected MatchResult tableIpspecFilter(FilterContext context,
 			PfIpSpec ipspec, IPRangeable ipAddress, AddressFamily af) {
+
+		/*
+		 * XXX: 'not' addresses in table are treated as exception
+		 * https://www.openbsd.org/faq/pf/tables.html
+		*/
+		PfIpSpec orIpSpec = new PfIpSpec();
+		PfIpSpec exceptIpSpec = new PfIpSpec();
 
 		for (PfNodeHost host: ipspec) {
 			/*
@@ -2478,6 +2481,18 @@ public class PacketFilter extends GenericEquipment {
 			 */
 			if (!host.isAddrMask())
 				throw new JtaclInternalException("invalid address in table");
+
+
+			if (host.isNot())
+				exceptIpSpec.add(host);
+			else
+				orIpSpec.add(host);
+		}
+
+		int ormAll = 0;
+		int ormMatch = 0;
+
+		for (PfNodeHost host: orIpSpec) {
 			int mAll = 0;
 			int mMatch = 0;
 
@@ -2492,16 +2507,65 @@ public class PacketFilter extends GenericEquipment {
 						mMatch++;
 				}
 			}
-			MatchResult res = MatchResult.NOT;
 			if (mAll > 0)
-				res = MatchResult.ALL;
-			if (mMatch > 0)
-				res = MatchResult.MATCH;
-			if (host.isNot())
-				res = res.not();
-			return res;
+				ormAll++;
+			else if (mMatch > 0)
+				ormMatch++;
+
 		}
-		return MatchResult.MATCH;
+		// no match so we don't check exception
+		if ((ormAll == 0) && (ormMatch == 0))
+			return MatchResult.NOT;
+
+		int exmAll = 0;
+		int exmMatch = 0;
+
+		for (PfNodeHost host: exceptIpSpec) {
+			int mAll = 0;
+			int mMatch = 0;
+
+			for (IPNet ip: host.getAddr()) {
+				if (!ip.sameIPVersion(ipAddress))
+					continue;
+
+				if (ip.contains(ipAddress)) {
+					mAll++;
+				} else {
+					if (ip.overlaps(ipAddress))
+						mMatch++;
+				}
+			}
+			if (mAll > 0)
+				exmAll++;
+			else if (mMatch > 0)
+				exmMatch++;
+
+		}
+		// at least one may match
+		if (ormAll == 0 && ormMatch > 0)
+			return MatchResult.MATCH;
+
+		// no exception match
+		if (ormAll > 0 && exmAll == 0 && exmMatch ==0) {
+			return MatchResult.ALL;
+		}
+
+		// exception may match
+		if (ormAll > 0 && exmAll == 0 && exmMatch > 0) {
+			return MatchResult.MATCH;
+		}
+
+		// at least one exception match
+		if (ormAll > 0 && exmAll > 0) {
+			return MatchResult.NOT;
+		}
+
+		// at least one exception may match
+		if (ormAll > 0 && exmMatch > 0) {
+			return MatchResult.MATCH;
+		}
+
+		return MatchResult.UNKNOWN;
 	}
 
 	/**
