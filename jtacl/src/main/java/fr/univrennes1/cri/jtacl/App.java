@@ -21,11 +21,6 @@ import fr.univrennes1.cri.jtacl.shell.ShellConsole;
 import java.io.IOException;
 import static java.util.Arrays.*;
 import java.util.List;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
