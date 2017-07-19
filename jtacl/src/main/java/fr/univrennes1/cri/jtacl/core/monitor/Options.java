@@ -17,9 +17,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import java.io.IOException;
 import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
