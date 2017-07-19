@@ -15,7 +15,12 @@ package fr.univrennes1.cri.jtacl.core.monitor;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Jtacl's options.
@@ -44,6 +49,11 @@ public class Options {
 	 * secure level
 	 */
 	private int _secureLevel = 0;
+
+	/**
+	 * logfile
+	 */
+	private String _logfile = null;
 
 	/**
 	 * Returns the max number of hop while probing.
@@ -171,9 +181,37 @@ public class Options {
 		if (secureLevel < _secureLevel)
 			throw new JtaclConfigurationException
 						("secure level can only be raised");
-			_secureLevel = secureLevel;
+		_secureLevel = secureLevel;
 	}
 
+	/**
+	 * Returns the logfile.
+	 * @return the logfile.
+	 */
+	public String getLogFile() {
+		return _logfile;
+	}
+
+	/**
+	 * Sets the logfile
+	 * @param logfile to set.
+	 * @throws java.io.IOException
+	 */
+	public void setLogFile(String logfile) throws IOException {
+
+		if (_logfile != null && !logfile.isEmpty())
+			 throw new JtaclConfigurationException("logfile cannot be changed");
+
+		if (!logfile.isEmpty()) {
+			_logfile = logfile;
+			FileHandler fh;
+			fh = new FileHandler(_logfile);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			Log.debug().getParent().addHandler(fh);
+			Log.consoleHandler().setLevel(Level.OFF);
+		}
+	}
 
 	/**
 	 * Sets the option with the specified value.
@@ -224,6 +262,11 @@ public class Options {
 				return;
 			}
 
+			if (optionName.equalsIgnoreCase("logfile")) {
+				setLogFile(value);
+				return;
+			}
+
 		} catch (Exception e) {
 			throw new JtaclConfigurationException(e.getMessage());
 		}
@@ -241,6 +284,7 @@ public class Options {
 				"crossreference=" + getXref() + "\n" +
 				"debug.level=" + getDebugLevel() + "\n" +
 				"dns.cache.ttl=" + getDnsCacheTTL() + "\n" +
+				"logfile=" + getLogFile() + '\n' +
 				"maxhop=" + getMaxHop() + "\n" +
 				"notify.level=" + getNotifyLevel() + "\n" +
 				"secureLevel=" + getSecureLevel();

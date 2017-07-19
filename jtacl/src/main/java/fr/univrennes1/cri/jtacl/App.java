@@ -40,27 +40,6 @@ public class App
 	static public final int EXIT_FAILURE = 1;
 	static public final int EXIT_ERROR = 255;
 
-	protected static void installLogger() {
-		class ShortFormatter extends Formatter {
-			// inefficient implementation
-			public String format(LogRecord record) {
-				return "[" + record.getLevel() + "]" +
-				 record.getMessage() + "\n";
-			}
-		}
-
-		ShortFormatter fmt = new ShortFormatter();
-
-		Logger l = Log.debug();
-		Handler [] hdler = l.getParent().getHandlers();
-		hdler[0].setFormatter(fmt);
-		l.setLevel(Level.ALL);
-		l.getParent().setLevel(Level.ALL);
-		Log.notifier().setLevel(Level.WARNING);
-		Log.debug().setLevel(Level.OFF);
-		Log.config().setLevel(Level.SEVERE);
-	}
-
 	protected static OptionParser initOptions() {
 		OptionParser optParser = new OptionParser();
 		optParser.acceptsAll(asList("c", "command"),
@@ -126,7 +105,7 @@ public class App
 	public static void main( String[] args ) throws IOException {
 
 		try {
-			installLogger();
+			Log.install();
 
 			/*
 			 * --option
