@@ -246,9 +246,9 @@ public class PacketFilter extends GenericEquipment {
 			new HashMap<String, String>();
 
 	/**
-	 * routes filename
+	 * routes files name
 	 */
-	 String _routesFile;
+	 List<String> _routesFiles;
 
 	/**
 	 * The root anchor
@@ -594,11 +594,10 @@ public class PacketFilter extends GenericEquipment {
 		/*
 		 * routes filename
 		 */
+		_routesFiles = new ArrayList<>();
 		list = doc.getElementsByTagName("routes-file");
-		if (list.getLength() > 1)
-			throw new JtaclConfigurationException("Only one routes-file entity is allowed");
-		if (list.getLength() == 1) {
-			e = (Element) list.item(0);
+		for (int i = 0; i < list.getLength(); i++) {
+			e = (Element) list.item(i);
 			filename = e.getAttribute("filename");
 			if (filename.isEmpty())
 				throw new JtaclConfigurationException("Missing routes-file file name");
@@ -606,7 +605,7 @@ public class PacketFilter extends GenericEquipment {
 			File file = new File(filename);
 			if (!file.exists() || !file.isFile())
 				throw new JtaclConfigurationException("No such routes-file: " + filename);
-			_routesFile = filename;
+			_routesFiles.add(filename);
 		}
 
 		/*
@@ -2027,9 +2026,9 @@ public class PacketFilter extends GenericEquipment {
 		loadAnchors();
 		loadTables();
 		routeDirectlyConnectedNetworks();
-		if (_routesFile != null) {
-			loadRoutesFromFile(_routesFile);
-			famAdd(_routesFile);
+		for (String file: _routesFiles) {
+			loadRoutesFromFile(file);
+			famAdd(file);
 		}
 		loadRoutesFromXML(doc);
 		/*
