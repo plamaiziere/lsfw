@@ -68,19 +68,14 @@ public class App
 
 	}
 
-	protected static boolean setOption(String option) {
+	protected static void setOption(String option) {
 
 		String[] opts = option.split("=");
 		if (opts.length != 2)
-			return false;
+			throw new JtaclConfigurationException("invalid option " + option);
 		String optName = opts[0].trim();
 		String optValue = opts[1].trim();
-		try {
-			Monitor.getInstance().getOptions().setOption(optName, optValue);
-		} catch (JtaclConfigurationException e) {
-			return false;
-		}
-		return true;
+		Monitor.getInstance().getOptions().setOption(optName, optValue);
 	}
 
 	protected static void quitError(OptionParser optParser, String message) {
@@ -111,9 +106,11 @@ public class App
 				List<?> options = optionSet.valuesOf("o");
 				for (Object o: options) {
 					String opt = (String)o;
-					boolean ok = setOption(opt);
-					if (!ok)
-						quitError(optParser, "Invalid option");
+					try {
+						setOption(opt);
+					} catch	(Exception ex) {
+						quitError(optParser, ex.getMessage());
+					}
 				}
 			}
 

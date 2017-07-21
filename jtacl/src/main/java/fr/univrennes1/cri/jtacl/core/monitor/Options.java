@@ -203,7 +203,12 @@ public class Options {
 		if (!logfile.isEmpty()) {
 			_logfile = logfile;
 			FileHandler fh;
-			fh = new FileHandler(_logfile);
+			try {
+				fh = new FileHandler(_logfile);
+			} catch (Exception ex) {
+				throw new JtaclConfigurationException("Error: cannot open " +
+					logfile);
+			}
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);
 			Log.debug().getParent().addHandler(fh);
