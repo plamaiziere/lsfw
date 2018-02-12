@@ -16,9 +16,8 @@ prequisite:
  - python 3.6 and module spur (ssh)
  - ssh access to the managment server via ssh keys.
 
-Configuration:
-
-The configuration uses a JSON file with the following informations :
+configuration:
+  The configuration uses a JSON file with the following informations :
 
 {
         "ssh_host":"hostname of the managment server",
@@ -29,6 +28,10 @@ The configuration uses a JSON file with the following informations :
         "max_job":number of jobs to run
         "job_timeout":time out in second for a job to complete
 }
+
+bugs:
+  The tool 'mgmt_cli' fails to connect to the managment server when the managment server is installing a policy
+  on gateway.
 
 """
 
