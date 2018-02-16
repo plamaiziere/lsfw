@@ -155,3 +155,6 @@ class Jobs(object):
                 self._running.remove(job)
 
             time.sleep(0.1)
+
+        self._done = sorted(self._done, key=lambda job: job.jobnumber)
+
