@@ -329,7 +329,6 @@ def main():
 
     # access rules per layer
     for layer in ckpconfig.access_layers:
-        layer['access-rulebase'] = []
         queue_firstcmd(
             sshjobs=sshjobs,
             nbobjects=50,
