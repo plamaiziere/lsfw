@@ -9,8 +9,9 @@ in JSON.
 The script connects to the managment server via ssh and run the Checkpoint 'mgmt_cli' tool to export the objects
 in JSON. As this is quite slow, we use several jobs in //.
 
-The script outputs the result in a single JSON that lists objects per UID, that will permit lsfw
-to handle Checkpoint >= R80.
+The script outputs the result in a single JSON, that will permit lsfw to handle Checkpoint >= R80.
+
+XXXX: WORK IN PROGRESS!
 
 prequisite:
  - python 3.6 and module spur (ssh)
@@ -74,7 +75,7 @@ def writeErr(err):
 
 class MgmtCliJob(sshjob.SshJob):
 
-    def __init__(self, host, user, key, command, jobstr, start_callback, done_callback, sshjobs, ckp_object, iteration, iteration_count, nbobjects, cmd_options=''):
+    def __init__(self, host, user, key, command, jobstr, start_callback, done_callback, sshjobs, ckp_object, iteration, iteration_count, nbobjects, outputfile, cmd_options=''):
         super().__init__(
             host = host,
             user = user,
@@ -89,7 +90,9 @@ class MgmtCliJob(sshjob.SshJob):
         self._iteration = iteration
         self._iteration_count = iteration_count
         self._nbobjects = nbobjects
+        self._outputfile = outputfile
         self._cmd_options = cmd_options
+
 
     @property
     def sshjobs(self):
@@ -112,13 +115,48 @@ class MgmtCliJob(sshjob.SshJob):
         return self._iteration_count
 
     @property
+    def outputfile(self):
+        return self._outputfile
+
+    @property
     def cmd_options (self):
         return self._cmd_options
+
+def find_uid(list, uid):
+    for o in list:
+        if o['uid'] == uid:
+            return o
+    return None
+
+class CkpConfig(object):
+
+    def __init__(self):
+        self.objects_dict = []
+        self.access_layers = []
+
+    def add_object_dict(self, ckp_object):
+        if find_uid(self.objects_dict, ckp_object['uid']) is None:
+            self.objects_dict.append(ckp_object)
+
+    def add_rulebase(self, rulebase):
+        l = find_uid(self.access_layers, rulebase['uid'])
+        # merge same rules and dict
+        rules = l['rulebase']
+        rules.extend(rulebase['rulebase'])
+        # append objects in the rulebase dictionary to global dict
+        for o in rulebase['objects-dictionary']:
+            self.add_object_dict(o)
+
+    def add_access_layer(self, layer):
+        if find_uid(self.access_layers, layer['uid']) is None:
+            layer['rulebase'] = []
+            self.access_layers.append(layer)
+
 
 def mgmt_cli():
     return "mgmt_cli " + "-u " + cfg['mgmt_user'] + " -p " + cfg['mgmt_password']
 
-def new_mgmt_job(command, jobstr, sshjobs, ckp_object, iteration, iteration_count, nbobjects, cmd_options=''):
+def new_mgmt_job(command, jobstr, sshjobs, ckp_object, iteration, iteration_count, nbobjects, outputfile, cmd_options=''):
     job = MgmtCliJob(
             host = cfg['ssh_host'],
             user = cfg['ssh_user'],
@@ -130,6 +168,7 @@ def new_mgmt_job(command, jobstr, sshjobs, ckp_object, iteration, iteration_coun
             iteration = iteration,
             iteration_count = iteration_count,
             nbobjects = nbobjects,
+            outputfile = outputfile,
             cmd_options = cmd_options,
             start_callback = job_start_callback,
             done_callback = job_done_callback
@@ -149,6 +188,15 @@ def job_done_callback(job):
     print('-', file = sys.stderr, end = '', flush = True)
     iteration = job.iteration
     nbobjects = job.nbobjects
+
+    if cfg['output_dir'] is not None:
+        filename = cfg['output_dir'] + '/' + job.outputfile + '_' + str(job.iteration) + '.json'
+        f = open(filename, 'w')
+        js = json.loads(job.result.output)
+        jenc = json.JSONEncoder(indent = 2)
+        jss = jenc.encode(js)
+        f.write(jss)
+        f.close()
 
     # the first iteration is used to know the number of objects to retrieve
     if iteration == 0:
@@ -173,13 +221,14 @@ def job_done_callback(job):
                 iteration = iteration,
                 iteration_count= count,
                 nbobjects = job.nbobjects,
+                outputfile= job.outputfile,
                 cmd_options = job.cmd_options
             )
             iteration += 1
             job.sshjobs.queuejob(njob)
 
 
-def queue_firstcmd(sshjobs, nbobjects, ckp_object, cmd_options=''):
+def queue_firstcmd(sshjobs, nbobjects, ckp_object, outputfile, cmd_options=''):
 
     cmd = ckp_command(
         ckp_object=ckp_object,
@@ -196,39 +245,54 @@ def queue_firstcmd(sshjobs, nbobjects, ckp_object, cmd_options=''):
         iteration=0,
         iteration_count=1,
         nbobjects=nbobjects,
+        outputfile = outputfile,
         cmd_options=cmd_options
     )
 
     sshjobs.queuejob(job)
 
-# return the results of ckp_object to a list
-def get_jobs_result(sshjobs, ckp_object):
+# retreive the results from jobs
+def get_jobs_result(sshjobs, ckpconfig):
 
-    res = []
     for job in sshjobs.done:
-        if job.ckp_object == ckp_object:
-            js = json.loads(job.result.output)
-            res.extend(js['objects'])
+        js = json.loads(job.result.output)
 
-    return res
+        if job.ckp_object == 'access-rulebase':
+            ckpconfig.add_rulebase(js)
+        elif job.ckp_object == 'access-layers':
+            for layer in js['access-layers']:
+                ckpconfig.add_access_layer(layer)
+        else:
+            for o in js['objects']:
+                ckpconfig.add_object_dict(o)
+
+def usage():
+    writeErr('Usage:')
+    writeErr("   -c <config file> configuration for the tools")
+    writeErr("   -o <output directory> directory to store output json files from mgmt_cli command (optionnal)")
 
 def getopts():
 
     global cfg
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "c:", [])
+        opts, args = getopt.getopt(sys.argv[1:], "c:o:", [])
     except getopt.GetoptError as err:
         writeErr(err)
         sys.exit(2)
 
     config_file = None
+    output_dir = None
     for o, a in opts:
         if (o == '-c'):
             config_file = a
 
+        if (o == '-o'):
+            output_dir = a
+
     if config_file is None:
         writeErr("-c <config file> is mandatory")
+        usage()
         sys.exit(2)
     jconfig = open(config_file).read()
     cfg = json.loads(jconfig)
@@ -238,91 +302,81 @@ def getopts():
             writeErr("missing configuration parameter: ", param, " in file: ", config_file)
             sys.exit(2)
 
+    cfg['output_dir'] = output_dir
+
 def main():
 
     getopts()
 
-    # the resulting Checkpoint config in one dict
-    ckp_config = {}
+    # the resulting Checkpoint config
+    ckpconfig = CkpConfig()
 
     # rules layers are needed to retrieve access rules set
     sshjobs = jobs.Jobs()
-    jobnumber = 0;
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=50, ckp_object="access-layers")
+    queue_firstcmd(
+        sshjobs=sshjobs,
+        nbobjects=50,
+        ckp_object="access-layers",
+        outputfile= 'access-layers'
+    )
     sshjobs.run(maxjob=15, timeout=300)
 
     # parse layers when jobs are done
-    layers = []
-    for job in sshjobs.done:
-        if job.ckp_object == 'access-layers':
-            jlayers = json.loads(job.result.output)
-            layers.extend(jlayers['access-layers'])
-
-    uids = []
-    uids.extend(layers)
-    ckp_config['uids'] = uids
+    get_jobs_result(sshjobs = sshjobs, ckpconfig = ckpconfig)
 
     # basic jobs scheduler for ssh command
     sshjobs = jobs.Jobs()
 
     # access rules per layer
-    for layer in layers:
-        queue_firstcmd(sshjobs=sshjobs, nbobjects=50, ckp_object='access-rulebase', cmd_options='uid ' + layer['uid'] + ' ' + 'use-object-dictionary true')
+    for layer in ckpconfig.access_layers:
+        layer['access-rulebase'] = []
+        queue_firstcmd(
+            sshjobs=sshjobs,
+            nbobjects=50,
+            ckp_object='access-rulebase',
+            outputfile = 'access-rulebase_' + layer['uid'],
+            cmd_options='uid ' + layer['uid'] + ' ' + 'use-object-dictionary true'
+        )
 
     # hosts
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="hosts")
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="hosts", outputfile = 'hosts')
 
     # groups
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=30, ckp_object="groups")
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=30, ckp_object="groups", outputfile = 'groups')
 
     # groups with exclusion
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=30, ckp_object="groups-with-exclusion")
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=30, ckp_object="groups-with-exclusion", outputfile = 'groups-with-exclusion')
 
     # networks
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="networks")
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="networks", outputfile= 'networks')
 
     # address ranges
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="address-ranges")
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="address-ranges", outputfile = 'address-ranges')
 
     # multicast address ranges
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="multicast-address-ranges")
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="multicast-address-ranges", outputfile= 'muticast-address-ranges')
 
-    # gateways
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="simple-gateways")
+     # gateways
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="simple-gateways", outputfile='gateways')
 
     # services
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-tcp")
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-udp")
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-other")
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="service-groups")
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-tcp", outputfile='services-tcp')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-udp", outputfile='services-udp')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-other", outputfile='services-other')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="service-groups", outputfile='service-groups')
 
     # run jobs in //
     sshjobs.run(cfg['max_job'], cfg['job_timeout'])
     print('', file=sys.stderr, flush=True)
 
-    # construct a single object with all the objects per uid
-    uids.extend(get_jobs_result(sshjobs, 'hosts'))
-    uids.extend(get_jobs_result(sshjobs, 'groups'))
-    uids.extend(get_jobs_result(sshjobs, 'groups-with-exclusion'))
-    uids.extend(get_jobs_result(sshjobs, 'networks'))
-    uids.extend(get_jobs_result(sshjobs, 'address-ranges'))
-    uids.extend(get_jobs_result(sshjobs, 'multicast-address-ranges'))
-    uids.extend(get_jobs_result(sshjobs, 'simple-gateways'))
-    uids.extend(get_jobs_result(sshjobs, 'services-tcp'))
-    uids.extend(get_jobs_result(sshjobs, 'services-udp'))
-    uids.extend(get_jobs_result(sshjobs, 'services-other'))
-    uids.extend(get_jobs_result(sshjobs, 'service-groups'))
-
-    access_rules = []
-    for job in sshjobs._done:
-        if job.ckp_object == 'access-rulebase':
-            js = json.loads(job.result.output)
-            access_rules.extend(js['rulebase'])
-    uids.extend(access_rules)
+    get_jobs_result(sshjobs = sshjobs, ckpconfig = ckpconfig)
 
     # export to json
+    ckp = {}
+    ckp['objects-dictionary'] = ckpconfig.objects_dict
+    ckp['layers'] = ckpconfig.access_layers
     jenc = json.JSONEncoder(indent = 2)
-    js = jenc.encode(ckp_config)
+    js = jenc.encode(ckp)
     print(js)
 
 if __name__ == "__main__":
