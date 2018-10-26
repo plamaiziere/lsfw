@@ -507,48 +507,6 @@ public class ShellParserTest extends TestCase {
 		assertEquals("F I L E N A M E", parser.getString("GroovyScript"));
 	}
 
-	public void testPolicyLoad() {
-		System.out.println("policy-load");
-
-		String line = "policy    load     FILENAME";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-load", parser.getString("Command"));
-		assertEquals("FILENAME", parser.getString("FileName"));
-
-		line = "policy    load     \"c:         FILENAME   \"";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-load", parser.getString("Command"));
-		assertEquals("c:         FILENAME   ", parser.getString("FileName"));
-	}
-
-	public void testPolicyProbe() {
-		System.out.println("policy-probe");
-
-		String line = "policy    probe    POLICYNAME";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-probe", parser.getString("Command"));
-		assertEquals("POLICYNAME", parser.getString("PolicyName"));
-
-		line = "policy    probe    POLICYNAME  to    TO";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-probe", parser.getString("Command"));
-		assertEquals("POLICYNAME", parser.getString("PolicyName"));
-		assertEquals("TO", parser.getString("PolicyTo"));
-
-		line = "policy    probe    POLICYNAME  from    FROM";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-probe", parser.getString("Command"));
-		assertEquals("POLICYNAME", parser.getString("PolicyName"));
-		assertEquals("FROM", parser.getString("PolicyFrom"));
-
-		line = "policy    probe    POLICYNAME  from    FROM   to    TO";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-probe", parser.getString("Command"));
-		assertEquals("POLICYNAME", parser.getString("PolicyName"));
-		assertEquals("FROM", parser.getString("PolicyFrom"));
-		assertEquals("TO", parser.getString("PolicyTo"));
-	}
-
 	public void testIp() {
 		System.out.println("ip");
 
@@ -566,21 +524,6 @@ public class ShellParserTest extends TestCase {
 		result = new ReportingParseRunner(parser.CommandLine()).run(line);
 		assertEquals("ip6", parser.getString("Command"));
 		assertEquals("ADDRESS1 ADDRESS2", parser.getString("AddressArg"));
-	}
-
-	public void testPolicyList() {
-		System.out.println("policy-list");
-
-		String line = "policy list";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-list", parser.getString("Command"));
-		assertEquals(null, parser.getString("PolicyName"));
-
-		line = "policy list POLICYNAME";
-		result = new ReportingParseRunner(parser.CommandLine()).run(line);
-		assertEquals("policy-list", parser.getString("Command"));
-		assertEquals("POLICYNAME", parser.getString("PolicyName"));
-
 	}
 
 }

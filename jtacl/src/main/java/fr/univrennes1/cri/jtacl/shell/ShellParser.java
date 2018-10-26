@@ -64,9 +64,6 @@ public class ShellParser extends CommonRules<Object> {
 					CommandGroovyConsole(),
 					CommandHost(),
 					CommandHost6(),
-					CommandPolicyList(),
-					CommandPolicyLoad(),
-					CommandPolicyProbe(),
 					CommandIp6(),
 					CommandIp()
 				)
@@ -194,74 +191,6 @@ public class ShellParser extends CommonRules<Object> {
 				EOI,
 				setString("Command", "define")
 		);
-	}
-
-	/*
-	 * policy list [policy]
-	 */
-	public Rule CommandPolicyList() {
-		return Sequence(
-					IgnoreCase("policy"),
-					WhiteSpaces(),
-					IgnoreCase("list"),
-					Optional(
-						WhiteSpaces(),
-						StringAtom(),
-						setString("PolicyName", match())
-					),
-					EOI,
-					setString("Command", "policy-list")
-				);
-	}
-
-	/*
-	 * policy load filename
-	 */
-	public Rule CommandPolicyLoad() {
-		return Sequence(
-					IgnoreCase("policy"),
-					WhiteSpaces(),
-					IgnoreCase("load"),
-					WhiteSpaces(),
-					StringOrQuotedString(),
-					setString("FileName", getLastQuotedString()),
-					EOI,
-					setString("Command", "policy-load")
-				);
-	}
-
-	/*
-	 * policy probe policyname [from ip] [to ip]
-	 */
-	public Rule CommandPolicyProbe() {
-		return Sequence (
-					IgnoreCase("policy"),
-					WhiteSpaces(),
-					IgnoreCase("probe"),
-					WhiteSpaces(),
-					StringAtom(),
-					setString("PolicyName", match()),
-					Optional(
-						Sequence(
-							WhiteSpaces(),
-							IgnoreCase("from"),
-							WhiteSpaces(),
-							StringAtom(),
-							setString("PolicyFrom", match())
-						)
-					),
-					Optional(
-						Sequence(
-							WhiteSpaces(),
-							IgnoreCase("to"),
-							WhiteSpaces(),
-							StringAtom(),
-							setString("PolicyTo", match())
-						)
-					),
-					EOI,
-					setString("Command", "policy-probe")
-				);
 	}
 
 	/*
