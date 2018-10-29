@@ -91,6 +91,7 @@ public final class IPNet implements Comparable, IPRangeable {
 			}
 		}
 
+		@SuppressWarnings("InfiniteLoopStatement")
 		@Override
 		public void run() {
 			while (true) {

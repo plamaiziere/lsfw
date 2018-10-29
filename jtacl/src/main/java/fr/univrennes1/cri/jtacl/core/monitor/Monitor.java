@@ -350,6 +350,7 @@ public class Monitor {
 		Class monitor = Monitor.class;
 		Constructor constructor;
 		try {
+			//noinspection unchecked
 			constructor = cl.getConstructor(monitor, str, str, str);
 		} catch (NoSuchMethodException ex) {
 			throw new JtaclConfigurationException(ex.getMessage());
