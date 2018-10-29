@@ -97,7 +97,7 @@ public class GenericEquipment extends NetworkEquipment {
 	 * Filters are regexp uses to filter-out some input from configuration.
 	 * @see #loadFiltersFromXML(org.w3c.dom.Document)
 	 */
-	 protected List<Pattern> _filters = new ArrayList<Pattern>();
+	 protected List<Pattern> _filters = new ArrayList<>();
 
 	/**
 	 * Options are pair of key, value.<br/>
@@ -106,13 +106,13 @@ public class GenericEquipment extends NetworkEquipment {
 	 *
 	 * @see #loadOptionsFromXML(org.w3c.dom.Document)
 	 */
-	protected Map<String, KeyValue> _options = new HashMap<String, KeyValue>();
+	protected Map<String, KeyValue> _options = new HashMap<>();
 
 	/**
 	 * sub shell registered on this equipment.
 	 */
 	protected List<GenericEquipmentShell> _shells
-			= new ArrayList<GenericEquipmentShell>();
+			= new ArrayList<>();
 
 	/**
 	 * File alteration monitor for this equipment
@@ -216,7 +216,7 @@ public class GenericEquipment extends NetworkEquipment {
 		 * null route
 		 */
 		if (snexthop.equalsIgnoreCase("null-route")) {
-			Route<IfaceLink> route = new Route<IfaceLink>(prefix);
+			Route<IfaceLink> route = new Route<>(prefix);
 			return route;
 		}
 
@@ -266,7 +266,7 @@ public class GenericEquipment extends NetworkEquipment {
 		if (link == null)
 			throw new JtaclConfigurationException("Invalid route: coud not find link " + s);
 
-		Route<IfaceLink> route = new Route<IfaceLink>(prefix, nexthop, metric, link);
+		Route<IfaceLink> route = new Route<>(prefix, nexthop, metric, link);
 		return route;
 	}
 	/**
@@ -357,7 +357,7 @@ public class GenericEquipment extends NetworkEquipment {
 				 * add a route to directly connected network.
 				 */
 				IPNet network = link.getNetwork();
-				Route<IfaceLink> route = new Route<IfaceLink>(network, network, 0, link);
+				Route<IfaceLink> route = new Route<>(network, network, 0, link);
 				Log.debug().info("add route on " + getName() + " " + route.toString());
 				_routingEngine.addRoute(route);
 			}

@@ -62,13 +62,13 @@ public final class IPNet implements Comparable, IPRangeable {
 	protected static long _dnsCacheTtl = 60000;
 
 	protected static final Map<String, DnsCacheEntry> _dnsCache =
-			new ConcurrentHashMap<String, DnsCacheEntry>();
+            new ConcurrentHashMap<>();
 
 	protected static final Map<InetAddress, RevertDnsCacheEntry> _dnsRevertCache =
-			new ConcurrentHashMap<InetAddress, RevertDnsCacheEntry>();
+            new ConcurrentHashMap<>();
 
 	protected static final Map<InetAddress, RevertDnsCacheEntry> _dnsPtrCache =
-			new ConcurrentHashMap<InetAddress, RevertDnsCacheEntry>();
+            new ConcurrentHashMap<>();
 
 	protected static class CacheCollector extends Thread {
 
@@ -212,8 +212,8 @@ public final class IPNet implements Comparable, IPRangeable {
 			right = saddr[1];
 		}
 
-		ArrayList<String> rightItems = new ArrayList<String>();
-		ArrayList<String> items = new ArrayList<String>();
+		ArrayList<String> rightItems = new ArrayList<>();
+		ArrayList<String> items = new ArrayList<>();
 
 		String[] lItems	= null;
 		String[] rItems	= null;
@@ -648,7 +648,7 @@ public final class IPNet implements Comparable, IPRangeable {
 			_dnsCache.put(hname, entry);
 		}
 
-		ArrayList<IPNet> addresses = new ArrayList<IPNet>();
+		ArrayList<IPNet> addresses = new ArrayList<>();
 		for (InetAddress addr: inet) {
 			if ((addr instanceof Inet4Address && ipVersion == IPversion.IPV4) ||
 				(addr instanceof Inet6Address && ipVersion == IPversion.IPV6)) {

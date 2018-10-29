@@ -25,7 +25,7 @@ import java.util.List;
 public class RouteOptsTemplate {
 
 	private int _rt;
-	private List<Xhost> _hosts = new ArrayList<Xhost>();
+	private List<Xhost> _hosts = new ArrayList<>();
 	private PoolOptsTemplate _poolOpts;
 
 	public List<Xhost> getHosts() {

@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public class FilesMonitor {
 
-	protected Map<String, Long> _filesMap = new HashMap<String, Long>();
+	protected Map<String, Long> _filesMap = new HashMap<>();
 
 	public void addFile(String filename) {
 		File file = new File(filename);
@@ -37,7 +37,7 @@ public class FilesMonitor {
 	}
 
 	public List<String> checkFiles() {
-		ArrayList<String> files = new ArrayList<String>();
+		ArrayList<String> files = new ArrayList<>();
 
 		for (String filename: _filesMap.keySet()) {
 			Long date = _filesMap.get(filename);

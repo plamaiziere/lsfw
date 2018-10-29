@@ -24,7 +24,7 @@ import java.util.List;
 public class ExpandedRuleLine {
 
 	private StringBuilder _line;
-	private List <StringBuilder>  _expanded = new ArrayList<StringBuilder>();
+	private List <StringBuilder>  _expanded = new ArrayList<>();
 
 	public List<StringBuilder> getExpanded() {
 		return _expanded;

@@ -30,8 +30,8 @@ public class FilterOptsTemplate {
 	private String _rcv;
 	private String _flags;
 	private String _flagset;
-	private List<IcmpItem> _icmpspec = new ArrayList<IcmpItem>();
-	private List<IcmpItem> _icmp6spec = new ArrayList<IcmpItem>();
+	private List<IcmpItem> _icmpspec = new ArrayList<>();
+	private List<IcmpItem> _icmp6spec = new ArrayList<>();
 	private boolean _fragment;
 	private boolean _allowopts;
 	private String _tag;

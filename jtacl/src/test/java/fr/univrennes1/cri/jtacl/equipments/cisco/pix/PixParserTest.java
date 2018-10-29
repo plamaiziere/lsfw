@@ -34,7 +34,7 @@ public class PixParserTest extends TestCase implements GroupTypeSearchable {
 	ReportingParseRunner parseRunerParse =
 		new ReportingParseRunner(parser.Parse());
 	HashMap<String, ObjectGroupType> groups =
-		new HashMap<String, ObjectGroupType>();
+            new HashMap<>();
 
     public PixParserTest(String testName) {
         super(testName);

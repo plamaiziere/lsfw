@@ -34,7 +34,7 @@ public class PortSpec {
 	/**
 	 * Range(s) of ports.
 	 */
-	protected List<PortRange> _ranges = new ArrayList<PortRange>();
+	protected List<PortRange> _ranges = new ArrayList<>();
 
 	/**
 	 * PortSpec NONE

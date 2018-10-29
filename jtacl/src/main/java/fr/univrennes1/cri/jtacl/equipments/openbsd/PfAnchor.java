@@ -61,17 +61,17 @@ public class PfAnchor {
 	/**
 	 * children anchors.
 	 */
-	protected List<PfAnchor> _children = new ArrayList<PfAnchor>();
+	protected List<PfAnchor> _children = new ArrayList<>();
 
 	/**
 	 * List of rules
 	 */
-	protected List<PfGenericRule> _rules = new ArrayList<PfGenericRule>();
+	protected List<PfGenericRule> _rules = new ArrayList<>();
 
 	/**
 	 * Map of tables
 	 */
-	protected Map<String, PfTable> _tables = new HashMap<String, PfTable>();
+	protected Map<String, PfTable> _tables = new HashMap<>();
 
 	/**
 	 * Creates a new root anchor.
@@ -267,7 +267,7 @@ public class PfAnchor {
 			return _children;
 		}
 
-		List<PfAnchor> anchorList = new ArrayList<PfAnchor>();
+		List<PfAnchor> anchorList = new ArrayList<>();
 		if (path.isEmpty()) {
 			anchorList.add(this);
 			return anchorList;

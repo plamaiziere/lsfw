@@ -28,11 +28,11 @@ public class CpNetworkGroup extends CpNetworkObject {
 
 	/* hash of base objects */
 	protected HashMap<String, CpNetworkObject> _baseObjects =
-		new HashMap<String, CpNetworkObject>();
+            new HashMap<>();
 
 	/* hash of excluded objects */
 	protected HashMap<String, CpNetworkObject> _excludedObjects =
-		new HashMap<String, CpNetworkObject>();
+            new HashMap<>();
 
 
 	/**
@@ -59,7 +59,7 @@ public class CpNetworkGroup extends CpNetworkObject {
 	 * @return a list of the base references name included in this group.
 	 */
 	public List<String> getBaseReferencesName() {
-		List<String> list = new LinkedList<String>(_baseObjects.keySet());
+		List<String> list = new LinkedList<>(_baseObjects.keySet());
 		Collections.sort(list);
 		return list;
 	}
@@ -69,7 +69,7 @@ public class CpNetworkGroup extends CpNetworkObject {
 	 * @return a list of the excluded references name included in this group.
 	 */
 	public List<String> getExcludedReferencesName() {
-		List<String> list = new LinkedList<String>(_excludedObjects.keySet());
+		List<String> list = new LinkedList<>(_excludedObjects.keySet());
 		Collections.sort(list);
 		return list;
 	}

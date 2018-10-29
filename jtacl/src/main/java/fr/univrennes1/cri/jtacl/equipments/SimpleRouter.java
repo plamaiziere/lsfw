@@ -43,7 +43,7 @@ import org.w3c.dom.NodeList;
  */
 public class SimpleRouter extends GenericEquipment {
 
-	protected ArrayList<String> _acls = new ArrayList<String>();
+	protected ArrayList<String> _acls = new ArrayList<>();
 
 	protected class SimpleRouterLink {
 		IfaceLink _link;
@@ -64,7 +64,7 @@ public class SimpleRouter extends GenericEquipment {
 	}
 
 	Map<IfaceLink, SimpleRouterLink> _srlinks =
-		new HashMap<IfaceLink, SimpleRouterLink>();
+            new HashMap<>();
 
 	/**
 	 * Create a new {@link SimpleRouter} with this name and this comment.<br/>
@@ -231,7 +231,7 @@ public class SimpleRouter extends GenericEquipment {
 		 * routes too because our goal is to know if a probe is able to
 		 * reach a destination, regardless of the route taken.
 		 */
-		ArrayList<Probe> probes = new ArrayList<Probe>();
+		ArrayList<Probe> probes = new ArrayList<>();
 		probes.add(probe);
 
 		/*

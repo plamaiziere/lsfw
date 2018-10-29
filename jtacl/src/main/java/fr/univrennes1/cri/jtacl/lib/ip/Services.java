@@ -122,7 +122,7 @@ public class Services extends ArrayList<IPServEnt> {
 			int port = Integer.valueOf(sproto[0]);
 			String proto = sproto[1];
 			// aliases
-			ArrayList<String> aliases = new ArrayList<String>();
+			ArrayList<String> aliases = new ArrayList<>();
 			for (int i = 2; i < splited.length; i++)
 				aliases.add(splited[i]);
 			IPServEnt ent = new IPServEnt(name, aliases, port, proto);

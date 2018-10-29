@@ -28,7 +28,7 @@ public abstract class CpNetworkObject {
 	protected String _comment;
 	protected CpNetworkType _type;
 	protected List<Object> _linkedTo =
-		new LinkedList<Object>();
+            new LinkedList<>();
 
 	public CpNetworkObject(String name, String className, String comment,
 			CpNetworkType type) {

@@ -39,7 +39,7 @@ public class IPProtoEnt {
 	 */
 	public IPProtoEnt(String name, List<String> aliases, int proto) {
 		_name = name;
-		_aliases = new ArrayList<String>();
+		_aliases = new ArrayList<>();
 		_aliases.addAll(aliases);
 		_proto = proto;
 	}

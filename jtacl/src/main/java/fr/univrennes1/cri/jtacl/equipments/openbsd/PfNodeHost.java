@@ -80,7 +80,7 @@ public class PfNodeHost {
 	public static PfNodeHost newAddrMask() {
 		PfNodeHost host = new PfNodeHost();
 		host._type = PfAddrType.PF_ADDR_ADDRMASK;
-		host._addr = new ArrayList<IPNet>();
+		host._addr = new ArrayList<>();
 		return host;
 	}
 
@@ -134,8 +134,8 @@ public class PfNodeHost {
 	 */
 	public static PfNodeHost newAddrRange() {
 		PfNodeHost host = new PfNodeHost();
-		host._addr = new ArrayList<IPNet>();
-		host._rangeAddr = new ArrayList<IPNet>();
+		host._addr = new ArrayList<>();
+		host._rangeAddr = new ArrayList<>();
 		host._type = PfAddrType.PF_ADDR_RANGE;
 		return host;
 	}

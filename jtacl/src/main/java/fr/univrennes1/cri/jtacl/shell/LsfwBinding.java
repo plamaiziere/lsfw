@@ -28,7 +28,7 @@ public class LsfwBinding {
 	protected String _cArgs;
 	protected ArrayList<String> _args;
 	protected static Map<String, Object> _vars =
-		new ConcurrentHashMap<String, Object>();
+            new ConcurrentHashMap<>();
 
 	/**
 	 * Constructs a new binding with the arguments in cArgs.
@@ -36,12 +36,12 @@ public class LsfwBinding {
 	 */
 	public LsfwBinding(String cArgs) {
 		_cArgs = cArgs;
-		_args = new ArrayList<String>();
+		_args = new ArrayList<>();
 		if (cArgs.length() != 0) {
 			String[] args = cArgs.split("\\s+");
 			_args.addAll(Arrays.asList(args));
 		} else
-			_args = new ArrayList<String>();
+			_args = new ArrayList<>();
 	}
 
 	/**

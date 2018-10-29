@@ -28,7 +28,7 @@ public class CpGroupService extends CpService {
 
 	/* hash of services */
 	protected HashMap<String, CpService> _services =
-		new HashMap<String, CpService>();
+            new HashMap<>();
 
 	boolean _isAny;
 
@@ -52,7 +52,7 @@ public class CpGroupService extends CpService {
 	 * @return a list of the references name included in this group.
 	 */
 	public List<String> getReferencesName() {
-		List<String> list = new LinkedList<String>(_services.keySet());
+		List<String> list = new LinkedList<>(_services.keySet());
 		Collections.sort(list);
 		return list;
 	}

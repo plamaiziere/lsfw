@@ -42,7 +42,7 @@ public class IPServEnt {
 	 */
 	public IPServEnt(String name, List<String> aliases, int port, String proto) {
 		_name = name;
-		_aliases = new ArrayList<String>();
+		_aliases = new ArrayList<>();
 		_aliases.addAll(aliases);
 		_port = port;
 		_proto = proto;

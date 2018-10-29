@@ -319,7 +319,7 @@ public class IP {
 	public static String[] ipv6ToStrings(BigInteger ip, int prefixLen, boolean compress) {
 		String[] result = new String[2];
 		StringBuilder sip = new StringBuilder("");
-		ArrayList<BigInteger> hextets = new ArrayList<BigInteger>();
+		ArrayList<BigInteger> hextets = new ArrayList<>();
 		int p1 = -1;
 		int p2 = -1;
 

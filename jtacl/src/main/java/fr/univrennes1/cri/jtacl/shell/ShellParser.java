@@ -24,7 +24,7 @@ import org.parboiled.Rule;
  */
 public class ShellParser extends CommonRules<Object> {
 
-	protected HashMap <String, String> _strings = new HashMap<String, String>();
+	protected HashMap <String, String> _strings = new HashMap<>();
 	protected ProbeCommandTemplate _probeCmdTemplate;
 
 	protected boolean clear() {

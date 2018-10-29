@@ -75,7 +75,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		protected String _name;
 		protected String _description;
 		protected boolean _shutdown;
-		protected ArrayList<IPNet> _ipAddresses = new ArrayList<IPNet>();
+		protected ArrayList<IPNet> _ipAddresses = new ArrayList<>();
 
 		public Iface getIface() {
 			return _iface;
@@ -169,55 +169,55 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	/**
 	 * interfaces
 	 */
-	protected HashMap<String, CiscoIface> _ciscoIfaces = new HashMap<String, CiscoIface>();
+	protected HashMap<String, CiscoIface> _ciscoIfaces = new HashMap<>();
 
 	/**
 	 * Names defined by the command name
 	 */
-	protected HashMap<String, PixName> _names = new HashMap<String, PixName>();
+	protected HashMap<String, PixName> _names = new HashMap<>();
 
 	/**
 	 * network object group defined by the command object-group network
 	 */
 	protected HashMap<String, ObjectGroup> _networkGroups =
-			new HashMap<String, ObjectGroup>();
+			new HashMap<>();
 
 	/**
 	 * service object group defined by the command object-group service
 	 */
 	protected HashMap<String, ObjectGroup> _serviceGroups =
-			new HashMap<String, ObjectGroup>();
+			new HashMap<>();
 
 	/**
 	 * enhanced service object group defined by the command object-group
 	 * service
 	 */
 	protected HashMap<String, ObjectGroup> _enhancedGroups =
-			new HashMap<String, ObjectGroup>();
+			new HashMap<>();
 
 	/**
 	 * protocol object group defined by the command object-group protocol
 	 */
 	protected HashMap<String, ObjectGroup> _protocolGroups =
-			new HashMap<String, ObjectGroup>();
+			new HashMap<>();
 
 	/**
 	 * icmp-type object group defined by the command object-group icmp-type
 	 */
 	protected HashMap<String, ObjectGroup> _icmpGroups =
-			new HashMap<String, ObjectGroup>();
+			new HashMap<>();
 
 	/**
 	 * access-group defined by the command access-group.
 	 */
 	protected HashMap<String, AccessGroup> _accessGroups =
-			new HashMap<String, AccessGroup>();
+			new HashMap<>();
 
 	/**
 	 * access list groups
 	 */
 	protected HashMap<String, AccessListGroup> _accessListGroups =
-			new HashMap<String, AccessListGroup>();
+			new HashMap<>();
 
 	/**
 	 * IP cross references map
@@ -298,7 +298,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 	}
 
 	protected void loadConfiguration(Document doc) {
-		_configurations = new ArrayList<ConfigurationFile>();
+		_configurations = new ArrayList<>();
 
 		NodeList list = doc.getElementsByTagName("file");
 		for (int i = 0; i < list.getLength(); i++) {
@@ -492,7 +492,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 */
 		if (routeNexthop == null ||
 				routeNexthop.equalsIgnoreCase("null0")) {
-			route = new Route<IfaceLink>(prefix);
+			route = new Route<>(prefix);
 		} else {
 			/*
 			 * Retrieve the link associated to the nexthop (may be null)
@@ -502,7 +502,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 			IfaceLink link = null;
 			if (iface != null)
 				link = iface.getLinkConnectedTo(nexthop);
-			route = new Route<IfaceLink>(prefix, nexthop, 1, link);
+			route = new Route<>(prefix, nexthop, 1, link);
 		}
 		/*
 		 * Add the route.
@@ -1614,7 +1614,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 * routes too because our goal is to know if a probe is able to
 		 * reach a destination, regardless of the route taken.
 		 */
-		ArrayList<Probe> probes = new ArrayList<Probe>();
+		ArrayList<Probe> probes = new ArrayList<>();
 		probes.add(probe);
 
 		/*
@@ -1924,7 +1924,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		/*
 		 * retrieve access groups associated in direction with the interface.
 		 */
-		List<AccessGroup> agroups = new ArrayList<AccessGroup>();
+		List<AccessGroup> agroups = new ArrayList<>();
 		for (AccessGroup agroup: _accessGroups.values()) {
 			if (agroup.getDirection() == direction &&
 					agroup.getIfName().equals(ifaceName)) {

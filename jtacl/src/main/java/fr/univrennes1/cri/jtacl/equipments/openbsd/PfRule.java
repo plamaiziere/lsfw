@@ -64,7 +64,7 @@ public class PfRule extends PfGenericRule {
 	/**
 	 * protocols list
 	 */
-	protected List<Integer> _protocols = new ArrayList<Integer>();
+	protected List<Integer> _protocols = new ArrayList<>();
 
 	/**
 	 * Address family

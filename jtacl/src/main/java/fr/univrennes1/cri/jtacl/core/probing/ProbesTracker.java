@@ -215,7 +215,7 @@ public class ProbesTracker {
 	 * @return true if the path taken by all final probes is unique.
 	 */
 	public boolean checkFinalProbePath() {
-		HashMap<Integer, String> paths = new HashMap<Integer, String>();
+		HashMap<Integer, String> paths = new HashMap<>();
 
 		for (Integer i: _finalProbes.keySet()) {
 			Probe probe = _finalProbes.get(i);
@@ -260,7 +260,7 @@ public class ProbesTracker {
 		/*
 		 * AclResults on each path.
 		 */
-		List<FwResult> pathResults = new ArrayList<FwResult>();
+		List<FwResult> pathResults = new ArrayList<>();
 
 		/*
 		 * each path

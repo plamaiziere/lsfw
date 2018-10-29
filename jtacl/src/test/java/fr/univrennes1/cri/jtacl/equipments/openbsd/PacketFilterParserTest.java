@@ -53,7 +53,7 @@ public class PacketFilterParserTest extends TestCase {
 		System.out.println("getRule");
 		StringBuilder line;
 		ExpandedRule exRule;
-		Map<String, String> macros = new HashMap<String, String>();
+		Map<String, String> macros = new HashMap<>();
 		macros.put("macro1", "ABCD");
 
 		/*

@@ -28,7 +28,7 @@ public class ServiceCrossRef {
 
 	public ServiceCrossRef(PortRange portRange) {
 		_portRange = portRange;
-		_contexts = new ArrayList<ServiceCrossRefContext>();
+		_contexts = new ArrayList<>();
 	}
 
 	public List<ServiceCrossRefContext> getContexts() {

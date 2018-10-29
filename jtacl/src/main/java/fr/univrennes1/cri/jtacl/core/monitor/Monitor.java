@@ -115,7 +115,7 @@ public class Monitor {
 
 	protected Monitor() {
 		_options = new Options();
-		_defines = new HashMap<String, String>();
+		_defines = new HashMap<>();
 		_equipments = new NetworkEquipmentsByName();
 		_topology = new Topology();
 		_probing = new Probing();

@@ -57,11 +57,11 @@ public class ProbeResults {
 	protected String _interfaceOut;
 
 	public ProbeResults() {
-		_strEvents = new ArrayList<String>();
-		_matchingAclsIn = new ArrayList<AccessControlList>();
-		_matchingAclsOut = new ArrayList<AccessControlList>();
-		_activesAclsIn = new ArrayList<AccessControlList>();
-		_activesAclsOut = new ArrayList<AccessControlList>();
+		_strEvents = new ArrayList<>();
+		_matchingAclsIn = new ArrayList<>();
+		_matchingAclsOut = new ArrayList<>();
+		_activesAclsIn = new ArrayList<>();
+		_activesAclsOut = new ArrayList<>();
 		_interfaceIn = "";
 		_interfaceOut = "";
 

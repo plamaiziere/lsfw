@@ -28,7 +28,7 @@ public abstract class CpService {
 	protected String _comment;
 	protected CpServiceType _type;
 	protected String _protocolTypeName;
-	protected List<Object> _linkedTo = new LinkedList<Object>();
+	protected List<Object> _linkedTo = new LinkedList<>();
 
 	public CpService(String name, String className, String comment,
 			CpServiceType type, String protocolTypeName) {

@@ -48,16 +48,16 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 	protected String _pfStateOptItem;
 	protected String _flags;
 	protected String _flagset;
-	protected List<Xhost> _ipspec = new ArrayList<Xhost>();
-	protected List<PortItemTemplate> _portspec = new ArrayList<PortItemTemplate>();
-	protected List<IcmpItem> _icmpspec = new ArrayList<IcmpItem>();
-	protected List<IcmpItem> _icmp6spec = new ArrayList<IcmpItem>();
+	protected List<Xhost> _ipspec = new ArrayList<>();
+	protected List<PortItemTemplate> _portspec = new ArrayList<>();
+	protected List<IcmpItem> _icmpspec = new ArrayList<>();
+	protected List<IcmpItem> _icmp6spec = new ArrayList<>();
 	protected StringsList _stateOptSpec = new StringsList();
 	protected ScrubOptsTemplate _scrubOpts;
 	protected PoolOptsTemplate _poolOpts;
 	protected String _pfQname;
 	protected String _pfPQname;
-	protected List<Xhost> _redirHosts = new ArrayList<Xhost>();
+	protected List<Xhost> _redirHosts = new ArrayList<>();
 	protected RedirSpecTemplate _redirSpec;
 	protected RouteOptsTemplate _routeOpts;
 	protected String _ifname;
@@ -418,7 +418,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 			sb.append(c);
 			i++;
 		}
-		List<StringBuilder> slist = new ArrayList<StringBuilder>();
+		List<StringBuilder> slist = new ArrayList<>();
 		StringBuilder sline = new StringBuilder("");
 		slist.add(sline);
 		for (int i = 0; i < sb.length(); i ++) {

@@ -206,12 +206,12 @@ public class PacketFilter extends GenericEquipment {
 	/*
 	 * interfaces
 	 */
-	protected HashMap<String, PfIface> _pfIfaces = new HashMap<String, PfIface>();
+	protected HashMap<String, PfIface> _pfIfaces = new HashMap<>();
 
 	/*
 	 * skipped interfaces
 	 */
-	protected Map<String, String> _skippedIfaces = new HashMap<String, String>();
+	protected Map<String, String> _skippedIfaces = new HashMap<>();
 
 	/*
 	 * pf.conf mapped into a string
@@ -226,7 +226,7 @@ public class PacketFilter extends GenericEquipment {
 	/*
 	 * List of files mapped.
 	 */
-	protected Map<String, String> _fileMap = new HashMap<String, String>();
+	protected Map<String, String> _fileMap = new HashMap<>();
 
 	/**
 	 * parse context
@@ -237,13 +237,13 @@ public class PacketFilter extends GenericEquipment {
 	 * Tables to load from file.
 	 */
 	protected Map<String, TableToLoad> _tablesToLoad =
-			new HashMap<String, TableToLoad>();
+			new HashMap<>();
 
 	/**
 	 * Anchors to load from file.
 	 */
 	protected Map<String, String> _anchorsToLoad =
-			new HashMap<String, String>();
+			new HashMap<>();
 
 	/**
 	 * routes files name
@@ -263,12 +263,12 @@ public class PacketFilter extends GenericEquipment {
 	/**
 	 * refence of all tables
 	 */
-	protected List<PfTable> _refTables = new ArrayList<PfTable>();
+	protected List<PfTable> _refTables = new ArrayList<>();
 
 	/**
 	 * reference of all rules
 	 */
-	protected List<PfRule> _refRules = new ArrayList<PfRule>();
+	protected List<PfRule> _refRules = new ArrayList<>();
 
 	/**
 	 * IP cross references map
@@ -531,7 +531,7 @@ public class PacketFilter extends GenericEquipment {
 			 * null route
 			 */
 			if (nbargs == 3 && sparams[2].equals("-blackhole")) {
-				route = new Route<IfaceLink>(prefix);
+				route = new Route<>(prefix);
 			} else {
 				Iface iface;
 				IfaceLink link;
@@ -555,7 +555,7 @@ public class PacketFilter extends GenericEquipment {
 					throw new JtaclConfigurationException(
 							"Invalid route: cannot find link " + sroute);
 
-				route = new Route<IfaceLink>(prefix, nexthop, 1, link);
+				route = new Route<>(prefix, nexthop, 1, link);
 			}
 			Log.debug().info(_name + " add route: " + route.toString());
 			_routingEngine.addRoute(route);
@@ -779,7 +779,7 @@ public class PacketFilter extends GenericEquipment {
 
 	protected List<IPNet> ifaLookup(String ifname, int flags) {
 
-		List<IPNet> addr = new ArrayList<IPNet>();
+		List<IPNet> addr = new ArrayList<>();
 
 		/*
 		 * if ifname is a group, retrieve the name of the ifaces associated
@@ -835,7 +835,7 @@ public class PacketFilter extends GenericEquipment {
 	protected List<IPNet> parseHostIf(String hostName, int mask)
 			throws UnknownHostException {
 
-		List<IPNet> addr = new ArrayList<IPNet>();
+		List<IPNet> addr = new ArrayList<>();
 		int flags = 0;
 
 		for (;;) {
@@ -875,7 +875,7 @@ public class PacketFilter extends GenericEquipment {
 	protected List<IPNet> pfHostDns(String host, int mask)
 			throws UnknownHostException {
 
-		List<IPNet> addr = new ArrayList<IPNet>();
+		List<IPNet> addr = new ArrayList<>();
 
 		boolean noalias = false;
 		boolean got4 = false;
@@ -959,7 +959,7 @@ public class PacketFilter extends GenericEquipment {
 		if (cont) {
 			try {
 				IPNet ip = new IPNet(dup);
-				hosts = new ArrayList<IPNet>();
+				hosts = new ArrayList<>();
 				hosts.add(ip);
 				cont = false;
 			} catch (UnknownHostException ex) {
@@ -1100,7 +1100,7 @@ public class PacketFilter extends GenericEquipment {
 	 }
 
 	protected List<Integer> parseProtoList(StringsList protocols) {
-		List<Integer> proto = new ArrayList<Integer>();
+		List<Integer> proto = new ArrayList<>();
 
 		for (String protoName: protocols) {
 			int protocol = parseProtocol(protoName);
@@ -1790,7 +1790,7 @@ public class PacketFilter extends GenericEquipment {
 	protected void parse(ConfigurationFile cfg) {
 		ParsingResult<?> result;
 
-		Map<String, String> macros = new HashMap<String, String>();
+		Map<String, String> macros = new HashMap<>();
 
 		famAdd(cfg.getFileName());
 
@@ -2255,7 +2255,7 @@ public class PacketFilter extends GenericEquipment {
 		 * routes too because our goal is to know if a probe is able to
 		 * reach a destination, regardless of the route taken.
 		 */
-		ArrayList<Probe> probes = new ArrayList<Probe>();
+		ArrayList<Probe> probes = new ArrayList<>();
 		probes.add(probe);
 
 		/*
@@ -2869,7 +2869,7 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	protected class AnchorResult {
-		protected List<RuleResult> _ruleResults = new ArrayList<RuleResult>();
+		protected List<RuleResult> _ruleResults = new ArrayList<>();
 		protected boolean _quickRule;
 		protected RuleResult _lastResult;
 
@@ -2934,7 +2934,7 @@ public class PacketFilter extends GenericEquipment {
 				 */
 				List<PfAnchor> anchorList;
 				if (anchorRule.isInlined()) {
-					anchorList = new ArrayList<PfAnchor>();
+					anchorList = new ArrayList<>();
 					anchorList.add(anchorRule.getInlinedAnchor());
 				} else {
 					anchorList = anchor.findAnchors(anchorRule.getAnchorName());
@@ -2955,7 +2955,7 @@ public class PacketFilter extends GenericEquipment {
 					/*
 					 * copy the rules result from the anchor
 					 */
-					List<RuleResult> itemResults = new ArrayList<RuleResult>();
+					List<RuleResult> itemResults = new ArrayList<>();
 					itemResults.addAll(anchorItemResult.getRuleResults());
 					lastResult = anchorItemResult.getLastResult();
 					/*

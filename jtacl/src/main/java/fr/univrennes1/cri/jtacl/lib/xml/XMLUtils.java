@@ -98,7 +98,7 @@ public class XMLUtils {
 	 */
 	public static List<Element> getDirectChildren(Element element, String tag) {
 
-		LinkedList<Element> list = new LinkedList<Element>();
+		LinkedList<Element> list = new LinkedList<>();
 
 		for (Node child = element.getFirstChild(); child != null;
 			child = child.getNextSibling()) {

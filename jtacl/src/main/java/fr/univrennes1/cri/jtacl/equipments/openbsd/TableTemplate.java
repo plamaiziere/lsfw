@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class TableTemplate {
 
-	private List<Xhost> _hosts = new ArrayList<Xhost>();
+	private List<Xhost> _hosts = new ArrayList<>();
 	private StringsList _options = new StringsList();
 	private String _name;
 	private StringsList _fileNames = new StringsList();

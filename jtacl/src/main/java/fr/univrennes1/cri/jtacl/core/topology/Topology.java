@@ -40,7 +40,7 @@ public class Topology {
 	 * links between ifacelink and so between equipments.
 	 */
 	protected NetworkLinks _networkLinks = new NetworkLinks();
-	private ArrayList<TopologicalLink> _topologicalLinks = new ArrayList<TopologicalLink>();
+	private ArrayList<TopologicalLink> _topologicalLinks = new ArrayList<>();
 
 	/**
 	 * Builds the topology of the network. The topology is describes by some
@@ -51,7 +51,7 @@ public class Topology {
 		/*
 		 * iterate through all the equipments to retrieve their iface links
 		 */
-		ArrayList<IfaceLink> ifacesLinks = new ArrayList<IfaceLink>();
+		ArrayList<IfaceLink> ifacesLinks = new ArrayList<>();
 		// each network equipment
 		for (String ename: _equipments.keySet()) {
 			NetworkEquipment ne = _equipments.get(ename);

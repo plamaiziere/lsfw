@@ -77,15 +77,15 @@ public class CiscoRouter extends GenericEquipment {
 		protected String _description;
 		protected boolean _shutdown;
 		protected ArrayList<AccessGroup> _accessGroup4In
-				= new ArrayList<AccessGroup>();
+				= new ArrayList<>();
 		protected ArrayList<AccessGroup> _accessGroup4Out
-				= new ArrayList<AccessGroup>();
+				= new ArrayList<>();
 		protected ArrayList<AccessGroup> _accessGroup6In
-				= new ArrayList<AccessGroup>();
+				= new ArrayList<>();
 		protected ArrayList<AccessGroup> _accessGroup6Out
-				= new ArrayList<AccessGroup>();
+				= new ArrayList<>();
 
-		protected ArrayList<IPNet> _ipAddresses = new ArrayList<IPNet>();
+		protected ArrayList<IPNet> _ipAddresses = new ArrayList<>();
 
 		public ArrayList<AccessGroup> getAccessGroup4In() {
 			return _accessGroup4In;
@@ -201,7 +201,7 @@ public class CiscoRouter extends GenericEquipment {
 	/**
 	 * interfaces
 	 */
-	protected HashMap<String, CiscoIface> _ciscoIfaces = new HashMap<String, CiscoIface>();
+	protected HashMap<String, CiscoIface> _ciscoIfaces = new HashMap<>();
 
 	/**
 	 * IP cross references map
@@ -221,7 +221,7 @@ public class CiscoRouter extends GenericEquipment {
 	/**
 	 * Access lists
 	 */
-	protected ArrayList<AccessList> _accessLists = new ArrayList<AccessList>();
+	protected ArrayList<AccessList> _accessLists = new ArrayList<>();
 
 	/**
 	 * IP cross references map
@@ -251,7 +251,7 @@ public class CiscoRouter extends GenericEquipment {
 	}
 
 	protected void loadConfiguration(Document doc) {
-		_configurations = new ArrayList<ConfigurationFile>();
+		_configurations = new ArrayList<>();
 
 		NodeList list = doc.getElementsByTagName("file");
 		for (int i = 0; i < list.getLength(); i++) {
@@ -288,7 +288,7 @@ public class CiscoRouter extends GenericEquipment {
 	}
 
 	protected List<IPNet> parseRouterIp(String sIP, String sNetmask) {
-		List<IPNet> iplist = new ArrayList<IPNet>();
+		List<IPNet> iplist = new ArrayList<>();
 
 		if (sIP.equals("any"))
 			return iplist;
@@ -538,7 +538,7 @@ public class CiscoRouter extends GenericEquipment {
 			 */
 			if (routeNexthop == null ||
 					routeNexthop.equalsIgnoreCase("null0")) {
-				route = new Route<IfaceLink>(prefix);
+				route = new Route<>(prefix);
 			} else {
 				/*
 				 * Retrieve the link associated to the nexthop (may be null)
@@ -548,7 +548,7 @@ public class CiscoRouter extends GenericEquipment {
 				IfaceLink link = null;
 				if (iface != null)
 					link = iface.getLinkConnectedTo(nexthop);
-				route = new Route<IfaceLink>(prefix, nexthop, 1, link);
+				route = new Route<>(prefix, nexthop, 1, link);
 			}
 			/*
 			 * Add the route.
@@ -1045,7 +1045,7 @@ public class CiscoRouter extends GenericEquipment {
 		 * routes too because our goal is to know if a probe is able to
 		 * reach a destination, regardless of the route taken.
 		 */
-		ArrayList<Probe> probes = new ArrayList<Probe>();
+		ArrayList<Probe> probes = new ArrayList<>();
 		probes.add(probe);
 
 		/*

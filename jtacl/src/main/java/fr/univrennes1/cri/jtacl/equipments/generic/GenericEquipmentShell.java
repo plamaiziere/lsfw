@@ -306,7 +306,7 @@ public abstract class GenericEquipmentShell {
 			if (format.contains("l"))
 				fmt += ";/##\\ %L";
 		}
-		List<IPRangeable> list = new LinkedList<IPRangeable>(netCrossRef.keySet());
+		List<IPRangeable> list = new LinkedList<>(netCrossRef.keySet());
 		Collections.sort(list, new IPRangeableComparator());
 		for (IPRangeable ip: list) {
 			IPCrossRef crossref = netCrossRef.get(ip);
@@ -365,7 +365,7 @@ public abstract class GenericEquipmentShell {
 		if (fmt == null) {
 			fmt = "%r; %p; %t; %c; %C; %F #%N;/##\\ %l;";
 		}
-		List<PortRange> list = new LinkedList<PortRange>(serviceCrossRef.keySet());
+		List<PortRange> list = new LinkedList<>(serviceCrossRef.keySet());
 		Collections.sort(list, new PortRangeComparator());
 
 		for (PortRange portrange: list) {

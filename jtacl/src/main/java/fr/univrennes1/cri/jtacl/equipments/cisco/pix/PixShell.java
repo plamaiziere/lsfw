@@ -38,7 +38,7 @@ public class PixShell extends GenericEquipmentShell {
 	protected void commandShowNames(PixShellParser parser) {
 
 		TreeMap<String, PixName> names =
-				new TreeMap<String, PixName>(_pix.getNames());
+                new TreeMap<>(_pix.getNames());
 
 		for (PixName name: names.values()) {
 			if (!parser.getParam().isEmpty()) {
@@ -62,7 +62,7 @@ public class PixShell extends GenericEquipmentShell {
 	protected void outputGroups(HashMap<String, ObjectGroup> groups, String using) {
 
 		TreeMap<String, ObjectGroup> tgroups =
-				new TreeMap<String, ObjectGroup>(groups);
+                new TreeMap<>(groups);
 
 		for (ObjectGroup group: tgroups.values()) {
 			if (using != null) {

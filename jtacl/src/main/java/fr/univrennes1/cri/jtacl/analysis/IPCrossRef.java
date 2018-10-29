@@ -28,7 +28,7 @@ public class IPCrossRef {
 
 	public IPCrossRef(IPRangeable ip) {
 		_ip = ip;
-		_contexts = new ArrayList<CrossRefContext>();
+		_contexts = new ArrayList<>();
 	}
 
 	public List<CrossRefContext> getContexts() {

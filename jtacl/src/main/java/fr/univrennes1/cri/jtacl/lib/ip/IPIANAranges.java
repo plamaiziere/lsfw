@@ -26,7 +26,7 @@ public final class IPIANAranges extends HashMap<String, String> {
 	 *  this should include www.iana.org/assignments/ipv4-address-space
 	 * and www.iana.org/assignments/multicast-addresses
 	 */
-	public static final HashMap<String, String> ipv4Ranges = new HashMap<String, String>();
+	public static final HashMap<String, String> ipv4Ranges = new HashMap<>();
 
 	/**
 	 * Definition of the Ranges for IPv6 IPs
@@ -35,7 +35,7 @@ public final class IPIANAranges extends HashMap<String, String> {
 	 * www.iana.org/assignments/ipv6-multicast-addresses,
 	 * www.iana.org/assignments/ipv6-anycast-addresses
 	 */
-	public static final HashMap<String, String> ipv6Ranges = new HashMap<String, String>();
+	public static final HashMap<String, String> ipv6Ranges = new HashMap<>();
 
 	static {
 		/*

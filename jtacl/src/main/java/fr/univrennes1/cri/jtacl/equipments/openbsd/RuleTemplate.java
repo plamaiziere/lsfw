@@ -34,10 +34,10 @@ public class RuleTemplate {
 	private StringsList _osList = new StringsList();
 	private String _af;
 	private boolean _all;
-	private List<Xhost> _sourceHostList = new ArrayList<Xhost>();
-	private List<PortItemTemplate> _sourcePortList = new ArrayList<PortItemTemplate>();
-	private List<Xhost> _destHostList = new ArrayList<Xhost>();
-	private List<PortItemTemplate> _destPortList = new ArrayList<PortItemTemplate>();
+	private List<Xhost> _sourceHostList = new ArrayList<>();
+	private List<PortItemTemplate> _sourcePortList = new ArrayList<>();
+	private List<Xhost> _destHostList = new ArrayList<>();
+	private List<PortItemTemplate> _destPortList = new ArrayList<>();
 	private FilterOptsTemplate _filterOpts = new FilterOptsTemplate();
 
 

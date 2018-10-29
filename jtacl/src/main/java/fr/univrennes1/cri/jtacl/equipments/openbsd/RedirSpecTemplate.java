@@ -27,7 +27,7 @@ public class RedirSpecTemplate {
 	 * redirection
 	 */
 	private String _portstar;
-	private List<Xhost> _hosts = new ArrayList<Xhost>();
+	private List<Xhost> _hosts = new ArrayList<>();
 
 	/*
 	 * pool options

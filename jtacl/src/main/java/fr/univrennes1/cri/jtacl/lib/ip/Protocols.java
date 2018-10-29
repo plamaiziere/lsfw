@@ -110,7 +110,7 @@ public class Protocols extends ArrayList<IPProtoEnt> {
 			int proto = Integer.valueOf(splited[1]);
 
 			// aliases
-			ArrayList<String> aliases = new ArrayList<String>();
+			ArrayList<String> aliases = new ArrayList<>();
 			for (int i = 2; i < splited.length; i++)
 				aliases.add(splited[i]);
 			IPProtoEnt ent = new IPProtoEnt(name, aliases, proto);

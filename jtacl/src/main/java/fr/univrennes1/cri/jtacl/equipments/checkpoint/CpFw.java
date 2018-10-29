@@ -121,7 +121,7 @@ public class CpFw extends GenericEquipment {
 	 * interfaces
 	 */
 	protected HashMap<String, CPfwIface> _cpfwIfaces
-		= new HashMap<String, CPfwIface>();
+		= new HashMap<>();
 
 	/**
 	 * IP cross references map
@@ -147,18 +147,18 @@ public class CpFw extends GenericEquipment {
 	 * services keyed by name
 	 */
 	protected HashMap<String, CpService> _services
-			= new HashMap<String, CpService>();
+			= new HashMap<>();
 
 	/*
 	 * network objects keyed by name
 	 */
 	protected HashMap<String, CpNetworkObject> _networkObjects
-			= new HashMap<String, CpNetworkObject>();
+			= new HashMap<>();
 
 	/*
 	 * firewall rules
 	 */
-	protected LinkedList <CpFwRule> _fwRules = new LinkedList<CpFwRule>();
+	protected LinkedList <CpFwRule> _fwRules = new LinkedList<>();
 
 	/**
 	 * IP cross references map
@@ -1371,7 +1371,7 @@ public class CpFw extends GenericEquipment {
 		 * routes too because our goal is to know if a probe is able to
 		 * reach a destination, regardless of the route taken.
 		 */
-		ArrayList<Probe> probes = new ArrayList<Probe>();
+		ArrayList<Probe> probes = new ArrayList<>();
 		probes.add(probe);
 
 		/*
@@ -1566,7 +1566,7 @@ public class CpFw extends GenericEquipment {
 	 */
 	public List<String> getServicesName() {
 
-		List<String> list = new LinkedList<String>();
+		List<String> list = new LinkedList<>();
 		list.addAll(_services.keySet());
 		Collections.sort(list);
 		return list;
@@ -1578,7 +1578,7 @@ public class CpFw extends GenericEquipment {
 	 */
 	public List<String> getNetworksName() {
 
-		List<String> list = new LinkedList<String>();
+		List<String> list = new LinkedList<>();
 		list.addAll(_networkObjects.keySet());
 		Collections.sort(list);
 		return list;

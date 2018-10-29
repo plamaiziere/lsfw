@@ -38,7 +38,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 
 	protected boolean clear() {
 		_command = "";
-		_param = new ArrayList<String>();
+		_param = new ArrayList<>();
 		_xrefObject = null;
 		_xrefFormat = null;
 		_xrefFmt = null;
@@ -136,7 +136,7 @@ public class GenericEquipmentShellParser extends CommonRules<Object> {
 	}
 
 	public static List<String> expandFormat(String format) {
-		LinkedList<String> fmtList = new LinkedList<String>();
+		LinkedList<String> fmtList = new LinkedList<>();
 		String fmt = format;
 
 		String cfmt = "";
