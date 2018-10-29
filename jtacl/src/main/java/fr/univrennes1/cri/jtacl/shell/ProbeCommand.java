@@ -207,7 +207,7 @@ public class ProbeCommand {
 		ProbeRequest request = new ProbeRequest();
 		if (sprotocol != null) {
 			protocol = ipProtocols.protocolLookup(sprotocol);
-			if (protocol.intValue() == -1)  {
+			if (protocol == -1)  {
 				throw new JtaclParameterException(
 					"unknown protocol: " + sprotocol);
 			}

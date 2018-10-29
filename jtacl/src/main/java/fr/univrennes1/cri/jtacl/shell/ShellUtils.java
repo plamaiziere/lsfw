@@ -63,7 +63,7 @@ public class ShellUtils {
 		IPServices ipServices = IPServices.getInstance();
 
 		Integer	port = ipServices.serviceLookup(service, protocol);
-		if (port.intValue() == -1) {
+		if (port == -1) {
 			throw new JtaclParameterException(
 				"unknown service: " + service);
 		}

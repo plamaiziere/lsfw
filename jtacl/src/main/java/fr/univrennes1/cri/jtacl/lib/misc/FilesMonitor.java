@@ -43,7 +43,7 @@ public class FilesMonitor {
 			Long date = _filesMap.get(filename);
 			File file = new File(filename);
 			long df = file.lastModified();
-			if (date.longValue() != df)
+			if (date != df)
 				files.add(filename);
 		}
 

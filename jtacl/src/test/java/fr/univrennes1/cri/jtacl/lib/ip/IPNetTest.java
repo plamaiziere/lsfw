@@ -64,22 +64,22 @@ public class IPNetTest extends TestCase {
 
 	private void testDataNetipOk(String [][] dt) throws UnknownHostException {
 
-		for (int i = 0; i < dt.length; i++) {
-			int prefix = Integer.parseInt(dt[i][2]);
-			IPversion version = Integer.parseInt(dt[i][3]) == 4 ? IPversion.IPV4 : IPversion.IPV6;
+		for (String[] aDt : dt) {
+			int prefix = Integer.parseInt(aDt[2]);
+			IPversion version = Integer.parseInt(aDt[3]) == 4 ? IPversion.IPV4 : IPversion.IPV6;
 
-			testConstructorNetIP(dt[i][0], dt[i][1], prefix, version);
+			testConstructorNetIP(aDt[0], aDt[1], prefix, version);
 		}
 	}
 
 	private void testDataNetipNOk(String [][] dt) {
-		for (int i = 0; i < dt.length; i++) {
+		for (String[] aDt : dt) {
 			boolean f = false;
-			int prefix = Integer.parseInt(dt[i][2]);
-			IPversion version = Integer.parseInt(dt[i][3]) == 4 ? IPversion.IPV4 : IPversion.IPV6;
+			int prefix = Integer.parseInt(aDt[2]);
+			IPversion version = Integer.parseInt(aDt[3]) == 4 ? IPversion.IPV4 : IPversion.IPV6;
 
 			try {
-				testConstructorNetIP(dt[i][0], dt[i][1], prefix, version);
+				testConstructorNetIP(aDt[0], aDt[1], prefix, version);
 			} catch (UnknownHostException e) {
 				System.out.println("check : " + e.getMessage());
 				f = true;
@@ -225,12 +225,12 @@ public class IPNetTest extends TestCase {
 			{"0.0.0.0",			"0"},
 		};
 
-		for (int i = 0 ; i < dtrn.length; i++) {
+		for (String[] aDtrn : dtrn) {
 			testConstructorNetIP(
-				"192.168.0.1/" + dtrn[i][0],
-				"0",
-				Integer.parseInt(dtrn[i][1]),
-				IPversion.IPV4
+					"192.168.0.1/" + aDtrn[0],
+					"0",
+					Integer.parseInt(aDtrn[1]),
+					IPversion.IPV4
 			);
 		}
 

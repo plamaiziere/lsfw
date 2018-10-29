@@ -722,7 +722,7 @@ public class Shell {
 		_daemon = true;
 		ServerSocket server = null;
 		if (port == null)
-			port = Integer.valueOf(8010);
+			port = 8010;
 		InetAddress bindAddr = null;
 		if (bind != null)
 			bindAddr = new IPNet(bind).toInetAddress();

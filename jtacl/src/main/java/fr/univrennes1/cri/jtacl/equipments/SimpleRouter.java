@@ -282,9 +282,9 @@ public class SimpleRouter extends GenericEquipment {
 		ProbeResults result = probe.getResults();
 		AccessControlList lastAcl = null;
 
-		for (int i = 0; i < _acls.size(); i++) {
+		for (String _acl : _acls) {
 			try {
-				String acl = _acls.get(i);
+				String acl = _acl;
 				String[] trules = acl.split(" ");
 				if (trules.length != 7) {
 					throw new JtaclConfigurationException("invalid acl + " + acl);
@@ -323,7 +323,7 @@ public class SimpleRouter extends GenericEquipment {
 					continue;
 				}
 				FwResult aclResult = new FwResult(raction.equals("accept") ?
-					FwResult.ACCEPT : FwResult.DENY);
+						FwResult.ACCEPT : FwResult.DENY);
 
 				result.addMatchingAcl(input ? Direction.IN : Direction.OUT, acl, aclResult);
 				/*
