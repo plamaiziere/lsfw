@@ -22,5 +22,5 @@ public interface ShowableRoutes {
 	 * Returns a {@link String} representation of the routing tables.
 	 * @return a {@link String} representation of the routing tables.
 	 */
-	public String showRoutes();
+	String showRoutes();
 }

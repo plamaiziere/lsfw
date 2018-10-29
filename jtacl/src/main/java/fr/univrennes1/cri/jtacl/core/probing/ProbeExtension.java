@@ -18,5 +18,5 @@ package fr.univrennes1.cri.jtacl.core.probing;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public interface ProbeExtension {
-	public ProbeExtension newInstance();
+	ProbeExtension newInstance();
 }

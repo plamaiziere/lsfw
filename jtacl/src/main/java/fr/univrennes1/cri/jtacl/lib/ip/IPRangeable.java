@@ -72,19 +72,19 @@ public interface IPRangeable {
 	 * @param format Format string
 	 * @return a String representation of this range.
 	 */
-	public String toString(String format);
+    String toString(String format);
 
 	/**
 	 * Tests if this instance is a single host IP address.
 	 * @return true if this instance is a single host IP address.
 	 */
-	public boolean isHost();
+    boolean isHost();
 
 	/**
 	 * Tests if this instance can be expressed as a network.
 	 * @return if this instance can be expressed as a network.
 	 */
-	public boolean isNetwork();
+    boolean isNetwork();
 
 	/**
 	 * Returns a String representation of this range according
@@ -93,31 +93,31 @@ public interface IPRangeable {
 	 * @return a String representation of this range according
 	 * to the String format.
 	 */
-	public String toNetString(String format);
+    String toNetString(String format);
 
 	/**
 	 * Returns the nearest network including this range.
 	 * @return the nearest network including this range.
 	 */
-	public IPNet nearestNetwork();
+    IPNet nearestNetwork();
 
 	/**
 	 * Returns the IP version of this range.
 	 * @return the IP version of this range.
 	 */
-	public IPversion getIpVersion();
+    IPversion getIpVersion();
 
 	/**
 	 * Checks if the {@link IPversion} IP version of this range is IPv4.
 	 * @return true if this range is an IPv6 range.
 	 */
-	public boolean isIPv4();
+    boolean isIPv4();
 
 	/**
 	 * Checks if the {@link IPversion} IP version of this range is IPv6.
 	 * @return true if this range is an IPv6 range.
 	 */
-	public boolean isIPv6();
+    boolean isIPv6();
 
 	/**
 	 * Compares the {@link IPversion} IP version of this instance to another
@@ -125,11 +125,11 @@ public interface IPRangeable {
 	 * @param range the range object to compare.
 	 * @return true if the {@link IPversion} IP versions are equal.
 	 */
-	public boolean sameIPVersion(IPRangeable range);
+    boolean sameIPVersion(IPRangeable range);
 
 	/**
 	 * Returns the length of this range.
 	 * @return the length of this range.
 	 */
-	public BigInteger length();
+    BigInteger length();
 }
