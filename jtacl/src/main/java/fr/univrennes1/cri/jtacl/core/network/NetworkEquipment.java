@@ -194,17 +194,17 @@ public class NetworkEquipment {
 	 * {@link NetworkEquipment} equipments have been created. This method should
 	 * be overrided, by example to read the configuration file of the equipment.
 	 */
-	public void configure() {};
+	public void configure() {}
 
-	/**
+    /**
 	 * This method is called when a {@link Probe} probe is received on this
 	 * {@link NetworkEquipment} equipment.<br/> This method should be overrided.
 	 * @param link the {@link IfaceLink} link from which the probe was received.
 	 * @param probe the {@link Probe} received
 	 */
-	public void incoming(IfaceLink link, Probe probe) {};
+	public void incoming(IfaceLink link, Probe probe) {}
 
-	/**
+    /**
 	 *  Sends a {@link Probe} probe on this {@link NetworkEquipment} equipment.
 	 * @param link the {@link IfaceLink} link to use.
 	 * @param probe the {@link Probe} to send.
@@ -212,9 +212,9 @@ public class NetworkEquipment {
 	 */
 	public void outgoing(IfaceLink link, Probe probe, IPNet nexthop) {
 		link.getIface().outgoing(link, probe, nexthop);
-	};
+	}
 
-	/**
+    /**
 	 * Returns a {@link ShowableRoutes} interface. This method must be overrided.
 	 * @return a {@link ShowableRoutes} interface.
 	 */

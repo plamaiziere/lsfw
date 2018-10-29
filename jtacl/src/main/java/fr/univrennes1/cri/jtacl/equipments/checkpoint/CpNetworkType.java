@@ -23,5 +23,5 @@ public enum CpNetworkType {
 	IPS,
 	RANGE,
 	GROUP,
-	ANY;
+	ANY
 }
