@@ -14,7 +14,6 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;
-import static org.parboiled.BaseParser.EOI;
 import org.parboiled.Rule;
 
 /**
