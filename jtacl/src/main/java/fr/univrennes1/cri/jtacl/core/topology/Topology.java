@@ -71,6 +71,7 @@ public class Topology {
 		/*
 		 * Connect equipments according to the topological links
 		 */
+		 @SuppressWarnings("unchecked")
 		 ArrayList<TopologicalLink> tlinks = (ArrayList<TopologicalLink>) _topologicalLinks.clone();
 		 // each topological links
 		 while (!tlinks.isEmpty()) {

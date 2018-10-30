@@ -235,11 +235,11 @@ public class IPNetTest extends TestCase {
 		}
 
 		// test /
-		for (int i = 0; i < dtrn.length; i++) {
+		for (String[] aDtrn : dtrn) {
 			testConstructorNetIP(
-				"192.168.0.1/" + dtrn[i][1],
+				"192.168.0.1/" + aDtrn[1],
 				"0",
-				Integer.parseInt(dtrn[i][1]),
+				Integer.parseInt(aDtrn[1]),
 				IPversion.IPV4
 			);
 		}

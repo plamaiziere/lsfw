@@ -223,6 +223,7 @@ public class Shell {
 		 * filter out each link by IP or equipment.
 		 */
 		NetworkLinks links = _monitor.getTopology().getNetworkLinks();
+		//noinspection unchecked
 		Collections.sort(links);
 
 		for (NetworkLink link: links) {

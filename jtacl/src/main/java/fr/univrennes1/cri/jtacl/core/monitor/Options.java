@@ -173,7 +173,7 @@ public class Options {
 
 	/**
 	 * Sets the securelevel.
-	 * @param securelevel to set.
+	 * @param secureLevel to set.
 	 */
 	public void setSecureLevel(int secureLevel) {
 		if (secureLevel < _secureLevel)

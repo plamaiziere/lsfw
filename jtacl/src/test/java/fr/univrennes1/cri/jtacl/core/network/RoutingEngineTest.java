@@ -46,7 +46,7 @@ public class RoutingEngineTest extends TestCase {
 
 		IPNet prefix = new IPNet("192.168.0.0/24");
 		IPNet nextHop = new IPNet("192.168.1.0");
-		Route<Iface> route = new Route(prefix, nextHop, 1, null);
+		Route<Iface> route = new Route<>(prefix, nextHop, 1, null);
 		rn.addRoute(route);
 	}
 
@@ -59,7 +59,7 @@ public class RoutingEngineTest extends TestCase {
 
 		IPNet prefix = new IPNet("192.168.0.0/24");
 		IPNet nextHop = new IPNet("192.168.1.0");
-		Route<Iface> route = new Route(prefix, nextHop, 1, null);
+		Route<Iface> route = new Route<>(prefix, nextHop, 1, null);
 		rn.addSourceRoute(route);
 	}
 	
@@ -73,7 +73,7 @@ public class RoutingEngineTest extends TestCase {
 
 		IPNet prefix = new IPNet("192.168.0.0/24");
 		IPNet nextHop = new IPNet("192.168.1.1");
-		Route<Iface> route = new Route(prefix, nextHop, 1, this);
+		Route<RoutingEngineTest> route = new Route<>(prefix, nextHop, 1, this);
 		rn.addRoute(route);
 
 		IPNet destination = new IPNet("192.168.0.1");
@@ -87,7 +87,7 @@ public class RoutingEngineTest extends TestCase {
 
 		prefix = new IPNet("192.168.0.0/24");
 		nextHop = new IPNet("192.168.1.2");
-		route = new Route(prefix, nextHop, 1, this);
+		route = new Route<>(prefix, nextHop, 1, this);
 		rn.addRoute(route);
 
 		destination = new IPNet("192.168.0.1");
@@ -99,7 +99,7 @@ public class RoutingEngineTest extends TestCase {
 		assertTrue(result.size() == 2);
 
 		prefix = new IPNet("127.0.0.1");
-		route = new Route(prefix);
+		route = new Route<>(prefix);
 		rn.addRoute(route);
 		destination = new IPNet("127.0.0.1");		
 		result = rn.getRoutes(destination);
@@ -116,7 +116,7 @@ public class RoutingEngineTest extends TestCase {
 
 		IPNet prefix = new IPNet("192.168.0.0/24");
 		IPNet nextHop = new IPNet("192.168.1.1");
-		Route<Iface> route = new Route(prefix, nextHop, 1, this);
+		Route<RoutingEngineTest> route = new Route<>(prefix, nextHop, 1, this);
 		rn.addSourceRoute(route);
 
 		IPNet address = new IPNet("192.168.0.1");

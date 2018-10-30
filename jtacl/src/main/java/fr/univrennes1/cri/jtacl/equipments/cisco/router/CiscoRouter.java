@@ -1059,6 +1059,7 @@ public class CiscoRouter extends GenericEquipment {
 		 * Set the position of the probes.
 		 */
 		for (int i = 0; i < routes.size(); i ++) {
+			@SuppressWarnings("unchecked")
 			Route<IfaceLink> route = routes.get(i);
 			probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
 		}

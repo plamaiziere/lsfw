@@ -216,7 +216,7 @@ public class PixParser extends CommonRules<Object> {
 
 	/**
 	 * Returns true if the line in argument should match a rule in main context.
-	 * @param line
+	 * @param line line to test
 	 * @return true if the line in argument should match a rule in main context.
 	 */
 	public boolean shouldMatchInMain(String line) {
@@ -246,7 +246,7 @@ public class PixParser extends CommonRules<Object> {
 	/**
 	 * Returns true if the line in argument should match a rule in interface
 	 * context.
-	 * @param line
+	 * @param line line to test
 	 * @return true if the line in argument should match a rule in interface
 	 * context.
 	 */

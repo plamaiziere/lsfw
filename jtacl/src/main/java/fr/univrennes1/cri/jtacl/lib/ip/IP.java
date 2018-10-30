@@ -287,7 +287,7 @@ public class IP {
 	 */
 	public static String[] ipv4ToStrings(BigInteger ip, int prefixlen) {
 		String[] result = new String[2];
-		StringBuilder sip = new StringBuilder("");
+		StringBuilder sip = new StringBuilder();
 
 		BigInteger bi = ip;
 		for (int i = 0; i < 4; i++) {
@@ -318,7 +318,7 @@ public class IP {
 	 */
 	public static String[] ipv6ToStrings(BigInteger ip, int prefixLen, boolean compress) {
 		String[] result = new String[2];
-		StringBuilder sip = new StringBuilder("");
+		StringBuilder sip = new StringBuilder();
 		ArrayList<BigInteger> hextets = new ArrayList<>();
 		int p1 = -1;
 		int p2 = -1;

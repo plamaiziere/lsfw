@@ -38,7 +38,7 @@ public class CpNetworkCluster extends CpNetworkObject {
 	public CpNetworkCluster(String name,	String className, String comment)
 	{
 		super(name, className, comment, CpNetworkType.IPS);
-		_ipRanges = new ArrayList();
+		_ipRanges = new ArrayList<>();
 	}
 
 	public List<IPRange> getIpRanges() {

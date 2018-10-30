@@ -298,8 +298,7 @@ public class CpFw extends GenericEquipment {
 		if (className.equalsIgnoreCase("icmpv6_service"))
 			af = AddressFamily.INET6;
 
-		CpService service = new CpIcmpService(sName, sComment, af,
-			icmpType, icmpCode);
+		CpService service = new CpIcmpService(sName, sComment, af, icmpType, icmpCode);
 
 		return service;
 	}
@@ -397,8 +396,7 @@ public class CpFw extends GenericEquipment {
 			throwCfgException("invalid IP address: " + sIp, true);
 		}
 
-		CpNetworkIP networkobj = new CpNetworkIP(sName, sClassName, sComment,
-			ip, broadcast);
+		CpNetworkIP networkobj = new CpNetworkIP(sName, sClassName, sComment, ip, broadcast);
 
 		return networkobj;
 	}
@@ -421,8 +419,7 @@ public class CpFw extends GenericEquipment {
 			throwCfgException("invalid IP address: " + sIp, true);
 		}
 
-		CpNetworkIP networkobj = new CpNetworkIP(sName, sClassName, sComment,
-			ip, true);
+		CpNetworkIP networkobj = new CpNetworkIP(sName, sClassName, sComment, ip, true);
 
 		return networkobj;
 	}
@@ -487,8 +484,7 @@ public class CpFw extends GenericEquipment {
 		}
 
 		IPRange ipRange = new IPRange(ipFirst, ipLast);
-		CpNetworkRange networkobj = new CpNetworkRange(sName, sClassName,
-				sComment, ipRange);
+		CpNetworkRange networkobj = new CpNetworkRange(sName, sClassName, sComment, ipRange);
 
 		return networkobj;
 	}
@@ -848,7 +844,7 @@ public class CpFw extends GenericEquipment {
 		/* install on gateway */
 		List<Element> installmember = XMLUtils.getDirectChildren(install.get(0), "members");
 		List<Element> installref = XMLUtils.getDirectChildren(installmember.get(0), "reference");
-		ArrayList<String> installgw = new ArrayList();
+		ArrayList<String> installgw = new ArrayList<>();
 		for (Element er: installref) {
 			String s = XMLUtils.getTagValue(er, "Name");
 			installgw.add(s);
@@ -1285,7 +1281,7 @@ public class CpFw extends GenericEquipment {
 		 */
 		for (CpNetworkObject nobj: _networkObjects.values()) {
 
-			IPRangeable ip = null;
+			IPRangeable ip;
 			IPCrossRef ipNetRef = null;
 			switch (nobj.getType()) {
 				case IP	:	CpNetworkIP nip = (CpNetworkIP) nobj;
@@ -1385,6 +1381,7 @@ public class CpFw extends GenericEquipment {
 		 * Set the position of the probes.
 		 */
 		for (int i = 0; i < routes.size(); i ++) {
+			//noinspection unchecked
 			Route<IfaceLink> route = routes.get(i);
 			probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
 		}

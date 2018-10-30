@@ -13,6 +13,7 @@
 
 package fr.univrennes1.cri.jtacl.core.network;
 
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRoutingException;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.monitor.Options;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
@@ -254,7 +255,7 @@ public class NetworkEquipment {
 	 * empty but not null.
 	 * @throws JtaclRoutingException if problem occurs.
 	 */
-	public Routes getRoutes(IPRangeable destination) {
+	public Routes getRoutes(IPRangeable destination) throws JtaclRoutingException {
 		return null;
 	}
 }

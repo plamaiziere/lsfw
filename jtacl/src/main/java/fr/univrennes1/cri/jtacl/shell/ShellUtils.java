@@ -62,7 +62,7 @@ public class ShellUtils {
 	public static Integer parseService(String service, String protocol) {
 		IPServices ipServices = IPServices.getInstance();
 
-		Integer	port = ipServices.serviceLookup(service, protocol);
+		int port = ipServices.serviceLookup(service, protocol);
 		if (port == -1) {
 			throw new JtaclParameterException(
 				"unknown service: " + service);
@@ -126,7 +126,7 @@ public class ShellUtils {
 			Integer portLast = parseService(ports[1], sprotocol);
 			if (portLast == null)
 				return null;
-			PortSpec spec = null;
+			PortSpec spec;
 			try {
 				spec = new PortSpec(PortOperator.RANGE, portFirst, portLast);
 			} catch (IllegalArgumentException ex) {
@@ -142,7 +142,7 @@ public class ShellUtils {
 		if (port == null)
 			return null;
 
-		PortSpec spec = null;
+		PortSpec spec;
 		try {
 			spec = new PortSpec(PortOperator.EQ, port);
 		} catch (IllegalArgumentException ex) {
@@ -246,7 +246,7 @@ public class ShellUtils {
 		if (notExpect && expect.length() > 1)
 				expect = expect.substring(1);
 
-		ExpectedProbing ep = null;
+		ExpectedProbing ep;
 		try {
 			ep = new ExpectedProbing(notExpect, expect);
 		} catch (JtaclInternalException ex) {
@@ -270,6 +270,7 @@ public class ShellUtils {
 		for (IfaceLink l: ilinks) {
 			NetworkEquipment eq = l.getEquipment();
 			Routes routes = eq.getRoutes(destination);
+			//noinspection unchecked
 			for (Route<IfaceLink> r: routes) {
 				IfaceLink rilink = r.getLink();
 				if (rilink != null && rilink.getNetworkLink() != link)

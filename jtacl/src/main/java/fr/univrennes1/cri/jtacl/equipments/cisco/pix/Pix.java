@@ -1628,6 +1628,7 @@ public class Pix extends GenericEquipment implements GroupTypeSearchable {
 		 * Set the position of the probes.
 		 */
 		for (int i = 0; i < routes.size(); i ++) {
+			//noinspection unchecked
 			Route<IfaceLink> route = routes.get(i);
 			probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
 		}

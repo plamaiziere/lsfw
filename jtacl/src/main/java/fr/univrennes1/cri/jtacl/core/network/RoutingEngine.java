@@ -84,6 +84,7 @@ public class RoutingEngine implements ShowableRoutes {
 	private void showRoutingTable(PrintWriter writer, RoutingTable table) {
 		ArrayList<RoutingTableItem> stable = new ArrayList<>();
 		stable.addAll(table.values());
+		//noinspection unchecked
 		Collections.sort(stable);
 		if (stable.isEmpty())
 			writer.println("(none)");

@@ -2269,6 +2269,7 @@ public class PacketFilter extends GenericEquipment {
 		 * Set the position of the probes.
 		 */
 		for (int i = 0; i < routes.size(); i ++) {
+			//noinspection unchecked
 			Route<IfaceLink> route = routes.get(i);
 			probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
 		}
@@ -2809,7 +2810,7 @@ public class PacketFilter extends GenericEquipment {
 				request.getProbeOptions().hasNoAction())
 			return mResult;
 
-		Route<IfaceLink> route = new Route(probe.getDestinationAddress().nearestNetwork(),
+		Route<IfaceLink> route = new Route<>(probe.getDestinationAddress().nearestNetwork(),
 				routeOpts.getNextHop(), 0, routeOpts.getLink());
 		_routeToEngine = new RoutingEngine();
 		_routeToEngine.addRoute(route);
