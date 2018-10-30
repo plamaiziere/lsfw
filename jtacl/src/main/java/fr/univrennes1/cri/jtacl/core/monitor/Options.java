@@ -193,7 +193,7 @@ public class Options {
 	/**
 	 * Sets the logfile
 	 * @param logfile to set.
-	 * @throws java.io.IOException
+	 * @throws java.io.IOException on error
 	 */
 	public void setLogFile(String logfile) throws IOException {
 

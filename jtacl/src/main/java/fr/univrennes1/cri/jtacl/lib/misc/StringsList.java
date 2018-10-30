@@ -29,17 +29,14 @@ public class StringsList extends ArrayList<String> {
 			throws FileNotFoundException, IOException {
 
 		clear();
-		BufferedReader reader = new BufferedReader(new FileReader(fileName));
-		try {
-			for (;;) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+			for (; ; ) {
 				String s = reader.readLine();
 				if (s != null)
 					add(s);
 				else
 					break;
 			}
-		} finally {
-			reader.close();
 		}
 	}
 }

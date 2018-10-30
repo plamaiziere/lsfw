@@ -179,7 +179,7 @@ public class Monitor {
 			if (fileName.isEmpty())
 				throw new JtaclConfigurationException("Missing services filename");
 
-			InputStream stream =null;
+			InputStream stream;
 			try {
 				stream = new FileInputStream(fileName);
 			} catch (FileNotFoundException ex) {
@@ -197,7 +197,7 @@ public class Monitor {
 			if (fileName.isEmpty())
 				throw new JtaclConfigurationException("Missing protocols filename");
 
-			InputStream stream =null;
+			InputStream stream;
 			try {
 				stream = new FileInputStream(fileName);
 			} catch (FileNotFoundException ex) {
@@ -215,7 +215,7 @@ public class Monitor {
 			if (fileName.isEmpty())
 				throw new JtaclConfigurationException("Missing icmp filename");
 
-			InputStream stream =null;
+			InputStream stream;
 			try {
 				stream = new FileInputStream(fileName);
 			} catch (FileNotFoundException ex) {
@@ -234,7 +234,7 @@ public class Monitor {
 			if (fileName.isEmpty())
 				throw new JtaclConfigurationException("Missing icmp filename");
 
-			InputStream stream =null;
+			InputStream stream;
 			try {
 				stream = new FileInputStream(fileName);
 			} catch (FileNotFoundException ex) {
@@ -331,7 +331,7 @@ public class Monitor {
 			String equipmentComment,
 			String fileName) {
 
-		NetworkEquipment equipment = null;
+		NetworkEquipment equipment;
 
 		/*
 		 * Retrieve the class for "className"
@@ -352,9 +352,7 @@ public class Monitor {
 		try {
 			//noinspection unchecked
 			constructor = cl.getConstructor(monitor, str, str, str);
-		} catch (NoSuchMethodException ex) {
-			throw new JtaclConfigurationException(ex.getMessage());
-		} catch (SecurityException ex) {
+		} catch (NoSuchMethodException | SecurityException ex) {
 			throw new JtaclConfigurationException(ex.getMessage());
 		}
 		/*
@@ -363,13 +361,8 @@ public class Monitor {
 		try {
 			equipment =  (NetworkEquipment)
 					constructor.newInstance(this, equipmentName, equipmentComment, fileName);
-		} catch (InstantiationException ex) {
-			throw new JtaclConfigurationException(ex.getMessage());
-		} catch (IllegalAccessException ex) {
-			throw new JtaclConfigurationException(ex.getMessage());
-		} catch (IllegalArgumentException ex) {
-			throw new JtaclConfigurationException(ex.getMessage());
-		} catch (InvocationTargetException ex) {
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException
+				| IllegalArgumentException ex) {
 			throw new JtaclConfigurationException(ex.getMessage());
 		}
 		return equipment;
@@ -384,8 +377,9 @@ public class Monitor {
 	 * @return the newly created network equipment.
 	 * @throws JtaclConfigurationException on error.
 	 */
-	public NetworkEquipment addEquipment(String className,	String equipmentName,
-			String equipmentComment, String fileName) {
+	@SuppressWarnings("UnusedReturnValue")
+    public NetworkEquipment addEquipment(String className, String equipmentName,
+                                         String equipmentComment, String fileName) {
 
 		String s = "className: " + className + " name: " + equipmentName +
 				" comment: " + equipmentComment +

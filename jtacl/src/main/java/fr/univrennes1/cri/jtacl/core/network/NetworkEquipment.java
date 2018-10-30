@@ -150,9 +150,7 @@ public class NetworkEquipment {
 			/*
 			 * each link in the iface
 			 */
-			for (IfaceLink link: ifacelinks.values()) {
-				links.add(link);
-			}
+			links.addAll(ifacelinks.values());
 		}
 		return links;
 	}

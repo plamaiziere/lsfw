@@ -56,11 +56,7 @@ public class XMLUtils {
 			DocumentBuilder builder;
 			builder = factory.newDocumentBuilder();
 			doc = builder.parse(fis);
-		} catch (ParserConfigurationException ex) {
-			throw new JtaclConfigurationException(ex.getMessage());
-		} catch (SAXException ex) {
-			throw new JtaclConfigurationException(ex.getMessage());
-		} catch (IOException ex) {
+		} catch (ParserConfigurationException | SAXException | IOException ex) {
 			throw new JtaclConfigurationException(ex.getMessage());
 		}
 		return doc;

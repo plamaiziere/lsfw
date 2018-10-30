@@ -66,14 +66,14 @@ public class Routes extends ArrayList<Route> {
 	 * Sorts this list by prefix order.
 	 */
 	public void sortByPrefix() {
-		Collections.sort(this, _prefixCompare);
+		this.sort(_prefixCompare);
 	}
 
 	/**
 	 * Sorts this list by metric order.
 	 */
 	public void sortByMetric() {
-		Collections.sort(this, _metricCompare);
+		this.sort(_metricCompare);
 	}
 
 }

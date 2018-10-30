@@ -539,13 +539,13 @@ public class Probe {
 	 * @return a {@link String} representation of {@link #getParentsPositions()}.
 	 */
 	public String showSimplePath() {
-		String str = "/";
+		StringBuilder str = new StringBuilder("/");
 		ProbePositions pos = getParentsPositions();
 
 		for (ProbePosition p: pos) {
-			str += p + "/";
+			str.append(p).append("/");
 		}
-		return str;
+		return str.toString();
 	}
 
 	/**
@@ -554,13 +554,13 @@ public class Probe {
 	 * @return a {@link String} representation of {@link #getPositions()}.
 	 */
 	public String showPath() {
-		String str = "/";
+		StringBuilder str = new StringBuilder("/");
 		ProbePositions pos = getPositions();
 
 		for (ProbePosition p: pos) {
-			str += p + "/";
+			str.append(p).append("/");
 		}
-		return str;
+		return str.toString();
 	}
 
 	/**

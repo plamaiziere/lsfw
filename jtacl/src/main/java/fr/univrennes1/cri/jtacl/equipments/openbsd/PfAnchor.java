@@ -263,7 +263,7 @@ public class PfAnchor {
 		if (path.equals("*")) {
 			if (!spath.isEmpty())
 				return null;
-			Collections.sort(_children, _anchorCompare);
+			_children.sort(_anchorCompare);
 			return _children;
 		}
 
