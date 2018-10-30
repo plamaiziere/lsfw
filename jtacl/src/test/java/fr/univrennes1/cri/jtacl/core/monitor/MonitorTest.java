@@ -55,7 +55,7 @@ public class MonitorTest extends TestCase {
 
 		boolean f = false;
 		try {
-			result = monitor.createNetworkEquipment("foo", equipmentName, equipmentComment, null);
+			monitor.createNetworkEquipment("foo", equipmentName, equipmentComment, null);
 		}
 		catch (JtaclConfigurationException e) {
 			System.out.println("check: " + e.getMessage());
