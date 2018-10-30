@@ -23,6 +23,7 @@ import org.parboiled.support.ParsingResult;
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
+@SuppressWarnings("TestFailedLine")
 public class IOSParserTest extends TestCase {
 
 	IOSParser parser = Parboiled.createParser(IOSParser.class);
@@ -600,6 +601,7 @@ public class IOSParserTest extends TestCase {
 			assertTrue(acl.getAclType().equals(AclType.IPSTD));
 			assertEquals("NAME", acl.getName());
 			assertEquals("ip access-list named", parser.getRuleName());
+			assertNull(ace);
 		}
 
 		line = "ip access-list extended NAME";
@@ -613,6 +615,7 @@ public class IOSParserTest extends TestCase {
 			assertTrue(acl.getAclType().equals(AclType.IPEXT));
 			assertEquals("NAME", acl.getName());
 			assertEquals("ip access-list named", parser.getRuleName());
+			assertNull(ace);
 		}
 
 	}
@@ -623,7 +626,7 @@ public class IOSParserTest extends TestCase {
 	public void testInAclContext() {
 		System.out.println("InAclContext");
 		String line;
-		AceTemplate ace;
+
 		ReportingParseRunner parseRunner =
 				new ReportingParseRunner(parser.InAclContext());
 
