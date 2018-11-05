@@ -13,6 +13,9 @@ The script outputs the result in a single JSON, that will permit lsfw to handle 
 
 XXXX: WORK IN PROGRESS!
 
+API mgmt_cli / documentation:
+https://sc1.checkpoint.com/documents/latest/APIs/index.html#mgmt_cli~v1.3%20
+
 prequisite:
  - python 3.6 and module spur (ssh)
  - ssh access to the managment server via ssh keys.
@@ -315,11 +318,11 @@ def main():
     sshjobs = jobs.Jobs()
     queue_firstcmd(
         sshjobs=sshjobs,
-        nbobjects=50,
+        nbobjects=cfg['access_layers_nbobjects'],
         ckp_object="access-layers",
         outputfile= 'access-layers'
     )
-    sshjobs.run(maxjob=15, timeout=300)
+    sshjobs.run(cfg['max_job'], cfg['job_timeout'])
 
     # parse layers when jobs are done
     get_jobs_result(sshjobs = sshjobs, ckpconfig = ckpconfig)
@@ -331,38 +334,40 @@ def main():
     for layer in ckpconfig.access_layers:
         queue_firstcmd(
             sshjobs=sshjobs,
-            nbobjects=50,
+            nbobjects=cfg["access_rulebase_nbobjects"],
             ckp_object='access-rulebase',
             outputfile = 'access-rulebase_' + layer['uid'],
             cmd_options='uid ' + layer['uid'] + ' ' + 'use-object-dictionary true'
         )
 
     # hosts
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="hosts", outputfile = 'hosts')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['hosts_nbobjects'], ckp_object="hosts", outputfile = 'hosts')
 
     # groups
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=30, ckp_object="groups", outputfile = 'groups')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['groups_nbobjects'], ckp_object="groups", outputfile = 'groups')
 
     # groups with exclusion
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=30, ckp_object="groups-with-exclusion", outputfile = 'groups-with-exclusion')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['groups_nbobjects'], ckp_object="groups-with-exclusion", outputfile = 'groups-with-exclusion')
 
     # networks
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="networks", outputfile= 'networks')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['networks_nbobjects'], ckp_object="networks", outputfile= 'networks')
 
     # address ranges
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="address-ranges", outputfile = 'address-ranges')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['address_ranges_nbobjects'], ckp_object="address-ranges", outputfile = 'address-ranges')
 
     # multicast address ranges
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="multicast-address-ranges", outputfile= 'muticast-address-ranges')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['multicast_address_ranges_nbobjects'], ckp_object="multicast-address-ranges", outputfile= 'multicast-address-ranges')
 
      # gateways
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="simple-gateways", outputfile='gateways')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['simple_gateways_nbobjects'], ckp_object="simple-gateways", outputfile='simple-gateways')
 
     # services
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-tcp", outputfile='services-tcp')
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-udp", outputfile='services-udp')
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="services-other", outputfile='services-other')
-    queue_firstcmd(sshjobs=sshjobs, nbobjects=100, ckp_object="service-groups", outputfile='service-groups')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['services_nbobjects'], ckp_object="services-tcp", outputfile='services-tcp')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['services_nbobjects'], ckp_object="services-udp", outputfile='services-udp')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['services_nbobjects'], ckp_object="services-icmp", outputfile='services-icmp')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['services_nbobjects'], ckp_object="services-icmp6", outputfile='services-icmp6')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['services_nbobjects'], ckp_object="services-other", outputfile='services-other')
+    queue_firstcmd(sshjobs=sshjobs, nbobjects=cfg['services_nbobjects'], ckp_object="service-groups", outputfile='service-groups')
 
     # run jobs in //
     sshjobs.run(cfg['max_job'], cfg['job_timeout'])
