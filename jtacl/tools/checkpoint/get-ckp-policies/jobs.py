@@ -133,7 +133,9 @@ class Jobs(object):
         :param timeout: time out in seconds for job completion
         :raise: JobTimeOutError if the execution time of a job exceed `timeout`
         """
+
         while (len(self._waiting) != 0) or (len(self._running) != 0):
+            # spawn maxjob jobs
             while (len(self._waiting) != 0) and (len(self._running) < maxjob):
                 job = self._waiting[0]
                 self._running.append(job)
@@ -141,6 +143,8 @@ class Jobs(object):
                 job.spawn()
 
             done = []
+
+            # check for jobs completion
             for job in self._running:
                 if not job.is_running():
                     job.wait_for()
