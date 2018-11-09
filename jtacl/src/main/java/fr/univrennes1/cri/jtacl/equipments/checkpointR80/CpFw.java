@@ -658,7 +658,7 @@ public class CpFw extends GenericEquipment {
 	        String uid = n.path("uid").textValue();
             String name = n.path("name").textValue();
 	        String className = n.path("type").textValue();
-	        String comment = n.path("comment").textValue();
+	        String comment = n.path("comments").textValue();
 	        /*
 	         * service objects
 	         */
