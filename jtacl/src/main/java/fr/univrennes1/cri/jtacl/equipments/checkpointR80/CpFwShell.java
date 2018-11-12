@@ -50,7 +50,7 @@ public class CpFwShell extends GenericEquipmentShell {
 	public void commandShowService(PrintStream output, CpFwShellParser parser) {
 
 		String service = parser.getService();
-		Map<String, CpService> services = _cpfw.getServices();
+		Map<String, CpService> services = _cpfw.getCpServices();
 
 		if (!service.isEmpty()) {
 			CpService servobj = services.get(service);
@@ -71,7 +71,7 @@ public class CpFwShell extends GenericEquipmentShell {
 	public void commandShowNetwork(PrintStream output, CpFwShellParser parser) {
 
 		String network = parser.getNetwork();
-		Map<String, CpNetworkObject> networks = _cpfw.getNetworkObjects();
+		Map<String, CpNetworkObject> networks = _cpfw.getCpNetwork();
 
 		if (!network.isEmpty()) {
 			CpNetworkObject netobj = networks.get(network);

@@ -137,21 +137,26 @@ public class CpFw extends GenericEquipment {
 	protected HashMap<String, CpObject> _cpObjects
             = new HashMap<>();
 
-	/*
+    /*
+     * layers objects keyed by name
+     */
+    protected HashMap<String, CpLayer> _cpLayers = new HashMap<>();
+
+    /*
 	 * rule base actions keyed by name
 	 */
-	protected HashMap<String, CpFwRuleBaseAction> _actions = new HashMap<>();
+	protected HashMap<String, CpFwRuleBaseAction> _cpActions = new HashMap<>();
 
 	/*
 	 * services keyed by name
 	 */
-	protected HashMap<String, CpService> _services
+	protected HashMap<String, CpService> _cpServices
 			= new HashMap<>();
 
 	/*
 	 * network objects keyed by name
 	 */
-	protected HashMap<String, CpNetworkObject> _networkObjects
+	protected HashMap<String, CpNetworkObject> _cpNetworks
 			= new HashMap<>();
 
 	/*
@@ -489,14 +494,17 @@ public class CpFw extends GenericEquipment {
 		return new CpUnhandledNetwork(name, className, comment, uid);
 	}
 
+	/*
+	 * Resolve Any and service groups references
+	 */
 	protected void linkServices() {
 		/*
 		 * each service
 		 */
-		for (String serviceName: _services.keySet()) {
-            CpService service = _services.get(serviceName);
+		for (String serviceName: _cpServices.keySet()) {
+            CpService service = _cpServices.get(serviceName);
             if (service.isInAny()) {
-                CpGroupService any = (CpGroupService) _services.get("Any");
+                CpGroupService any = (CpGroupService) _cpServices.get("Any");
                 any.addReference(serviceName, service);
                 any.linkWith(service);
             }
@@ -506,7 +514,7 @@ public class CpFw extends GenericEquipment {
                  */
                 CpGroupService group = (CpGroupService) service;
                 for (String refName : group.getReferencesName()) {
-                    CpService ref = _services.get(refName);
+                    CpService ref = _cpServices.get(refName);
                     if (ref == null) {
                         warnConfig("cannot link service group: "
                                 + serviceName + " to member: " + refName, false);
@@ -606,15 +614,15 @@ public class CpFw extends GenericEquipment {
 
 	        if (action != null) {
 	            obj = action;
-	            _actions.put(name, action);
+	            _cpActions.put(name, action);
             }
             if (service != null) {
                 obj = service;
-                _services.put(name, service);
+                _cpServices.put(name, service);
             }
             if (network != null) {
                 obj = network;
-                _networkObjects.put(name, network);
+                _cpNetworks.put(name, network);
             }
             if (obj != null) {
                 if (_cpObjects.get(uid) != null) {
@@ -630,46 +638,63 @@ public class CpFw extends GenericEquipment {
         }
     }
 
+    /*
+     * Resolve network groups references
+     */
 	protected void linkNetworkObjects() {
 		/*
 		 * each network object
 		 */
-		for (String objectName: _networkObjects.keySet()) {
-			CpNetworkObject nobj = _networkObjects.get(objectName);
-			if (nobj.getType() != CpNetworkType.GROUP)
-				continue;
-			/*
-			 * resolves the base references of the group
-			 */
-			CpNetworkGroup group = (CpNetworkGroup) nobj;
-			for (String refName: group.getBaseReferencesName()) {
-				CpNetworkObject ref = _networkObjects.get(refName);
-				if (ref == null) {
-					warnConfig("cannot link network group: "
-							+ objectName + " to member: " + refName, false);
-				} else {
-					group.addBaseReference(refName, ref);
-					ref.linkWith(group);
-				}
-			}
-			/*
-			 * excluded ref
-			 */
-			for (String refName: group.getExcludedReferencesName()) {
-				CpNetworkObject ref = _networkObjects.get(refName);
-				if (ref == null) {
-					warnConfig("cannot link network group: "
-							+ objectName
-							+ " to excluded member: " + refName, false);
-				} else {
-					group.addExcludedReference(refName, ref);
-					ref.linkWith(group);
-				}
-			}
-		}
+		for (String objectName: _cpNetworks.keySet()) {
+            CpNetworkObject nobj = _cpNetworks.get(objectName);
+            if (nobj.getType() == CpNetworkType.GROUP) {
+                /*
+                 * resolves the base references of the group
+                 */
+                CpNetworkGroup group = (CpNetworkGroup) nobj;
+                for (String refName : group.getBaseReferencesName()) {
+                    CpNetworkObject ref = _cpNetworks.get(refName);
+                    if (ref == null) {
+                        warnConfig("cannot link network group: "
+                                + objectName + " to member: " + refName, false);
+                    } else {
+                        group.addBaseReference(refName, ref);
+                        ref.linkWith(group);
+                    }
+                }
+                /*
+                 * excluded ref
+                 */
+                for (String refName : group.getExcludedReferencesName()) {
+                    CpNetworkObject ref = _cpNetworks.get(refName);
+                    if (ref == null) {
+                        warnConfig("cannot link network group: "
+                                + objectName
+                                + " to excluded member: " + refName, false);
+                    } else {
+                        group.addExcludedReference(refName, ref);
+                        ref.linkWith(group);
+                    }
+                }
+            }
+        }
 	}
 
-	protected CpFwServicesSpec parseFwServicesSpec(Element e) {
+    protected void loadJsonCpLayers(JsonNode layers) {
+
+        Iterator<JsonNode> it = layers.elements();
+        while (it.hasNext()) {
+            JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String uid = n.path("uid").textValue();
+            String name = n.path("name").textValue();
+            String className = n.path("type").textValue();
+            String comment = n.path("comments").textValue();
+        }
+    }
+
+    protected CpFwServicesSpec parseFwServicesSpec(Element e) {
 
 		CpFwServicesSpec servicesSpec = new CpFwServicesSpec();
 		/*
@@ -681,7 +706,7 @@ public class CpFw extends GenericEquipment {
 
 		for (Element ref: references) {
 			String refName = XMLUtils.getTagValue(ref, "Name");
-			CpService service = _services.get(refName);
+			CpService service = _cpServices.get(refName);
 			if (service == null) {
 				warnConfig("unknown service object: " + refName, true);
 				continue;
@@ -712,7 +737,7 @@ public class CpFw extends GenericEquipment {
 
 		for (Element ref: references) {
 			String refName = XMLUtils.getTagValue(ref, "Name");
-			CpNetworkObject nobj = _networkObjects.get(refName);
+			CpNetworkObject nobj = _cpNetworks.get(refName);
 			if (nobj == null) {
 				warnConfig("unknown network object: " + refName, true);
 				continue;
@@ -906,7 +931,7 @@ public class CpFw extends GenericEquipment {
          *  ANY network object.
          */
         CpNetworkObject any = new CpNetworkAny("Any", "ANY_object", "any network object", null);
-        _networkObjects.put("Any", any);
+        _cpNetworks.put("Any", any);
 
         FileReader jf;
         JsonNode rootNode;
@@ -920,6 +945,8 @@ public class CpFw extends GenericEquipment {
         }
         JsonNode dictNode = rootNode.path("objects-dictionary");
         loadJsonCpObjects(dictNode);
+        JsonNode layersNode = rootNode.path("layers");
+        loadJsonCpLayers(layersNode);
 
 		// loadNetworkObject(filename);
         // loadFwRules(filename);
@@ -1206,7 +1233,7 @@ public class CpFw extends GenericEquipment {
 		/*
 		 * network object
 		 */
-		for (CpNetworkObject nobj: _networkObjects.values()) {
+		for (CpNetworkObject nobj: _cpNetworks.values()) {
 
 			IPRangeable ip;
 			IPRangeable ip6;
@@ -1250,7 +1277,7 @@ public class CpFw extends GenericEquipment {
 		/*
 		 * services object
 		 */
-		for (CpService sobj: _services.values()) {
+		for (CpService sobj: _cpServices.values()) {
 			if (sobj.getType() != CpServiceType.TCP &&
 					sobj.getType() != CpServiceType.UDP)
 				continue;
@@ -1493,16 +1520,20 @@ public class CpFw extends GenericEquipment {
 	    return _cpObjects;
     }
 
-    public HashMap<String, CpFwRuleBaseAction> getActions() {
-        return _actions;
+    public HashMap<String, CpFwRuleBaseAction> getCpActions() {
+        return _cpActions;
     }
 
-    public HashMap<String, CpService> getServices() {
-		return _services;
+    public HashMap<String, CpLayer> getCpLayers() {
+	    return _cpLayers;
+    }
+
+    public HashMap<String, CpService> getCpServices() {
+		return _cpServices;
 	}
 
-	public HashMap<String, CpNetworkObject> getNetworkObjects() {
-		return _networkObjects;
+	public HashMap<String, CpNetworkObject> getCpNetwork() {
+		return _cpNetworks;
 	}
 
 	public LinkedList<CpFwRule> getFwRules() {
@@ -1516,7 +1547,7 @@ public class CpFw extends GenericEquipment {
 	public List<String> getServicesName() {
 
 		List<String> list = new LinkedList<>();
-		list.addAll(_services.keySet());
+		list.addAll(_cpServices.keySet());
 		Collections.sort(list);
 		return list;
 	}
@@ -1528,7 +1559,7 @@ public class CpFw extends GenericEquipment {
 	public List<String> getNetworksName() {
 
 		List<String> list = new LinkedList<>();
-		list.addAll(_networkObjects.keySet());
+		list.addAll(_cpNetworks.keySet());
 		Collections.sort(list);
 		return list;
 	}
