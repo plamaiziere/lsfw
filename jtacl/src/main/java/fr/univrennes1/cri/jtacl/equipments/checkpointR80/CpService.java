@@ -25,14 +25,17 @@ import java.util.List;
 public abstract class CpService extends CpObject {
 	protected CpServiceType _type;
 	protected String _protocolTypeName;
+    /* included in "Any" service */
+    protected boolean _inAny;
 	protected List<Object> _linkedTo = new LinkedList<>();
 
 	public CpService(String name, String className, String comment, String uid,
-                     CpServiceType type, String protocolTypeName) {
+                     CpServiceType type, String protocolTypeName, boolean inAny) {
 
 		super(name, className, comment, uid);
 		_type = type;
 		_protocolTypeName = protocolTypeName;
+		_inAny = inAny;
 	}
 
 	public List<Object> getLinkedTo() {
@@ -68,6 +71,10 @@ public abstract class CpService extends CpObject {
 	public boolean hasProtocolType() {
 		return _protocolTypeName != null;
 	}
+
+    public boolean isInAny() {
+        return _inAny;
+    }
 
 	/**
 	 * Returns the {@link CpServicesMatch} of the given {@link ProbeRequest}.

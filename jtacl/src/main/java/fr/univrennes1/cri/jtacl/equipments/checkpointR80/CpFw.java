@@ -132,10 +132,15 @@ public class CpFw extends GenericEquipment {
 	protected String _policyName;
 
     /*
-     * Checkpoint objets keyed by uid
+     * Checkpoint objects keyed by uid
      */
 	protected HashMap<String, CpObject> _cpObjects
             = new HashMap<>();
+
+	/*
+	 * rule base actions keyed by name
+	 */
+	protected HashMap<String, CpFwRuleBaseAction> _actions = new HashMap<>();
 
 	/*
 	 * services keyed by name
@@ -283,11 +288,6 @@ public class CpFw extends GenericEquipment {
 		if (className.equalsIgnoreCase("service-udp"))
 			service = new CpUdpService(name, comment, uid, portItem, srcPortItem, sProtocol, inAny);
 
-		if (inAny) {
-			CpGroupService any = (CpGroupService) _services.get("Any");
-			any.addReference(name, service);
-		}
-
 		return service;
 	}
 
@@ -319,11 +319,6 @@ public class CpFw extends GenericEquipment {
 		CpService service =
 			new CpOtherService(name, comment, uid, protocol, sAction,null, inAny);
 
-		if (inAny) {
-			CpGroupService any = (CpGroupService) _services.get("Any");
-			any.addReference(name, service);
-		}
-
 		return service;
 	}
 
@@ -348,7 +343,7 @@ public class CpFw extends GenericEquipment {
 
 	protected CpService parseUnhandledService(String name, String className, String comment, String uid, JsonNode n) {
 
-		return new CpUnhandledService(name, className, comment, uid);
+		return new CpUnhandledService(name, className, comment, uid, false);
 	}
 
     protected CpNetworkObject parseHost(String name, String className, String comment, String uid, JsonNode n) {
@@ -494,163 +489,39 @@ public class CpFw extends GenericEquipment {
 		return new CpUnhandledNetwork(name, className, comment, uid);
 	}
 
-
-
-	protected void loadServices(String filename) {
-
-		Document doc = XMLUtils.getXMLDocument(filename);
-		doc.getDocumentElement().normalize();
-
-		_parseContext = new ParseContext();
-		CpService service;
-
-		Element root = doc.getDocumentElement();
-		List<Element> list = XMLUtils.getDirectChildren(root, "service");
-		int i = 0;
-		for (Element e: list) {
-			_parseContext.set(filename, i, XMLUtils.elementToText(e));
-			String className = XMLUtils.getTagValue(e, "Class_Name");
-			service = null;
-/*
-			if (className.equalsIgnoreCase("tcp_service"))
-				service = parseTcpUdpService(e);
-			if (className.equalsIgnoreCase("udp_service"))
-				service = parseTcpUdpService(e);
-			if (className.equalsIgnoreCase("icmp_service"))
-				service = parseIcmpService(e);
-			if (className.equalsIgnoreCase("icmpv6_service"))
-				service = parseIcmpService(e);
-			if (className.equalsIgnoreCase("other_service"))
-				service = parseOtherService(e);
-			if (className.equalsIgnoreCase("service_group"))
-				service = parseServiceGroup(e);
-*/
-			/*
-			 * unhandled by lsfw
-			 */
-			if (service == null) {
-//				service = parseUnhandledService(e);
-				warnConfig("service is unhandled: " + service, false);
-			}
-			i++;
-
-			if (service != null) {
-				String name = service.getName();
-				if (_services.get(name) != null)
-					warnConfig("service object: " + name
-						+ " overrides previous definition", false);
-				_services.put(service.getName(), service);
-			}
-
-			if (service != null && Log.debug().isLoggable(Level.INFO)) {
-			Log.debug().info("CpService: " + service.toString());
-			}
-		}
-	}
-
 	protected void linkServices() {
 		/*
 		 * each service
 		 */
 		for (String serviceName: _services.keySet()) {
-			CpService service = _services.get(serviceName);
-			if (service.getType() != CpServiceType.GROUP)
-				continue;
-			/*
-			 * resolves the references of the group
-			 */
-			CpGroupService group = (CpGroupService) service;
-			for (String refName: group.getReferencesName()) {
-				CpService ref = _services.get(refName);
-				if (ref == null) {
-					warnConfig("cannot link service group: "
-							+ serviceName + " to member: " + refName, false);
-				} else {
-					group.addReference(refName, ref);
-					ref.linkWith(group);
-				}
-			}
-		}
-	}
-
-	protected void loadNetworkObject(String filename) {
-
-		Document doc = XMLUtils.getXMLDocument(filename);
-		doc.getDocumentElement().normalize();
-
-		_parseContext = new ParseContext();
-		CpNetworkObject networkObj = null;
-
-		Element root = doc.getDocumentElement();
-		List<Element> list = XMLUtils.getDirectChildren(root, "network_object");
-		int i = 0;
-		for (Element e: list) {
-/*
-			_parseContext.set(filename, i, XMLUtils.elementToText(e));
-			String className = XMLUtils.getTagValue(e, "Class_Name");
-			networkObj = null;
-			if (className.equalsIgnoreCase("host_plain"))
-				networkObj = parseNetworkHost(e);
-			if (className.equalsIgnoreCase("host_ckp"))
-				networkObj = parseNetworkHost(e);
-			if (className.equalsIgnoreCase("gateway_plain"))
-				networkObj = parseNetworkHost(e);
-			if (className.equalsIgnoreCase("cluster_member"))
-				networkObj = parseNetworkCluster(e);
-			if (className.equalsIgnoreCase("gateway_cluster"))
-				networkObj = parseNetworkCluster(e);
-			if (className.equalsIgnoreCase("network"))
-				networkObj = parseNetworkHost(e);
-			if (className.equalsIgnoreCase("ipv6_object"))
-				networkObj = parseNetworkHostV6(e);
-			if (className.equalsIgnoreCase("network_object_group")
-					|| className.equalsIgnoreCase("group_with_exception"))
-				networkObj = parseNetworkGroup(e);
-			if (className.equalsIgnoreCase("address_range"))
-				networkObj = parseNetworkRange(e);
-*/
-			/*
-			 * unhandled by lsfw
-			 */
-/*
-*/
-			if (networkObj == null) {
-				//networkObj = parseUnhandledNetwork(e);
-				warnConfig("network object is unhandled: " + networkObj, false);
-			}
-
-			i++;
-
-			if (networkObj != null) {
-				String name = networkObj.getName();
-				if (_networkObjects.get(name) != null)
-					warnConfig("network object: " + name
-						+ " overrides previous definition", false);
-				_networkObjects.put(networkObj.getName(), networkObj);
-			}
-
-			if (networkObj != null && Log.debug().isLoggable(Level.INFO)) {
-				Log.debug().info("CpNetworkObject: " + networkObj.toString());
-			}
-		}
-
-	}
-
-	protected void loadJsonCpObjects(String filename) {
-
-	    FileReader jf;
-	    JsonNode rootNode;
-
-	    try {
-            jf = new FileReader(filename);
-            ObjectMapper objectMapper = new ObjectMapper();
-            rootNode = objectMapper.readTree(jf);
-        } catch (IOException ex) {
-            throw new JtaclConfigurationException("Cannot read file " + ex.getMessage());
+            CpService service = _services.get(serviceName);
+            if (service.isInAny()) {
+                CpGroupService any = (CpGroupService) _services.get("Any");
+                any.addReference(serviceName, service);
+                any.linkWith(service);
+            }
+            if (service.getType() == CpServiceType.GROUP) {
+                /*
+                 * resolves the references of the group
+                 */
+                CpGroupService group = (CpGroupService) service;
+                for (String refName : group.getReferencesName()) {
+                    CpService ref = _services.get(refName);
+                    if (ref == null) {
+                        warnConfig("cannot link service group: "
+                                + serviceName + " to member: " + refName, false);
+                    } else {
+                        group.addReference(refName, ref);
+                        ref.linkWith(group);
+                    }
+                }
+            }
         }
+	}
 
-        JsonNode dictNode = rootNode.path("objects-dictionary");
-	    Iterator<JsonNode> it = dictNode.elements();
+	protected void loadJsonCpObjects(JsonNode objectsDictionary) {
+
+	    Iterator<JsonNode> it = objectsDictionary.elements();
 	    while (it.hasNext()) {
 	        JsonNode n = it.next();
             _parseContext = new ParseContext();
@@ -659,87 +530,104 @@ public class CpFw extends GenericEquipment {
             String name = n.path("name").textValue();
 	        String className = n.path("type").textValue();
 	        String comment = n.path("comments").textValue();
-	        /*
-	         * service objects
-	         */
+
 	        CpService service = null;
-	        if (className.equals("service-tcp")
-                    || className.equals("service-udp")) {
-	            service = parseTcpUdpService(name, className, comment, uid, n);
-            }
-            if (className.equals("service-icmp")
-                    || className.equals("service-icmp6")) {
-                service = parseIcmpService(name, className, comment, uid, n);
-            }
-            if (className.equals("service-other")) {
-                service = parseOtherService(name, className, comment, uid, n);
-            }
-            if (className.equals("service-group")) {
-                service = parseServiceGroup(name, className, comment, uid, n);
-            }
-            if (className.equals("service-dce-rpc")
-                    || className.equals("service-rpc")
-                    || className.equals("services-sctp")) {
+	        CpNetworkObject network = null;
+	        CpFwRuleBaseAction action = null;
+	        CpObject obj = null;
+	        switch (className) {
                 /*
-                 * unhandled by lsfw
+                 * Rule base action
                  */
-                service = parseUnhandledService(name, className, comment, uid, n);
-                warnConfig("service is unhandled: " + service, false);
+                case "RulebaseAction":
+                   switch (name) {
+                        case "Accept":
+                            action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.ACCEPT);
+                            break;
+                        case "Drop":
+                            action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.DROP);
+                            break;
+                        case "Reject": /*TODO */
+                            action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.REJECT);
+                            break;
+                        case "Auth": /*TODO */
+                            action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.AUTH);
+                            break;
+                    }
+                    break;
+                /*
+                 * service objects
+                 */
+                case "service-tcp":
+                case "service-udp":
+                    service = parseTcpUdpService(name, className, comment, uid, n);
+                    break;
+                case "service-icmp":
+                case "service-icmp6":
+                    service = parseIcmpService(name, className, comment, uid, n);
+                    break;
+                case "service-other":
+                    service = parseOtherService(name, className, comment, uid, n);
+                    break;
+                case "CpmiAnyObject":
+                case "service-group":
+                    service = parseServiceGroup(name, className, comment, uid, n);
+                    break;
+                case "service-dce-rpc":
+                case "service-rpc":
+                case "services-sctp":
+                    /*
+                     * unhandled by lsfw
+                     */
+                    service = parseUnhandledService(name, className, comment, uid, n);
+                    warnConfig("service is unhandled: " + service, false);
+                    break;
+                /*
+                 * network objects
+                 */
+                case "host":
+                case "CpmiGatewayPlain":
+                case "CpmiClusterMember":
+                case "CpmiGatewayCluster":
+                    network = parseHost(name, className, comment, uid, n);
+                    break;
+                case "network":
+                    network = parseNetwork(name, className, comment, uid, n);
+                    break;
+                case "multicast-address-range":
+                case "address-range":
+                    network = parseNetworkRange(name, className, comment, uid, n);
+                    break;
+                case "group":
+                case "group-with-exclusion":
+                    network = parseNetworkGroup(name, className, comment, uid, n);
+                    break;
+            }
+
+	        if (action != null) {
+	            obj = action;
+	            _actions.put(name, action);
             }
             if (service != null) {
-                name = service.getName();
-                if (_services.get(name) != null) {
-                    warnConfig("service object: " + name
-                            + " overrides previous definition", false);
-                }
+                obj = service;
                 _services.put(name, service);
-                _cpObjects.put(uid, service);
-                if (Log.debug().isLoggable(Level.INFO)) {
-                    Log.debug().info("CpService: " + service.toString());
-                }
-            }
-            /*
-             * network objects
-             */
-            CpNetworkObject network = null;
-            if (className.equals("host")
-                    || className.equals("CpmiGatewayPlain")
-                    || className.equals("CpmiClusterMember")
-                    || className.equals("CpmiGatewayCluster")) {
-                network = parseHost(name, className, comment, uid, n);
-            }
-            if (className.equals("network")) {
-                network = parseNetwork(name, className, comment, uid, n);
-            }
-            if (className.equals("multicast-address-range")
-                    || className.equals("address-range")) {
-                network = parseNetworkRange(name, className, comment, uid, n);
-            }
-            if (className.equals("group")
-                    || className.equals("group-with-exclusion")) {
-                network = parseNetworkGroup(name, className, comment, uid, n);
             }
             if (network != null) {
-                name = network.getName();
-                if (_networkObjects.get(name) != null) {
-                    warnConfig("network object: " + name
-                            + " overrides previous definition", false);
-                }
+                obj = network;
                 _networkObjects.put(name, network);
-                _cpObjects.put(uid, network);
+            }
+            if (obj != null) {
+                if (_cpObjects.get(uid) != null) {
+                    warnConfig("Checkpoint object: " + name + ", " + className
+                            + " overrides previous definition", false);
+
+                }
+                _cpObjects.put(uid, obj);
                 if (Log.debug().isLoggable(Level.INFO)) {
-                    Log.debug().info("CpNetwork: " + network.toString());
+                    Log.debug().info("CpObject: " + obj.toString());
                 }
             }
-
-            // System.out.println("type: " + className );
         }
-        /*
-        Document doc = XMLUtils.getXMLDocument(filename);
-        doc.getDocumentElement().normalize();
-*/
-        _parseContext = new ParseContext();
-
     }
 
 	protected void linkNetworkObjects() {
@@ -1015,18 +903,23 @@ public class CpFw extends GenericEquipment {
         famAdd(filename);
 
         /*
-         *  ANY service object.
-         */
-        CpService servAny = new CpGroupService("Any", "Any service", null);
-        _services.put("Any", servAny);
-
-        /*
          *  ANY network object.
          */
         CpNetworkObject any = new CpNetworkAny("Any", "ANY_object", "any network object", null);
         _networkObjects.put("Any", any);
 
-		loadJsonCpObjects(filename);
+        FileReader jf;
+        JsonNode rootNode;
+
+        try {
+            jf = new FileReader(filename);
+            ObjectMapper objectMapper = new ObjectMapper();
+            rootNode = objectMapper.readTree(jf);
+        } catch (IOException ex) {
+            throw new JtaclConfigurationException("Cannot read file " + ex.getMessage());
+        }
+        JsonNode dictNode = rootNode.path("objects-dictionary");
+        loadJsonCpObjects(dictNode);
 
 		// loadNetworkObject(filename);
         // loadFwRules(filename);
@@ -1036,9 +929,6 @@ public class CpFw extends GenericEquipment {
 		CpFwRule fwdrop = new CpFwRule("implicit_drop", "", null);
 		_fwRules.add(fwdrop);
         */
-		if (Log.debug().isLoggable(Level.INFO)) {
-			Log.debug().info("'Any' service: " + servAny.toString());
-		}
 	}
 
 	protected void loadIfaces(Document doc) {
@@ -1603,7 +1493,11 @@ public class CpFw extends GenericEquipment {
 	    return _cpObjects;
     }
 
-	public HashMap<String, CpService> getServices() {
+    public HashMap<String, CpFwRuleBaseAction> getActions() {
+        return _actions;
+    }
+
+    public HashMap<String, CpService> getServices() {
 		return _services;
 	}
 

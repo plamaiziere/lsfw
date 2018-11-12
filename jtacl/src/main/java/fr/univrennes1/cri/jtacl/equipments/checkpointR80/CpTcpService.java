@@ -33,9 +33,6 @@ public class CpTcpService extends CpService {
 	/* source port */
 	protected CpPortItem _sourcePort;
 
-	/* included in "Any" service */
-	protected boolean _inAny;
-
 	/*
 	 * TCP flags / TCP flagsSet
 	 */
@@ -49,7 +46,7 @@ public class CpTcpService extends CpService {
 	 * @param uid object's uid
 	 * @param port port
 	 * @param sourcePort source port
-	 * @param inAny true if this service is included in any
+     * @param inAny true if this service is included in any
 	 */
 	public CpTcpService(String name,
 			String comment,
@@ -59,10 +56,9 @@ public class CpTcpService extends CpService {
 			String protocolTypeName,
 			boolean inAny) {
 
-		super(name, "service-tcp", comment, uid, CpServiceType.TCP, protocolTypeName);
+		super(name, "service-tcp", comment, uid, CpServiceType.TCP, protocolTypeName, inAny);
 		_port = port;
 		_sourcePort = sourcePort;
-		_inAny = inAny;
 	}
 
 	public CpPortItem getPort() {
@@ -71,10 +67,6 @@ public class CpTcpService extends CpService {
 
 	public CpPortItem getSourcePort() {
 		return _sourcePort;
-	}
-
-	public boolean isInAny() {
-		return _inAny;
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class CpGroupService extends CpService {
 	 */
 	public CpGroupService(String name, String comment, String uid) {
 
-		super(name, "service-group", comment, uid, CpServiceType.GROUP, null);
+		super(name, "service-group", comment, uid, CpServiceType.GROUP, null, false);
 		if (name.equals("Any"))
 			_isAny = true;
 	}

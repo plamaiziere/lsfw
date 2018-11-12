@@ -28,10 +28,11 @@ public class CpUnhandledService extends CpService {
 	 * @param className class name
 	 * @param comment comment
      * @param uid object's uid
+     * @param inAny true if this service is included in any
 	 */
-	public CpUnhandledService(String name, String className, String comment, String uid) {
+	public CpUnhandledService(String name, String className, String comment, String uid, boolean inAny) {
 
-		super(name, className, comment, uid, CpServiceType.UNHANDLED, null);
+		super(name, className, comment, uid, CpServiceType.UNHANDLED, null, inAny);
 	}
 
 	@Override

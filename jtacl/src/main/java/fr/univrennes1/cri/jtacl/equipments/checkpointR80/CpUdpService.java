@@ -31,9 +31,6 @@ public class CpUdpService extends CpService {
 	/* source port */
 	protected CpPortItem _sourcePort;
 
-	/* included in "Any" service */
-	protected boolean _inAny;
-
 	/**
 	 * Construct a new checkpoint UDP service
 	 * @param name service name
@@ -51,10 +48,9 @@ public class CpUdpService extends CpService {
 			String protocolTypeName,
 			boolean inAny) {
 
-		super(name, "service-udp", comment, uid, CpServiceType.UDP, protocolTypeName);
+		super(name, "service-udp", comment, uid, CpServiceType.UDP, protocolTypeName, inAny);
 		_port = port;
 		_sourcePort = sourcePort;
-		_inAny = inAny;
 	}
 
 	public CpPortItem getPort() {

@@ -50,10 +50,9 @@ public class CpOtherService extends CpService {
 			boolean inAny) {
 
 		super(name, "service-other", comment, uid, CpServiceType.OTHER,
-				protocolTypeName);
+				protocolTypeName, inAny);
 		_protocol = protocol;
 		_exp = exp;
-		_inAny = inAny;
 	}
 
 	public Integer getProtocol() {
@@ -62,10 +61,6 @@ public class CpOtherService extends CpService {
 
 	public String getExp() {
 		return _exp;
-	}
-
-	public boolean isInAny() {
-		return _inAny;
 	}
 
 	@Override
