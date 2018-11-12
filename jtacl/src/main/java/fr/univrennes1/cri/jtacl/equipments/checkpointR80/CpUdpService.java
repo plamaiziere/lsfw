@@ -61,10 +61,6 @@ public class CpUdpService extends CpService {
 		return _sourcePort;
 	}
 
-	public boolean isInAny() {
-		return _inAny;
-	}
-
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type

@@ -48,18 +48,6 @@ public abstract class CpService extends CpObject {
 		}
 	}
 
-	public String getName() {
-		return _name;
-	}
-
-	public String getClassName() {
-		return _className;
-	}
-
-	public String getComment() {
-		return _comment;
-	}
-
 	public CpServiceType getType() {
 		return _type;
 	}
