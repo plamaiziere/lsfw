@@ -17,7 +17,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
  * Checkpoint base object
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public abstract class CpObject {
+public class CpObject {
     protected String _name;
     protected String _className;
     protected String _comment;

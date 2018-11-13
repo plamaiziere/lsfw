@@ -15,25 +15,33 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
 
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Checkpoint layer object
+ * Checkpoint "Any" object
+ * This object can be use in ip specification or service specification.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class CpLayer extends CpObject {
+public class CpAny extends CpObject {
 
-    List<CpFwRule> _rules = new ArrayList<>();
+    protected CpGroupService _anyService;
+    protected CpNetworkGroup _anyNetwork;
 
-	public CpLayer(String name, String className, String comment, String uid) {
+	public CpAny(String name, String className, String comment, String uid) {
 
 		super(name, className, comment, uid);
+		_anyService = new CpGroupService(name, comment, uid);
+		_anyNetwork = new CpNetworkGroup(name, className, comment, uid);
 	}
 
-    List<CpFwRule> getRules() { return _rules; };
+    public CpGroupService getAnyService() {
+        return _anyService;
+    }
 
-	/**
+    public CpNetworkGroup getAnyNetwork() {
+        return _anyNetwork;
+    }
+
+    /**
 	 * Returns the {@link CpServicesMatch} of the given {@link ProbeRequest}.
 	 * @param request request to test.
 	 * @return the CpServicesMatch of the given ProbeRequest.

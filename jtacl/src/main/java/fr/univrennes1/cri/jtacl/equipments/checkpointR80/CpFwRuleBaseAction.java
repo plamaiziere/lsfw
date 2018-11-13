@@ -25,4 +25,6 @@ public class CpFwRuleBaseAction extends CpObject {
         super(name, className, comment, uid);
         _action = action;
     }
+
+    public CpFwRuleAction getAction() { return _action; }
 }

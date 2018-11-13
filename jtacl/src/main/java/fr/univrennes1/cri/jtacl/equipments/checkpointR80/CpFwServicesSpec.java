@@ -49,7 +49,7 @@ public class CpFwServicesSpec {
 		String s = "";
 		if (_notIn)
 			s= "!";
-		return s + _services.toString();
+		return s + _services.getReferencesName();
 	}
 
 }

@@ -21,5 +21,6 @@ public enum CpFwRuleAction {
 	AUTH,
 	ACCEPT,
 	DROP,
-	REJECT
+	REJECT,
+    LAYER_CALL
 }

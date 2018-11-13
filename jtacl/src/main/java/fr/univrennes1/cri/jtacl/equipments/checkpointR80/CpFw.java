@@ -132,6 +132,11 @@ public class CpFw extends GenericEquipment {
 	protected String _policyName;
 
     /*
+     * name of layers to skip (by default 'Application')
+     */
+	protected List<String> _skippedLayers = new ArrayList<>();
+
+    /*
      * Checkpoint objects keyed by uid
      */
 	protected HashMap<String, CpObject> _cpObjects
@@ -543,10 +548,13 @@ public class CpFw extends GenericEquipment {
 	        CpNetworkObject network = null;
 	        CpFwRuleBaseAction action = null;
 	        CpObject obj = null;
+	        CpAny any = null;
+	        CpLayer layer = null;
 	        switch (className) {
                 /*
-                 * Rule base action
+                 * actions objects
                  */
+                case "Global":
                 case "RulebaseAction":
                    switch (name) {
                         case "Accept":
@@ -561,6 +569,13 @@ public class CpFw extends GenericEquipment {
                         case "Auth": /*TODO */
                             action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.AUTH);
                             break;
+                       case "Inner Layer":
+                           action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.LAYER_CALL);
+                           break;
+                       case "Policy Targets":
+                           /* used in install on */
+                           obj = new CpObject(name, className, comment, uid);
+                           break;
                     }
                     break;
                 /*
@@ -578,6 +593,8 @@ public class CpFw extends GenericEquipment {
                     service = parseOtherService(name, className, comment, uid, n);
                     break;
                 case "CpmiAnyObject":
+                    any = new CpAny(name, className, comment, uid);
+                    break;
                 case "service-group":
                     service = parseServiceGroup(name, className, comment, uid, n);
                     break;
@@ -597,6 +614,7 @@ public class CpFw extends GenericEquipment {
                 case "CpmiGatewayPlain":
                 case "CpmiClusterMember":
                 case "CpmiGatewayCluster":
+                case "CpmiHostCkp":
                     network = parseHost(name, className, comment, uid, n);
                     break;
                 case "network":
@@ -610,6 +628,19 @@ public class CpFw extends GenericEquipment {
                 case "group-with-exclusion":
                     network = parseNetworkGroup(name, className, comment, uid, n);
                     break;
+                /*
+                 * Layers
+                 */
+                case "access-layer":
+                    layer = new CpLayer(name, className, comment, uid);
+                    break;
+            }
+
+            // XXXX: any is dual: network or service.
+            if (any != null) {
+                _cpObjects.put(uid, any);
+                _cpServices.put(name, any.getAnyService());
+                _cpNetworks.put(name, any.getAnyNetwork());
             }
 
 	        if (action != null) {
@@ -623,6 +654,10 @@ public class CpFw extends GenericEquipment {
             if (network != null) {
                 obj = network;
                 _cpNetworks.put(name, network);
+            }
+            if (layer != null) {
+                obj = layer;
+                _cpLayers.put(name, layer);
             }
             if (obj != null) {
                 if (_cpObjects.get(uid) != null) {
@@ -680,6 +715,31 @@ public class CpFw extends GenericEquipment {
         }
 	}
 
+	protected void parseCpRules(CpLayer layer, JsonNode l) {
+        Iterator<JsonNode> it = l.elements();
+        while (it.hasNext()) {
+            JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String uid = n.path("uid").textValue();
+            String name = n.path("name").textValue();
+            String className = n.path("type").textValue();
+            String comment = n.path("comments").textValue();
+
+            switch (className) {
+                case "access-section":
+                    /* XXX Access section contains rules. We ignore the section */
+                    JsonNode rulesNode = n.path("rulebase");
+                    parseCpRules(layer, rulesNode);
+                    break;
+                case "access-rule":
+                    CpFwRule rule = parseFwRule(name, className, comment, uid, layer, n);
+                    break;
+
+            }
+        }
+    }
+
     protected void loadJsonCpLayers(JsonNode layers) {
 
         Iterator<JsonNode> it = layers.elements();
@@ -691,157 +751,146 @@ public class CpFw extends GenericEquipment {
             String name = n.path("name").textValue();
             String className = n.path("type").textValue();
             String comment = n.path("comments").textValue();
+            if (_skippedLayers.contains(name)) {
+                warnConfig("Layer " + name + " skipped.", false);
+            } else {
+                CpLayer layer = new CpLayer(name, className, comment, uid);
+                JsonNode l = n.path("rulebase");
+                parseCpRules(layer, l);
+                _cpLayers.put(name, layer);
+                _cpObjects.put(uid, layer);
+            }
         }
     }
 
-    protected CpFwServicesSpec parseFwServicesSpec(Element e) {
+    protected List<String> parseFWInstallGateway(JsonNode n) {
+	    List<String> list = new ArrayList<>();
+        Iterator<JsonNode> it = n.elements();
+        while (it.hasNext()) {
+            JsonNode rn = it.next();
+            String refuid = rn.textValue();
+            CpObject ref = _cpObjects.get(refuid);
+            if (ref != null) {
+                list.add(ref.getName());
+            } else {
+                warnConfig("cannot find object uid: " + refuid, true);
+                return null;
+            }
+        }
+        return list;
+    }
 
-		CpFwServicesSpec servicesSpec = new CpFwServicesSpec();
-		/*
-		 * members/reference
-		 */
-		List<Element> members = XMLUtils.getDirectChildren(e, "members");
-		List<Element> references
-				= XMLUtils.getDirectChildren(members.get(0), "reference");
+    protected CpFwServicesSpec parseFwServicesSpec(JsonNode n) {
 
-		for (Element ref: references) {
-			String refName = XMLUtils.getTagValue(ref, "Name");
-			CpService service = _cpServices.get(refName);
-			if (service == null) {
-				warnConfig("unknown service object: " + refName, true);
-				continue;
-			}
-			servicesSpec.addReference(refName, service);
-		}
-
-		/*
-		 * cell negation
-		 */
-		String op = XMLUtils.getTagValue(e, "op");
-		if (op != null && op.equals("not in")) {
-			servicesSpec.setNotIn(true);
-		}
-
-		return servicesSpec;
+        CpFwServicesSpec servicesSpec = new CpFwServicesSpec();
+        Iterator<JsonNode> it = n.elements();
+        while (it.hasNext()) {
+            JsonNode rn = it.next();
+            String refuid = rn.textValue();
+            CpObject ref = _cpObjects.get(refuid);
+            if (ref != null) {
+                if (ref instanceof CpAny) {
+                    CpAny cref = (CpAny) ref;
+                    servicesSpec.addReference(cref.getName(), cref.getAnyService());
+                }
+                if (ref instanceof CpService) {
+                    CpService cref = (CpService) ref;
+                    servicesSpec.addReference(cref.getName(), cref);
+                }
+            } else {
+                warnConfig("cannot find service object uid: " + refuid, true);
+                return null;
+            }
+        }
+        return servicesSpec;
 	}
 
-	protected CpFwIpSpec parseFwIpSpec(Element e) {
+	protected CpFwIpSpec parseFwIpSpec(JsonNode n) {
 
-		CpFwIpSpec ipSpec = new CpFwIpSpec();
-		/*
-		 * members/reference
-		 */
-		List<Element> members = XMLUtils.getDirectChildren(e, "members");
-		List<Element> references
-				= XMLUtils.getDirectChildren(members.get(0), "reference");
+        CpFwIpSpec ipSpec = new CpFwIpSpec();
+        Iterator<JsonNode> it = n.elements();
+        while (it.hasNext()) {
+            JsonNode rn = it.next();
+            String refuid = rn.textValue();
+            CpObject ref = _cpObjects.get(refuid);
+            if (ref != null) {
+                if (ref instanceof CpAny) {
+                    CpAny cref = (CpAny) ref;
+                    ipSpec.addReference(cref.getName(), cref.getAnyNetwork());
+                }
+                if (ref instanceof CpNetworkObject) {
+                    CpNetworkObject cref = (CpNetworkObject) ref;
+                    ipSpec.addReference(cref.getName(), cref);
+                }
+            } else {
+                warnConfig("cannot find network object uid: " + refuid, true);
+                return null;
+            }
+        }
+        return ipSpec;
+    }
 
-		for (Element ref: references) {
-			String refName = XMLUtils.getTagValue(ref, "Name");
-			CpNetworkObject nobj = _cpNetworks.get(refName);
-			if (nobj == null) {
-				warnConfig("unknown network object: " + refName, true);
-				continue;
-			}
-			ipSpec.addReference(refName, nobj);
-		}
+	protected CpFwRule parseFwRule(String name, String className, String comment, String uid, CpLayer layer, JsonNode n) {
 
-		/*
-		 * cell negation
-		 */
-		String op = XMLUtils.getTagValue(e, "op");
-		if (op != null && op.equals("not in")) {
-			ipSpec.setNotIn(true);
-		}
+        Integer ruleNumber = n.path("rule-number").asInt();
 
-		return ipSpec;
-	}
+        // source ip(s)
+        JsonNode jsource = n.path("source");
+        CpFwIpSpec sourceSpec = parseFwIpSpec(jsource);
+        boolean sourceNegate = n.path("source-negate").asBoolean();
+        if (sourceNegate) sourceSpec.setNotIn(true);
 
-	protected String parseFwAction(Element e) {
+        // destination ip(s)
+        JsonNode jdest = n.path("destination");
+        CpFwIpSpec destSpec = parseFwIpSpec(jdest);
+        boolean destNegate = n.path("destination-negate").asBoolean();
+        if (destNegate) destSpec.setNotIn(true);
 
-		/*
-		 * action/Class_Name
-		 */
-		List<Element> action
-				= XMLUtils.getDirectChildren(e, "action");
+        // service(s)
+        JsonNode jserv = n.path("service");
+        CpFwServicesSpec servSpec = parseFwServicesSpec(jserv);
+        boolean servNegate = n.path("service-negate").asBoolean();
+        if (servNegate) servSpec.setNotIn(true);
 
-		String sAction = XMLUtils.getTagValue(action.get(0), "Class_Name");
-		return sAction;
-	}
+        // rule enabled
+        boolean enabled = n.path("enabled").asBoolean();
 
-	protected CpFwRule parseFwRule(Element e) {
-		String sName = XMLUtils.getTagValue(e, "name");
-		String sComment = XMLUtils.getTagValue(e, "comments");
-		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
-		String sRuleNumber = XMLUtils.getTagValue(e, "Rule_Number");
-		String sDisabled = XMLUtils.getTagValue(e, "disabled");
+        // rule action
+        String action = n.path("action").textValue();
+        CpFwRuleAction ruleAction = null;
+        String layerCall = null;
+        CpObject o = _cpObjects.get(action);
+        if (o != null && o instanceof CpFwRuleBaseAction) {
+            ruleAction = ((CpFwRuleBaseAction) o).getAction();
+            if (ruleAction == CpFwRuleAction.LAYER_CALL) {
+                String layerUIdCall = n.path("inline-layer").textValue();
+                CpObject clayer = _cpObjects.get(layerUIdCall);
+                if (clayer == null) {
+                    warnConfig("layer: " + layer.getName() + " rule: " + name + " (uid:" + uid + ")" + " cannot find layer uid:" + layerUIdCall, false);
+                } else {
+                    layerCall = clayer.getName();
+                }
+            }
+        } else {
+            warnConfig("layer: " + layer.getName() + " rule: " + name + " (uid:" + uid + ")" + " cannot find rule action uid:" + action, false);
+        }
 
-		List<Element> sources = XMLUtils.getDirectChildren(e, "src");
-		List<Element> dsts = XMLUtils.getDirectChildren(e, "dst");
-		List<Element> services = XMLUtils.getDirectChildren(e, "services");
-		List<Element> actions = XMLUtils.getDirectChildren(e, "action");
-		List<Element> install = XMLUtils.getDirectChildren(e, "install");
+        // install on gateway(s)
+        JsonNode inst = n.path("install-on");
+        List<String> installgw = parseFWInstallGateway(inst);
+        CpFwRule fwrule = new CpFwRule(name, className, comment, uid, layer, ruleNumber
+            , !enabled, sourceSpec, destSpec, servSpec, action, ruleAction, layerCall, installgw);
 
-		/*
-		 * sanity checks
-		 */
-		if (sRuleNumber == null || sDisabled == null ||sources == null
-			|| dsts == null || sources.isEmpty() || dsts.isEmpty()
-			|| services == null || services.isEmpty() || actions == null
-			|| install == null	|| actions.isEmpty()) {
-			warnConfig("cannot parse rule", true);
-			return null;
-		}
-
-		/* source */
-		Element source = sources.get(0);
-		CpFwIpSpec srcIpSpec = parseFwIpSpec(source);
-
-		/* destination */
-		Element dst = dsts.get(0);
-		CpFwIpSpec dstIpSpec = parseFwIpSpec(dst);
-
-		/* services */
-		Element service = services.get(0);
-		CpFwServicesSpec servicesSpec = parseFwServicesSpec(service);
-
-		/* action */
-		String sAction = parseFwAction(actions.get(0));
-		if (sAction == null) {
-			warnConfig("invalid rule action (null)", true);
-			return null;
-		}
-		CpFwRuleAction ruleAction = null;
-		if (sAction.equals("accept_action"))
-			ruleAction = CpFwRuleAction.ACCEPT;
-		if (sAction.equals("drop_action"))
-			ruleAction = CpFwRuleAction.DROP;
-		if (sAction.equals("reject_action"))
-			ruleAction = CpFwRuleAction.REJECT;
-		if (ruleAction == null)
-			ruleAction = CpFwRuleAction.AUTH;
-		Integer rNumber = Integer.parseInt(sRuleNumber);
-		Boolean disabled = Boolean.parseBoolean(sDisabled);
-
-		/* install on gateway */
-		List<Element> installmember = XMLUtils.getDirectChildren(install.get(0), "members");
-		List<Element> installref = XMLUtils.getDirectChildren(installmember.get(0), "reference");
-		ArrayList<String> installgw = new ArrayList<>();
-		for (Element er: installref) {
-			String s = XMLUtils.getTagValue(er, "Name");
-			installgw.add(s);
-		}
-
-		CpFwRule fwrule = new CpFwRule(sName, sClassName, sComment, rNumber,
-				disabled, srcIpSpec, dstIpSpec, servicesSpec, sAction, ruleAction, installgw);
-
-		/*
-		 * track references
-		 */
-		srcIpSpec.linkTo(fwrule);
-		dstIpSpec.linkTo(fwrule);
-		servicesSpec.linkTo(fwrule);
-
-		return fwrule;
+        /*
+         * track references
+         */
+        sourceSpec.linkTo(fwrule);
+        destSpec.linkTo(fwrule);
+        servSpec.linkTo(fwrule);
+        if (Log.debug().isLoggable(Level.INFO)) {
+            Log.debug().info("CpFwRule: " + fwrule);
+        }
+        return fwrule;
 	}
 
 	protected void loadFwRules(String filename) {
@@ -870,13 +919,15 @@ public class CpFw extends GenericEquipment {
 				 */
 				String headerText = XMLUtils.getTagValue(e, "header_text");
 				if (headerText != null)
-					fwRule = new CpFwRule(null, null, headerText, null);
+					fwRule = new CpFwRule(null, null, headerText, null, null);
 			} else {
 				/*
 				 * security rule
 				 */
+				/*
 				if (className.equalsIgnoreCase("security_rule"))
-					fwRule = parseFwRule(e);
+					fwRule = parseFwRule(null, null);
+					*/
 			}
 
 			if (fwRule != null) {
@@ -897,25 +948,42 @@ public class CpFw extends GenericEquipment {
 
 	protected void loadConfiguration(Document doc) {
 
-	    /* fwpolicy */
+         /* fwpolicy */
 		NodeList list = doc.getElementsByTagName("fwpolicy");
-		if (list.getLength() != 1) {
-			throw new JtaclConfigurationException("One fwpolicy must be specified");
+		if (list.getLength() < 1) {
+			throw new JtaclConfigurationException("At least one fwpolicy must be specified");
 		}
 
-		Element e = (Element) list.item(0);
-		String filename = e.getAttribute("filename");
-		if (filename.isEmpty())
-			throw new JtaclConfigurationException("Missing policy file name");
-		String fwpolicy = e.getAttribute("name");
-		if (fwpolicy.isEmpty())
-			throw new JtaclConfigurationException("Missing policy name");
-		_policyName = fwpolicy;
+		List<String> filenames = new ArrayList<>();
+		String fwpolicy = null;
+		for (int i = 0; i < list.getLength(); i++) {
+            Element e = (Element) list.item(i);
+            String filename = e.getAttribute("filename");
+            if (!filename.isEmpty()) {
+                filenames.add(filename);
+            }
+            String pn = e.getAttribute("name");
+            if (!pn.isEmpty()) {
+                fwpolicy = pn;
+            }
+        }
+
+        if (filenames.isEmpty()) {
+            throw new JtaclConfigurationException("Missing policy file name");
+        }
+        if (fwpolicy == null || fwpolicy.isEmpty()) {
+            throw new JtaclConfigurationException("Missing policy name");
+        }
+
+        /* skip this layer */
+        _skippedLayers.add("Application");
+        _skippedLayers.add("coeur Application");
+
 
         /* gateway name (for rule installation) */
         list = doc.getElementsByTagName("gatewayName");
         if (list.getLength() != 1) {
-            e = (Element) list.item(0);
+            Element e = (Element) list.item(0);
             _gatewayName = e.getAttribute("name");
             if (_gatewayName == null || _gatewayName.isEmpty()) {
                 throw new JtaclConfigurationException(
@@ -925,28 +993,24 @@ public class CpFw extends GenericEquipment {
             _gatewayName = null;
         }
 
-        famAdd(filename);
+        for (String f: filenames) {
+            famAdd(f);
+            FileReader jf;
+            JsonNode rootNode;
 
-        /*
-         *  ANY network object.
-         */
-        CpNetworkObject any = new CpNetworkAny("Any", "ANY_object", "any network object", null);
-        _cpNetworks.put("Any", any);
-
-        FileReader jf;
-        JsonNode rootNode;
-
-        try {
-            jf = new FileReader(filename);
-            ObjectMapper objectMapper = new ObjectMapper();
-            rootNode = objectMapper.readTree(jf);
-        } catch (IOException ex) {
-            throw new JtaclConfigurationException("Cannot read file " + ex.getMessage());
+            try {
+                jf = new FileReader(f);
+                ObjectMapper objectMapper = new ObjectMapper();
+                rootNode = objectMapper.readTree(jf);
+            } catch (IOException ex) {
+                throw new JtaclConfigurationException("Cannot read file " + ex.getMessage());
+            }
+            JsonNode dictNode = rootNode.path("objects-dictionary");
+            loadJsonCpObjects(dictNode);
+            JsonNode layersNode = rootNode.path("layers");
+            loadJsonCpLayers(layersNode);
         }
-        JsonNode dictNode = rootNode.path("objects-dictionary");
-        loadJsonCpObjects(dictNode);
-        JsonNode layersNode = rootNode.path("layers");
-        loadJsonCpLayers(layersNode);
+
 
 		// loadNetworkObject(filename);
         // loadFwRules(filename);

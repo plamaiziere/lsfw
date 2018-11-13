@@ -19,17 +19,16 @@ import java.util.List;
  * Checkpoint firewall rule
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class CpFwRule {
+public class CpFwRule extends CpObject {
 
-	protected String _name;
-	protected String _className;
-	protected String _comment;
+    protected CpLayer _layer;
 	protected Integer _number;
 	protected boolean _disabled;
 	protected boolean _headerText;
 
 	protected String _action;
 	protected CpFwRuleAction _ruleAction;
+	protected String _layerCall;
 
 	protected CpFwIpSpec _sourceIp;
 	protected CpFwIpSpec _destIp;
@@ -39,17 +38,7 @@ public class CpFwRule {
 
 	protected List<String> _installGateway;
 
-	public String getName() {
-		return _name;
-	}
-
-	public String getClassName() {
-		return _className;
-	}
-
-	public String getComment() {
-		return _comment;
-	}
+    public CpLayer getLayer() { return _layer; }
 
 	public Integer getNumber() {
 		return _number;
@@ -83,13 +72,25 @@ public class CpFwRule {
 		_ruleAction = ruleAction;
 	}
 
-	public boolean ruleActionIsAccept() {
+    public String getLayerCall() {
+        return _layerCall;
+    }
+
+    public void setLayerCall(String layerCall) {
+        _layerCall = layerCall;
+    }
+
+    public boolean ruleActionIsAccept() {
 		return _ruleAction != null &&
 			(_ruleAction == CpFwRuleAction.ACCEPT
 				|| _ruleAction == CpFwRuleAction.AUTH);
 	}
 
-	public CpFwIpSpec getSourceIp() {
+    public boolean ruleActionIsLayerCall() {
+        return _ruleAction != null && _ruleAction == CpFwRuleAction.LAYER_CALL;
+    }
+
+    public CpFwIpSpec getSourceIp() {
 		return _sourceIp;
 	}
 
@@ -114,24 +115,27 @@ public class CpFwRule {
 	 * @param name name
 	 * @param className class name
 	 * @param comment comment
-	 * @param number rule number
+     * @param uid object's uid
+     * @param layer parent layer
+     * @param number rule number
 	 * @param disabled rule disabled
 	 * @param srcIpSpec source IP specification
 	 * @param dstIpSpec destination IP specification
 	 * @param servicesSpec services specification
 	 * @param action action class name
 	 * @param ruleAction rule action (Accept, drop etc)
+     * @param layerCall action call to a layer.
 	 * @param installGateway rule gateway installation
 	 */
-	public CpFwRule(String name, String className, String comment,
+	public CpFwRule(String name, String className, String comment, String uid, CpLayer layer,
                     Integer number, boolean disabled,
                     CpFwIpSpec srcIpSpec, CpFwIpSpec dstIpSpec,
                     CpFwServicesSpec servicesSpec, String action,
                     CpFwRuleAction ruleAction,
+                    String layerCall,
                     List<String> installGateway) {
-		_name = name;
-		_className = className;
-		_comment = comment;
+	    super(name, className, comment, uid);
+	    _layer = layer;
 		_number = number;
 		_disabled = disabled;
 		_sourceIp = srcIpSpec;
@@ -139,6 +143,7 @@ public class CpFwRule {
 		_services = servicesSpec;
 		_action = action;
 		_ruleAction = ruleAction;
+		_layerCall = layerCall;
 		_installGateway = installGateway;
 	}
 
@@ -149,9 +154,7 @@ public class CpFwRule {
 	 * @param installGateway rule gateway installation
 	 */
 	public CpFwRule(String name, String className, List<String> installGateway) {
-		_name = name;
-		_className = className;
-		_comment = "implicit drop rule";
+	    super(name, className, "implicit drop rule", "0");
 		_number = 999999;
 		_action = "drop_action";
 		_ruleAction = CpFwRuleAction.DROP;
@@ -164,10 +167,12 @@ public class CpFwRule {
 	 * @param name name
 	 * @param className class name
 	 * @param comment header text
+     * @param uid object's uid
 	 * @param installGateway rule gateway installation
 	 */
-	public CpFwRule(String name, String className, String comment,
+	public CpFwRule(String name, String className, String comment, String uid,
 			List<String> installGateway) {
+	    super(name, "header_text", comment, uid);
 		_name = name;
 		_className = "header_text";
 		_comment = comment;
@@ -179,13 +184,14 @@ public class CpFwRule {
 
 	@Override
 	public String toString() {
-		return "rule name=" + _name + ", className=" + _className
-				+ ", comment=" + _comment + ", number=" + _number +
+	    String s = "rule name=" + _name + ", className=" + _className
+				+ ", comment=" + _comment + ", layer=" + _layer.getName() + ", number=" + _number +
 				", disabled=" + _disabled + ", implicit= " + _implicitDrop
 				+ ", action=" + _action + ", ruleAction=" + _ruleAction
 				+ ", sourceIp=" + _sourceIp
 				+ ", destIp=" + _destIp	+ " services=" + _services
 				+ ", install=" + _installGateway;
+	    return s;
 	}
 
 	public String toText() {
