@@ -725,17 +725,19 @@ public class CpFw extends GenericEquipment {
             String name = n.path("name").textValue();
             String className = n.path("type").textValue();
             String comment = n.path("comments").textValue();
-
+            CpFwRule rule;
             switch (className) {
                 case "access-section":
-                    /* XXX Access section contains rules. We ignore the section */
+                    /* XXX Access section contains rules */
+                    rule = parseFwAccessSection(name, className, comment, uid, layer, n);
+                    layer.getRules().add(rule);
                     JsonNode rulesNode = n.path("rulebase");
                     parseCpRules(layer, rulesNode);
                     break;
                 case "access-rule":
-                    CpFwRule rule = parseFwRule(name, className, comment, uid, layer, n);
+                    rule = parseFwRule(name, className, comment, uid, layer, n);
+                    layer.getRules().add(rule);
                     break;
-
             }
         }
     }
@@ -830,7 +832,22 @@ public class CpFw extends GenericEquipment {
         return ipSpec;
     }
 
-	protected CpFwRule parseFwRule(String name, String className, String comment, String uid, CpLayer layer, JsonNode n) {
+    protected CpFwRule parseFwAccessSection(String name
+                                            , String className
+                                            , String comment
+                                            , String uid
+                                            , CpLayer layer
+                                            , JsonNode n) {
+
+        Integer ruleNumber = n.path("from").asInt();
+        CpFwRule fwrule = new CpFwRule(name, className, comment, uid, layer, ruleNumber);
+        if (Log.debug().isLoggable(Level.INFO)) {
+            Log.debug().info("CpFwRule: " + fwrule);
+        }
+        return fwrule;
+    }
+
+    protected CpFwRule parseFwRule(String name, String className, String comment, String uid, CpLayer layer, JsonNode n) {
 
         Integer ruleNumber = n.path("rule-number").asInt();
 
@@ -892,59 +909,6 @@ public class CpFw extends GenericEquipment {
             Log.debug().info("CpFwRule: " + fwrule);
         }
         return fwrule;
-	}
-
-	protected void loadFwRules(String filename) {
-		Document doc = XMLUtils.getXMLDocument(filename);
-		doc.getDocumentElement().normalize();
-
-		_parseContext = new ParseContext();
-
-		Element root = doc.getDocumentElement();
-		/*
-		 * fw_policies/fw_policie/rule/rule
-		 */
-		List<Element> policie = XMLUtils.getDirectChildren(root, "fw_policie");
-		List<Element> rule = XMLUtils.getDirectChildren(policie.get(0), "rule");
-		List<Element> rules = XMLUtils.getDirectChildren(rule.get(0), "rule");
-
-		int i = 0;
-		for (Element e: rules) {
-			_parseContext.set(filename, i, XMLUtils.elementToText(e));
-
-			CpFwRule fwRule = null;
-			String className = XMLUtils.getTagValue(e, "Class_Name");
-			if (className == null) {
-				/*
-				 * header text
-				 */
-				String headerText = XMLUtils.getTagValue(e, "header_text");
-				if (headerText != null)
-					fwRule = new CpFwRule(null, null, headerText, null, null);
-			} else {
-				/*
-				 * security rule
-				 */
-				/*
-				if (className.equalsIgnoreCase("security_rule"))
-					fwRule = parseFwRule(null, null);
-					*/
-			}
-
-			if (fwRule != null) {
-				List<String> igateway = fwRule.getInstallGateway();
-				if (igateway == null) {
-					_fwRules.add(fwRule);
-				} else {
-					if (_gatewayName == null || igateway.contains(_gatewayName)) {
-						_fwRules.add(fwRule);
-					}
-				}
-				if (Log.debug().isLoggable(Level.INFO)) {
-					Log.debug().info("CpFwRule: " + fwRule);
-				}
-			}
-		}
 	}
 
 	protected void loadConfiguration(Document doc) {

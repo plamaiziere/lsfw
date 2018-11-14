@@ -24,7 +24,7 @@ public class CpFwRule extends CpObject {
     protected CpLayer _layer;
 	protected Integer _number;
 	protected boolean _disabled;
-	protected boolean _headerText;
+	protected boolean _access_section;
 
 	protected CpFwRuleAction _ruleAction;
 	protected String _layerCall;
@@ -47,12 +47,12 @@ public class CpFwRule extends CpObject {
 		return _disabled;
 	}
 
-	public boolean isHeaderText() {
-		return _headerText;
+	public boolean isAccessSection() {
+		return _access_section;
 	}
 
 	public boolean isSecurityRule() {
-		return ! _headerText;
+		return !_access_section;
 	}
 
 	public CpFwRuleAction getRuleAction() {
@@ -107,7 +107,7 @@ public class CpFwRule extends CpObject {
 	 * @param className class name
 	 * @param comment comment
      * @param uid object's uid
-     * @param layer parent layer
+     * @param layer rule's layer
      * @param number rule number
 	 * @param disabled rule disabled
 	 * @param srcIpSpec source IP specification
@@ -151,22 +151,19 @@ public class CpFwRule extends CpObject {
 	}
 
 	/**
-	 * Construct a new fw rule (headerText)
+	 * Construct a new fw rule (access-section)
 	 * @param name name
 	 * @param className class name
 	 * @param comment header text
      * @param uid object's uid
-	 * @param installGateway rule gateway installation
+     * @param layer rule's layer
+     * @param number rule number
 	 */
-	public CpFwRule(String name, String className, String comment, String uid,
-			List<String> installGateway) {
-	    super(name, "header_text", comment, uid);
-		_name = name;
-		_className = "header_text";
-		_comment = comment;
-		_number = 0;
-		_headerText = true;
-		_installGateway = installGateway;
+	public CpFwRule(String name, String className, String comment, String uid, CpLayer layer, Integer number) {
+	    super(name, className, comment, uid);
+		_layer = layer;
+		_number = number;
+		_access_section = true;
 	}
 
 	@Override
@@ -185,8 +182,8 @@ public class CpFwRule extends CpObject {
 		if (isImplicitDrop())
 			return "*** implicit drop ***";
 
-		if (isHeaderText())
-			return "### " + _comment;
+		if (isAccessSection())
+			return "### " + _name;
 
 		String s = "#" + _number;
 		if (_name != null)
