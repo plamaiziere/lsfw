@@ -878,8 +878,9 @@ public class CpFw extends GenericEquipment {
         // install on gateway(s)
         JsonNode inst = n.path("install-on");
         List<String> installgw = parseFWInstallGateway(inst);
+
         CpFwRule fwrule = new CpFwRule(name, className, comment, uid, layer, ruleNumber
-            , !enabled, sourceSpec, destSpec, servSpec, action, ruleAction, layerCall, installgw);
+            , !enabled, sourceSpec, destSpec, servSpec, ruleAction, layerCall, installgw);
 
         /*
          * track references

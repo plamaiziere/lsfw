@@ -26,7 +26,6 @@ public class CpFwRule extends CpObject {
 	protected boolean _disabled;
 	protected boolean _headerText;
 
-	protected String _action;
 	protected CpFwRuleAction _ruleAction;
 	protected String _layerCall;
 
@@ -54,14 +53,6 @@ public class CpFwRule extends CpObject {
 
 	public boolean isSecurityRule() {
 		return ! _headerText;
-	}
-
-	public String getAction() {
-		return _action;
-	}
-
-	public void setAction(String action) {
-		_action = action;
 	}
 
 	public CpFwRuleAction getRuleAction() {
@@ -122,7 +113,6 @@ public class CpFwRule extends CpObject {
 	 * @param srcIpSpec source IP specification
 	 * @param dstIpSpec destination IP specification
 	 * @param servicesSpec services specification
-	 * @param action action class name
 	 * @param ruleAction rule action (Accept, drop etc)
      * @param layerCall action call to a layer.
 	 * @param installGateway rule gateway installation
@@ -130,7 +120,7 @@ public class CpFwRule extends CpObject {
 	public CpFwRule(String name, String className, String comment, String uid, CpLayer layer,
                     Integer number, boolean disabled,
                     CpFwIpSpec srcIpSpec, CpFwIpSpec dstIpSpec,
-                    CpFwServicesSpec servicesSpec, String action,
+                    CpFwServicesSpec servicesSpec,
                     CpFwRuleAction ruleAction,
                     String layerCall,
                     List<String> installGateway) {
@@ -141,7 +131,6 @@ public class CpFwRule extends CpObject {
 		_sourceIp = srcIpSpec;
 		_destIp = dstIpSpec;
 		_services = servicesSpec;
-		_action = action;
 		_ruleAction = ruleAction;
 		_layerCall = layerCall;
 		_installGateway = installGateway;
@@ -156,7 +145,6 @@ public class CpFwRule extends CpObject {
 	public CpFwRule(String name, String className, List<String> installGateway) {
 	    super(name, className, "implicit drop rule", "0");
 		_number = 999999;
-		_action = "drop_action";
 		_ruleAction = CpFwRuleAction.DROP;
 		_implicitDrop = true;
 		_installGateway = installGateway;
@@ -177,7 +165,6 @@ public class CpFwRule extends CpObject {
 		_className = "header_text";
 		_comment = comment;
 		_number = 0;
-		_action = "none";
 		_headerText = true;
 		_installGateway = installGateway;
 	}
@@ -185,9 +172,9 @@ public class CpFwRule extends CpObject {
 	@Override
 	public String toString() {
 	    String s = "rule name=" + _name + ", className=" + _className
-				+ ", comment=" + _comment + ", layer=" + _layer.getName() + ", number=" + _number +
-				", disabled=" + _disabled + ", implicit= " + _implicitDrop
-				+ ", action=" + _action + ", ruleAction=" + _ruleAction
+				+ ", comment=" + _comment + ", layer=" + _layer.getName() + ", number=" + _number
+                + ", disabled=" + _disabled + ", implicit= " + _implicitDrop
+				+ ", ruleAction=" + _ruleAction
 				+ ", sourceIp=" + _sourceIp
 				+ ", destIp=" + _destIp	+ " services=" + _services
 				+ ", install=" + _installGateway;
