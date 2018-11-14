@@ -148,6 +148,13 @@ public class CpFw extends GenericEquipment {
     protected HashMap<String, CpLayer> _cpLayers = new HashMap<>();
 
     /*
+     * main layer
+     */
+    protected CpLayer _rootLayer;
+
+    public CpLayer getRootLayer() { return _rootLayer; }
+
+    /*
 	 * rule base actions keyed by name
 	 */
 	protected HashMap<String, CpFwRuleBaseAction> _cpActions = new HashMap<>();
@@ -911,6 +918,19 @@ public class CpFw extends GenericEquipment {
         return fwrule;
 	}
 
+	/* compute the order of the layers calls */
+	protected void computeLayersCalls(CpLayer layer) {
+	    for (CpFwRule rule: layer.getRules()) {
+	        if (rule.isSecurityRule() && (rule.getRuleAction() == CpFwRuleAction.LAYER_CALL)) {
+	            Integer ruleNumber = rule.getNumber();
+	            String layerCall = rule.getLayerCall();
+	            CpLayer nlayer = _cpLayers.get(layerCall);
+	            nlayer.setParentLayer(layer);
+	            nlayer.setLayerCallRuleNumber(ruleNumber);
+            }
+        }
+    }
+
 	protected void loadConfiguration(Document doc) {
 
          /* fwpolicy */
@@ -976,6 +996,12 @@ public class CpFw extends GenericEquipment {
             loadJsonCpLayers(layersNode);
         }
 
+        /* main layer */
+        String rootLayerName = fwpolicy + " Security";
+        _rootLayer = _cpLayers.get(rootLayerName);
+        _rootLayer.setLayerCallRuleNumber(0);
+        if (_rootLayer == null)
+            throw new JtaclConfigurationException("Cannot find fwpolicy layer: " + rootLayerName);
 
 		// loadNetworkObject(filename);
         // loadFwRules(filename);
@@ -1083,6 +1109,8 @@ public class CpFw extends GenericEquipment {
 
 		linkServices();
 		linkNetworkObjects();
+
+		computeLayersCalls(_rootLayer);
 
 		/*
 		 * routing

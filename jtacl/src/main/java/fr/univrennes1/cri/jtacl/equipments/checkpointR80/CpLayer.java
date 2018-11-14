@@ -25,15 +25,34 @@ import java.util.List;
 public class CpLayer extends CpObject {
 
     List<CpFwRule> _rules = new ArrayList<>();
+    protected CpLayer _parentLayer;
+    protected Integer _layerCallRuleNumber;
 
 	public CpLayer(String name, String className, String comment, String uid) {
 
 		super(name, className, comment, uid);
 	}
 
-    List<CpFwRule> getRules() { return _rules; };
+    public List<CpFwRule> getRules() { return _rules; };
+	public CpLayer getParentLayer() { return _parentLayer; }
 
-	/**
+    public void setParentLayer(CpLayer parentLayer) {
+       _parentLayer = parentLayer;
+    }
+
+    public boolean hasParentLayer() {
+	    return _parentLayer != null;
+    }
+
+    public Integer getLayerCallRuleNumber() {
+        return _layerCallRuleNumber;
+    }
+
+    public void setLayerCallRuleNumber(Integer ruleNumber) {
+        _layerCallRuleNumber = ruleNumber;
+    }
+
+    /**
 	 * Returns the {@link CpServicesMatch} of the given {@link ProbeRequest}.
 	 * @param request request to test.
 	 * @return the CpServicesMatch of the given ProbeRequest.

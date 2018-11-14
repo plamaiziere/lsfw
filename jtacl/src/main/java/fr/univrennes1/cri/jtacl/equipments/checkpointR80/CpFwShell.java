@@ -89,11 +89,18 @@ public class CpFwShell extends GenericEquipmentShell {
 		}
 	}
 
-	public void commandShowRules(PrintStream output, CpFwShellParser parser) {
+	protected void showLayer(PrintStream output, CpLayer layer) {
+        for (CpFwRule rule: layer.getRules()) {
+            output.println(rule.toText());
+            if (rule.isSecurityRule() && (rule.getRuleAction() == CpFwRuleAction.LAYER_CALL)) {
+                CpLayer nlayer = _cpfw.getCpLayers().get(rule.getLayerCall());
+                showLayer(output, nlayer);
+            }
+        }
+    }
 
-		for (CpFwRule rule: _cpfw.getFwRules()) {
-			output.println(rule.toText());
-		}
+	public void commandShowRules(PrintStream output, CpFwShellParser parser) {
+        showLayer(output, _cpfw.getRootLayer());
 	}
 
 

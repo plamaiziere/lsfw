@@ -37,6 +37,24 @@ public class CpFwRule extends CpObject {
 
 	protected List<String> _installGateway;
 
+	protected String lineNumber() {
+	    Integer linecall = _layer.getLayerCallRuleNumber();
+	    if (linecall != null) {
+            if (linecall != 0) {
+                return linecall.toString() + "." + _number.toString();
+            } else {
+                return _number.toString();
+            }
+        }
+        return "." + _number.toString();
+    }
+
+    protected String ruleActionTxt() {
+        if (ruleActionIsLayerCall())
+            return _ruleAction.toString() + "(" + _layerCall + ")";
+        return _ruleAction.toString();
+    }
+
     public CpLayer getLayer() { return _layer; }
 
 	public Integer getNumber() {
@@ -169,7 +187,7 @@ public class CpFwRule extends CpObject {
 	@Override
 	public String toString() {
 	    String s = "rule name=" + _name + ", className=" + _className
-				+ ", comment=" + _comment + ", layer=" + _layer.getName() + ", number=" + _number
+				+ ", comment=" + _comment + ", layer=" + _layer.getName() + ", number=" + lineNumber()
                 + ", disabled=" + _disabled + ", implicit= " + _implicitDrop
 				+ ", ruleAction=" + _ruleAction
 				+ ", sourceIp=" + _sourceIp
@@ -185,9 +203,10 @@ public class CpFwRule extends CpObject {
 		if (isAccessSection())
 			return "### " + _name;
 
-		String s = "#" + _number;
+		String s = "#" + lineNumber();
+		s += ", name: ";
 		if (_name != null)
-			s+= ", name: " + _name;
+			s+= _name;
 
 		String senabled = _disabled ? "disabled" : "enabled";
 		String srcNot = _sourceIp.isNotIn() ? "!" : "";
@@ -200,11 +219,10 @@ public class CpFwRule extends CpObject {
 			_destIp.getNetworks().getBaseReferencesName() +
 			", services: " + servicesNot +
 			_services.getServices().getReferencesName() +
-			", ruleAction: " + _ruleAction +
+			", ruleAction: " + ruleActionTxt() +
 			", install: " + _installGateway;
 		if (_comment != null)
 			s+= ", # "	+ _comment;
 		return s;
 	}
-
 }
