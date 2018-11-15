@@ -23,6 +23,13 @@ public class CpObject {
     protected String _comment;
     protected String _uid;
 
+    /**
+     * Contruct a new checkpoint object.
+     * @param name name
+     * @param className class name
+     * @param comment comment
+     * @param uid object's uid
+     */
     public CpObject(String name, String className, String comment, String uid) {
         this._name = name;
         this._className = className;

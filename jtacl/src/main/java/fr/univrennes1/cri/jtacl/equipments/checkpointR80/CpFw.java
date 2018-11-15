@@ -44,7 +44,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- * Checkpoint Firewall
+ * Checkpoint Firewall >= R80
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpFw extends GenericEquipment {
@@ -220,27 +220,25 @@ public class CpFw extends GenericEquipment {
     }
 
     protected IPRange parseIpRange(String ipAddressFirst, String ipAddressLast) {
-        IPNet ipFirst = null;
-        IPRange ipRange = null;
 
         if (ipAddressFirst == null)
             throwCfgException("invalid IP address (ipAddressFirst is null)" , true);
         if (ipAddressLast == null)
             throwCfgException("invalid IP address (ipAddressLast is null)" , true);
 
-        try {
-            ipFirst = new IPNet(ipAddressFirst);
-        } catch (UnknownHostException ex) {
-            throwCfgException("invalid IP address: " + ipAddressFirst, true);
-        }
-
-        IPNet ipLast = null;
-        try {
-            ipLast = new IPNet(ipAddressLast);
-        } catch (UnknownHostException ex) {
-            throwCfgException("invalid IP address: " + ipAddressLast, true);
-        }
+        IPNet ipFirst = parseIpAddress(ipAddressFirst);
+        IPNet ipLast = parseIpAddress(ipAddressLast);
         return new IPRange(ipFirst, ipLast);
+    }
+
+    protected int parsePortNumber(String port) {
+	    int i = 0;
+        try {
+            i = Integer.parseInt(port);
+        } catch (NumberFormatException ex) {
+            throwCfgException("invalid port number: " + port, true);
+        }
+        return i;
     }
 
 	protected CpPortItem parsePort(String sPorts) {
@@ -254,20 +252,8 @@ public class CpFw extends GenericEquipment {
 
 		String sfirst = port.getFirstPort();
 		String slast = port.getLastPort();
-		int first = -1;
-		int last = -1;
-		try {
-			first = Integer.parseInt(sfirst);
-		} catch (NumberFormatException ex) {
-			throwCfgException("invalid port number: " + sfirst, true);
-		}
-		if (slast != null ) {
-			try {
-				last = Integer.parseInt(slast);
-			} catch (NumberFormatException ex) {
-				throwCfgException("invalid port number: " + slast, true);
-			}
-		}
+		int first = parsePortNumber(sfirst);
+		int last = slast != null ? parsePortNumber(slast) : -1;
 
 		String operator = port.getOperator();
 		if (operator == null)
@@ -341,7 +327,7 @@ public class CpFw extends GenericEquipment {
 
 	protected CpService parseServiceGroup(String name, String className, String comment, String uid, JsonNode n) {
 
-		CpGroupService service = new CpGroupService(name, comment, uid);
+		CpGroupService service = new CpGroupService(name, className, comment, uid);
 
 		/*
 		 * members of this group (should be one member)
@@ -459,64 +445,20 @@ public class CpFw extends GenericEquipment {
 		return networkobj;
 	}
 
-	protected CpNetworkObject parseNetworkCluster(Element e) {
-		String sName = XMLUtils.getTagValue(e, "Name");
-		String sComment = XMLUtils.getTagValue(e, "comments");
-		String sClassName = XMLUtils.getTagValue(e, "Class_Name");
-
-		CpNetworkCluster cm =
-				new CpNetworkCluster(sName, sClassName, sComment, null);
-		List<IPRange> ips = cm.getIpRanges();
-
-		List<Element> einterfaces = XMLUtils.getDirectChildren(e, "interfaces");
-		for (Element eiface: einterfaces) {
-			List<Element> interfaces =
-					XMLUtils.getDirectChildren(eiface, "interfaces");
-			for (Element iface: interfaces) {
-				/* ipv4 */
-				String sIp = XMLUtils.getTagValue(iface, "ipaddr");
-				if (sIp != null) {
-					IPRange ip;
-					try {
-						ip = new IPRange(sIp);
-						ips.add(ip);
-					} catch (UnknownHostException ex) {
-						throwCfgException("invalid IP address: " + sIp, true);
-					}
-				}
-				/* ipv6 */
-				sIp = XMLUtils.getTagValue(iface, "ipaddr6");
-				if (sIp != null) {
-					IPRange ip;
-					try {
-						ip = new IPRange(sIp);
-						ips.add(ip);
-					} catch (UnknownHostException ex) {
-						throwCfgException("invalid IP address: " + sIp, true);
-					}
-				}
-			}
-		}
-
-		return cm;
-	}
-
-	protected CpNetworkObject parseUnhandledNetwork(String name, String className, String comment, String uid, JsonNode n) {
-
-		return new CpUnhandledNetwork(name, className, comment, uid);
-	}
-
 	/*
 	 * Resolve Any and service groups references
 	 */
 	protected void linkServices() {
+
+	    // Any
+        CpGroupService any = (CpGroupService) _cpServices.get("Any");
+
 		/*
 		 * each service
 		 */
 		for (String serviceName: _cpServices.keySet()) {
             CpService service = _cpServices.get(serviceName);
             if (service.isInAny()) {
-                CpGroupService any = (CpGroupService) _cpServices.get("Any");
                 any.addReference(serviceName, service);
                 any.linkWith(service);
             }
@@ -539,6 +481,9 @@ public class CpFw extends GenericEquipment {
         }
 	}
 
+	/*
+	 * parse and load objects from JSON
+	 */
 	protected void loadJsonCpObjects(JsonNode objectsDictionary) {
 
 	    Iterator<JsonNode> it = objectsDictionary.elements();
@@ -722,6 +667,9 @@ public class CpFw extends GenericEquipment {
         }
 	}
 
+	/*
+	 * parse fw rules
+	 */
 	protected void parseCpRules(CpLayer layer, JsonNode l) {
 	    CpFwRule lastSection = null;
 
@@ -756,6 +704,9 @@ public class CpFw extends GenericEquipment {
         }
     }
 
+    /*
+     * parse and load layers
+     */
     protected void loadJsonCpLayers(JsonNode layers) {
 
         Iterator<JsonNode> it = layers.elements();
@@ -779,6 +730,9 @@ public class CpFw extends GenericEquipment {
         }
     }
 
+    /*
+     * parse rule's "install-on"
+     */
     protected List<String> parseFWInstallGateway(JsonNode n) {
 	    List<String> list = new ArrayList<>();
         Iterator<JsonNode> it = n.elements();
@@ -796,6 +750,9 @@ public class CpFw extends GenericEquipment {
         return list;
     }
 
+    /*
+     * parse rule's services specification
+     */
     protected CpFwServicesSpec parseFwServicesSpec(JsonNode n) {
 
         CpFwServicesSpec servicesSpec = new CpFwServicesSpec();
@@ -821,7 +778,10 @@ public class CpFw extends GenericEquipment {
         return servicesSpec;
 	}
 
-	protected CpFwIpSpec parseFwIpSpec(JsonNode n) {
+    /*
+     * parse rule's IP specification (source or destination)
+     */
+    protected CpFwIpSpec parseFwIpSpec(JsonNode n) {
 
         CpFwIpSpec ipSpec = new CpFwIpSpec();
         Iterator<JsonNode> it = n.elements();
@@ -846,6 +806,9 @@ public class CpFw extends GenericEquipment {
         return ipSpec;
     }
 
+    /*
+     * parse access-section rule
+     */
     protected CpFwRule parseFwAccessSection(String name
                                             , String className
                                             , String comment
@@ -862,6 +825,9 @@ public class CpFw extends GenericEquipment {
         return fwrule;
     }
 
+    /*
+     * parse security fw rule
+     */
     protected CpFwRule parseFwRule(String name, String className, String comment, String uid, CpLayer layer, JsonNode n) {
 
         Integer ruleNumber = n.path("rule-number").asInt();
@@ -926,7 +892,9 @@ public class CpFw extends GenericEquipment {
         return fwrule;
 	}
 
-	/* compute the order of the layers calls */
+	/*
+	 * compute the order of the layers calls
+	 */
 	protected void computeLayersCalls(CpLayer layer) {
 	    for (CpFwRule rule: layer.getRules()) {
 	        if (rule.isSecurityRule() && (rule.getRuleAction() == CpFwRuleAction.LAYER_CALL)) {
@@ -952,7 +920,7 @@ public class CpFw extends GenericEquipment {
          /* fwpolicy */
 		NodeList list = doc.getElementsByTagName("fwpolicy");
 		if (list.getLength() < 1) {
-			throw new JtaclConfigurationException("At least one fwpolicy must be specified");
+			throwCfgException("At least one fwpolicy must be specified", false);
 		}
 
 		List<String> filenames = new ArrayList<>();
@@ -970,10 +938,10 @@ public class CpFw extends GenericEquipment {
         }
 
         if (filenames.isEmpty()) {
-            throw new JtaclConfigurationException("Missing policy file name");
+            throwCfgException("Missing policy file name", false);
         }
         if (fwpolicy == null || fwpolicy.isEmpty()) {
-            throw new JtaclConfigurationException("Missing policy name");
+            throwCfgException("Missing policy name", false);
         }
 
         /* skip these layers */
@@ -987,8 +955,7 @@ public class CpFw extends GenericEquipment {
             Element e = (Element) list.item(0);
             _gatewayName = e.getAttribute("name");
             if (_gatewayName == null || _gatewayName.isEmpty()) {
-                throw new JtaclConfigurationException(
-                        "gateway name must be specified");
+                throwCfgException("gateway name must be specified", false);
             }
         } else {
             _gatewayName = null;
@@ -997,14 +964,13 @@ public class CpFw extends GenericEquipment {
         for (String f: filenames) {
             famAdd(f);
             FileReader jf;
-            JsonNode rootNode;
-
+            JsonNode rootNode = null;
             try {
                 jf = new FileReader(f);
                 ObjectMapper objectMapper = new ObjectMapper();
                 rootNode = objectMapper.readTree(jf);
             } catch (IOException ex) {
-                throw new JtaclConfigurationException("Cannot read file " + ex.getMessage());
+                throwCfgException("Cannot read file " + ex.getMessage(), false);
             }
             JsonNode dictNode = rootNode.path("objects-dictionary");
             loadJsonCpObjects(dictNode);
@@ -1017,7 +983,7 @@ public class CpFw extends GenericEquipment {
         _rootLayer = _cpLayers.get(rootLayerName);
         _rootLayer.setLayerCallRuleNumber(0);
         if (_rootLayer == null)
-            throw new JtaclConfigurationException("Cannot find fwpolicy layer: " + rootLayerName);
+            throwCfgException("Cannot find fwpolicy layer: " + rootLayerName, false);
 
 		// loadNetworkObject(filename);
         // loadFwRules(filename);
@@ -1043,20 +1009,20 @@ public class CpFw extends GenericEquipment {
 					" IP: " + ifIp + " network: " + ifNetwork;
 
 			if (name.isEmpty())
-				throw new JtaclConfigurationException("Missing interface name: " + s);
+				throwCfgException("Missing interface name: " + s, false);
 
 			if (ifIp.isEmpty())
-				throw new JtaclConfigurationException("Missing interface IP: " + s);
+				throwCfgException("Missing interface IP: " + s, false);
 
-			IPNet ip;
+			IPNet ip = null;
 			try {
 				ip = new IPNet(ifIp);
 				ip = ip.hostAddress();
 			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid interface IP: " + s);
+				throwCfgException("Invalid interface IP: " + s, false);
 			}
 
-			IPNet network;
+			IPNet network = null;
 			try {
 				/*
 				 * If network attribute is empty, use the network address of the IP
@@ -1068,7 +1034,7 @@ public class CpFw extends GenericEquipment {
 					network = new IPNet(ifNetwork);
 				network = network.networkAddress();
 			} catch (UnknownHostException ex) {
-				throw new JtaclConfigurationException("Invalid interface network: " + s);
+				throwCfgException("Invalid interface network: " + s, false);
 			}
 
 			/*
@@ -1078,7 +1044,7 @@ public class CpFw extends GenericEquipment {
 			Iface iface = getIface(name);
 			if (iface == null) {
 				if (comment.isEmpty())
-					throw new JtaclConfigurationException("Missing interface comment: " + s);
+					throwCfgException("Missing interface comment: " + s, false);
 				iface = addIface(name, comment);
 				cpfwIface = new CPfwIface(iface);
 				_cpfwIfaces.put(name, cpfwIface);

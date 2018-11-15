@@ -173,7 +173,7 @@ public class CpFwRule extends CpObject {
 	 * Construct a new fw rule (access-section)
 	 * @param name name
 	 * @param className class name
-	 * @param comment header text
+	 * @param comment comment
      * @param uid object's uid
      * @param layer rule's layer
      * @param number rule number

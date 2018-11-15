@@ -29,7 +29,7 @@ public class CpAny extends CpObject {
 	public CpAny(String name, String className, String comment, String uid) {
 
 		super(name, className, comment, uid);
-		_anyService = new CpGroupService(name, comment, uid);
+		_anyService = new CpGroupService(name, className, comment, uid);
 		_anyNetwork = new CpNetworkGroup(name, className, comment, uid);
 	}
 

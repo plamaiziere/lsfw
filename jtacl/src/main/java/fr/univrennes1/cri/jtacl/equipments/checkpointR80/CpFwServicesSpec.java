@@ -19,7 +19,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
  */
 public class CpFwServicesSpec {
 
-	protected CpGroupService _services = new CpGroupService("", "", null);
+	protected CpGroupService _services = new CpGroupService();
 	protected boolean _notIn;
 
 	public CpGroupService getServices() {

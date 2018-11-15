@@ -36,15 +36,21 @@ public class CpGroupService extends CpService {
 	/**
 	 * Construct a new checkpoint service group
 	 * @param name service name
+     * @param className class name
 	 * @param comment comment
      * @param uid object's uid
 	 */
-	public CpGroupService(String name, String comment, String uid) {
+	public CpGroupService(String name, String className, String comment, String uid) {
 
-		super(name, "service-group", comment, uid, CpServiceType.GROUP, null, false);
+		super(name, className, comment, uid, CpServiceType.GROUP, null, false);
 		if (name.equals("Any"))
 			_isAny = true;
 	}
+
+	public CpGroupService() {
+        super(null, null, null, null, CpServiceType.GROUP, null, false);
+        _isAny = false;
+    }
 
 	public void addReference(String name, CpService service) {
 		_services.put(name, service);
