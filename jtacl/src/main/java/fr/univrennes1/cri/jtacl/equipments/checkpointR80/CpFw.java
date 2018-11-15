@@ -818,7 +818,7 @@ public class CpFw extends GenericEquipment {
 
         Integer ruleNumber = n.path("from").asInt();
         Integer toNumber = n.path("to").asInt();
-        CpFwRule fwrule = new CpFwRule(name, className, comment, uid, layer, ruleNumber, toNumber);
+        CpFwRule fwrule = CpFwRule.newAccessSectionRule(name, className, comment, uid, layer, ruleNumber, toNumber);
         if (Log.debug().isLoggable(Level.INFO)) {
             Log.debug().info("CpFwRule: " + fwrule);
         }
@@ -877,7 +877,7 @@ public class CpFw extends GenericEquipment {
         JsonNode inst = n.path("install-on");
         List<String> installgw = parseFWInstallGateway(inst);
 
-        CpFwRule fwrule = new CpFwRule(name, className, comment, uid, layer, ruleNumber
+        CpFwRule fwrule = CpFwRule.newSecurityRule(name, className, comment, uid, layer, ruleNumber
             , !enabled, sourceSpec, destSpec, servSpec, ruleAction, layerCall, installgw);
 
         /*
@@ -985,15 +985,11 @@ public class CpFw extends GenericEquipment {
         if (_rootLayer == null)
             throwCfgException("Cannot find fwpolicy layer: " + rootLayerName, false);
 
-		// loadNetworkObject(filename);
-        // loadFwRules(filename);
+        // implicit drop rule at the end of the root layer
+        CpFwRule fwdrop = CpFwRule.newImplicitDropRule(_rootLayer);
+        _rootLayer.getRules().add(fwdrop);
 
-		/* implicit drop rule */
-        /*
-		CpFwRule fwdrop = new CpFwRule("implicit_drop", "", null);
-		_fwRules.add(fwdrop);
-        */
-	}
+    }
 
 	protected void loadIfaces(Document doc) {
 

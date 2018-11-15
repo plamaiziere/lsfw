@@ -120,76 +120,91 @@ public class CpFwRule extends CpObject {
 		return _installGateway;
 	}
 
-	/**
-	 * Construct a new fw rule
-	 * @param name name
-	 * @param className class name
-	 * @param comment comment
+	private CpFwRule(String name, String className, String comment, String uid) {
+	    super(name, className, comment, uid);
+    }
+
+    /**
+     * return a new security rule
+     * @param name name
+     * @param className class name
+     * @param comment comment
      * @param uid object's uid
      * @param layer rule's layer
      * @param number rule number
-	 * @param disabled rule disabled
-	 * @param srcIpSpec source IP specification
-	 * @param dstIpSpec destination IP specification
-	 * @param servicesSpec services specification
-	 * @param ruleAction rule action (Accept, drop etc)
+     * @param disabled rule disabled
+     * @param srcIpSpec source IP specification
+     * @param dstIpSpec destination IP specification
+     * @param servicesSpec services specification
+     * @param ruleAction rule action (Accept, drop etc)
      * @param layerCall action call to a layer.
-	 * @param installGateway rule gateway installation
-	 */
-	public CpFwRule(String name, String className, String comment, String uid, CpLayer layer,
-                    Integer number, boolean disabled,
-                    CpFwIpSpec srcIpSpec, CpFwIpSpec dstIpSpec,
-                    CpFwServicesSpec servicesSpec,
-                    CpFwRuleAction ruleAction,
-                    String layerCall,
-                    List<String> installGateway) {
-	    super(name, className, comment, uid);
-	    _layer = layer;
-		_number = number;
-		_disabled = disabled;
-		_sourceIp = srcIpSpec;
-		_destIp = dstIpSpec;
-		_services = servicesSpec;
-		_ruleAction = ruleAction;
-		_layerCall = layerCall;
-		_installGateway = installGateway;
+     * @param installGateway rule gateway installation
+     * @return new security rule
+     */
+    static public CpFwRule newSecurityRule(String name, String className, String comment, String uid, CpLayer layer,
+                                    Integer number, boolean disabled,
+                                    CpFwIpSpec srcIpSpec, CpFwIpSpec dstIpSpec,
+                                    CpFwServicesSpec servicesSpec,
+                                    CpFwRuleAction ruleAction,
+                                    String layerCall,
+                                    List<String> installGateway) {
+
+	    CpFwRule rule = new CpFwRule(name, className, comment, uid);
+        rule._layer = layer;
+        rule._number = number;
+        rule._disabled = disabled;
+        rule._sourceIp = srcIpSpec;
+        rule._destIp = dstIpSpec;
+        rule._services = servicesSpec;
+        rule._ruleAction = ruleAction;
+        rule._layerCall = layerCall;
+        rule._installGateway = installGateway;
+        return rule;
+    }
+
+    /**
+     * return a new "implicit drop" rule
+     * @param layer rule's layer
+     * @return new rule
+     */
+    static public CpFwRule newImplicitDropRule(CpLayer layer) {
+
+        CpFwRule rule = new CpFwRule("implict drop", null, null, null);
+		rule._number = 999999;
+		rule._ruleAction = CpFwRuleAction.DROP;
+		rule._implicitDrop = true;
+		return rule;
 	}
 
 	/**
-	 * Construct a new fw rule (implicit drop)
-	 * @param name name
-	 * @param className class name
-	 * @param installGateway rule gateway installation
-	 */
-	public CpFwRule(String name, String className, List<String> installGateway) {
-	    super(name, className, "implicit drop rule", "0");
-		_number = 999999;
-		_ruleAction = CpFwRuleAction.DROP;
-		_implicitDrop = true;
-		_installGateway = installGateway;
-	}
-
-	/**
-	 * Construct a new fw rule (access-section)
+	 * return a new access-section rule
 	 * @param name name
 	 * @param className class name
 	 * @param comment comment
      * @param uid object's uid
      * @param layer rule's layer
      * @param number rule number
+     * @param toNumber rule toNumber
+     * @return new rule
 	 */
-	public CpFwRule(String name, String className, String comment, String uid, CpLayer layer, Integer number, Integer toNumber) {
-	    super(name, className, comment, uid);
-		_layer = layer;
-		_number = number;
-		_toNumber = toNumber;
-		_access_section = true;
+	static public CpFwRule newAccessSectionRule(String name, String className, String comment, String uid, CpLayer layer, Integer number, Integer toNumber) {
+	    CpFwRule rule = new CpFwRule(name, className, comment, uid);
+	    rule._layer = layer;
+		rule._number = number;
+		rule._toNumber = toNumber;
+		rule._access_section = true;
+		return rule;
 	}
 
 	@Override
 	public String toString() {
 	    String s = "rule name=" + _name + ", className=" + _className
-				+ ", comment=" + _comment + ", layer=" + _layer.getName() + ", number=" + lineNumber()
+				+ ", comment=" + _comment + ", layer=";
+	    if (_layer != null)
+	        s+= _layer.getName();
+	    else
+	        s+= "null";
+	    s+= ", number=" + lineNumber()
                 + ", to=" + _toNumber
                 + ", disabled=" + _disabled + ", implicit= " + _implicitDrop
 				+ ", ruleAction=" + _ruleAction
@@ -201,7 +216,7 @@ public class CpFwRule extends CpObject {
 
 	public String toText() {
 		if (isImplicitDrop())
-			return "*** implicit drop ***, layer: " + _layer.getName();
+			return "*** implicit drop ***";
 
 		if (isAccessSection()) {
             if (_number == 0)
