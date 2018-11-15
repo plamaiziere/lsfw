@@ -23,6 +23,7 @@ public class CpFwRule extends CpObject {
 
     protected CpLayer _layer;
 	protected Integer _number;
+	protected Integer _toNumber;
 	protected boolean _disabled;
 	protected boolean _access_section;
 
@@ -177,10 +178,11 @@ public class CpFwRule extends CpObject {
      * @param layer rule's layer
      * @param number rule number
 	 */
-	public CpFwRule(String name, String className, String comment, String uid, CpLayer layer, Integer number) {
+	public CpFwRule(String name, String className, String comment, String uid, CpLayer layer, Integer number, Integer toNumber) {
 	    super(name, className, comment, uid);
 		_layer = layer;
 		_number = number;
+		_toNumber = toNumber;
 		_access_section = true;
 	}
 
@@ -188,6 +190,7 @@ public class CpFwRule extends CpObject {
 	public String toString() {
 	    String s = "rule name=" + _name + ", className=" + _className
 				+ ", comment=" + _comment + ", layer=" + _layer.getName() + ", number=" + lineNumber()
+                + ", to=" + _toNumber
                 + ", disabled=" + _disabled + ", implicit= " + _implicitDrop
 				+ ", ruleAction=" + _ruleAction
 				+ ", sourceIp=" + _sourceIp
@@ -198,16 +201,21 @@ public class CpFwRule extends CpObject {
 
 	public String toText() {
 		if (isImplicitDrop())
-			return "*** implicit drop ***";
+			return "*** implicit drop ***, layer: " + _layer.getName();
 
-		if (isAccessSection())
-			return "### " + _name;
+		if (isAccessSection()) {
+            if (_number == 0)
+                return "### " + _name + " (No Rules), layer: " + _layer.getName();
+            if (_number < _toNumber)
+                return "### " + _name + " (" + _number.toString() + "-" + _toNumber.toString() + "), layer: " + _layer.getName();
+            return "### " + _name + " (" + _number.toString() + "), layer: " + _layer.getName();
+        }
 
 		String s = "#" + lineNumber();
 		s += ", name: ";
 		if (_name != null)
 			s+= _name;
-
+		s+= ", layer: " + _layer.getName();
 		String senabled = _disabled ? "disabled" : "enabled";
 		String srcNot = _sourceIp.isNotIn() ? "!" : "";
 		String destNot = _destIp.isNotIn() ? "!" : "";

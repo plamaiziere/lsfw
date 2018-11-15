@@ -723,6 +723,8 @@ public class CpFw extends GenericEquipment {
 	}
 
 	protected void parseCpRules(CpLayer layer, JsonNode l) {
+	    CpFwRule lastSection = null;
+
         Iterator<JsonNode> it = l.elements();
         while (it.hasNext()) {
             JsonNode n = it.next();
@@ -737,7 +739,12 @@ public class CpFw extends GenericEquipment {
                 case "access-section":
                     /* XXX Access section contains rules */
                     rule = parseFwAccessSection(name, className, comment, uid, layer, n);
-                    layer.getRules().add(rule);
+                    /* same section can be repeated */
+                    if (lastSection == null || (lastSection != null && ! name.equals(lastSection.getName())
+                            && lastSection.getNumber() != rule.getNumber())) {
+                        layer.getRules().add(rule);
+                    }
+                    lastSection = rule;
                     JsonNode rulesNode = n.path("rulebase");
                     parseCpRules(layer, rulesNode);
                     break;
@@ -847,7 +854,8 @@ public class CpFw extends GenericEquipment {
                                             , JsonNode n) {
 
         Integer ruleNumber = n.path("from").asInt();
-        CpFwRule fwrule = new CpFwRule(name, className, comment, uid, layer, ruleNumber);
+        Integer toNumber = n.path("to").asInt();
+        CpFwRule fwrule = new CpFwRule(name, className, comment, uid, layer, ruleNumber, toNumber);
         if (Log.debug().isLoggable(Level.INFO)) {
             Log.debug().info("CpFwRule: " + fwrule);
         }
@@ -929,6 +937,14 @@ public class CpFw extends GenericEquipment {
 	            nlayer.setLayerCallRuleNumber(ruleNumber);
             }
         }
+        /* warn if a layer is never called */
+        for (CpLayer l: _cpLayers.values()) {
+            if (l != _rootLayer) {
+                if (! l.hasParentLayer()) {
+                    warnConfig("layer: " + l.getName() + " uid: " + l.getUid() + " is never called.", false);
+                }
+            }
+        }
     }
 
 	protected void loadConfiguration(Document doc) {
@@ -960,9 +976,9 @@ public class CpFw extends GenericEquipment {
             throw new JtaclConfigurationException("Missing policy name");
         }
 
-        /* skip this layer */
+        /* skip these layers */
         _skippedLayers.add("Application");
-        _skippedLayers.add("coeur Application");
+        _skippedLayers.add(fwpolicy + " Application");
 
 
         /* gateway name (for rule installation) */
