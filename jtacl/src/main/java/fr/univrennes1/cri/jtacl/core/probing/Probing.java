@@ -24,7 +24,7 @@ public class Probing extends ArrayList<ProbesTracker> {
 
 	/**
 	 * Returns the global FwResult of this probing.
-	 * @return the global AclResultRoutingResult of this probing.
+	 * @return the global FWResult of this probing.
 	 */
 	public FwResult getAclResult() {
 		/*
