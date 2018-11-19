@@ -23,9 +23,6 @@ import java.util.ArrayList;
  */
 public class ProbeResults {
 
-	// a list of events
-	protected ArrayList<String> _strEvents;
-
 	// the list of matching ACL in input.
 	protected ArrayList<AccessControlList> _matchingAclsIn;
 
@@ -57,7 +54,6 @@ public class ProbeResults {
 	protected String _interfaceOut;
 
 	public ProbeResults() {
-		_strEvents = new ArrayList<>();
 		_matchingAclsIn = new ArrayList<>();
 		_matchingAclsOut = new ArrayList<>();
 		_activesAclsIn = new ArrayList<>();
@@ -69,10 +65,6 @@ public class ProbeResults {
 		_resultOut = new FwResult(FwResult.ACCEPT);
 		_routingResult = RoutingResult.UNKNOWN;
 		_routingMessage = "";
-	}
-
-	public void addEvent(String message) {
-		_strEvents.add(message);
 	}
 
 	public void addMatchingAclIn(String aclString, FwResult result) {
@@ -135,10 +127,6 @@ public class ProbeResults {
 
 	public FwResult getAclResultOut() {
 		return _resultOut;
-	}
-
-	public ArrayList<String> getStrEvents() {
-		return _strEvents;
 	}
 
 	public ArrayList<AccessControlList> getActivesAclsIn() {
