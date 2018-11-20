@@ -951,14 +951,12 @@ public class CpFw extends GenericEquipment {
 
         /* gateway name (for rule installation) */
         list = doc.getElementsByTagName("gatewayName");
-        if (list.getLength() != 1) {
+        if (list.getLength() == 1) {
             Element e = (Element) list.item(0);
             _gatewayName = e.getAttribute("name");
-            if (_gatewayName == null || _gatewayName.isEmpty()) {
-                throwCfgException("gateway name must be specified", false);
-            }
-        } else {
-            _gatewayName = null;
+        }
+        if (_gatewayName == null || _gatewayName.isEmpty()) {
+            throwCfgException("gateway name must be specified", false);
         }
 
         for (String f: filenames) {
@@ -1439,10 +1437,11 @@ public class CpFw extends GenericEquipment {
 		ProbeRequest request = probe.getRequest();
 
 		/*
-		 * implicit drop rule
+		 * applied on this gateway?
 		 */
-		if (rule.isImplicitDrop())
-			return MatchResult.ALL;
+		List<String> gateways = rule.getInstallGateway();
+		if (gateways != null && !gateways.contains(_gatewayName) && ! gateways.contains("Policy Targets"))
+		    return MatchResult.NOT;
 
 		/*
 		 * disabled
@@ -1450,7 +1449,13 @@ public class CpFw extends GenericEquipment {
 		if (rule.isDisabled())
 			return MatchResult.NOT;
 
-		/*
+        /*
+         * implicit drop rule
+         */
+        if (rule.isImplicitDrop())
+            return MatchResult.ALL;
+
+        /*
 		 * check source IP
 		 */
 		CpFwIpSpec ipspec = rule.getSourceIp();
@@ -1486,65 +1491,94 @@ public class CpFw extends GenericEquipment {
 		return MatchResult.MATCH;
 	}
 
+    /**
+     * per layer filter
+     */
+    protected void layerFilter(IfaceLink link, Direction direction, Probe probe, CpLayer layer, FwResult callResult) {
+
+        String ifaceName = link.getIfaceName();
+        String ifaceComment = link.getIface().getComment();
+        ProbeResults results = probe.getResults();
+
+        MatchResult match;
+        for (CpFwRule rule : layer.getRules()) {
+            /*
+             * skip the rule if not a security rule
+             */
+            if (!rule.isSecurityRule())
+                continue;
+            CpFwFilter filter = new CpFwFilter();
+            String ruleText = rule.toText();
+            match = ruleFilter(filter, probe, rule);
+            /* if the rule matches */
+            if (match != MatchResult.NOT) {
+                /*
+                 * store the result in the probe
+                 */
+                FwResult aclResult = new FwResult();
+                /*
+                 * XXX: if this layer's call is "may" this alters the result
+                 */
+                if (match != MatchResult.ALL || callResult.hasMay()) {
+                    aclResult.addResult(FwResult.MAY);
+                }
+                switch (rule.getRuleAction()) {
+                    case LAYER_CALL:
+                        aclResult.addResult(FwResult.MATCH);
+                        break;
+                    case ACCEPT:
+                        aclResult.addResult(FwResult.ACCEPT);
+                        break;
+                    case REJECT:
+                    case DROP:
+                        aclResult.addResult(FwResult.DENY);
+                        break;
+                }
+                if (filter.hasServiceInspected()) {
+                    ruleText += " {inspect}";
+                }
+                results.addMatchingAcl(direction, ruleText,
+                        aclResult);
+
+                results.setInterface(direction,
+                        ifaceName + " (" + ifaceComment + ")");
+
+                /*
+                 * the active ace is the ace accepting or denying the packet.
+                 * this is the first ace that match the packet.
+                 */
+                if (results.getActiveAcl(direction).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+                    results.addActiveAcl(direction,
+                            ruleText,
+                            aclResult);
+                    results.setAclResult(direction,
+                            aclResult);
+                }
+                /*
+                 * if the rule action is a call to a layer, filter it.
+                 */
+                if (rule.ruleActionIsLayerCall()) {
+                    FwResult r = new FwResult();
+                    if (aclResult.hasMay()) {
+                        r.addResult(FwResult.MAY);
+                    }
+                    CpLayer next = _cpLayers.get(rule.getLayerCall());
+                    layerFilter(link, direction, probe, next, r);
+                }
+            }
+        }
+    }
 
 	/**
 	 * Packet filter
 	 */
 	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
 
-		String ifaceName = link.getIfaceName();
-		String ifaceComment = link.getIface().getComment();
-		ProbeResults results = probe.getResults();
-		boolean first = true;
-
-		/*
-		 * check each rule
-		 */
-		MatchResult match;
-		for (CpFwRule rule: _fwRules) {
-			/*
-			 * skip the rule if not a security rule
-			 */
-			if (!rule.isSecurityRule())
-				continue;
-			CpFwFilter filter = new CpFwFilter();
-			String ruleText = rule.toText();
-			match = ruleFilter(filter, probe, rule);
-			if (match != MatchResult.NOT) {
-				/*
-				 * store the result in the probe
-				 */
-				FwResult aclResult = new FwResult();
-				aclResult.setResult(rule.ruleActionIsAccept() ?
-					FwResult.ACCEPT : FwResult.DENY);
-				if (match != MatchResult.ALL)
-					aclResult.addResult(FwResult.MAY);
-				if (rule.ruleActionIsAccept()
-						&& filter.hasServiceInspected()) {
-					ruleText += " {inspect}";
-				}
-				results.addMatchingAcl(direction, ruleText,
-					aclResult);
-
-				results.setInterface(direction,
-					ifaceName + " (" + ifaceComment + ")");
-
-
-				/*
-				 * the active ace is the ace accepting or denying the packet.
-				 * this is the first ace that match the packet.
-				 */
-				if (first) {
-					results.addActiveAcl(direction,
-								ruleText,
-								aclResult);
-					results.setAclResult(direction,
-							aclResult);
-					first = false;
-				}
-			}
-		}
+	    CpLayer layer = _rootLayer;
+	    FwResult r = new FwResult();
+	    layerFilter(link, direction, probe, layer, r);
 	}
+
 
 	@Override
 	public void runShell(String command, PrintStream output) {

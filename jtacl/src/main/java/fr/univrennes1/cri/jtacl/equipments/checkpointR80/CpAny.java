@@ -40,12 +40,4 @@ public class CpAny extends CpObject {
     public CpNetworkGroup getAnyNetwork() {
         return _anyNetwork;
     }
-
-    /**
-	 * Returns the {@link CpServicesMatch} of the given {@link ProbeRequest}.
-	 * @param request request to test.
-	 * @return the CpServicesMatch of the given ProbeRequest.
-	 */
-	// public CpServicesMatch matches(ProbeRequest request);
-
 }

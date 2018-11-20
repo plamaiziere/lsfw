@@ -83,6 +83,10 @@ public class CpNetworkGroup extends CpNetworkObject {
 		return _excludedObjects;
 	}
 
+	public boolean isAny() {
+        return _className != null && _className.equals("CpmiAnyObject");
+    }
+
 	@Override
 	public String toString() {
 		return _name + ", " + _className + ", " + _comment + ", " +  _type
@@ -92,6 +96,11 @@ public class CpNetworkGroup extends CpNetworkObject {
 
 	@Override
 	public MatchResult matches(IPRangeable ip) {
+
+	    if (isAny()) {
+	        return MatchResult.ALL;
+        }
+
 		/*
 		 * excluded items
 		 */

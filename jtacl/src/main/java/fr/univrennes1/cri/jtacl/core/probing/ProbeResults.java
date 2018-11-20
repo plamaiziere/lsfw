@@ -101,6 +101,13 @@ public class ProbeResults {
 			addActiveAclOut(aclString, result);
 	}
 
+    public ArrayList<AccessControlList> getActiveAcl(Direction direction) {
+        if (direction == Direction.IN)
+            return getActivesAclsIn();
+        else
+            return getActivesAclsOut();
+    }
+
 	public FwResult getAclResultIn() {
 		return _resultIn;
 	}
