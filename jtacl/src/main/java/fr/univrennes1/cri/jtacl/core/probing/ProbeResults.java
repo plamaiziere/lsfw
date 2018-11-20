@@ -17,7 +17,7 @@ import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import java.util.ArrayList;
 
 /**
- * This class is responsible to track all events and results associated to one
+ * This class is responsible to track all results associated to one
  * {@link Probe} probe.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
