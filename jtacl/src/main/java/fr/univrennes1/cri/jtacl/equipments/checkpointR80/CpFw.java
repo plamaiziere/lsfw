@@ -1525,17 +1525,20 @@ public class CpFw extends GenericEquipment {
                 switch (rule.getRuleAction()) {
                     case LAYER_CALL:
                         aclResult.addResult(FwResult.MATCH);
+                        if (filter.hasServiceInspected()) {
+                            ruleText += " {inspect}";
+                        }
                         break;
                     case ACCEPT:
                         aclResult.addResult(FwResult.ACCEPT);
+                        if (filter.hasServiceInspected()) {
+                            ruleText += " {inspect}";
+                        }
                         break;
                     case REJECT:
                     case DROP:
                         aclResult.addResult(FwResult.DENY);
                         break;
-                }
-                if (filter.hasServiceInspected()) {
-                    ruleText += " {inspect}";
                 }
                 results.addMatchingAcl(direction, ruleText,
                         aclResult);
