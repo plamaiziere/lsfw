@@ -165,6 +165,10 @@ class CkpConfig(object):
             layer['rulebase'] = []
             self.access_layers.append(layer)
 
+    def sort(self):
+        self.access_layers = sorted(self.access_layers, key=lambda object: object['uid'])
+        self.objects_dict = sorted(self.objects_dict, key=lambda object: object['uid'])
+
 
 def mgmt_cli():
     return "mgmt_cli " + "-u " + cfg['mgmt_user'] + " -p " + cfg['mgmt_password']
@@ -319,7 +323,7 @@ def getopts():
 
     for param in ["ssh_host", "ssh_user", "ssh_key", "mgmt_user", "mgmt_password", "max_job", "job_timeout"]:
         if param not in cfg:
-            writeErr("missing configuration parameter: ", param, " in file: ", config_file)
+            writeErr("missing configuration parameter: " + param + " in file: " + config_file)
             sys.exit(2)
 
     cfg['output_dir'] = output_dir
@@ -410,6 +414,21 @@ def main():
     get_jobs_result(sshjobs = sshjobs, ckpconfig = ckpconfig)
 
     # export to json
+    if cfg['output_dir'] is not None:
+        filename = cfg['output_dir'] + '/objects.json'
+        f = open(filename, 'w')
+        jenc = json.JSONEncoder(indent = 2)
+        jss = jenc.encode(ckpconfig.objects_dict)
+        f.write(jss)
+        f.close()
+        filename = cfg['output_dir'] + '/rules.json'
+        f = open(filename, 'w')
+        jenc = json.JSONEncoder(indent = 2)
+        jss = jenc.encode(ckpconfig.access_layers)
+        f.write(jss)
+        f.close()
+
+    ckpconfig.sort()
     ckp = {}
     ckp['objects-dictionary'] = ckpconfig.objects_dict
     ckp['layers'] = ckpconfig.access_layers
