@@ -27,8 +27,17 @@ configuration:
         "ssh_user":"ssh user",
         "mgmt_user":"managment server user name (a read only account is recommended)",
         "mgmt_password":"managment server user password",
-        "max_job":number of jobs to run
-        "job_timeout":time out in second for a job to complete
+        "max_job":number of jobs to run,
+        "job_timeout":time out in second for a job to complete,
+        "access_layers_nbobjects":number of access layers to retrieve per job,
+        "access_rulebase_nbobjects":number of access rule base to retrieve per job,
+        "hosts_nbobjects":number of hosts to retrieve per job,
+        "groups_nbobjects":number of groups to retrieve per job,
+        "networks_nbobjects":number of networks to retrieve per job,
+        "address_ranges_nbobjects":number of address-ranges to retrieve per job,
+        "multicast_address_ranges_nbobjects":number of multicast address-ranges to retrieve per job,
+        "simple_gateways_nbobjects":number of simple gateways to retrieve per job,
+        "services_nbobjects":number of services to retrieve per job
 }
 
 bugs:
@@ -321,7 +330,24 @@ def getopts():
     jconfig = open(config_file).read()
     cfg = json.loads(jconfig)
 
-    for param in ["ssh_host", "ssh_user", "ssh_key", "mgmt_user", "mgmt_password", "max_job", "job_timeout"]:
+    for param in [
+        "ssh_host",
+        "ssh_user",
+        "ssh_key",
+        "mgmt_user",
+        "mgmt_password",
+        "max_job",
+        "job_timeout",
+        "access_layers_nbobjects",
+        "access_rulebase_nbobjects",
+        "hosts_nbobjects",
+        "groups_nbobjects",
+        "networks_nbobjects",
+        "address_ranges_nbobjects",
+        "multicast_address_ranges_nbobjects",
+        "simple_gateways_nbobjects",
+        "services_nbobjects",
+    ]:
         if param not in cfg:
             writeErr("missing configuration parameter: " + param + " in file: " + config_file)
             sys.exit(2)
