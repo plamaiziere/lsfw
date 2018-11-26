@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : checkpointR80.xml
+	Created on : 26/11 2018
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the CheckPointR80 FW  configuration.
+		See https://groupes.renater.fr/wiki/jtacl/public/checkpointR80
+-->
+
+<equipment>
+
+	<!-- definitions of the interfaces -->
+	<iface name="eth0" comment="interface 0" ip="IPaddress" network="IPaddress/Netmask"/>
+	<!-- when adding an IP to an already defined interface, "comment" attribute is optional -->
+	<iface name="eth0" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<iface name="eth1" comment="interface 1" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<!-- coonfiguration files -->
+	<!-- services -->
+	<services filename="/path/to/services.xml" />
+
+	<!-- network objects -->
+	<network_objects filename="/path/to/network_objects.xml" />
+
+	<!-- policies -->
+	<fwpolicies name="policy_name" filename="/path/to/policy.json" />
+
+    <!--gateway name -->
+    <gatewayName name="gateway_name" />
+
+	<!-- routing engine -->
+	<routing>
+		<!--
+			Add routing engine definitions here.
+			See the file routing.xml
+			https://groupes.renater.fr/wiki/jtacl/public/commonrouting
+		-->
+	</routing>
+
+</equipment>
