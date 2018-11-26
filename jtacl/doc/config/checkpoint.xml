@@ -28,6 +28,9 @@
 	<!-- policies -->
 	<fwpolicies filename="/path/to/Security_Policy.xml" />
 
+    <!--gateway name -->
+    <gatewayName name="gateway_name" />
+
 	<!-- routing engine -->
 	<routing>
 		<!--
