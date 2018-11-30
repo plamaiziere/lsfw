@@ -25,6 +25,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
 '''
 
+import sys
 import time
 import jobs
 import spur
@@ -97,6 +98,10 @@ class SshJob(jobs.Job):
     def done_callback(self):
         if self._done_callback is not None:
             self._done_callback(self)
+
+    def timeout_error(self):
+        print('', file=sys.stderr, flush=True)
+        print('Error job timeout !: ' + self._command, file=sys.stderr, flush=True)
 
     def __str__(self):
         return "job #" + str(self.jobnumber) + ", " + self._jobstr

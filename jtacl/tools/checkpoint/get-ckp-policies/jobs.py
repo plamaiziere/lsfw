@@ -83,6 +83,12 @@ class Job(object):
         """
         raise NotImplementedError()
 
+    def timeout_error(self):
+        """
+        callback when this job timeout
+        :return:
+        """
+        raise NotImplementedError()
 
 class Jobs(object):
     """Quick & dirty jobs scheduler"""
@@ -153,6 +159,7 @@ class Jobs(object):
                 else:
                     now = time.time()
                     if now - job.spawn_time > timeout:
+                        job.timeout_error()
                         raise JobTimeOutError
 
             for job in done:
