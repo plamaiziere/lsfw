@@ -83,9 +83,9 @@ class Job(object):
         """
         raise NotImplementedError()
 
-    def timeout_error(self):
+    def error_callback(self, error):
         """
-        callback when this job timeout
+        callback on job error
         :return:
         """
         raise NotImplementedError()
@@ -159,8 +159,11 @@ class Jobs(object):
                 else:
                     now = time.time()
                     if now - job.spawn_time > timeout:
-                        job.timeout_error()
-                        raise JobTimeOutError
+                        try:
+                            raise JobTimeOutError
+                        except JobTimeOutError as error:
+                            job.error(error)
+                            raise error
 
             for job in done:
                 self._running.remove(job)

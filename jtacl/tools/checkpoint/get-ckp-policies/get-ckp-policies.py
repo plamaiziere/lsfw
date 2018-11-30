@@ -72,6 +72,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
 '''
 
+import time
 import sshjob
 import jobs
 import json
@@ -86,7 +87,23 @@ def writeErr(err):
 
 class MgmtCliJob(sshjob.SshJob):
 
-    def __init__(self, host, user, key, command, jobstr, start_callback, done_callback, sshjobs, ckp_object, iteration, iteration_count, nbobjects, outputfile, cmd_options=''):
+    def __init__(self,
+                 host,
+                 user,
+                 key,
+                 command,
+                 jobstr,
+                 start_callback,
+                 done_callback,
+                 error_callback,
+                 sshjobs,
+                 ckp_object,
+                 iteration,
+                 iteration_count,
+                 nbobjects,
+                 outputfile,
+                 cmd_options=''):
+
         super().__init__(
             host = host,
             user = user,
@@ -94,7 +111,8 @@ class MgmtCliJob(sshjob.SshJob):
             command = command,
             jobstr = jobstr,
             start_callback = start_callback,
-            done_callback = done_callback
+            done_callback = done_callback,
+            error_callback = error_callback
         )
         self._sshjobs = sshjobs
         self._ckp_object = ckp_object
@@ -180,7 +198,7 @@ class CkpConfig(object):
 
 
 def mgmt_cli():
-    return "mgmt_cli " + "-u " + cfg['mgmt_user'] + " -p " + cfg['mgmt_password']
+    return "mgmt_cli " + "-u " + cfg['mgmt_user'] + " -p " + cfg['mgmt_password'] + " --conn-timeout " + str(cfg['job_timeout'])
 
 def new_mgmt_job(command, jobstr, sshjobs, ckp_object, iteration, iteration_count, nbobjects, outputfile, cmd_options=''):
     job = MgmtCliJob(
@@ -197,21 +215,33 @@ def new_mgmt_job(command, jobstr, sshjobs, ckp_object, iteration, iteration_coun
             outputfile = outputfile,
             cmd_options = cmd_options,
             start_callback = job_start_callback,
-            done_callback = job_done_callback
+            done_callback = job_done_callback,
+            error_callback = job_error_callback
     )
     return job
 
 def ckp_command(ckp_object, cmd_options, limit, offset):
     return "show " + str(ckp_object) + " " + cmd_options + " limit " + str(limit) + " offset " + str(offset) + " details-level full --format json"
 
+def job_error_callback(job, error):
+    print("Error " + job.command + ": " + str(error), file = sys.stderr, flush=True)
+
 # callback called when a job is started
 def job_start_callback(job):
-    print('+', file = sys.stderr, end = '', flush = True)
+    if (cfg['debug']):
+        print("+ " + job.command, flush=True)
+    else:
+     print('+', file = sys.stderr, end = '', flush = True)
 
 # callback called when a job is ended
 def job_done_callback(job):
 
-    print('-', file = sys.stderr, end = '', flush = True)
+
+    if (cfg['debug']):
+        now = time.time()
+        print("- " + job.command + " (" + str(now - job.spawn_time) + ")")
+    else:
+        print('-', file = sys.stderr, end = '', flush = True)
     iteration = job.iteration
     nbobjects = job.nbobjects
 
@@ -303,25 +333,31 @@ def usage():
     writeErr('Usage:')
     writeErr("   -c <config file> configuration for the tools")
     writeErr("   -o <output directory> directory to store output json files from mgmt_cli command (optionnal)")
+    writeErr('   -D debug flag (optionnal)')
 
 def getopts():
 
     global cfg
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "c:o:", [])
+        opts, args = getopt.getopt(sys.argv[1:], "c:o:D", [])
     except getopt.GetoptError as err:
         writeErr(err)
         sys.exit(2)
 
     config_file = None
     output_dir = None
+    debug = False
+
     for o, a in opts:
         if (o == '-c'):
             config_file = a
 
         if (o == '-o'):
             output_dir = a
+
+        if (o == '-D'):
+            debug = True
 
     if config_file is None:
         writeErr("-c <config file> is mandatory")
@@ -353,6 +389,7 @@ def getopts():
             sys.exit(2)
 
     cfg['output_dir'] = output_dir
+    cfg['debug'] = debug
 
 def main():
 

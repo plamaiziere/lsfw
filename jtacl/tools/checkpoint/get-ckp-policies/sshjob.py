@@ -34,7 +34,7 @@ import shlex
 class SshJob(jobs.Job):
     """A job running via SSH"""
 
-    def __init__(self, host, user, key, command, jobstr, start_callback, done_callback):
+    def __init__(self, host, user, key, command, jobstr, start_callback, done_callback, error_callback):
         """
         Create a new job to run via SSH
         :param host: ssh host
@@ -44,6 +44,7 @@ class SshJob(jobs.Job):
         :param jobstr: a textual documentation of the job
         :param start_callback: callback to call when the job starts
         :param done_callback: callback to call when the job terminates
+        :param error_callback: callback to call on job error.
         """
         super()
         self._host = host
@@ -53,6 +54,7 @@ class SshJob(jobs.Job):
         self._jobstr = jobstr
         self._start_callback = start_callback
         self._done_callback = done_callback
+        self._error_callback = error_callback
         self._ssh = None
         self._process = None
         self._result = None
@@ -60,6 +62,10 @@ class SshJob(jobs.Job):
     @property
     def result(self):
         return self._result
+
+    @property
+    def command(self):
+        return self._command
 
     def _newssh(self):
         self._ssh = spur.SshShell(
@@ -82,7 +88,11 @@ class SshJob(jobs.Job):
         return self
 
     def wait_for(self):
-        self._result = self._process.wait_for_result()
+        try:
+            self._result = self._process.wait_for_result()
+        except spur.results.RunProcessError as error:
+            self.error_callback(error)
+            raise error
         self.done_callback()
         return self
 
@@ -99,9 +109,9 @@ class SshJob(jobs.Job):
         if self._done_callback is not None:
             self._done_callback(self)
 
-    def timeout_error(self):
-        print('', file=sys.stderr, flush=True)
-        print('Error job timeout !: ' + self._command, file=sys.stderr, flush=True)
+    def error_callback(self, error):
+        if (self._error_callback) is not None:
+            self._error_callback(self, error)
 
     def __str__(self):
         return "job #" + str(self.jobnumber) + ", " + self._jobstr
