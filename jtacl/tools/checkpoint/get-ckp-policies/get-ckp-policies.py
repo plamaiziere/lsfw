@@ -12,7 +12,10 @@ in JSON. As this is quite slow, we use several jobs in //.
 The script outputs the result in a single JSON, that will permit lsfw to handle Checkpoint >= R80.
 
 API mgmt_cli / documentation:
-https://sc1.checkpoint.com/documents/latest/APIs/index.html#mgmt_cli~v1.3%20
+https://sc1.checkpoint.com/documents/latest/APIs/index.html#mgmt_cli~v1.2%20
+
+In case of API server failure (add more RAM to api server) :
+https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk119553
 
 prequisite:
  - python 3.6 and module spur (ssh)
@@ -48,7 +51,7 @@ bugs:
 """
 
 '''
-Copyright (c) 2018  Universite de Rennes 1
+Copyright (c) 2018 - 2019  Universite de Rennes 1
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met:
