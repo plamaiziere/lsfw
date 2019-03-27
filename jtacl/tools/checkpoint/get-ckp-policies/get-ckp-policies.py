@@ -240,6 +240,13 @@ def job_start_callback(job):
     else:
      print('+', file = sys.stderr, end = '', flush = True)
 
+def job_login_done_callback(job):
+    if (cfg['debug']):
+        now = time.time()
+        print("- " + job.command + " (" + str(now - job.spawn_time) + ")")
+    else:
+        print('-', file = sys.stderr, end = '', flush = True)
+
 # callback called when a job is ended
 def job_done_callback(job):
 
@@ -346,8 +353,8 @@ def mgmt_login():
                   + str(cfg['job_timeout']) + ' login '
                   + ' --format json',
         jobstr='login mgmt',
-        start_callback=None,
-        done_callback=None,
+        start_callback=job_start_callback,
+        done_callback=job_login_done_callback,
         error_callback=None
     )
     return job
@@ -359,8 +366,8 @@ def mgmt_logout():
         key=cfg['ssh_key'],
         command="mgmt_cli " + " --session-id " + var['session-id'] + ' logout ' + ' --format json',
         jobstr='login mgmt',
-        start_callback=None,
-        done_callback=None,
+        start_callback=job_start_callback,
+        done_callback=job_login_done_callback,
         error_callback=None
     )
     return job
@@ -438,8 +445,10 @@ def main():
     print('Running...', file=sys.stderr, flush=True)
 
     # login
+    sshjobs = jobs.Jobs()
     job = mgmt_login()
-    job.run()
+    sshjobs.queuejob(job)
+    sshjobs.run(cfg['max_job'], cfg['job_timeout'])
     js = json.loads(job.result.output)
     var['session-id'] = js['sid']
     try:
@@ -544,8 +553,10 @@ def main():
         print(js)
     finally:
         # logout
+        sshjobs = jobs.Jobs()
         job = mgmt_logout()
-        job.run()
+        sshjobs.queuejob(job)
+        sshjobs.run(cfg['max_job'], cfg['job_timeout'])
 
 if __name__ == "__main__":
     main()
