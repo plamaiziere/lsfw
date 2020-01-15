@@ -349,6 +349,30 @@ public class CpFw extends GenericEquipment {
 		return new CpUnhandledService(name, className, comment, uid, false);
 	}
 
+	protected CpNetworkObject parseSimpleGateway(String name, String className, String comment, String uid, JsonNode n) {
+		CpNetworkIPs networkIPs = new CpNetworkIPs(name, className, comment, uid);
+
+		/*
+		 * interfaces
+		 */
+		JsonNode interfaces = n.path("interfaces");
+		Iterator<JsonNode> it = interfaces.elements();
+		while (it.hasNext()) {
+			JsonNode iface = it.next();
+			String sIp = iface.path("ipv4-address").textValue();
+			if (!StringNullOrEmpty(sIp)) {
+				IPNet ip = parseIpAddress(sIp);
+				networkIPs.addIp(ip);
+			}
+			String sIp6 = iface.path("ipv6-address").textValue();
+			if (!StringNullOrEmpty(sIp6)) {
+				IPNet ip6 = parseIpAddress(sIp6);
+				networkIPs.addIp(ip6);
+			}
+		}
+		return networkIPs;
+	}
+
     protected CpNetworkObject parseHost(String name, String className, String comment, String uid, JsonNode n) {
 
         String sIp = n.path("ipv4-address").textValue();
@@ -580,6 +604,9 @@ public class CpFw extends GenericEquipment {
                 case "group-with-exclusion":
                     network = parseNetworkGroup(name, className, comment, uid, n);
                     break;
+				case "simple-gateway":
+					network = parseSimpleGateway(name, className, comment, uid, n);
+					break;
                 /*
                  * Layers
                  */
@@ -1298,7 +1325,7 @@ public class CpFw extends GenericEquipment {
                                 crossRefNetworkLink(ipNetRef6, nobj);
                             }
 							break;
-				case IPS:   CpNetworkCluster member = (CpNetworkCluster) nobj;
+				case IPS:   CpNetworkIPs member = (CpNetworkIPs) nobj;
 							for (IPRange ipr : member.getIpRanges()) {
 								ipNetRef = getIPNetCrossRef(ipr);
 								crossRefNetworkLink(ipNetRef, nobj);

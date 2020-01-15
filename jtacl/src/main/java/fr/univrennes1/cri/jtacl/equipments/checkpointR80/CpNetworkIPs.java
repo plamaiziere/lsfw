@@ -14,6 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
@@ -25,18 +26,18 @@ import java.util.List;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
-public class CpNetworkCluster extends CpNetworkObject {
+public class CpNetworkIPs extends CpNetworkObject {
 
 	/* list of ip addresses */
 	protected ArrayList<IPRange> _ipRanges;
 
 	/**
-	 * Construct a new checkpoint cluster member object
+	 * Construct a new checkpoint object that is a list of IP
 	 * @param name object name name
 	 * @param className checkpoint class name
 	 * @param comment comment
 	 */
-	public CpNetworkCluster(String name, String className, String comment, String uid)
+	public CpNetworkIPs(String name, String className, String comment, String uid)
 	{
 		super(name, className, comment, uid, CpNetworkType.IPS);
 		_ipRanges = new ArrayList<>();
@@ -45,6 +46,14 @@ public class CpNetworkCluster extends CpNetworkObject {
 	public List<IPRange> getIpRanges() {
 		return _ipRanges;
 	}
+
+	public void addRange(IPRange range) {
+	    getIpRanges().add(range);
+    }
+
+    public void addIp(IPNet ip) {
+	    addRange(new IPRange(ip, false));
+    }
 
 	@Override
 	public String toString() {
