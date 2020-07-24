@@ -25,6 +25,7 @@ public class ProbeCommandTemplate {
 	protected String _srcAddress;
 	protected String _destAddress;
 	protected String _equipments;
+	protected String _outEquipment;
 	protected String _protoSpecification;
 	protected String _portSource;
 	protected String _portDest;
@@ -66,6 +67,13 @@ public class ProbeCommandTemplate {
 		_equipments = equipments;
 		return true;
 	}
+
+	public String getOutEquipment() { return _outEquipment; }
+
+	public boolean setOutEquipment(String equipment) {
+		_outEquipment = equipment;
+		return true;
+    }
 
 	public String getProtoSpecification() {
 		return _protoSpecification;

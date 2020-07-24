@@ -37,16 +37,7 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
-import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
-import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
-import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
-import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
-import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
-import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
+import fr.univrennes1.cri.jtacl.lib.ip.*;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
@@ -2019,6 +2010,15 @@ public class PacketFilter extends GenericEquipment {
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
+
+		// loopback interface
+        Iface iface = addLoopbackIface("lo0", "loopback");
+        PfIface pfIface = new PfIface(iface);
+        pfIface.getGroups().add("lo");
+        _pfIfaces.put("lo0", pfIface);
+        pfIface.setFirstIpV4(iface.getLink(IPNetConst.ipLoopbackV4));
+        pfIface.setFirstIpV6(iface.getLink(IPNetConst.ipLoopbackV6));
+
 		loadIfaces(doc);
 		loadConfiguration(doc);
 		_curAnchor = _rootAnchor;
@@ -2192,12 +2192,6 @@ public class PacketFilter extends GenericEquipment {
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
 
-		probe.decTimeToLive();
-		if (!probe.isAlive()) {
-			probe.killError("TimeToLive expiration");
-			return;
-		}
-
 		/*
 		 * PF probe extension
 		 */
@@ -2209,10 +2203,18 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		_routeToEngine = null;
 
-		/*
-		 * Filter in the probe
-		 */
-		packetFilter(link, Direction.IN, probe);
+		if (!link.isLoopback()) {
+            probe.decTimeToLive();
+            if (!probe.isAlive()) {
+                probe.killError("TimeToLive expiration");
+                return;
+            }
+
+            /*
+             * Filter in the probe
+             */
+            packetFilter(link, Direction.IN, probe);
+        }
 
 		/*
 		 * Check if the destination of the probe is on this equipment.

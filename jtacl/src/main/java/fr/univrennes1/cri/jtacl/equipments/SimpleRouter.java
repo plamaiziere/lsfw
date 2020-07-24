@@ -166,6 +166,7 @@ public class SimpleRouter extends GenericEquipment {
                 famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 
+		addLoopbackIface("loopback", "loopback");
 		loadIfaces(doc);
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
@@ -179,16 +180,18 @@ public class SimpleRouter extends GenericEquipment {
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
 
-		probe.decTimeToLive();
-		if (!probe.isAlive()) {
-			probe.killError("TimeToLive expiration");
-			return;
-		}
+		if (!link.isLoopback()) {
+            probe.decTimeToLive();
+            if (!probe.isAlive()) {
+                probe.killError("TimeToLive expiration");
+                return;
+            }
 
-		/*
-		 * Filter in the probe
-		 */
-		packetFilter(link, Direction.IN, probe);
+            /*
+             * Filter in the probe
+             */
+            packetFilter(link, Direction.IN, probe);
+        }
 
 		/*
 		 * Check if the destination of the probe is on this equipment or if

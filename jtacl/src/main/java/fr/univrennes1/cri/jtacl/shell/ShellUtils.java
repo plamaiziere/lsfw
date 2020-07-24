@@ -158,15 +158,15 @@ public class ShellUtils {
 	 * The format of the 'equipment specification' string is:
 	 * equipment-name'|'[iface-name|IPaddress]
 	 *
-	 * @param EquipmentSpecification Equipment specification used to filter.
+	 * @param equipmentSpecification Equipment specification used to filter.
 	 * @return a {@link IfaceLinks} list containing the links.
 	 */
 	public static IfaceLinks getIfaceLinksByEquipmentSpec(IPNet sourceIP,
-			String EquipmentSpecification) {
+			String equipmentSpecification) {
 
 		IfaceLinks resLinks = new IfaceLinks();
 
-		String [] specSplit = EquipmentSpecification.split("\\|");
+		String [] specSplit = equipmentSpecification.split("\\|");
 		String equipmentName = specSplit[0];
 		Monitor monitor = Monitor.getInstance();
 		NetworkEquipment equipment = monitor.getEquipments().get(equipmentName);
@@ -209,9 +209,9 @@ public class ShellUtils {
 			 * by interface name
 			 */
 			if (iface != null) {
-				if (link.getIfaceName().equals(ifaceName)) {
+				if (link.getIfaceName().equals(ifaceName) && link.getIp().sameIPVersion(sourceIP))  {
 					/*
-					 * pick up the first link
+					 * pick up the first link that matches the ip version
 					 */
 					resLinks.add(link);
 					break;
@@ -236,6 +236,42 @@ public class ShellUtils {
 					resLinks.add(link);
 				continue;
 			}
+		}
+		return resLinks;
+	}
+
+	/**
+	 * Returns all the {@link IfaceLink} links of the loopback iface of an equipment
+	 *
+	 * @param equipmentName equipment used to filter.
+	 * @return a {@link IfaceLinks} list containing the links.
+	 */
+	public static IfaceLinks getIfaceLinksByLoopbackEquipment(IPNet sourceIP,
+			String equipmentName) {
+
+		IfaceLinks resLinks = new IfaceLinks();
+		Monitor monitor = Monitor.getInstance();
+		NetworkEquipment equipment = monitor.getEquipments().get(equipmentName);
+		if (equipment == null) {
+			throw new JtaclParameterException(
+					"No such equipment: " + equipmentName);
+		}
+
+		/*
+		 * filter the iface links
+		 */
+		IfaceLinks links = equipment.getIfaceLinks();
+		for (IfaceLink link: links) {
+			/*
+			 * search interface loopback
+			 */
+			if (link.isLoopback() && link.getIp().sameIPVersion(sourceIP))  {
+                /*
+                 * pick up the first link that matches the ip version
+                 */
+                resLinks.add(link);
+                break;
+            }
 		}
 		return resLinks;
 	}

@@ -83,6 +83,16 @@ public class IfaceLink {
 		return _iface.getName();
 	}
 
+    /**
+	 * Returns true if the {@link Iface} interface associated to this
+	 * {@link IfaceLink} link is a loopback interface.
+	 * @return Returns true if the {@link Iface} interface associated to this
+     * {@link IfaceLink} link is a loopback interface.
+	 */
+	public boolean isLoopback() {
+	    return _iface.isLoopback();
+    }
+
 	/**
 	 * Returns the {@link NetworkEquipment} equipment associated to this
 	 * {@link IfaceLink} link. This is a shortcut for getIface().getEquipment().

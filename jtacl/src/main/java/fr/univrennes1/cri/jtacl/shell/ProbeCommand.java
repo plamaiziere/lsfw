@@ -55,11 +55,7 @@ public class ProbeCommand {
 
 	public void buildRequest(ProbeCommandTemplate probeCmd) {
 
-		IPversion ipVersion;
-		if (probeCmd.getProbe6flag())
-			ipVersion = IPversion.IPV6;
-		else
-			ipVersion = IPversion.IPV4;
+		IPversion ipVersion = probeCmd.getProbe6flag() ? IPversion.IPV6 : IPversion.IPV4;
 
 		String sSourceAddress = probeCmd.getSrcAddress();
 		/*
@@ -129,14 +125,24 @@ public class ProbeCommand {
 		NetworkLink nlink = null;
 		IfaceLinks ilinks;
 		String onEquipment = probeCmd.getEquipments();
+		String outEquipment = probeCmd.getOutEquipment();
 		boolean autolink = onEquipment != null && onEquipment.equalsIgnoreCase("auto");
+		if (onEquipment != null && outEquipment != null)
+        	throw new JtaclParameterException("cannot specify 'on and out equipment at the same time");
+
 		if (onEquipment != null && !autolink) {
 			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress.nearestNetwork(),
 					onEquipment);
 			// error
 			if (ilinks == null)
 				throw new JtaclParameterException("no links found");
-		} else {
+		} else if (outEquipment != null) {
+         			ilinks = ShellUtils.getIfaceLinksByLoopbackEquipment(sourceAddress.nearestNetwork(),
+					    outEquipment);
+			// error
+			if (ilinks == null)
+				throw new JtaclParameterException("no links found");
+        } else {
 			/*
 			 * try to find a network link that matches the source IP address.
 			 */

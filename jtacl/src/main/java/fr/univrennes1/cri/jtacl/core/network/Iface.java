@@ -17,6 +17,7 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclTopologyException;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNetConst;
 
 /**
  * Describes a network interface.<br/><br/>
@@ -43,6 +44,11 @@ public class Iface {
 	 */
 	protected String _comment;
 
+    /**
+     * true if loopback interface
+     */
+	protected boolean _loopback;
+
 	/**
 	 * links attached to this iface.
 	 */
@@ -53,6 +59,15 @@ public class Iface {
 	 */
 	protected Monitor _monitor;
 
+	private Iface(Monitor monitor, String name, String comment, boolean loopback, NetworkEquipment equipment) {
+		_monitor = monitor;
+		_name = name;
+		_comment = comment;
+		_loopback = loopback;
+		_equipment = equipment;
+		_links = new IfaceLinksByIp();
+	}
+
 	/**
 	 * Create a new {@link Iface} interface with these name and comment, attached
 	 * to a {@link NetworkEquipment} equipement.
@@ -61,12 +76,24 @@ public class Iface {
 	 * @param comment a free comment for this interface.
 	 * @param equipment the {@link NetworkEquipment} associated with this interface.
 	 */
-	public Iface(Monitor monitor, String name, String comment, NetworkEquipment equipment) {
-		_monitor = monitor;
-		_name = name;
-		_comment = comment;
-		_equipment = equipment;
-		_links = new IfaceLinksByIp();
+	public static Iface newIface(Monitor monitor, String name, String comment, NetworkEquipment equipment) {
+	    return new Iface(monitor, name, comment, false, equipment);
+	}
+
+	/**
+	 * Create a new kind of loopback {@link Iface} interface with these name and comment, attached
+	 * to a {@link NetworkEquipment} equipement.
+	 * @param monitor the {@link Monitor} monitor associated with this interface.
+	 * @param name the name of this interface.
+	 * @param comment a free comment for this interface.
+	 * @param equipment the {@link NetworkEquipment} associated with this interface.
+	 */
+	public static Iface newLoopback(Monitor monitor, String name, String comment, NetworkEquipment equipment) {
+	    Iface iface = new Iface(monitor, name, comment, true, equipment);
+	    // links with loopback addresses
+	    iface.addLink(IPNetConst.ipLoopbackV4, IPNetConst.netLoopbackV4);
+	    iface.addLink(IPNetConst.ipLoopbackV6, IPNetConst.netLoopbackV6);
+	    return iface;
 	}
 
 	/**
@@ -168,6 +195,14 @@ public class Iface {
 	 */
 	public String getComment() {
 		return _comment;
+	}
+
+	/**
+	 * Returns true if this {@link Iface} interface is a loopback interface.
+	 * @return true if this {@link Iface} interface is a loopback interface.
+	 */
+	public boolean isLoopback() {
+		return _loopback;
 	}
 
 	/**

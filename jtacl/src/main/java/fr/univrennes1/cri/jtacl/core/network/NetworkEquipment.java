@@ -21,6 +21,8 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.io.PrintStream;
 
+import static fr.univrennes1.cri.jtacl.core.network.Iface.newIface;
+
 /**
  *	Describes a network equipment.<br/><br/>
  *	A network equipment has a name and is connected to the network by at least
@@ -86,7 +88,21 @@ public class NetworkEquipment {
 	 * @return the {@link Iface} created
 	 */
 	public Iface addIface(String name, String comment) {
-		Iface iface = new Iface(_monitor, name, comment, this);
+		Iface iface = Iface.newIface(_monitor, name, comment, this);
+		_ifaces.put(iface);
+		return iface;
+	}
+
+	/**
+	 * Create a new loopback {@link Iface} named name and attach it to this equipment.
+	 * <br/><br/>
+	 * @param name the name of the Interface. The name of an {@link Iface} must
+	 * be unique in one {@link NetworkEquipment}.
+	 * @param comment a free comment for this interface.
+	 * @return the {@link Iface} created
+	 */
+	public Iface addLoopbackIface(String name, String comment) {
+		Iface iface = Iface.newLoopback(_monitor, name, comment, this);
 		_ifaces.put(iface);
 		return iface;
 	}

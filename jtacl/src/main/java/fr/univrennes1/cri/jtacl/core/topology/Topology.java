@@ -59,12 +59,14 @@ public class Topology {
 
 			// each interface
 			for (Iface iface: Ifaces.values()) {
-				IfaceLinksByIp iLinks = iface.getLinks();
+			    if (!iface.isLoopback()) { // skip loopback interface
+                    IfaceLinksByIp iLinks = iface.getLinks();
 
-				// each interface link
-				for (IfaceLink ilink: iLinks.values()) {
-					ifacesLinks.add(ilink);
-				}
+                    // each interface link
+                    for (IfaceLink ilink: iLinks.values()) {
+                        ifacesLinks.add(ilink);
+                    }
+                }
 			}
 		}
 

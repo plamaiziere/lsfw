@@ -309,6 +309,7 @@ public class ShellParser extends CommonRules<Object> {
 				FirstOf(
 					ProbeExpect(),
 					OnEquipments(),
+					OutEquipment(),
 					OptNoAction(),
 					OptVerbose(),
 					OptActive(),
@@ -348,6 +349,20 @@ public class ShellParser extends CommonRules<Object> {
 			WhiteSpaces()
 		);
 	}
+
+	/*
+	 * out atom
+	 */
+	public Rule OutEquipment() {
+		return Sequence(
+			IgnoreCase("out"),
+			WhiteSpaces(),
+			StringAtom(),
+			_probeCmdTemplate.setOutEquipment(match()),
+			WhiteSpaces()
+		);
+	}
+
 
 	/*
 	 * OptNoAction: no-action | na
