@@ -5,6 +5,9 @@
 	<artifactId>lsfw</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 	<name>lsfw</name>
 	<url>https://groupes.renater.fr/wiki/jtacl/index</url>
 	<organization>
