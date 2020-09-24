@@ -1,6 +1,8 @@
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.lib.ip.*;
@@ -74,8 +76,9 @@ public class FgTcpUdpSctpService extends FgService {
     }
 
     @Override
-    public FgServicesMatch matches(ProbeRequest request) {
+    public FgServicesMatch matches(Probe probe) {
 
+        ProbeRequest request = probe.getRequest();
 		ProtocolsSpec reqProto = request.getProtocols();
 		FgServicesMatch servicesMatch = new FgServicesMatch();
 		boolean testTCP = reqProto.contains(Protocols.TCP) && _isTCP;
@@ -121,19 +124,36 @@ public class FgTcpUdpSctpService extends FgService {
             }
         }
         if (all > 0) {
-            servicesMatch.setMatchResult(MatchResult.ALL);
-		    servicesMatch.add(new FgServiceMatch(this, MatchResult.ALL));
+            switch (matchAddress(probe.getDestinationAddress())) {
+                case ALL: mres = MatchResult.ALL; break;
+                case MATCH: mres = MatchResult.MATCH; break;
+                case NOT: mres = MatchResult.NOT; break;
+            }
+            servicesMatch.setMatchResult(mres);
+		    servicesMatch.add(new FgServiceMatch(this, mres));
 		    return servicesMatch;
         }
         if (may > 0) {
-            servicesMatch.setMatchResult(MatchResult.MATCH);
-		    servicesMatch.add(new FgServiceMatch(this, MatchResult.MATCH));
+            switch (matchAddress(probe.getDestinationAddress())) {
+                case ALL: mres = MatchResult.MATCH; break;
+                case MATCH: mres = MatchResult.MATCH; break;
+                case NOT: mres = MatchResult.NOT; break;
+            }
+            servicesMatch.setMatchResult(mres);
+		    servicesMatch.add(new FgServiceMatch(this, mres));
 		    return servicesMatch;
         }
         servicesMatch.setMatchResult(MatchResult.NOT);
         servicesMatch.add(new FgServiceMatch(this, MatchResult.NOT));
 	    return servicesMatch;
 	}
+
+    private MatchResult matchAddress(IPRangeable range) {
+            if (_ipRange == null) return MatchResult.ALL;
+            if (_ipRange.contains(range)) return MatchResult.ALL;
+            if (_ipRange.overlaps(range)) return MatchResult.MATCH;
+            return MatchResult.NOT;
+    }
 
 	private MatchResult matchPorts(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
 
