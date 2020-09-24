@@ -80,7 +80,7 @@ public class CpPortItem {
 	}
 
 	/**
-	 * Constructs a new {@link PfPortItem} instance using an operator
+	 * Constructs a new {@link CpPortItem} instance using an operator
 	 * with two operands (operator range).
 	 * @param operator operator to apply.
 	 * @param firstPort first port operand.

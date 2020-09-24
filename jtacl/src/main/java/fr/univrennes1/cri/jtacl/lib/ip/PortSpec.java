@@ -168,6 +168,14 @@ public class PortSpec {
 
 	}
 
+    /**
+     * Add a {@link PortRange} to this instance
+     * @param range to add
+     */
+	public void add(PortRange range) {
+	    _ranges.add(range);
+    }
+
 	/**
 	 * Returns an immutable list of {@link PortRange} of this instance.
 	 * @return an immutable list of {@link PortRange} of this instance.
