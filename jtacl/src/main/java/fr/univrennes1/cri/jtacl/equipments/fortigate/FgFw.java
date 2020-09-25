@@ -1,5 +1,7 @@
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
 import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
@@ -9,18 +11,19 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
+import fr.univrennes1.cri.jtacl.equipments.checkpointR80.*;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
-import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+import fr.univrennes1.cri.jtacl.lib.ip.*;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
+import java.util.*;
 
 public class FgFw extends GenericEquipment {
 
@@ -78,6 +81,67 @@ public class FgFw extends GenericEquipment {
 	 * Services cross references map
 	 */
 	protected ServiceCrossRefMap _serviceCrossRef = new ServiceCrossRefMap();
+
+	/**
+	 * IP cross references map
+	 */
+	IPCrossRefMap getNetCrossRef() {
+		return _netCrossRef;
+	}
+
+	/**
+	 * service cross references map
+	 */
+	ServiceCrossRefMap getServiceCrossRef() {
+		return _serviceCrossRef;
+	}
+
+    /*
+	 * services keyed by origin key
+	 */
+	protected HashMap<String, FgService> _fgServices
+			= new HashMap<>();
+
+
+	/*
+	 * network objects keyed origin key
+	 */
+	protected HashMap<String, FgNetworkObject> _fgNetworks
+			= new HashMap<>();
+
+    public HashMap<String, FgService> getFgServices() {
+        return _fgServices;
+    }
+
+    public HashMap<String, FgNetworkObject> getFgNetworks() {
+        return _fgNetworks;
+    }
+
+	/**
+	 * Sorted list of services orgin key
+	 * @return a sorted list of services origin key.
+	 */
+	public List<String> getServicesName() {
+
+		List<String> list = new LinkedList<>();
+		list.addAll(_fgServices.keySet());
+		Collections.sort(list);
+		return list;
+	}
+
+	/**
+	 * Sorted list of networks origin key
+	 * @return a sorted list of networks origin key
+	 */
+	public List<String> getNetworksName() {
+
+		List<String> list = new LinkedList<>();
+		list.addAll(_fgNetworks.keySet());
+		Collections.sort(list);
+		return list;
+	}
+
+    FgFwShell _shell = new FgFwShell(this);
 
 	/**
 	 * Create a new {@link FgFw} with this name and this comment.<br/>
@@ -203,6 +267,155 @@ public class FgFw extends GenericEquipment {
 			CrossReferences();
 */
 	}
+
+	protected void loadConfiguration(Document doc) {
+
+         /* fwpolicy */
+		NodeList list = doc.getElementsByTagName("fwpolicy");
+		if (list.getLength() < 1) {
+			throwCfgException("At least one fwpolicy must be specified", false);
+		}
+
+		List<String> filenames = new ArrayList<>();
+		for (int i = 0; i < list.getLength(); i++) {
+            Element e = (Element) list.item(i);
+            String filename = e.getAttribute("filename");
+            if (!filename.isEmpty()) {
+                filenames.add(filename);
+            }
+        }
+
+        if (filenames.isEmpty()) {
+            throwCfgException("Missing policy file name", false);
+        }
+
+        for (String f: filenames) {
+            famAdd(f);
+            FileReader jf;
+            JsonNode rootNode = null;
+            try {
+                jf = new FileReader(f);
+                ObjectMapper objectMapper = new ObjectMapper();
+                rootNode = objectMapper.readTree(jf);
+            } catch (IOException ex) {
+                throwCfgException("Cannot read file " + ex.getMessage(), false);
+            }
+            JsonNode dictNode = rootNode.path("services");
+            loadJsonServices(dictNode);
+            //JsonNode layersNode = rootNode.path("layers");
+            //loadJsonCpLayers(layersNode);
+        }
+
+        // implicit drop rule at the end of the root layer
+        //CpFwRule fwdrop = CpFwRule.newImplicitDropRule(_rootLayer);
+        //_rootLayer.getRules().add(fwdrop);
+
+    }
+
+    protected int parsePortNumber(String port) {
+	    int i = 0;
+        try {
+            i = Integer.parseInt(port);
+        } catch (NumberFormatException ex) {
+            throwCfgException("invalid port number: " + port, true);
+        }
+        return i;
+    }
+
+    protected List<PortSpec> parsePortsRanges(String portsRanges) {
+	    List<PortSpec> portsSpecs = new ArrayList<>();
+	    String[] lpr = portsRanges.split(":");
+	    if (lpr.length > 2) throwCfgException("invalid source/destination ports ranges: " + portsRanges, true);
+	    if (lpr.length == 1) {
+	        portsSpecs.add(null);
+	        portsSpecs.add(parsePortRange(lpr[0]));
+        } else {
+   	        portsSpecs.add(parsePortRange(lpr[0]));
+	        portsSpecs.add(parsePortRange(lpr[1]));
+        }
+	        return portsSpecs;
+	}
+
+    protected PortSpec parsePortRange(String portrange) {
+	    PortSpec portSpec = new PortSpec();
+
+	    //XXX: form : port1 port2 range1-range1 port3 range2-range2 ...
+	    String[] slp = portrange.split(" ");
+        for (String sp: slp) {
+            String[] sr = sp.split("-");
+            if (sr.length > 2) throwCfgException("invalid port range: " + portrange, true);
+
+            int port1 = parsePortNumber(sr[0]);
+            int port2 = port1;
+            if (sr.length == 2) {
+                port2 = parsePortNumber(sr[1]);
+            }
+            portSpec.add(new PortRange(port1, port2));
+        }
+        return portSpec;
+	}
+
+	List<IPRangeable> parseFqdn(String fqdn) {
+	    List<IPRangeable> ips = new LinkedList<>();
+        try {
+            List<IPNet> lip = IPNet.getAllByName(fqdn, IPversion.IPV4);
+            for (IPNet ip: lip) {
+                ips.add(new IPRange(ip));
+            }
+        } catch (UnknownHostException e) {
+            throwCfgException("cannot resolve FQDN: " + fqdn, true);
+        }
+        return ips;
+	}
+
+	List<IPRangeable> parseIpRange(String iprange) {
+	    List<IPRangeable> ips = new LinkedList<>();
+
+	    IPNet ip;
+	    ip = new IPNet(iprange);
+	    ips.add(new IPRange(ip, ip);
+        try {
+            List<IPNet> lip = IPNet.getAllByName(fqdn, IPversion.IPV4);
+            for (IPNet ip: lip) {
+                ips.add(new IPRange(ip));
+            }
+        } catch (UnknownHostException e) {
+            throwCfgException("cannot resolve FQDN: " + fqdn, true);
+        }
+        return ips;
+	}
+
+	/*
+	 * parse and load services objects from JSON
+	 */
+	protected void loadJsonServices(JsonNode objectsDictionary) {
+
+	    Iterator<JsonNode> it = objectsDictionary.elements();
+	    while (it.hasNext()) {
+	        JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String sname = n.path("name").textValue();
+            String soriginKey = n.path("q_origin_key").textValue();
+            String sprotocol = n.path("protocol").textValue();
+            String siprange = n.path("iprange").textValue();
+            String sfqdn = n.path("fqdn").textValue();
+	        String scomment = n.path("comments").textValue();
+
+	        parseFqdn()
+	        FgService service = null;
+	        if (protocol.equals("TCP/UDP/SCTP")) {
+
+            }
+	        CpNetworkObject network = null;
+	        CpFwRuleBaseAction action = null;
+	        CpObject obj = null;
+	        CpAny any = null;
+	        CpLayer layer = null;
+	        switch (className) {
+            }
+            }
+
 
 	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
 		if (!_monitorOptions.getXref())

@@ -1,8 +1,6 @@
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.equipments.checkpointR80.CpNetworkType;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
@@ -27,15 +25,11 @@ public class FgNetworkIP extends FgNetworkObject {
 	 * @param ip ipv4/network address
      * @param ip6 ipv6/network address
 	 */
-	public FgNetworkIP(String name, String originKey, String comment, String uid, IPNet ip, IPNet ip6) {
+	public FgNetworkIP(String name, String originKey, String comment, String uid, IPRange ip, IPRange ip6) {
 
 		super(name, originKey, comment, uid, FgNetworkType.IPMASK);
-		if (ip != null) {
-		    _ipRange = new IPRange(ip);
-		}
-		if (ip6 != null) {
-            _ipRange6 = new IPRange(ip6);
-        }
+	    _ipRange = ip;
+        _ipRange6 = ip6;
 	}
 
 	@Override

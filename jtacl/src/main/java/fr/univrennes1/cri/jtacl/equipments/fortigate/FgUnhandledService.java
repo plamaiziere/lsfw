@@ -1,10 +1,7 @@
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
-import fr.univrennes1.cri.jtacl.equipments.checkpoint.CpServiceMatch;
-import fr.univrennes1.cri.jtacl.equipments.checkpoint.CpServiceType;
-import fr.univrennes1.cri.jtacl.equipments.checkpoint.CpServicesMatch;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
 
 /**
  * Checkpoint service left unhandled by lsfw
@@ -19,7 +16,7 @@ public class FgUnhandledService extends FgService {
 	 * @param comment comment
 	 */
 	public FgUnhandledService(String name, String originKey, String comment, String uid) {
-		super(name, originKey, comment, FgServiceType.UNHANDLED);
+		super(name, originKey, comment, null, null, FgServiceType.UNHANDLED);
 	}
 
 	@Override
@@ -28,7 +25,7 @@ public class FgUnhandledService extends FgService {
 	}
 
 	@Override
-	public FgServicesMatch matches(ProbeRequest request) {
+	public FgServicesMatch matches(Probe probe) {
 		FgServicesMatch servicesMatch = new FgServicesMatch();
 		servicesMatch.setMatchResult(MatchResult.UNKNOWN);
 		servicesMatch.add(new FgServiceMatch(this, MatchResult.UNKNOWN));

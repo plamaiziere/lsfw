@@ -1,11 +1,12 @@
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.lib.ip.*;
+
+import java.util.List;
 
 public class FgTcpUdpSctpService extends FgService {
 
@@ -18,8 +19,6 @@ public class FgTcpUdpSctpService extends FgService {
     private PortSpec _udpPortSpec;
     private PortSpec _sctpSourcePortSpec;
     private PortSpec _sctpPortSpec;
-    private IPRange _ipRange;
-    private String _fqdn;
 
     /*
 	 * TCP flags / TCP flagsSet
@@ -29,7 +28,7 @@ public class FgTcpUdpSctpService extends FgService {
 
 
     public FgTcpUdpSctpService(String name, String originKey, String comment
-            , IPRange ipRange
+            , List<IPRangeable> ipRanges
             , String fqdn
             , PortSpec udpSourcePortSpec
             , PortSpec udpPortSpec
@@ -38,10 +37,8 @@ public class FgTcpUdpSctpService extends FgService {
             , PortSpec sctpSourcePortSpec
             , PortSpec sctpPortSpec) {
 
-        super(name, originKey, comment, FgServiceType.TCPUDPSCTP);
+        super(name, originKey, comment, ipRanges, fqdn, FgServiceType.TCPUDPSCTP);
 
-        _ipRange = ipRange;
-        _fqdn = fqdn;
         _isTCP = tcpPortSpec != null || tcpSourcePortSpec != null;
         _isUDP = udpPortSpec != null || udpSourcePortSpec != null;
         _isSCTP = sctpPortSpec != null || sctpSourcePortSpec != null;
@@ -69,9 +66,6 @@ public class FgTcpUdpSctpService extends FgService {
             s += ", SCTP ports=" + _sctpPortSpec;
             p += "SCTP";
         }
-        s += ", protocolType=" + p
-                + ", adresseRange=" + _ipRange
-                + ", fqdn=" + _fqdn;
         return s;
     }
 
@@ -102,16 +96,14 @@ public class FgTcpUdpSctpService extends FgService {
 			return servicesMatch;
 		}
 
-		int udpMay = 0;
 		MatchResult mres = MatchResult.NOT;
-		int not = 0;
 		int all = 0;
 		int may = 0;
         if (testTCP && _isTCP) {
             mres = matchPorts(request, _tcpSourcePortSpec, _tcpPortSpec);
             switch (mres) {
                 case ALL: all++; break;
-                case NOT: not++; break;
+                case NOT: break;
                 case MATCH: may++; break;
             }
         }
@@ -119,7 +111,7 @@ public class FgTcpUdpSctpService extends FgService {
             mres = matchPorts(request, _udpSourcePortSpec, _udpPortSpec);
             switch (mres) {
                 case ALL: all++; break;
-                case NOT: not++; break;
+                case NOT: break;
                 case MATCH: may++; break;
             }
         }
@@ -147,13 +139,6 @@ public class FgTcpUdpSctpService extends FgService {
         servicesMatch.add(new FgServiceMatch(this, MatchResult.NOT));
 	    return servicesMatch;
 	}
-
-    private MatchResult matchAddress(IPRangeable range) {
-            if (_ipRange == null) return MatchResult.ALL;
-            if (_ipRange.contains(range)) return MatchResult.ALL;
-            if (_ipRange.overlaps(range)) return MatchResult.MATCH;
-            return MatchResult.NOT;
-    }
 
 	private MatchResult matchPorts(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
 

@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +83,12 @@ public class PortSpec {
 			default:
 				throw new JtaclInternalException("Invalid port operator");
 			}
+	}
+
+	/**
+	 * Constructs a new empty instance
+	 */
+	public PortSpec() {
 	}
 
 	/**
@@ -199,11 +206,8 @@ public class PortSpec {
 	 */
 	public MatchResult matches(PortSpec portSpec) {
 
-		if (_operator == PortOperator.NONE)
+		if (_ranges.isEmpty())
 			return MatchResult.NOT;
-
-		if (_operator == PortOperator.ANY)
-			return MatchResult.ALL;
 
 		int all = 0;
 		int match = 0;
@@ -251,7 +255,8 @@ public class PortSpec {
 
 	@Override
 	public String toString() {
-		String s = _operator.toString();
+		String s = "";
+		if (_operator != null) s =_operator.toString();
 		for (PortRange range: _ranges) {
 			s = s + " " + range;
 		}
