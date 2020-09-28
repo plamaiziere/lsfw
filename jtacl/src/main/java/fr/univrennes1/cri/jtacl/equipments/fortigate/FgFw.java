@@ -1,17 +1,28 @@
+/*
+ * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
+
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
-import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
-import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
-import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.*;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
-import fr.univrennes1.cri.jtacl.equipments.checkpointR80.*;
+import fr.univrennes1.cri.jtacl.equipments.checkpointR80.CpService;
+import fr.univrennes1.cri.jtacl.equipments.checkpointR80.CpServiceType;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.*;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
@@ -22,8 +33,10 @@ import org.w3c.dom.NodeList;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class FgFw extends GenericEquipment {
 
@@ -104,7 +117,7 @@ public class FgFw extends GenericEquipment {
 
 
 	/*
-	 * network objects keyed origin key
+	 * network objects keyed by origin key
 	 */
 	protected HashMap<String, FgNetworkObject> _fgNetworks
 			= new HashMap<>();
@@ -118,8 +131,8 @@ public class FgFw extends GenericEquipment {
     }
 
 	/**
-	 * Sorted list of services orgin key
-	 * @return a sorted list of services origin key.
+	 * Sorted list of services by orgin key
+	 * @return a sorted list of services by origin key.
 	 */
 	public List<String> getServicesName() {
 
@@ -130,8 +143,8 @@ public class FgFw extends GenericEquipment {
 	}
 
 	/**
-	 * Sorted list of networks origin key
-	 * @return a sorted list of networks origin key
+	 * Sorted list of networks by origin key
+	 * @return a sorted list of networks by origin key
 	 */
 	public List<String> getNetworksName() {
 
@@ -152,6 +165,11 @@ public class FgFw extends GenericEquipment {
 	 */
 	public FgFw(Monitor monitor, String name, String comment, String configurationFileName) {
 		super(monitor, name, comment, configurationFileName);
+	}
+
+	@Override
+	public void runShell(String command, PrintStream output) {
+		_shell.shellCommand(command, output);
 	}
 
 	protected void loadIfaces(Document doc) {
@@ -246,11 +264,9 @@ public class FgFw extends GenericEquipment {
 		loadFiltersFromXML(doc);
 
 		loadIfaces(doc);
-/*
-
 		loadConfiguration(doc);
-
 		linkServices();
+/*
 		linkNetworkObjects();
 */
 
@@ -302,6 +318,13 @@ public class FgFw extends GenericEquipment {
             }
             JsonNode dictNode = rootNode.path("services");
             loadJsonServices(dictNode);
+
+            dictNode = rootNode.path("serv_groups");
+            loadJsonServicesGroup(dictNode);
+
+            dictNode = rootNode.path("addresses");
+            loadJsonAddresses(dictNode);
+
             //JsonNode layersNode = rootNode.path("layers");
             //loadJsonCpLayers(layersNode);
         }
@@ -312,12 +335,37 @@ public class FgFw extends GenericEquipment {
 
     }
 
-    protected int parsePortNumber(String port) {
+    protected void linkServices() {
+		/*
+		 * each service
+		 */
+		for (String serviceKey: _fgServices.keySet()) {
+            FgService service = _fgServices.get(serviceKey);
+            if (service.getType() == FgServiceType.GROUP) {
+                /*
+                 * resolves the references of the group
+                 */
+                FgServicesGroup group = (FgServicesGroup) service;
+                for (String refKey : group.getReferencesName()) {
+                    FgService ref = _fgServices.get(refKey);
+                    if (ref == null) {
+                        warnConfig("cannot link service group: "
+                                + serviceKey + " to member: " + refKey, false);
+                    } else {
+                        group.addReference(refKey, ref);
+                        ref.linkWith(group);
+                    }
+                }
+            }
+        }
+    }
+
+    protected int parseNumber(String number) {
 	    int i = 0;
         try {
-            i = Integer.parseInt(port);
+            i = Integer.parseInt(number);
         } catch (NumberFormatException ex) {
-            throwCfgException("invalid port number: " + port, true);
+            throwCfgException("invalid number: " + number, true);
         }
         return i;
     }
@@ -345,10 +393,10 @@ public class FgFw extends GenericEquipment {
             String[] sr = sp.split("-");
             if (sr.length > 2) throwCfgException("invalid port range: " + portrange, true);
 
-            int port1 = parsePortNumber(sr[0]);
+            int port1 = parseNumber(sr[0]);
             int port2 = port1;
             if (sr.length == 2) {
-                port2 = parsePortNumber(sr[1]);
+                port2 = parseNumber(sr[1]);
             }
             portSpec.add(new PortRange(port1, port2));
         }
@@ -368,29 +416,113 @@ public class FgFw extends GenericEquipment {
         return ips;
 	}
 
-	List<IPRangeable> parseIpRange(String iprange) {
+	List<IPRangeable> parseServiceIpRange(String iprange) {
 	    List<IPRangeable> ips = new LinkedList<>();
 
 	    IPNet ip;
-	    ip = new IPNet(iprange);
-	    ips.add(new IPRange(ip, ip);
-        try {
-            List<IPNet> lip = IPNet.getAllByName(fqdn, IPversion.IPV4);
-            for (IPNet ip: lip) {
-                ips.add(new IPRange(ip));
-            }
+	    try {
+	        ip = new IPNet(iprange);
+	        ips.add(new IPRange(ip, ip));
         } catch (UnknownHostException e) {
-            throwCfgException("cannot resolve FQDN: " + fqdn, true);
+            throwCfgException("invalid IP " + iprange, true);
         }
         return ips;
 	}
 
+	IPRangeable parseAddressSubnet(String subnet) {
+        String[] sip = subnet.split(" ");
+        if (sip.length != 2) throwCfgException("Invalid subnet " + subnet, true);
+        IPNet ip = null;
+        try {
+            ip = new IPNet(sip[0] + "/" + sip[1]);
+        } catch (UnknownHostException e) {
+            throwCfgException("Invalid subnet " + subnet, true);
+        }
+        return new IPRange(ip);
+    }
+
+    IPRangeable parseAddressIPRange(String start, String end) {
+	    IPRange r = null;
+	    try {
+	        IPNet ip1 = new IPNet(start);
+	        IPNet ip2 = new IPNet(end);
+	        r = new IPRange(ip1, ip2);
+        } catch (UnknownHostException e) {
+            throwCfgException("Invalid ip range " + start + ", " + end, true);
+        }
+	    return r;
+    }
+
+	/*
+	 * parse and load addresses from JSON
+	 */
+	protected void loadJsonAddresses(JsonNode jAddresses) {
+        Iterator<JsonNode> it = jAddresses.elements();
+	    while (it.hasNext()) {
+	        JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String sname = n.path("name").textValue();
+            String soriginKey = n.path("q_origin_key").textValue();
+	        String scomment = n.path("comment").textValue();
+	        String stype = n.path("type").textValue();
+	        String suid = n.path("uuid").textValue();
+
+	        FgNetworkObject address = null;
+
+	        if (stype.equals("ipmask")) {
+	            IPRangeable r = parseAddressSubnet(n.path("subnet").textValue());
+	            address = new FgNetworkIP(sname, soriginKey, scomment, suid, r, null);
+            }
+
+	        if (stype.equals("iprange")) {
+	            String start = n.path("start-ip").textValue();
+	            String end = n.path("end-ip").textValue();
+	            IPRangeable r = parseAddressIPRange(start, end);
+	            address = new FgNetworkIP(sname, soriginKey, scomment, suid, r, null);
+            }
+
+	        if (address == null) {
+                address = new FgUnhandledNetwork(sname, soriginKey, scomment, suid);
+                warnConfig("address is unhandled: " + address, false);
+
+            }
+	        _fgNetworks.put(soriginKey, address);
+        }
+    }
+
+	/*
+	 * parse and load services groups from JSON
+	 */
+	protected void loadJsonServicesGroup(JsonNode jServGroup) {
+
+	    Iterator<JsonNode> it = jServGroup.elements();
+	    while (it.hasNext()) {
+	        JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String sname = n.path("name").textValue();
+            String soriginKey = n.path("q_origin_key").textValue();
+	        String scomment = n.path("comment").textValue();
+	        FgServicesGroup servicesGroup = new FgServicesGroup(sname, soriginKey, scomment);
+
+	        Iterator<JsonNode> itMembers = n.path("member").elements();
+	        while (itMembers.hasNext()) {
+	            JsonNode m = itMembers.next();
+	            String ok = m.path("q_origin_key").textValue();
+                /* XXXX: references are resolved later */
+	            servicesGroup.addReference(ok, null);
+            }
+	        _fgServices.put(soriginKey, servicesGroup);
+        }
+    }
+
 	/*
 	 * parse and load services objects from JSON
 	 */
-	protected void loadJsonServices(JsonNode objectsDictionary) {
+	protected void loadJsonServices(JsonNode jServices) {
 
-	    Iterator<JsonNode> it = objectsDictionary.elements();
+	    Iterator<JsonNode> it = jServices.elements();
 	    while (it.hasNext()) {
 	        JsonNode n = it.next();
             _parseContext = new ParseContext();
@@ -400,21 +532,93 @@ public class FgFw extends GenericEquipment {
             String sprotocol = n.path("protocol").textValue();
             String siprange = n.path("iprange").textValue();
             String sfqdn = n.path("fqdn").textValue();
-	        String scomment = n.path("comments").textValue();
+	        String scomment = n.path("comment").textValue();
 
-	        parseFqdn()
-	        FgService service = null;
-	        if (protocol.equals("TCP/UDP/SCTP")) {
+            List<IPRangeable> ips = new LinkedList<>();
+	        if (!sfqdn.isEmpty()) {
+	            ips = parseFqdn(sfqdn);
+            } else sfqdn = null;
 
+	        if (!siprange.equals("0.0.0.0")) {
+	            ips.addAll(parseServiceIpRange(siprange));
+            } else {
+	            ips = null;
+	        }
+
+	        FgAddressService service = null;
+	        /* TCP / UDP ... */
+	        if (sprotocol.equals("TCP/UDP/SCTP") || sprotocol.equals("ALL")) {
+	            JsonNode ntcpports = n.path("tcp-portrange");
+	            List<PortSpec> tcpPortsSpec = null;
+	            if (!ntcpports.isMissingNode() && !ntcpports.textValue().isEmpty())
+	                tcpPortsSpec = parsePortsRanges(ntcpports.textValue());
+
+	            JsonNode nudpports = n.path("udp-portrange");
+	            List<PortSpec> udpPortsSpec = null;
+	            if (!nudpports.isMissingNode() && !nudpports.textValue().isEmpty())
+	                udpPortsSpec = parsePortsRanges(nudpports.textValue());
+
+	            JsonNode nsctpports = n.path("sctp-portrange");
+	            List<PortSpec> sctpPortsSpec = null;
+	            if (!nsctpports.isMissingNode() && !nsctpports.textValue().isEmpty())
+	                sctpPortsSpec = parsePortsRanges(nsctpports.textValue());
+
+	            if (sprotocol.equals("ALL")) {
+                    service = new FgProtoAllService(
+                            sname
+                            , soriginKey
+                            , scomment
+                            , ips
+                            , sfqdn
+                            , udpPortsSpec == null ? null : udpPortsSpec.get(0)
+                            , udpPortsSpec == null ? null : udpPortsSpec.get(1)
+                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(0)
+                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(1)
+                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(0)
+                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(1)
+                    );
+                } else {
+                    service = new FgTcpUdpSctpService(
+                            sname
+                            , soriginKey
+                            , scomment
+                            , ips
+                            , sfqdn
+                            , udpPortsSpec == null ? null : udpPortsSpec.get(0)
+                            , udpPortsSpec == null ? null : udpPortsSpec.get(1)
+                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(0)
+                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(1)
+                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(0)
+                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(1)
+                    );
+                }
             }
-	        CpNetworkObject network = null;
-	        CpFwRuleBaseAction action = null;
-	        CpObject obj = null;
-	        CpAny any = null;
-	        CpLayer layer = null;
-	        switch (className) {
+
+	        /* ICMP */
+            if (sprotocol.equals("ICMP")) {
+                String sicmp = n.path("icmptype").asText();
+                String stype = n.path("icmpcode").asText();
+                int icmp = parseNumber(sicmp);
+                service = new FgIcmpService(sname, soriginKey, scomment, ips, sfqdn, AddressFamily.INET, icmp
+                        , stype.isEmpty() ? -1 : parseNumber(stype));
             }
+
+            /* IP */
+            if (sprotocol.equals("IP")) {
+                String sprotoNumber = n.path("protocol-number").asText();
+                service = new FgProtocolService(sname, soriginKey, scomment, ips, sfqdn, parseNumber(sprotoNumber));
             }
+
+	        if (service == null) {
+	             /*
+                 * unhandled by lsfw
+                 */
+                service = new FgUnhandledService(sname, soriginKey, scomment, ips, sfqdn);
+                warnConfig("service is unhandled: " + service, false);
+            };
+            _fgServices.put(soriginKey, service);
+        }
+    }
 
 
 	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
@@ -439,6 +643,89 @@ public class FgFw extends GenericEquipment {
 			_serviceCrossRef.put(ref);
 		}
 		return ref;
+	}
+
+	protected void crossRefNetworkLink(IPCrossRef ipNetRef,
+			Object obj) {
+
+		if (obj instanceof FgNetworkObject) {
+			FgNetworkObject nobj = (FgNetworkObject) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref NetworkLink/Network: " + nobj.toString());
+			}
+			CrossRefContext refContext =
+				new CrossRefContext(nobj.toString(), nobj.getType().toString(),
+					nobj.getName(), null, 0);
+			ipNetRef.addContext(refContext);
+			for (Object linkobj: nobj.getLinkedTo()) {
+				crossRefNetworkLink(ipNetRef, linkobj);
+			}
+		}
+		if (obj instanceof FgAddressService) {
+		    FgAddressService nobj = (FgAddressService) obj;
+            if (Log.debug().isLoggable(Level.INFO)) {
+                Log.debug().info("xref NetworkLink/Service: " + nobj.toString());
+            }
+            CrossRefContext refContext = new CrossRefContext(nobj.toString(), nobj.getType().toString(),
+                nobj.getName(), null, 0);
+			ipNetRef.addContext(refContext);
+			for (Object linkobj: nobj.getLinkedTo()) {
+				crossRefNetworkLink(ipNetRef, linkobj);
+			}
+        }
+		/* TODO
+		if (obj instanceof CpFwRule) {
+			CpFwRule rule = (CpFwRule) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref NetworkLink/rule: " + rule.toText());
+			}
+			CrossRefContext refContext =
+				new CrossRefContext(rule.toText(), "rule", "", null, 0);
+			ipNetRef.addContext(refContext);
+
+		}*/
+	}
+
+
+	/**
+	 * Compute cross references
+	 */
+	protected void CrossReferences() {
+		/*
+		 * network object
+		 */
+		for (FgNetworkObject nobj: _fgNetworks.values()) {
+
+			IPRangeable ip;
+			IPRangeable ip6;
+			IPCrossRef ipNetRef;
+            IPCrossRef ipNetRef6;
+
+			switch (nobj.getType()) {
+                case IPRANGE: FgNetworkIP nip = (FgNetworkIP) nobj;
+							ip = nip.getIpRange();
+							if (ip != null) {
+                                ipNetRef = getIPNetCrossRef(ip);
+                                crossRefNetworkLink(ipNetRef, nobj);
+                            }
+                            ip6 = nip.getIpRange6();
+                            if (ip6 != null) {
+                                ipNetRef6 = getIPNetCrossRef(ip6);
+                                crossRefNetworkLink(ipNetRef6, nobj);
+                            }
+                            break;
+			}
+		}
+
+		/*
+		 * services object
+		 */
+		for (CpService sobj: _cpServices.values()) {
+			if (sobj.getType() != CpServiceType.TCP &&
+					sobj.getType() != CpServiceType.UDP)
+				continue;
+			crossRefTcpUdpService(sobj);
+		}
 	}
 
 }

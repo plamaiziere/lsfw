@@ -1,7 +1,19 @@
+/*
+ * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
+
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
-import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
 /**
@@ -11,10 +23,10 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 public class FgNetworkIP extends FgNetworkObject {
 
    	/* ip/network address */
-	protected IPRange _ipRange;
+	protected IPRangeable _ipRange;
 
     /* ipv6/network address */
-    protected IPRange _ipRange6;
+    protected IPRangeable _ipRange6;
 
 	/**
 	 * Construct a new Fortigate IP network object
@@ -25,9 +37,9 @@ public class FgNetworkIP extends FgNetworkObject {
 	 * @param ip ipv4/network address
      * @param ip6 ipv6/network address
 	 */
-	public FgNetworkIP(String name, String originKey, String comment, String uid, IPRange ip, IPRange ip6) {
+	public FgNetworkIP(String name, String originKey, String comment, String uid, IPRangeable ip, IPRangeable ip6) {
 
-		super(name, originKey, comment, uid, FgNetworkType.IPMASK);
+		super(name, originKey, comment, uid, FgNetworkType.IPRANGE);
 	    _ipRange = ip;
         _ipRange6 = ip6;
 	}
@@ -44,11 +56,11 @@ public class FgNetworkIP extends FgNetworkObject {
 		return s;
 	}
 
-	public IPRange getIpRange() {
+	public IPRangeable getIpRange() {
 		return _ipRange;
 	}
 
-    public IPRange getIpRange6() {
+    public IPRangeable getIpRange6() {
         return _ipRange6;
     }
 

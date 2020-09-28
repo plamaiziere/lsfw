@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
+
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
@@ -8,7 +21,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.*;
 
 import java.util.List;
 
-public class FgTcpUdpSctpService extends FgService {
+public class FgTcpUdpSctpService extends FgAddressService {
 
     private boolean _isUDP;
     private boolean _isTCP;
@@ -52,21 +65,24 @@ public class FgTcpUdpSctpService extends FgService {
 
     @Override
     public String toString() {
-        String s = super.toString();
+        String s = "";
         String p = "";
         if (_isUDP) {
-            s += ", UDP ports=" + _udpPortSpec;
+            if (_udpSourcePortSpec != null) s += ", UDP src. ports=" + _udpSourcePortSpec;
+            if (_udpPortSpec != null) s += ", UDP dest. ports=" + _udpPortSpec;
             p = (_isTCP || _isSCTP) ? "UDP/" : "UDP";
         }
         if (_isTCP) {
-            s += ", TCP ports=" + _tcpPortSpec;
+            if (_tcpSourcePortSpec != null) s += ", TCP src. ports=" + _tcpSourcePortSpec;
+            if (_tcpPortSpec != null) s += ", TCP dest. ports=" + _tcpPortSpec;
             p += (_isSCTP) ? "TCP/": "TCP";
         }
         if (_isSCTP) {
-            s += ", SCTP ports=" + _sctpPortSpec;
+            if (_sctpSourcePortSpec != null) s += ", SCTP src. ports=" + _sctpSourcePortSpec;
+            if (_sctpPortSpec != null) s += ", SCTP dest. ports=" + _sctpPortSpec;
             p += "SCTP";
         }
-        return s;
+        return super.toString() + ", " + p + s;
     }
 
     @Override
@@ -140,7 +156,7 @@ public class FgTcpUdpSctpService extends FgService {
 	    return servicesMatch;
 	}
 
-	private MatchResult matchPorts(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
+	protected MatchResult matchPorts(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
 
 		/*
 		 * source port

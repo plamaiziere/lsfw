@@ -1,0 +1,15 @@
+--- Fortigate Shell Help ---
+
+help: this help.
+
+show network [network_name]: without parameter, displays all the checkpoint
+  network objects. Or displays the network object 'network_name'.
+
+show rules: displays the firewall rules set.
+
+show service [service_name]: without parameter, displays all the checkpoint
+  services. Or displays the service 'service_name'.
+
+xref ip     :see help xref-ip.
+xref service: see help xref-service.xref ip : see help xref.
+
