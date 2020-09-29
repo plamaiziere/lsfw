@@ -21,8 +21,6 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
-import fr.univrennes1.cri.jtacl.equipments.checkpointR80.CpService;
-import fr.univrennes1.cri.jtacl.equipments.checkpointR80.CpServiceType;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.*;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
@@ -266,9 +264,7 @@ public class FgFw extends GenericEquipment {
 		loadIfaces(doc);
 		loadConfiguration(doc);
 		linkServices();
-/*
 		linkNetworkObjects();
-*/
 
 		/*
 		 * routing
@@ -278,10 +274,8 @@ public class FgFw extends GenericEquipment {
 		/*
 		 * compute cross reference
 		 */
-/*
 		if (_monitorOptions.getXref())
 			CrossReferences();
-*/
 	}
 
 	protected void loadConfiguration(Document doc) {
@@ -325,8 +319,8 @@ public class FgFw extends GenericEquipment {
             dictNode = rootNode.path("addresses");
             loadJsonAddresses(dictNode);
 
-            //JsonNode layersNode = rootNode.path("layers");
-            //loadJsonCpLayers(layersNode);
+            dictNode = rootNode.path("addr_groups");
+            loadJsonNetworkGroup(dictNode);
         }
 
         // implicit drop rule at the end of the root layer
@@ -359,6 +353,48 @@ public class FgFw extends GenericEquipment {
             }
         }
     }
+
+   /*
+     * Resolve network groups references
+     */
+	protected void linkNetworkObjects() {
+		/*
+		 * each network object
+		 */
+		for (String objectName: _fgNetworks.keySet()) {
+            FgNetworkObject nobj = _fgNetworks.get(objectName);
+            if (nobj.getType() == FgNetworkType.GROUP) {
+                /*
+                 * resolves the base references of the group
+                 */
+                FgNetworkGroup group = (FgNetworkGroup) nobj;
+                for (String refName : group.getBaseReferencesName()) {
+                    FgNetworkObject ref = _fgNetworks.get(refName);
+                    if (ref == null) {
+                        warnConfig("cannot link network group: "
+                                + objectName + " to member: " + refName, false);
+                    } else {
+                        group.addBaseReference(refName, ref);
+                        ref.linkWith(group);
+                    }
+                }
+                /*
+                 * excluded ref
+                 */
+                for (String refName : group.getExcludedReferencesName()) {
+                    FgNetworkObject ref = _fgNetworks.get(refName);
+                    if (ref == null) {
+                        warnConfig("cannot link network group: "
+                                + objectName
+                                + " to excluded member: " + refName, false);
+                    } else {
+                        group.addExcludedReference(refName, ref);
+                        ref.linkWith(group);
+                    }
+                }
+            }
+        }
+	}
 
     protected int parseNumber(String number) {
 	    int i = 0;
@@ -488,6 +524,41 @@ public class FgFw extends GenericEquipment {
 
             }
 	        _fgNetworks.put(soriginKey, address);
+        }
+    }
+
+	/*
+	 * parse and load network groups from JSON
+	 */
+	protected void loadJsonNetworkGroup(JsonNode jServGroup) {
+
+	    Iterator<JsonNode> it = jServGroup.elements();
+	    while (it.hasNext()) {
+	        JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String sname = n.path("name").textValue();
+            String soriginKey = n.path("q_origin_key").textValue();
+	        String scomment = n.path("comment").textValue();
+	        String suid = n.path("uuid").textValue();
+	        FgNetworkGroup networkGroup = new FgNetworkGroup(sname, soriginKey, scomment, suid);
+
+	        Iterator<JsonNode> itMembers = n.path("member").elements();
+	        while (itMembers.hasNext()) {
+	            JsonNode m = itMembers.next();
+	            String ok = m.path("q_origin_key").textValue();
+                /* XXXX: references are resolved later */
+	            networkGroup.addBaseReference(ok, null);
+            }
+
+	        Iterator<JsonNode> itExcludeMembers = n.path("exclude-member").elements();
+	        while (itExcludeMembers.hasNext()) {
+	            JsonNode m = itExcludeMembers.next();
+	            String ok = m.path("q_origin_key").textValue();
+                /* XXXX: references are resolved later */
+	            networkGroup.addExcludedReference(ok, null);
+            }
+	        _fgNetworks.put(soriginKey, networkGroup);
         }
     }
 
@@ -645,7 +716,91 @@ public class FgFw extends GenericEquipment {
 		return ref;
 	}
 
-	protected void crossRefNetworkLink(IPCrossRef ipNetRef,
+	protected void crossRefOwnerService(PortRange range,
+			ServiceCrossRefContext refctx, Object obj) {
+
+		ProtocolsSpec protoSpec = refctx.getProtoSpec();
+		ServiceCrossRefType xrefType = refctx.getType();
+
+		if (obj instanceof FgServicesGroup) {
+			FgServicesGroup group = (FgServicesGroup) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref owner service/group: " + group.toString());
+			}
+
+			ServiceCrossRefContext nrefctx =
+				new ServiceCrossRefContext(protoSpec,
+						xrefType, group.toString(),
+						group.getType().toString(),
+						group.getName(),
+						null,
+						0);
+			ServiceCrossRef serv = getServiceCrossRef(range);
+			serv.addContext(nrefctx);
+			for (Object owner: group.getLinkedTo())
+				crossRefOwnerService(range, refctx, owner);
+		}
+
+		/* TODO
+		if (obj instanceof CpFwRule) {
+			CpFwRule rule = (CpFwRule) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref owner service/rule: " + rule.toString());
+			}
+			ServiceCrossRefContext nrefctx =
+				new ServiceCrossRefContext(protoSpec,
+						xrefType, rule.toText(), "rule", "", null, 0);
+			ServiceCrossRef serv = getServiceCrossRef(range);
+			serv.addContext(nrefctx);
+		}
+
+		 */
+
+	}
+
+	protected void crossRefService(FgTcpUdpSctpService service) {
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			Log.debug().info("xref tcp/udp service: " + service.toString());
+		}
+
+		List<Object> owners = service.getLinkedTo();
+        if (service.hasUdpSourcePortSpec()) {
+            addServiceCrossRef(service, service.getUdpSourcePortSpec(), ServiceCrossRefType.FROM, Protocols.UDP, owners);
+        }
+        if (service.hasUdpPortSpec()) {
+            addServiceCrossRef(service, service.getUdpPortSpec(), ServiceCrossRefType.TO, Protocols.UDP, owners);
+        }
+        if (service.hasTcpSourcePortSpec()) {
+            addServiceCrossRef(service, service.getTcpSourcePortSpec(), ServiceCrossRefType.FROM, Protocols.TCP, owners);
+        }
+        if (service.hasTcpPortSpec()) {
+            addServiceCrossRef(service, service.getTcpPortSpec(), ServiceCrossRefType.TO, Protocols.TCP, owners);
+        }
+	}
+
+    protected void addServiceCrossRef(FgTcpUdpSctpService service, PortSpec portSpec
+            , ServiceCrossRefType serviceCrossRefType, Integer proto, List<Object> owners) {
+
+        ProtocolsSpec protoSpec = new ProtocolsSpec();
+        protoSpec.add(proto);
+        ServiceCrossRefContext refctx =
+            new ServiceCrossRefContext(protoSpec,
+                    serviceCrossRefType, service.toString(),
+                    service.getType().toString(),
+                    service.getName(),
+                    null,
+                    0);
+        for (PortRange range: portSpec.getRanges()) {
+            ServiceCrossRef xref = getServiceCrossRef(range);
+            xref.addContext(refctx);
+            for (Object owner: owners) {
+                crossRefOwnerService(range, refctx, owner);
+            }
+        }
+    }
+
+    protected void crossRefNetworkLink(IPCrossRef ipNetRef,
 			Object obj) {
 
 		if (obj instanceof FgNetworkObject) {
@@ -714,18 +869,26 @@ public class FgFw extends GenericEquipment {
                                 crossRefNetworkLink(ipNetRef6, nobj);
                             }
                             break;
-			}
-		}
+		    }
+        }
 
 		/*
 		 * services object
 		 */
-		for (CpService sobj: _cpServices.values()) {
-			if (sobj.getType() != CpServiceType.TCP &&
-					sobj.getType() != CpServiceType.UDP)
-				continue;
-			crossRefTcpUdpService(sobj);
+		for (FgService sobj: _fgServices.values()) {
+		    if (sobj instanceof FgTcpUdpSctpService) {
+    			crossRefService((FgTcpUdpSctpService) sobj);
+            }
+		    if (sobj instanceof FgAddressService) {
+		        FgAddressService nserv = (FgAddressService) sobj;
+		        if (nserv.hasRanges()) {
+                    List<IPRangeable> ranges = nserv.getipRanges();
+                    for (IPRangeable range: ranges) {
+                        IPCrossRef ipNetRef = getIPNetCrossRef(range);
+                        crossRefNetworkLink(ipNetRef, sobj);
+                    }
+                }
+            }
 		}
 	}
-
 }

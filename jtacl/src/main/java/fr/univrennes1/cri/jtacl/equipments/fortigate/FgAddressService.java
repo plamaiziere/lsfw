@@ -52,13 +52,16 @@ public abstract class FgAddressService extends FgService {
 
 	public List<IPRangeable> getipRanges() { return _ipRanges; }
 
+	public boolean hasRanges() { return _ipRanges != null; }
+
 	public String getFqdn() { return _fqdn; }
+	public boolean hasFqdn() { return _fqdn != null; }
 
     @Override
     public String toString() {
         String s = _name + ", " + _originKey + ", " + _comment + ", " + _type;
-        if (_ipRanges != null) s += ", ipRanges=" + _ipRanges;
-        if (_fqdn != null) s += ", fqdn = " + _fqdn;
+        if (hasRanges()) s += ", ipRanges=" + _ipRanges;
+        if (hasFqdn()) s += ", fqdn = " + _fqdn;
         return s;
     }
 }

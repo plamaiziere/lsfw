@@ -63,23 +63,41 @@ public class FgTcpUdpSctpService extends FgAddressService {
         _sctpSourcePortSpec = sctpSourcePortSpec;
     }
 
+    public PortSpec getUdpSourcePortSpec() {return _udpSourcePortSpec;}
+    public PortSpec getUdpPortSpec() {return _udpPortSpec;}
+    public PortSpec getTcpSourcePortSpec() {return _tcpSourcePortSpec;}
+    public PortSpec getTcpPortSpec() {return _tcpPortSpec;}
+    public PortSpec getSctpSourcePortSpec() {return _sctpSourcePortSpec;}
+    public PortSpec getSctpPortSpec() {return _sctpPortSpec;}
+    public boolean isUdp() {return _isUDP;}
+    public boolean isTcp() {return _isTCP;}
+    public boolean isSctp() {return _isSCTP;}
+
+    public boolean hasUdpSourcePortSpec() {return _udpSourcePortSpec != null;}
+    public boolean hasUdpPortSpec() {return _udpPortSpec != null;}
+    public boolean hasTcpSourcePortSpec() {return _tcpSourcePortSpec != null;}
+    public boolean hasTcpPortSpec() {return _tcpPortSpec != null;}
+    public boolean hasSctpSourcePortSpec() {return _sctpSourcePortSpec != null;}
+    public boolean hasSctpPortSpec() {return _sctpPortSpec != null;}
+
+
     @Override
     public String toString() {
         String s = "";
         String p = "";
         if (_isUDP) {
-            if (_udpSourcePortSpec != null) s += ", UDP src. ports=" + _udpSourcePortSpec;
-            if (_udpPortSpec != null) s += ", UDP dest. ports=" + _udpPortSpec;
+            if (hasUdpSourcePortSpec()) s += ", UDP src. ports=" + _udpSourcePortSpec;
+            if (hasUdpPortSpec()) s += ", UDP dest. ports=" + _udpPortSpec;
             p = (_isTCP || _isSCTP) ? "UDP/" : "UDP";
         }
         if (_isTCP) {
-            if (_tcpSourcePortSpec != null) s += ", TCP src. ports=" + _tcpSourcePortSpec;
-            if (_tcpPortSpec != null) s += ", TCP dest. ports=" + _tcpPortSpec;
+            if (hasTcpSourcePortSpec()) s += ", TCP src. ports=" + _tcpSourcePortSpec;
+            if (hasTcpPortSpec()) s += ", TCP dest. ports=" + _tcpPortSpec;
             p += (_isSCTP) ? "TCP/": "TCP";
         }
         if (_isSCTP) {
-            if (_sctpSourcePortSpec != null) s += ", SCTP src. ports=" + _sctpSourcePortSpec;
-            if (_sctpPortSpec != null) s += ", SCTP dest. ports=" + _sctpPortSpec;
+            if (hasSctpSourcePortSpec()) s += ", SCTP src. ports=" + _sctpSourcePortSpec;
+            if (hasSctpPortSpec()) s += ", SCTP dest. ports=" + _sctpPortSpec;
             p += "SCTP";
         }
         return super.toString() + ", " + p + s;

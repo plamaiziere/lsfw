@@ -16,4 +16,5 @@ package fr.univrennes1.cri.jtacl.equipments.fortigate;
 public enum FgNetworkType {
     UNHANDLED,
     IPRANGE,
+    GROUP
 }
