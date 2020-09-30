@@ -552,7 +552,7 @@ public class FgFw extends GenericEquipment {
             JsonNode n = it.next();
             _parseContext = new ParseContext();
             _parseContext.setLine(n.toString());
-            String suid = n.path("uuid").textValue();
+            String suid = n.path("policyid").asText();
             String sname = n.path("name").textValue();
             String soriginKey = n.path("q_origin_key").textValue();
             String scomment = n.path("comment").textValue();
@@ -581,8 +581,9 @@ public class FgFw extends GenericEquipment {
             if (saction.equals("accept")) action =FgFwRuleAction.ACCEPT;
             if (saction.equals("deny")) action = FgFwRuleAction.DROP;
             if (action == null) throwCfgException("Unknown action " + saction, true);
+            String slabel = n.path("global-label").textValue();
 
-            FgFwRule rule = FgFwRule.newSecurityRule(sname, soriginKey, scomment, suid, number
+            FgFwRule rule = FgFwRule.newSecurityRule(sname, soriginKey, scomment, slabel, suid, number
                 , disable, srcIfaces, dstIfaces, srcAddresses, dstAddresses, servSpec, action);
 
             srcAddresses.linkTo(rule);

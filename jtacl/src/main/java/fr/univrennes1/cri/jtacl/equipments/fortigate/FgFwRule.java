@@ -32,6 +32,7 @@ public class FgFwRule extends FgObject {
 	protected String _uid;
 	protected List<String> _sourceIfaces;
 	protected List<String> _destIfaces;
+	protected String _label;
 
 	protected boolean _implicitDrop;
 
@@ -79,6 +80,8 @@ public class FgFwRule extends FgObject {
 
 	public List<String> getDestIfaces() { return _destIfaces; }
 
+	public String getLabel() { return _label; }
+
 	private FgFwRule(String name, String originKey, String comment, String uid) {
 	    super(name, originKey);
 	    _comment = comment;
@@ -90,6 +93,7 @@ public class FgFwRule extends FgObject {
      * @param name name
      * @param originKey fortigate origin key
      * @param comment comment
+     * @param label label
      * @param uid object's uid
      * @param number rule number
      * @param disabled rule disabled
@@ -101,7 +105,7 @@ public class FgFwRule extends FgObject {
      * @param ruleAction rule action (Accept, drop etc)
      * @return new security rule
      */
-    static public FgFwRule newSecurityRule(String name, String originKey, String comment, String uid,
+    static public FgFwRule newSecurityRule(String name, String originKey, String comment, String label, String uid,
                                     Integer number, boolean disabled,
                                     List<String> sourceIfaces, List<String> destIfaces,
                                     FgFwIpSpec srcIpSpec, FgFwIpSpec dstIpSpec,
@@ -109,6 +113,7 @@ public class FgFwRule extends FgObject {
                                     FgFwRuleAction ruleAction) {
 
 	    FgFwRule rule = new FgFwRule(name, originKey, comment, uid);
+	    rule._label = label;
         rule._number = number;
         rule._disabled = disabled;
         rule._sourceIfaces = sourceIfaces;
@@ -137,7 +142,7 @@ public class FgFwRule extends FgObject {
 	@Override
 	public String toString() {
 	    String s = "rule name=" + _name + ", originKey=" + _originKey
-				+ ", comment=" + _comment;
+				+ ", comment=" + _comment + ", id=" + _uid;
 	    s+= ", number=" + _number
                 + ", to=" + _toNumber
                 + ", disabled=" + _disabled + ", implicit= " + _implicitDrop
@@ -153,11 +158,14 @@ public class FgFwRule extends FgObject {
 		if (isImplicitDrop())
 			return "*** implicit drop ***";
 
-		String s = "#" + _number;
+		String s = "#" + _number + ", id: " + _uid;
 		s += ", name: ";
 		if (_name != null)
 			s+= _name;
-
+		s += ", label: ";
+		if (_label != null) {
+		    s += _label;
+        }
 		String senabled = _disabled ? "disabled" : "enabled";
 		String srcNot = _sourceIp.isNotIn() ? "!" : "";
 		String destNot = _destIp.isNotIn() ? "!" : "";
