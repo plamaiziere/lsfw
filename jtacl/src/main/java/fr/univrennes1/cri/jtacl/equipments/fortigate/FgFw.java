@@ -75,7 +75,7 @@ public class FgFw extends GenericEquipment {
 	/**
 	 * interfaces
 	 */
-	protected HashMap<String, FgIface> _fnFwIfaces
+	protected HashMap<String, FgIface> _fgFwIfaces
 		= new HashMap<>();
 
 	/**
@@ -113,7 +113,6 @@ public class FgFw extends GenericEquipment {
 	protected HashMap<String, FgService> _fgServices
 			= new HashMap<>();
 
-
 	/*
 	 * network objects keyed by origin key
 	 */
@@ -127,6 +126,13 @@ public class FgFw extends GenericEquipment {
     public HashMap<String, FgNetworkObject> getFgNetworks() {
         return _fgNetworks;
     }
+
+	/*
+	 * firewall rules
+	 */
+	protected List <FgFwRule> _fgRules = new LinkedList<>();
+
+	public List<FgFwRule> getFgRules() { return _fgRules; }
 
 	/**
 	 * Sorted list of services by orgin key
@@ -222,7 +228,7 @@ public class FgFw extends GenericEquipment {
 					throw new JtaclConfigurationException("Missing interface comment: " + s);
 				iface = addIface(name, comment);
 				fnfwIface = new FgIface(iface);
-				_fnFwIfaces.put(name, fnfwIface);
+				_fgFwIfaces.put(name, fnfwIface);
 			}
 			iface.addLink(ip, network);
 		}
@@ -321,12 +327,14 @@ public class FgFw extends GenericEquipment {
 
             dictNode = rootNode.path("addr_groups");
             loadJsonNetworkGroup(dictNode);
+
+            dictNode = rootNode.path("rules");
+            loadJsonFwRules(dictNode);
         }
 
-        // implicit drop rule at the end of the root layer
-        //CpFwRule fwdrop = CpFwRule.newImplicitDropRule(_rootLayer);
-        //_rootLayer.getRules().add(fwdrop);
-
+        // implicit drop rule at the end of the rules
+        FgFwRule fwdrop = FgFwRule.newImplicitDropRule();
+        _fgRules.add(fwdrop);
     }
 
     protected void linkServices() {
@@ -487,6 +495,102 @@ public class FgFw extends GenericEquipment {
             throwCfgException("Invalid ip range " + start + ", " + end, true);
         }
 	    return r;
+    }
+
+    protected void checkFwRuleIface(List<String> ifaces) {
+	    for (String intf: ifaces) {
+	        if (!intf.equals("any") && !_fgFwIfaces.containsKey(intf))
+                throwCfgException("Unknown interface " + intf, true);
+        }
+	}
+
+    protected List<String> parseJsonOriginKeyList(JsonNode node) {
+	    List<String> list = new LinkedList<>();
+	    Iterator<JsonNode> it = node.elements();
+	    while(it.hasNext()) {
+	        JsonNode n = it.next();
+            list.add(n.path("q_origin_key").textValue());
+        }
+	    return list;
+	}
+
+	protected FgFwIpSpec parseJsonFwRulesAddresses(JsonNode n) {
+        FgFwIpSpec ipSpec = new FgFwIpSpec();
+        List<String> saddresses = parseJsonOriginKeyList(n);
+        for (String saddress: saddresses) {
+            FgNetworkObject address = _fgNetworks.get(saddress);
+            if (address == null) {
+                warnConfig("Unknown address object " + saddress, true);
+            } else {
+                ipSpec.addReference(saddress, address);
+            }
+        }
+        return ipSpec;
+	}
+
+	protected FgFwServicesSpec parseJsonFwRulesServices(JsonNode n) {
+        FgFwServicesSpec servSpec = new FgFwServicesSpec();
+        List<String> sservices = parseJsonOriginKeyList(n);
+        for (String sservice: sservices) {
+            FgService service = _fgServices.get(sservice);
+            if (service == null) {
+                warnConfig("Unknown service object " + sservice, true);
+            } else {
+                servSpec.addReference(sservice, service);
+            }
+        }
+        return servSpec;
+	}
+
+    /*
+     * parse and load fw rules from JSON
+     */
+    protected void loadJsonFwRules(JsonNode jrules) {
+        int number = 0;
+        Iterator<JsonNode> it = jrules.elements();
+        while (it.hasNext()) {
+            JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String suid = n.path("uuid").textValue();
+            String sname = n.path("name").textValue();
+            String soriginKey = n.path("q_origin_key").textValue();
+            String scomment = n.path("comment").textValue();
+
+            /* Interfaces */
+            List<String> srcIfaces = parseJsonOriginKeyList(n.path("srcintf"));
+            checkFwRuleIface(srcIfaces);
+            List<String> dstIfaces = parseJsonOriginKeyList(n.path("dstintf"));
+            checkFwRuleIface(dstIfaces);
+
+            /* addresses */
+            FgFwIpSpec srcAddresses = parseJsonFwRulesAddresses(n.path("srcaddr"));
+            srcAddresses.setNotIn(!n.path("srcaddr-negate").textValue().equals("disable"));
+
+            FgFwIpSpec dstAddresses = parseJsonFwRulesAddresses(n.path("dstaddr"));
+            dstAddresses.setNotIn(!n.path("dstaddr-negate").textValue().equals("disable"));
+
+            /* services */
+            FgFwServicesSpec servSpec = parseJsonFwRulesServices(n.path("service"));
+            servSpec.setNotIn(!n.path("service-negate").textValue().equals("disable"));
+
+            /* misc */
+            boolean disable = !n.path("status").textValue().equals("enable");
+            String saction = n.path("action").textValue();
+            FgFwRuleAction action = null;
+            if (saction.equals("accept")) action =FgFwRuleAction.ACCEPT;
+            if (saction.equals("deny")) action = FgFwRuleAction.DROP;
+            if (action == null) throwCfgException("Unknown action " + saction, true);
+
+            FgFwRule rule = FgFwRule.newSecurityRule(sname, soriginKey, scomment, suid, number
+                , disable, srcIfaces, dstIfaces, srcAddresses, dstAddresses, servSpec, action);
+
+            srcAddresses.linkTo(rule);
+            dstAddresses.linkTo(rule);
+            servSpec.linkTo(rule);
+            _fgRules.add(rule);
+            number++;
+        }
     }
 
 	/*
@@ -741,21 +845,17 @@ public class FgFw extends GenericEquipment {
 				crossRefOwnerService(range, refctx, owner);
 		}
 
-		/* TODO
-		if (obj instanceof CpFwRule) {
-			CpFwRule rule = (CpFwRule) obj;
+		if (obj instanceof FgFwRule) {
+			FgFwRule rule = (FgFwRule) obj;
 			if (Log.debug().isLoggable(Level.INFO)) {
 				Log.debug().info("xref owner service/rule: " + rule.toString());
 			}
 			ServiceCrossRefContext nrefctx =
 				new ServiceCrossRefContext(protoSpec,
-						xrefType, rule.toText(), "rule", "", null, 0);
+						xrefType, rule.toText(), "RULE", "", null, 0);
 			ServiceCrossRef serv = getServiceCrossRef(range);
 			serv.addContext(nrefctx);
 		}
-
-		 */
-
 	}
 
 	protected void crossRefService(FgTcpUdpSctpService service) {
@@ -828,17 +928,16 @@ public class FgFw extends GenericEquipment {
 				crossRefNetworkLink(ipNetRef, linkobj);
 			}
         }
-		/* TODO
-		if (obj instanceof CpFwRule) {
-			CpFwRule rule = (CpFwRule) obj;
+
+		if (obj instanceof FgFwRule) {
+			FgFwRule rule = (FgFwRule) obj;
 			if (Log.debug().isLoggable(Level.INFO)) {
 				Log.debug().info("xref NetworkLink/rule: " + rule.toText());
 			}
 			CrossRefContext refContext =
-				new CrossRefContext(rule.toText(), "rule", "", null, 0);
+				new CrossRefContext(rule.toText(), "RULE", "", null, 0);
 			ipNetRef.addContext(refContext);
-
-		}*/
+		}
 	}
 
 

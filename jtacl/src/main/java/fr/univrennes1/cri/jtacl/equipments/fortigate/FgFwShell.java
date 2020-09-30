@@ -91,7 +91,9 @@ public class FgFwShell extends GenericEquipmentShell {
 
 	public void commandShowRules(PrintStream output, FgFwShellParser parser)
     {
-        //showLayer(output, _cpfw.getRootLayer());
+        for(FgFwRule r: _fgfw.getFgRules()) {
+            output.println(r.toText());
+        }
 	}
 
 
