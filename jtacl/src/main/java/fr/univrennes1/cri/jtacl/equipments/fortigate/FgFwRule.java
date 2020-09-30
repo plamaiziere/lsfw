@@ -157,9 +157,7 @@ public class FgFwRule extends FgObject {
 		s += ", name: ";
 		if (_name != null)
 			s+= _name;
-		s += ", comment: ";
-		if (_comment != null)
-			s+= _comment;
+
 		String senabled = _disabled ? "disabled" : "enabled";
 		String srcNot = _sourceIp.isNotIn() ? "!" : "";
 		String destNot = _destIp.isNotIn() ? "!" : "";
