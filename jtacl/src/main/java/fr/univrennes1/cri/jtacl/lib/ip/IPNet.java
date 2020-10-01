@@ -13,6 +13,8 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
+import org.xbill.DNS.*;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Inet4Address;
@@ -24,16 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.xbill.DNS.DClass;
-import org.xbill.DNS.ExtendedResolver;
-import org.xbill.DNS.Message;
-import org.xbill.DNS.Name;
-import org.xbill.DNS.PTRRecord;
-import org.xbill.DNS.Record;
-import org.xbill.DNS.Resolver;
-import org.xbill.DNS.ReverseMap;
-import org.xbill.DNS.Section;
-import org.xbill.DNS.Type;
 
 /**
  * Class and tools to deal with IPv4 and IPv6 addresses and networks.<br/>
@@ -689,7 +681,7 @@ public final class IPNet implements Comparable, IPRangeable {
      * the FQDN depending on the underlying system configuration.
 	 * @return the cannonical hostname for this IP address.
      * @throws UnknownHostException if problem occurs.
-     * @see InetAddress#canonicalHostName
+     * @see InetAddress#getCanonicalHostName
 	 */
 	public String getCannonicalHostname() throws UnknownHostException {
 		InetAddress ip = toInetAddress();
@@ -714,7 +706,7 @@ public final class IPNet implements Comparable, IPRangeable {
      * Gets the DNS PTR entry for this IP address.
 	 * @return The PTR entry for this IP address, null if not found.
      * @throws UnknownHostException if problem occurs.
-     * @see InetAddress#canonicalHostName
+     * @see InetAddress#getCanonicalHostName
 	 */
 	public String getPtrHostname() throws UnknownHostException {
 		InetAddress ip = toInetAddress();
