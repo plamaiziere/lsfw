@@ -21,8 +21,16 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
+import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+import fr.univrennes1.cri.jtacl.core.network.Route;
+import fr.univrennes1.cri.jtacl.core.network.Routes;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.*;
+import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import org.w3c.dom.Document;
@@ -268,6 +276,10 @@ public class FgFw extends GenericEquipment {
 		loadFiltersFromXML(doc);
 
 		loadIfaces(doc);
+		// loopback interface
+        Iface iface = addLoopbackIface("loopback", "loopback");
+        _fgFwIfaces.put("loopback", new FgIface(iface));
+
 		loadConfiguration(doc);
 		linkServices();
 		linkNetworkObjects();
@@ -497,7 +509,7 @@ public class FgFw extends GenericEquipment {
 	    return r;
     }
 
-    protected void checkFwRuleIface(List<String> ifaces) {
+    protected void checkFwRuleIface(FgIfacesSpec ifaces) {
 	    for (String intf: ifaces) {
 	        if (!intf.equals("any") && !_fgFwIfaces.containsKey(intf))
                 throwCfgException("Unknown interface " + intf, true);
@@ -558,9 +570,12 @@ public class FgFw extends GenericEquipment {
             String scomment = n.path("comment").textValue();
 
             /* Interfaces */
-            List<String> srcIfaces = parseJsonOriginKeyList(n.path("srcintf"));
+            FgIfacesSpec srcIfaces = new FgIfacesSpec();
+            srcIfaces.addAll(parseJsonOriginKeyList(n.path("srcintf")));
             checkFwRuleIface(srcIfaces);
-            List<String> dstIfaces = parseJsonOriginKeyList(n.path("dstintf"));
+
+            FgIfacesSpec dstIfaces = new FgIfacesSpec();
+            dstIfaces.addAll(parseJsonOriginKeyList(n.path("dstintf")));
             checkFwRuleIface(dstIfaces);
 
             /* addresses */
@@ -991,4 +1006,220 @@ public class FgFw extends GenericEquipment {
             }
 		}
 	}
+
+    @Override
+    public void incoming(IfaceLink link, Probe probe) {
+   		if (Log.debug().isLoggable(Level.INFO))
+    		Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
+
+		if (!link.isLoopback()) {
+            probe.decTimeToLive();
+            if (!probe.isAlive()) {
+                probe.killError("TimeToLive expiration");
+                return;
+            }
+
+            /*
+             * Filter in the probe
+             */
+            packetFilter(link, Direction.IN, probe);
+        }
+
+		/*
+		 * Check if the destination of the probe is on this equipment.
+		 */
+		IPNet ipdest = probe.getDestinationAddress().toIPNet();
+		if (ipdest != null) {
+			IfaceLink ilink = getIfaceLink(ipdest);
+			if (ilink != null) {
+				/*
+				 * Set the probe's final position and notify the monitor
+				 */
+				probe.setOutgoingLink(ilink, ipdest);
+				probe.destinationReached("destination reached");
+				return;
+			}
+		}
+		/*
+		 * Route the probe.
+		 */
+		Routes routes;
+		routes = _routingEngine.getRoutes(probe);
+		if (routes.isEmpty()) {
+			probe.killNoRoute("No route to " + probe.getDestinationAddress());
+			return;
+		}
+		probe.routed(probe.getDestinationAddress().toString("i::"));
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			for (Route r: routes) {
+				Log.debug().info("route: " + r.toString());
+			}
+		}
+
+		/*
+		 * if we have several routes for a destination, we have to probe these
+		 * routes too because our goal is to know if a probe is able to
+		 * reach a destination, regardless of the route taken.
+		 */
+		ArrayList<Probe> probes = new ArrayList<>();
+		probes.add(probe);
+
+		/*
+		 * Create copies of the incoming probe to describe the other routes.
+		 */
+		for (int i = 1; i < routes.size(); i ++) {
+			probes.add(probe.newInstance());
+		}
+
+		/*
+		 * Set the position of the probes.
+		 */
+		for (int i = 0; i < routes.size(); i ++) {
+			//noinspection unchecked
+			Route<IfaceLink> route = routes.get(i);
+			probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
+		}
+
+		/*
+		 * Filter out the probes
+		 */
+		for (Probe p: probes) {
+			packetFilter(p.getOutgoingLink(), Direction.OUT, p);
+		}
+
+		/*
+		 * Send the probes over the network.
+		 */
+		for (Probe p: probes) {
+			/*
+			 * Do not send the probe if the outgoing link is the same as the input.
+			 */
+			if (!p.getOutgoingLink().equals(link))
+				outgoing(p.getOutgoingLink(), p, p.getNextHop());
+			else
+				probe.killLoop("same incoming and outgoing link");
+		}
+	}
+
+	protected MatchResult interfaceFilter(IfaceLink link, FgIfacesSpec ifacesSpec) {
+	    return ifacesSpec.isAny() ? MatchResult.ALL
+                                  : (ifacesSpec.contains(link.getIfaceName()) ? MatchResult.ALL : MatchResult.NOT);
+    }
+
+	protected MatchResult ipSpecFilter(FgFwIpSpec ipSpec, IPRangeable range) {
+
+		MatchResult mres = ipSpec.getNetworks().matches(range);
+		if (ipSpec.isNotIn())
+			mres = mres.not();
+		return mres;
+	}
+
+	protected MatchResult servicesSpecFilter(FgFwServicesSpec servicesSpec,
+                                             Probe probe) {
+
+		FgServicesMatch smatch = servicesSpec.getServices().matches(probe);
+		MatchResult mres = smatch.getMatchResult();
+		if (servicesSpec.isNotIn())
+			mres = mres.not();
+		return mres;
+	}
+
+	protected MatchResult ruleFilter(IfaceLink link, Direction direction, Probe probe, FgFwRule rule) {
+	    /*
+	     * disabled
+	     */
+	    if (rule.isDisabled()) return MatchResult.NOT;
+
+	    /* implicit drop */
+        if (rule.isImplicitDrop()) return MatchResult.NOT;
+
+	    /*
+	     * interfaces
+	     */
+        FgIfacesSpec ifacesSpec = direction == Direction.IN ? rule._sourceIfaces : rule._destIfaces;
+        if (interfaceFilter(link, ifacesSpec) == MatchResult.NOT) return MatchResult.NOT;
+
+        /*
+		 * check source IP
+		 */
+		FgFwIpSpec ipspec = rule.getSourceIp();
+		MatchResult mIpSource = ipSpecFilter(ipspec, probe.getSourceAddress());
+		if (mIpSource == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		/*
+		 * check destination IP
+		 */
+		ipspec = rule.getDestIp();
+		MatchResult mIpDest =ipSpecFilter(ipspec, probe.getDestinationAddress());
+		if (mIpDest == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		/*
+		 * check services
+		 */
+		MatchResult mService;
+		if (probe.getRequest().getProtocols() != null) {
+			FgFwServicesSpec services = rule.getServices();
+			mService = servicesSpecFilter(services, probe);
+			if (mService == MatchResult.NOT)
+				return MatchResult.NOT;
+		} else {
+			mService = MatchResult.ALL;
+		}
+
+		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
+				mService == MatchResult.ALL)
+			return MatchResult.ALL;
+
+		return MatchResult.MATCH;
+    }
+
+	/**
+	 * Packet filter
+	 */
+	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
+        String ifaceName = link.getIfaceName();
+        String ifaceComment = link.getIface().getComment();
+        ProbeResults results = probe.getResults();
+
+        MatchResult match;
+        for (FgFwRule rule : _fgRules) {
+            String ruleText = rule.toText();
+            match = ruleFilter(link, direction, probe, rule);
+            /* if the rule matches */
+            if (match != MatchResult.NOT) {
+                /*
+                 * store the result in the probe
+                 */
+                FwResult aclResult = new FwResult();
+                switch (rule.getRuleAction()) {
+                    case ACCEPT:
+                        aclResult.addResult(FwResult.ACCEPT);
+                        break;
+                    case DROP:
+                        aclResult.addResult(FwResult.DENY);
+                        break;
+                }
+                results.addMatchingAcl(direction, ruleText,
+                        aclResult);
+
+                results.setInterface(direction,
+                        ifaceName + " (" + ifaceComment + ")");
+
+                /*
+                 * the active ace is the ace accepting or denying the packet.
+                 * this is the first ace that match the packet.
+                 */
+                if (results.getActiveAcl(direction).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+                    results.addActiveAcl(direction,
+                            ruleText,
+                            aclResult);
+                    results.setAclResult(direction,
+                            aclResult);
+                }
+            }
+        }
+    }
 }

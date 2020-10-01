@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<!--
+	Document   : fortigate.xml
+	Created on : 01/10/2020
+	Author     : Patrick Lamaiziere
+	Description:
+		Template of the fortigate  configuration.
+		See https://groupes.renater.fr/wiki/jtacl/public/fortigate
+-->
+
+<equipment>
+
+	<!-- definitions of the interfaces -->
+	<iface name="eth0" comment="interface 0" ip="IPaddress" network="IPaddress/Netmask"/>
+	<!-- when adding an IP to an already defined interface, "comment" attribute is optional -->
+	<iface name="eth0" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<iface name="eth1" comment="interface 1" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<!-- policies -->
+	<fwpolicies filename="/path/to/policy.json" />
+
+    <!--gateway name -->
+    <gatewayName name="gateway_name" />
+
+	<!-- routing engine -->
+	<routing>
+		<!--
+			Add routing engine definitions here.
+			See the file routing.xml
+			https://groupes.renater.fr/wiki/jtacl/public/commonrouting
+		-->
+	</routing>
+
+</equipment>

@@ -13,8 +13,6 @@
 
 package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
-import java.util.List;
-
 /**
  * Fortigate firewall rule
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -30,8 +28,8 @@ public class FgFwRule extends FgObject {
 	protected FgFwServicesSpec _services;
 	protected String _comment;
 	protected String _uid;
-	protected List<String> _sourceIfaces;
-	protected List<String> _destIfaces;
+	protected FgIfacesSpec _sourceIfaces;
+	protected FgIfacesSpec _destIfaces;
 	protected String _label;
 
 	protected boolean _implicitDrop;
@@ -76,9 +74,9 @@ public class FgFwRule extends FgObject {
 		return _implicitDrop;
 	}
 
-	public List<String> getSourceIfaces() { return _sourceIfaces; }
+	public FgIfacesSpec getSourceIfaces() { return _sourceIfaces; }
 
-	public List<String> getDestIfaces() { return _destIfaces; }
+	public FgIfacesSpec getDestIfaces() { return _destIfaces; }
 
 	public String getLabel() { return _label; }
 
@@ -107,7 +105,7 @@ public class FgFwRule extends FgObject {
      */
     static public FgFwRule newSecurityRule(String name, String originKey, String comment, String label, String uid,
                                     Integer number, boolean disabled,
-                                    List<String> sourceIfaces, List<String> destIfaces,
+                                    FgIfacesSpec sourceIfaces, FgIfacesSpec destIfaces,
                                     FgFwIpSpec srcIpSpec, FgFwIpSpec dstIpSpec,
                                     FgFwServicesSpec servicesSpec,
                                     FgFwRuleAction ruleAction) {
