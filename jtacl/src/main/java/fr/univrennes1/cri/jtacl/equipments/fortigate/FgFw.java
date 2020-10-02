@@ -426,36 +426,42 @@ public class FgFw extends GenericEquipment {
         return i;
     }
 
-    protected List<PortSpec> parsePortsRanges(String portsRanges) {
-	    List<PortSpec> portsSpecs = new ArrayList<>();
-	    String[] lpr = portsRanges.split(":");
-	    if (lpr.length > 2) throwCfgException("invalid source/destination ports ranges: " + portsRanges, true);
-	    if (lpr.length == 1) {
-	        portsSpecs.add(null);
-	        portsSpecs.add(parsePortRange(lpr[0]));
-        } else {
-   	        portsSpecs.add(parsePortRange(lpr[0]));
-	        portsSpecs.add(parsePortRange(lpr[1]));
+    protected List<FgPortsSpec> parseListPortsSpecs(String listPortsSpecs) {
+        //XXX: form : rangedest1[-rangedest1][:rangesource1-rangesource1] rangedest2[-rangedest2] ...
+	    List<FgPortsSpec> lps = new LinkedList<>();
+	    String[] lp = listPortsSpecs.split(" ");
+	    for(String p: lp) {
+	        lps.add(parsePortsSpec(p));
         }
-	        return portsSpecs;
+	    return lps;
+    }
+
+    protected FgPortsSpec parsePortsSpec(String portsSpec) {
+        //XXX: form : rangedest1[-rangedest1][:rangesource1-rangesource1]
+        PortSpec source = null;
+        PortSpec dest = null;
+	    String[] lpr = portsSpec.split(":");
+	    if (lpr.length > 2) throwCfgException("invalid source/destination ports ranges: " + portsSpec, true);
+        dest = parsePortRange(lpr[0]);
+	    if (lpr.length == 2) {
+	        source = parsePortRange(lpr[1]);
+        }
+        return new FgPortsSpec(source, dest);
 	}
 
     protected PortSpec parsePortRange(String portrange) {
+       //XXX: form : range1[-range1]
 	    PortSpec portSpec = new PortSpec();
 
-	    //XXX: form : port1 port2 range1-range1 port3 range2-range2 ...
-	    String[] slp = portrange.split(" ");
-        for (String sp: slp) {
-            String[] sr = sp.split("-");
-            if (sr.length > 2) throwCfgException("invalid port range: " + portrange, true);
+        String[] sr = portrange.split("-");
+        if (sr.length > 2) throwCfgException("invalid port range: " + portrange, true);
 
-            int port1 = parseNumber(sr[0]);
-            int port2 = port1;
-            if (sr.length == 2) {
-                port2 = parseNumber(sr[1]);
-            }
-            portSpec.add(new PortRange(port1, port2));
+        int port1 = parseNumber(sr[0]);
+        int port2 = port1;
+        if (sr.length == 2) {
+            port2 = parseNumber(sr[1]);
         }
+        portSpec.add(new PortRange(port1, port2));
         return portSpec;
 	}
 
@@ -740,19 +746,19 @@ public class FgFw extends GenericEquipment {
 	        /* TCP / UDP ... */
 	        if (sprotocol.equals("TCP/UDP/SCTP") || sprotocol.equals("ALL")) {
 	            JsonNode ntcpports = n.path("tcp-portrange");
-	            List<PortSpec> tcpPortsSpec = null;
+	            List<FgPortsSpec> tcpPortsSpec = null;
 	            if (!ntcpports.isMissingNode() && !ntcpports.textValue().isEmpty())
-	                tcpPortsSpec = parsePortsRanges(ntcpports.textValue());
+	                tcpPortsSpec = parseListPortsSpecs(ntcpports.textValue());
 
 	            JsonNode nudpports = n.path("udp-portrange");
-	            List<PortSpec> udpPortsSpec = null;
+	            List<FgPortsSpec> udpPortsSpec = null;
 	            if (!nudpports.isMissingNode() && !nudpports.textValue().isEmpty())
-	                udpPortsSpec = parsePortsRanges(nudpports.textValue());
+	                udpPortsSpec = parseListPortsSpecs(nudpports.textValue());
 
 	            JsonNode nsctpports = n.path("sctp-portrange");
-	            List<PortSpec> sctpPortsSpec = null;
+	            List<FgPortsSpec> sctpPortsSpec = null;
 	            if (!nsctpports.isMissingNode() && !nsctpports.textValue().isEmpty())
-	                sctpPortsSpec = parsePortsRanges(nsctpports.textValue());
+	                sctpPortsSpec = parseListPortsSpecs(nsctpports.textValue());
 
 	            if (sprotocol.equals("ALL")) {
                     service = new FgProtoAllService(
@@ -761,12 +767,9 @@ public class FgFw extends GenericEquipment {
                             , scomment
                             , ips
                             , sfqdn
-                            , udpPortsSpec == null ? null : udpPortsSpec.get(0)
-                            , udpPortsSpec == null ? null : udpPortsSpec.get(1)
-                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(0)
-                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(1)
-                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(0)
-                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(1)
+                            , udpPortsSpec
+                            , tcpPortsSpec
+                            , sctpPortsSpec
                     );
                 } else {
                     service = new FgTcpUdpSctpService(
@@ -775,12 +778,9 @@ public class FgFw extends GenericEquipment {
                             , scomment
                             , ips
                             , sfqdn
-                            , udpPortsSpec == null ? null : udpPortsSpec.get(0)
-                            , udpPortsSpec == null ? null : udpPortsSpec.get(1)
-                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(0)
-                            , tcpPortsSpec == null ? null : tcpPortsSpec.get(1)
-                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(0)
-                            , sctpPortsSpec == null ? null : sctpPortsSpec.get(1)
+                            , udpPortsSpec
+                            , tcpPortsSpec
+                            , sctpPortsSpec
                     );
                 }
             }
@@ -881,17 +881,22 @@ public class FgFw extends GenericEquipment {
 		}
 
 		List<Object> owners = service.getLinkedTo();
-        if (service.hasUdpSourcePortSpec()) {
-            addServiceCrossRef(service, service.getUdpSourcePortSpec(), ServiceCrossRefType.FROM, Protocols.UDP, owners);
+		if (service.isUdp()) {
+		    for (FgPortsSpec portsSpec: service.getUdpPortsSpec()) {
+		        if (portsSpec.hasSourcePortSpec())
+		            addServiceCrossRef(service, portsSpec.getSourcePorts(), ServiceCrossRefType.FROM, Protocols.UDP, owners);
+		        if (portsSpec.hasDestPortSpec())
+		            addServiceCrossRef(service, portsSpec.getDestPorts(), ServiceCrossRefType.TO, Protocols.UDP, owners);
+            }
         }
-        if (service.hasUdpPortSpec()) {
-            addServiceCrossRef(service, service.getUdpPortSpec(), ServiceCrossRefType.TO, Protocols.UDP, owners);
-        }
-        if (service.hasTcpSourcePortSpec()) {
-            addServiceCrossRef(service, service.getTcpSourcePortSpec(), ServiceCrossRefType.FROM, Protocols.TCP, owners);
-        }
-        if (service.hasTcpPortSpec()) {
-            addServiceCrossRef(service, service.getTcpPortSpec(), ServiceCrossRefType.TO, Protocols.TCP, owners);
+
+		if (service.isTcp()) {
+		    for (FgPortsSpec portsSpec: service.getTcpPortsSpec()) {
+		        if (portsSpec.hasSourcePortSpec())
+		            addServiceCrossRef(service, portsSpec.getSourcePorts(), ServiceCrossRefType.FROM, Protocols.TCP, owners);
+		        if (portsSpec.hasDestPortSpec())
+		            addServiceCrossRef(service, portsSpec.getDestPorts(), ServiceCrossRefType.TO, Protocols.TCP, owners);
+            }
         }
 	}
 

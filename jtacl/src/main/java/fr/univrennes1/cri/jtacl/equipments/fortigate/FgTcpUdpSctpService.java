@@ -23,15 +23,13 @@ import java.util.List;
 
 public class FgTcpUdpSctpService extends FgAddressService {
 
-    private boolean _isUDP;
-    private boolean _isTCP;
-    private boolean _isSCTP;
-    private PortSpec _tcpSourcePortSpec;
-    private PortSpec _tcpPortSpec;
-    private PortSpec _udpSourcePortSpec;
-    private PortSpec _udpPortSpec;
-    private PortSpec _sctpSourcePortSpec;
-    private PortSpec _sctpPortSpec;
+    protected  boolean _isUDP;
+    protected boolean _isTCP;
+    protected boolean _isSCTP;
+
+    List<FgPortsSpec> _tcpPortsSpecs;
+    List<FgPortsSpec> _udpPortsSpecs;
+    List<FgPortsSpec> _sctpPortsSpecs;
 
     /*
 	 * TCP flags / TCP flagsSet
@@ -39,65 +37,44 @@ public class FgTcpUdpSctpService extends FgAddressService {
 	private TcpFlags _tcpFlags = new TcpFlags("S");
 	private TcpFlags _tcpFlagSet = new TcpFlags("SA");
 
-
     public FgTcpUdpSctpService(String name, String originKey, String comment
             , List<IPRangeable> ipRanges
             , String fqdn
-            , PortSpec udpSourcePortSpec
-            , PortSpec udpPortSpec
-            , PortSpec tcpSourcePortSpec
-            , PortSpec tcpPortSpec
-            , PortSpec sctpSourcePortSpec
-            , PortSpec sctpPortSpec) {
+            , List<FgPortsSpec> udpPortsSpecs
+            , List<FgPortsSpec> tcpPortsSpecs
+            , List<FgPortsSpec> sctpPortsSpecs) {
 
         super(name, originKey, comment, ipRanges, fqdn, FgServiceType.TCPUDPSCTP);
 
-        _isTCP = tcpPortSpec != null || tcpSourcePortSpec != null;
-        _isUDP = udpPortSpec != null || udpSourcePortSpec != null;
-        _isSCTP = sctpPortSpec != null || sctpSourcePortSpec != null;
-        _tcpPortSpec = tcpPortSpec;
-        _tcpSourcePortSpec = tcpSourcePortSpec;
-        _udpPortSpec = udpPortSpec;
-        _udpSourcePortSpec = udpSourcePortSpec;
-        _sctpPortSpec = sctpPortSpec;
-        _sctpSourcePortSpec = sctpSourcePortSpec;
+        _isTCP = tcpPortsSpecs != null;
+        _isUDP = udpPortsSpecs != null;
+        _isSCTP = sctpPortsSpecs != null;
+        _udpPortsSpecs = udpPortsSpecs;
+        _tcpPortsSpecs = tcpPortsSpecs;
+        _sctpPortsSpecs = sctpPortsSpecs;
     }
 
-    public PortSpec getUdpSourcePortSpec() {return _udpSourcePortSpec;}
-    public PortSpec getUdpPortSpec() {return _udpPortSpec;}
-    public PortSpec getTcpSourcePortSpec() {return _tcpSourcePortSpec;}
-    public PortSpec getTcpPortSpec() {return _tcpPortSpec;}
-    public PortSpec getSctpSourcePortSpec() {return _sctpSourcePortSpec;}
-    public PortSpec getSctpPortSpec() {return _sctpPortSpec;}
+    public List<FgPortsSpec> getUdpPortsSpec() {return _udpPortsSpecs;}
+    public List<FgPortsSpec> getTcpPortsSpec() {return _tcpPortsSpecs;}
+    public List<FgPortsSpec> getSctpPortsSpec() {return _sctpPortsSpecs;}
     public boolean isUdp() {return _isUDP;}
     public boolean isTcp() {return _isTCP;}
     public boolean isSctp() {return _isSCTP;}
-
-    public boolean hasUdpSourcePortSpec() {return _udpSourcePortSpec != null;}
-    public boolean hasUdpPortSpec() {return _udpPortSpec != null;}
-    public boolean hasTcpSourcePortSpec() {return _tcpSourcePortSpec != null;}
-    public boolean hasTcpPortSpec() {return _tcpPortSpec != null;}
-    public boolean hasSctpSourcePortSpec() {return _sctpSourcePortSpec != null;}
-    public boolean hasSctpPortSpec() {return _sctpPortSpec != null;}
-
 
     @Override
     public String toString() {
         String s = "";
         String p = "";
         if (_isUDP) {
-            if (hasUdpSourcePortSpec()) s += ", UDP src. ports=" + _udpSourcePortSpec;
-            if (hasUdpPortSpec()) s += ", UDP dest. ports=" + _udpPortSpec;
+            s += ", UDP: " + _udpPortsSpecs;
             p = (_isTCP || _isSCTP) ? "UDP/" : "UDP";
         }
         if (_isTCP) {
-            if (hasTcpSourcePortSpec()) s += ", TCP src. ports=" + _tcpSourcePortSpec;
-            if (hasTcpPortSpec()) s += ", TCP dest. ports=" + _tcpPortSpec;
+            s += ", TCP: " + _tcpPortsSpecs;
             p += (_isSCTP) ? "TCP/": "TCP";
         }
         if (_isSCTP) {
-            if (hasSctpSourcePortSpec()) s += ", SCTP src. ports=" + _sctpSourcePortSpec;
-            if (hasSctpPortSpec()) s += ", SCTP dest. ports=" + _sctpPortSpec;
+            s += ", SCTP: " + _sctpPortsSpecs;
             p += "SCTP";
         }
         return super.toString() + ", " + p + s;
@@ -134,7 +111,7 @@ public class FgTcpUdpSctpService extends FgAddressService {
 		int all = 0;
 		int may = 0;
         if (testTCP && _isTCP) {
-            mres = matchPorts(request, _tcpSourcePortSpec, _tcpPortSpec);
+            mres = matchPorts(request, _tcpPortsSpecs);
             switch (mres) {
                 case ALL: all++; break;
                 case NOT: break;
@@ -142,7 +119,7 @@ public class FgTcpUdpSctpService extends FgAddressService {
             }
         }
         if (testUDP && _isUDP) {
-            mres = matchPorts(request, _udpSourcePortSpec, _udpPortSpec);
+            mres = matchPorts(request, _udpPortsSpecs);
             switch (mres) {
                 case ALL: all++; break;
                 case NOT: break;
@@ -174,7 +151,23 @@ public class FgTcpUdpSctpService extends FgAddressService {
 	    return servicesMatch;
 	}
 
-	protected MatchResult matchPorts(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
+	protected MatchResult matchPorts(ProbeRequest request, List<FgPortsSpec> portsSpecs) {
+        int all = 0;
+        int may = 0;
+
+        for (FgPortsSpec portsSpec: portsSpecs) {
+            MatchResult mres = matchPortsSrcDest(request, portsSpec.getSourcePorts(), portsSpec.getDestPorts());
+            switch (mres) {
+                case ALL: all++; break;
+                case MATCH: may++; break;
+            }
+        }
+        if (all > 0) return MatchResult.ALL;
+        if (may > 0) return MatchResult.MATCH;
+        return MatchResult.MATCH;
+    }
+
+	protected MatchResult matchPortsSrcDest(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
 
 		/*
 		 * source port

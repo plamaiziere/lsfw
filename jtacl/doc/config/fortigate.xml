@@ -21,9 +21,6 @@
 	<!-- policies -->
 	<fwpolicies filename="/path/to/policy.json" />
 
-    <!--gateway name -->
-    <gatewayName name="gateway_name" />
-
 	<!-- routing engine -->
 	<routing>
 		<!--

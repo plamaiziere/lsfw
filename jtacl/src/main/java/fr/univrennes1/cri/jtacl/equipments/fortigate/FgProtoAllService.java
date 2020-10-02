@@ -15,7 +15,6 @@ package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
-import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 
 import java.util.List;
 
@@ -25,16 +24,13 @@ public class FgProtoAllService extends FgAddressService {
     public FgProtoAllService(String name, String originKey, String comment
             , List<IPRangeable> ipRanges
             , String fqdn
-            , PortSpec udpSourcePortSpec
-            , PortSpec udpPortSpec
-            , PortSpec tcpSourcePortSpec
-            , PortSpec tcpPortSpec
-            , PortSpec sctpSourcePortSpec
-            , PortSpec sctpPortSpec) {
+            , List<FgPortsSpec> udpPortsSpec
+            , List<FgPortsSpec> tcpPortsSpec
+            , List<FgPortsSpec> sctpPortsSpec) {
 
         super(name, originKey, comment, ipRanges, fqdn, FgServiceType.ALL);
-        _service = new FgTcpUdpSctpService(name, originKey, comment, ipRanges, fqdn, udpSourcePortSpec
-            , udpPortSpec, tcpSourcePortSpec, tcpPortSpec, sctpSourcePortSpec, sctpPortSpec);
+        _service = new FgTcpUdpSctpService(name, originKey, comment, ipRanges, fqdn, udpPortsSpec
+            , tcpPortsSpec, sctpPortsSpec);
     }
 
     @Override
