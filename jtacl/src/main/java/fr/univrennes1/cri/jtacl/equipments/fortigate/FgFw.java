@@ -731,16 +731,14 @@ public class FgFw extends GenericEquipment {
             String sfqdn = n.path("fqdn").textValue();
 	        String scomment = n.path("comment").textValue();
 
-            List<IPRangeable> ips = new LinkedList<>();
+	        List<IPRangeable> ips = null;
 	        if (!sfqdn.isEmpty()) {
 	            ips = parseFqdn(sfqdn);
             } else sfqdn = null;
 
 	        if (!siprange.equals("0.0.0.0")) {
 	            ips.addAll(parseServiceIpRange(siprange));
-            } else {
-	            ips = null;
-	        }
+            }
 
 	        FgAddressService service = null;
 	        /* TCP / UDP ... */
