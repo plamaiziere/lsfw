@@ -23,6 +23,7 @@ import java.util.List;
 public class FgIcmpService extends FgAddressService {
     private IPIcmpEnt _icmp;
     private AddressFamily _af;
+    public boolean hasIcmp() { return _icmp != null; };
 
     public FgIcmpService(String name, String originKey, String comment
             , List<IPRangeable> ipRanges
@@ -32,7 +33,9 @@ public class FgIcmpService extends FgAddressService {
             , Integer icmpCode) {
 
         super(name, originKey, comment, ipRanges, fqdn, FgServiceType.ICMP);
-        _icmp = new IPIcmpEnt(name, icmpType, icmpCode);
+        if (icmpType != null)
+            _icmp = new IPIcmpEnt(name, icmpType, icmpCode);
+        else _icmp = null;
         _af = af;
     }
 
@@ -70,6 +73,12 @@ public class FgIcmpService extends FgAddressService {
     }
 
     protected MatchResult matchIcmp(ProbeRequest request) {
+
+        /*
+         * all icmp
+         */
+        if (!hasIcmp()) return MatchResult.ALL;
+
 		/*
 		 * icmp type and code
 		 */

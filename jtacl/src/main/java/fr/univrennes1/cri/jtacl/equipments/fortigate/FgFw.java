@@ -783,13 +783,14 @@ public class FgFw extends GenericEquipment {
                 }
             }
 
-	        /* ICMP */
-            if (sprotocol.equals("ICMP")) {
-                String sicmp = n.path("icmptype").asText();
-                String stype = n.path("icmpcode").asText();
-                int icmp = parseNumber(sicmp);
-                service = new FgIcmpService(sname, soriginKey, scomment, ips, sfqdn, AddressFamily.INET, icmp
-                        , stype.isEmpty() ? -1 : parseNumber(stype));
+	        /* ICMP / ICMP6 */
+            if (sprotocol.equals("ICMP") || sprotocol.equals("ICMP6")) {
+                String sicmpType = n.path("icmptype").asText();
+                String scode = n.path("icmpcode").asText();
+                Integer icmpType = sicmpType.isEmpty() ? null : parseNumber(sicmpType) ;
+                AddressFamily af = sprotocol.equals("ICMP") ? AddressFamily.INET : AddressFamily.INET6;
+                service = new FgIcmpService(sname, soriginKey, scomment, ips, sfqdn, af, icmpType
+                        , scode.isEmpty() ? -1 : parseNumber(scode));
             }
 
             /* IP */
@@ -1135,7 +1136,7 @@ public class FgFw extends GenericEquipment {
 	    if (rule.isDisabled()) return MatchResult.NOT;
 
 	    /* implicit drop */
-        if (rule.isImplicitDrop()) return MatchResult.NOT;
+        if (rule.isImplicitDrop()) return MatchResult.ALL;
 
 	    /*
 	     * interfaces
