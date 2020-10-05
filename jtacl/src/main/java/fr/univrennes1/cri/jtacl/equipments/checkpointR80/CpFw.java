@@ -36,6 +36,7 @@ import org.parboiled.support.ParsingResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -1108,6 +1109,9 @@ public class CpFw extends GenericEquipment {
 		loadFiltersFromXML(doc);
 
 		loadIfaces(doc);
+		// loopback interface
+        Iface iface = addLoopbackIface("loopback", "loopback");
+        _cpfwIfaces.put("loopback", new CpFw.CPfwIface(iface));
 		loadConfiguration(doc);
 
 		linkServices();
@@ -1351,16 +1355,18 @@ public class CpFw extends GenericEquipment {
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
 
-		probe.decTimeToLive();
-		if (!probe.isAlive()) {
-			probe.killError("TimeToLive expiration");
-			return;
-		}
+		if (!link.isLoopback()) {
+            probe.decTimeToLive();
+            if (!probe.isAlive()) {
+                probe.killError("TimeToLive expiration");
+                return;
+            }
 
-		/*
-		 * Filter in the probe
-		 */
-		packetFilter(link, Direction.IN, probe);
+            /*
+             * Filter in the probe
+             */
+            packetFilter(link, Direction.IN, probe);
+        }
 
 		/*
 		 * Check if the destination of the probe is on this equipment.
