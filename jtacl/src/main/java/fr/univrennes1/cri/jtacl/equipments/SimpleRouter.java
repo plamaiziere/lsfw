@@ -28,14 +28,15 @@ import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * A test case for a simple equipment doing routing and firewalling.
@@ -166,7 +167,6 @@ public class SimpleRouter extends GenericEquipment {
                 famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 
-		addLoopbackIface("loopback", "loopback");
 		loadIfaces(doc);
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);

@@ -1112,6 +1112,7 @@ public class CpFw extends GenericEquipment {
 		// loopback interface
         Iface iface = addLoopbackIface("loopback", "loopback");
         _cpfwIfaces.put("loopback", new CpFw.CPfwIface(iface));
+
 		loadConfiguration(doc);
 
 		linkServices();
