@@ -16,20 +16,11 @@ package fr.univrennes1.cri.jtacl.shell;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclParameterException;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
-import fr.univrennes1.cri.jtacl.core.network.Iface;
-import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
-import fr.univrennes1.cri.jtacl.core.network.IfaceLinks;
-import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
-import fr.univrennes1.cri.jtacl.core.network.Route;
-import fr.univrennes1.cri.jtacl.core.network.Routes;
+import fr.univrennes1.cri.jtacl.core.network.*;
 import fr.univrennes1.cri.jtacl.core.probing.ExpectedProbing;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
-import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
-import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
-import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
+import fr.univrennes1.cri.jtacl.lib.ip.*;
+
 import java.net.UnknownHostException;
 
 /**
@@ -241,21 +232,49 @@ public class ShellUtils {
 	}
 
 	/**
-	 * Returns all the {@link IfaceLink} links of the loopback iface of an equipment
-	 *
-	 * @param equipmentName equipment used to filter.
-	 * @return a {@link IfaceLinks} list containing the links.
+	 * Returns {@link IfaceLink} list of links that matches the specified IP
+	 * @param ip ip to search and interface link for
+	 * @return a {@link IfaceLink} list of links is found, null otherwise.
 	 */
-	public static IfaceLinks getIfaceLinksByLoopbackEquipment(IPNet sourceIP,
+	public static IfaceLinks getLoopBackIfaceLinksByIP(IPNet ip) {
+
+	    IfaceLinks ilinks = new IfaceLinks();
+		Monitor monitor = Monitor.getInstance();
+		NetworkEquipmentsByName equipments = monitor.getEquipments();
+		for(NetworkEquipment equipment: equipments.values()) {
+		    IfaceLink link = getIfaceLinkLoopback(equipment, ip.getIpVersion());
+		    if (link != null) ilinks.add(link);
+        }
+		return ilinks.isEmpty() ? null : ilinks;
+	}
+
+
+	/**
+	 * Returns {@link IfaceLink} link of the loopback iface of an equipment
+	 * @param ipVersion ip version of the loopback link
+	 * @param equipmentName equipment used to filter.
+	 * @return a {@link IfaceLink} if a link is found, null otherwise.
+	 */
+	public static IfaceLink getIfaceLinksByLoopbackEquipment(IPversion ipVersion,
 			String equipmentName) {
 
-		IfaceLinks resLinks = new IfaceLinks();
 		Monitor monitor = Monitor.getInstance();
 		NetworkEquipment equipment = monitor.getEquipments().get(equipmentName);
 		if (equipment == null) {
 			throw new JtaclParameterException(
 					"No such equipment: " + equipmentName);
 		}
+
+		return getIfaceLinkLoopback(equipment, ipVersion);
+	}
+
+	/**
+	 * Returns {@link IfaceLink} link of the loopback iface of an equipment
+	 * @param ipVersion ip version of the loopback link
+	 * @param equipment equipment used to filter.
+	 * @return a {@link IfaceLink} if a link is found, null otherwise.
+	 */
+	public static IfaceLink getIfaceLinkLoopback(NetworkEquipment equipment, IPversion ipVersion) {
 
 		/*
 		 * filter the iface links
@@ -265,15 +284,14 @@ public class ShellUtils {
 			/*
 			 * search interface loopback
 			 */
-			if (link.isLoopback() && link.getIp().sameIPVersion(sourceIP))  {
+			if (link.isLoopback() && (link.getIp().getIpVersion() == ipVersion))  {
                 /*
                  * pick up the first link that matches the ip version
                  */
-                resLinks.add(link);
-                break;
+                return link;
             }
 		}
-		return resLinks;
+		return null;
 	}
 
 	public static ExpectedProbing parseExpectedProbing(String expect) {

@@ -24,20 +24,9 @@ import fr.univrennes1.cri.jtacl.core.probing.Probing;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
 import fr.univrennes1.cri.jtacl.core.topology.Topology;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
-import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
-import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
-import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
-import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
-import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
-import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
-import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
-import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
-import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
+import fr.univrennes1.cri.jtacl.lib.ip.*;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
+
 import java.net.UnknownHostException;
 
 /**
@@ -127,59 +116,78 @@ public class ProbeCommand {
 		String onEquipment = probeCmd.getEquipments();
 		String outEquipment = probeCmd.getOutEquipment();
 		boolean autolink = onEquipment != null && onEquipment.equalsIgnoreCase("auto");
+		boolean autoout = outEquipment != null && outEquipment.equalsIgnoreCase("auto");
 		if (onEquipment != null && outEquipment != null)
-        	throw new JtaclParameterException("cannot specify 'on and out equipment at the same time");
+        	throw new JtaclParameterException("cannot specify 'on' and 'out' equipment at the same time");
 
 		if (onEquipment != null && !autolink) {
+             // on equipment-name
 			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress.nearestNetwork(),
 					onEquipment);
 			// error
 			if (ilinks == null)
 				throw new JtaclParameterException("no links found");
-		} else if (outEquipment != null) {
-         			ilinks = ShellUtils.getIfaceLinksByLoopbackEquipment(sourceAddress.nearestNetwork(),
-					    outEquipment);
-			// error
-			if (ilinks == null)
-				throw new JtaclParameterException("no links found");
-        } else {
-			/*
-			 * try to find a network link that matches the source IP address.
-			 */
-			NetworkLinks nlinks;
-			Topology topology = _monitor.getTopology();
-			if (!equalSourceAddress) {
-				nlinks = topology.getNetworkLinksByIP(sourceAddress.nearestNetwork());
-			} else {
-				nlinks = topology.getNetworkLinksByIP(isourceAddress.hostAddress());
-			}
-			if (nlinks.isEmpty()) {
-				/*
-				 * use the DFLTEQUIPMENT variable if defined.
-				 */
-				String defaultEquipment;
-				if (sourceAddress.isIPv4())
-					 defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT");
-				else
-					defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT6");
-				if (defaultEquipment != null) {
-					ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(
-							sourceAddress.nearestNetwork(), defaultEquipment);
-					// error
-					if (ilinks == null)
-						throw new JtaclParameterException("no links found");
-				} else {
-					throw new JtaclParameterException("No network matches");
-				}
-			} else {
-				if (nlinks.size() > 1) {
-					throw new JtaclParameterException(
-						"Too many networks match this source IP address");
-				}
-				nlink = nlinks.get(0);
-				ilinks = nlink.getIfaceLinks();
-			}
-		}
+		} else
+                if (outEquipment != null && !autoout) {
+                    // out equipment-name
+                    IfaceLink link = ShellUtils.getIfaceLinksByLoopbackEquipment(sourceAddress.getIpVersion(),
+                        outEquipment);
+                    // error
+                    if (link == null)
+                        throw new JtaclParameterException("no links found");
+                    else {
+                        ilinks = new IfaceLinks();
+                        ilinks.add(link);
+                    }
+                } else if (autoout) {
+                    // out auto
+                    ilinks = ShellUtils.getLoopBackIfaceLinksByIP(sourceAddress.nearestNetwork());
+                    // error
+                    if (ilinks == null)
+                        throw new JtaclParameterException("no link found");
+                    else {
+                        if (ilinks.size() > 1)
+                            throw new JtaclParameterException("too many links");
+                    }
+
+                } else {
+                        /*
+                         * try to find a network link that matches the source IP address.
+                         */
+                        NetworkLinks nlinks;
+                        Topology topology = _monitor.getTopology();
+                        if (!equalSourceAddress) {
+                            nlinks = topology.getNetworkLinksByIP(sourceAddress.nearestNetwork());
+                        } else {
+                            nlinks = topology.getNetworkLinksByIP(isourceAddress.hostAddress());
+                        }
+                        if (nlinks.isEmpty()) {
+                            /*
+                             * use the DFLTEQUIPMENT variable if defined.
+                             */
+                            String defaultEquipment;
+                            if (sourceAddress.isIPv4())
+                                 defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT");
+                            else
+                                defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT6");
+                            if (defaultEquipment != null) {
+                                ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(
+                                        sourceAddress.nearestNetwork(), defaultEquipment);
+                                // error
+                                if (ilinks == null)
+                                    throw new JtaclParameterException("no links found");
+                            } else {
+                                throw new JtaclParameterException("No network matches");
+                            }
+                        } else {
+                            if (nlinks.size() > 1) {
+                                throw new JtaclParameterException(
+                                    "Too many networks match this source IP address");
+                            }
+                            nlink = nlinks.get(0);
+                            ilinks = nlink.getIfaceLinks();
+                        }
+                    }
 
 		if (ilinks.isEmpty()) {
 			throw new JtaclParameterException("No link found");
