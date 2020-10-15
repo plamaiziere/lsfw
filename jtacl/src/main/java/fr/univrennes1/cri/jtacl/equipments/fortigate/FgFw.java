@@ -1206,6 +1206,10 @@ public class FgFw extends GenericEquipment {
                         aclResult.addResult(FwResult.DENY);
                         break;
                 }
+                /* may be */
+                if (match == MatchResult.MATCH || match == MatchResult.UNKNOWN)
+                    aclResult.addResult(FwResult.MAY);
+
                 results.addMatchingAcl(direction, ruleText,
                         aclResult);
 
