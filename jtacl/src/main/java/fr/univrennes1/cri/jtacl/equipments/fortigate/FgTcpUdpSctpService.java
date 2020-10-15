@@ -164,7 +164,7 @@ public class FgTcpUdpSctpService extends FgAddressService {
         }
         if (all > 0) return MatchResult.ALL;
         if (may > 0) return MatchResult.MATCH;
-        return MatchResult.MATCH;
+        return MatchResult.NOT;
     }
 
 	protected MatchResult matchPortsSrcDest(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
