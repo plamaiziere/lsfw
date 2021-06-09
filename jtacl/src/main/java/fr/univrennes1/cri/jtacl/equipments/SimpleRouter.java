@@ -18,6 +18,7 @@ import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.probing.AccessControlList;
@@ -159,12 +160,12 @@ public class SimpleRouter extends GenericEquipment {
 	}
 
 	@Override
-	public void configure() {
+	public NetworkEquipmentsByName configure() {
 
 		if (_configurationFileName.isEmpty())
-			return;
+			return null;
 
-                famAdd(_configurationFileName);
+		famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 
 		loadIfaces(doc);
@@ -172,6 +173,7 @@ public class SimpleRouter extends GenericEquipment {
 		loadRoutesFromXML(doc);
 		loadAcl(doc);
 
+		return null;
 	}
 
 	@Override

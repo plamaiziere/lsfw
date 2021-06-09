@@ -27,6 +27,7 @@ import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLinksByIp;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.network.RoutingEngine;
@@ -37,12 +38,29 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
-import fr.univrennes1.cri.jtacl.lib.ip.*;
+import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
+import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNetConst;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
+import org.parboiled.Parboiled;
+import org.parboiled.parserunners.BasicParseRunner;
+import org.parboiled.support.ParsingResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -59,12 +77,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.parboiled.Parboiled;
-import org.parboiled.parserunners.BasicParseRunner;
-import org.parboiled.support.ParsingResult;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Packet Filter based equipment.
@@ -1999,9 +2011,9 @@ public class PacketFilter extends GenericEquipment {
 	}
 
 	@Override
-	public void configure() {
+	public NetworkEquipmentsByName configure() {
 		if (_configurationFileName.isEmpty())
-			return;
+			return null;
 
 		/*
 		 * Read the XML configuration file
@@ -2036,6 +2048,8 @@ public class PacketFilter extends GenericEquipment {
 		 */
 		if (_monitorOptions.getXref())
 			CrossReferences();
+
+		return null;
 	}
 
 

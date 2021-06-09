@@ -34,6 +34,10 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,11 +45,10 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * The Monitor is the main class of Jtacl.<br/>
@@ -456,9 +459,16 @@ public class Monitor {
 	 */
 	public void init() {
 
-		for (String name : _equipments.keySet()) {
+		final List<String> equipments = new LinkedList<>(_equipments.keySet());
+
+		for (String name : equipments) {
 			NetworkEquipment eq = _equipments.get(name);
-			eq.configure();
+			NetworkEquipmentsByName subEq = eq.configure();
+			if (subEq != null) _equipments.putAll(subEq);
+		}
+
+		for(String name : _equipments.keySet()) {
+			NetworkEquipment eq = _equipments.get(name);
 			_topology.registerNetworkequipment(eq);
 		}
 
@@ -497,13 +507,21 @@ public class Monitor {
 				equipment.getComment(),
 				equipment.getConfigurationFileName()
 			);
-		newEq.configure();
+
+		NetworkEquipmentsByName subEq = newEq.configure();
 
 		/*
 		 * build the topology
 		 */
 		topology.registerNetworkequipment(newEq);
 		equipments.put(newEq);
+		if (subEq != null) {
+			for (NetworkEquipment eq: subEq.values()) {
+				topology.registerNetworkequipment(eq);
+				equipments.put(eq);
+			}
+		}
+
 		for (NetworkEquipment eq: _equipments.values()) {
 			if (eq == equipment)
 				continue;

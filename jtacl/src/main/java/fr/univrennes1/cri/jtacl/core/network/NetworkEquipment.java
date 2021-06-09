@@ -19,9 +19,8 @@ import fr.univrennes1.cri.jtacl.core.monitor.Options;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
-import java.io.PrintStream;
 
-import static fr.univrennes1.cri.jtacl.core.network.Iface.newIface;
+import java.io.PrintStream;
 
 /**
  *	Describes a network equipment.<br/><br/>
@@ -208,8 +207,10 @@ public class NetworkEquipment {
 	 * This method is called by the {@link Monitor} monitor when all the
 	 * {@link NetworkEquipment} equipments have been created. This method should
 	 * be overrided, by example to read the configuration file of the equipment.
+	 * @return a {@link NetworkEquipmentsByName} list to be added to the Monitor, this allows an equipment
+	 * to generate his own NetworkEquipment(s) equipment. Could be null
 	 */
-	public void configure() {}
+	public NetworkEquipmentsByName configure() { return null; }
 
     /**
 	 * This method is called when a {@link Probe} probe is received on this

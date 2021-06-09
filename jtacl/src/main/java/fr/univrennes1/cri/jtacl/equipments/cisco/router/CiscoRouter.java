@@ -26,6 +26,7 @@ import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.probing.FwResult;
@@ -48,6 +49,13 @@ import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringTools;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
+import org.parboiled.Parboiled;
+import org.parboiled.parserunners.BasicParseRunner;
+import org.parboiled.support.ParsingResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,12 +66,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
-import org.parboiled.Parboiled;
-import org.parboiled.parserunners.BasicParseRunner;
-import org.parboiled.support.ParsingResult;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -832,9 +834,9 @@ public class CiscoRouter extends GenericEquipment {
 	}
 
 	@Override
-	public void configure() {
+	public NetworkEquipmentsByName configure() {
 		if (_configurationFileName.isEmpty())
-			return;
+			return null;
 
 		/*
 		 * Read the XML configuration file
@@ -887,6 +889,8 @@ public class CiscoRouter extends GenericEquipment {
 		 */
 		if (_monitorOptions.getXref())
 			CrossReferences();
+
+		return null;
 	}
 
 	protected IPCrossRef getIPNetCrossRef(IPNet ipnet) {

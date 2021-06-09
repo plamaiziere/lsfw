@@ -13,18 +13,36 @@
 
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
-import fr.univrennes1.cri.jtacl.analysis.*;
+import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.IPCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRef;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefContext;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefMap;
+import fr.univrennes1.cri.jtacl.analysis.ServiceCrossRefType;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
 import fr.univrennes1.cri.jtacl.core.network.Route;
 import fr.univrennes1.cri.jtacl.core.network.Routes;
-import fr.univrennes1.cri.jtacl.core.probing.*;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
-import fr.univrennes1.cri.jtacl.lib.ip.*;
+import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -37,7 +55,11 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintStream;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -1063,9 +1085,9 @@ public class CpFw extends GenericEquipment {
 	}
 
 	@Override
-	public void configure() {
+	public NetworkEquipmentsByName configure() {
 		if (_configurationFileName.isEmpty())
-			return;
+			return null;
 
 		/*
 		 * Read the XML configuration file
@@ -1095,6 +1117,8 @@ public class CpFw extends GenericEquipment {
 		 */
 		if (_monitorOptions.getXref())
 			CrossReferences();
+
+		return null;
 	}
 
 	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
