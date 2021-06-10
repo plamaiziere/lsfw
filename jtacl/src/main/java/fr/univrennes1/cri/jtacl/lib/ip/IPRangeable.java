@@ -109,7 +109,7 @@ public interface IPRangeable {
 
 	/**
 	 * Checks if the {@link IPversion} IP version of this range is IPv4.
-	 * @return true if this range is an IPv6 range.
+	 * @return true if this range is an IPv4 range.
 	 */
     boolean isIPv4();
 
