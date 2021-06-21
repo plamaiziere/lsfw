@@ -14,7 +14,6 @@
 package fr.univrennes1.cri.jtacl.lib.misc;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 public class StringsList extends ArrayList<String> {
 
 	public void readFromFile(String fileName)
-			throws FileNotFoundException, IOException {
+			throws IOException {
 
 		clear();
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
