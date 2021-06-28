@@ -35,6 +35,12 @@ public class ParseContext {
 		return _lineNumber;
 	}
 
+	public static ParseContext of(String fileName, int lineNumber, String line)  {
+		ParseContext p = new ParseContext();
+		p.set(fileName, lineNumber, line);
+		return p;
+	}
+
 	public void set(String fileName, int lineNumber, String line) {
 		_fileName = fileName;
 		_lineNumber = lineNumber;

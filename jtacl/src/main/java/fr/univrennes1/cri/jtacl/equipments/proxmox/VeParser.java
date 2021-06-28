@@ -38,6 +38,8 @@ public class VeParser extends CommonRules<Object> {
 	protected String ident;
 	protected List<String> listIdents;
 	protected RuleTemplate ruleTpl;
+	protected SectionTemplate sectionTpl;
+	protected AliasTemplate aliasTpl;
 
 	public RuleTemplate getRuleTpl() {
 		return ruleTpl;
@@ -45,6 +47,20 @@ public class VeParser extends CommonRules<Object> {
 
 	public boolean newRuleTpl() {
 		this.ruleTpl = new RuleTemplate();
+		return true;
+	}
+
+	public SectionTemplate getSectionTpl() { return sectionTpl; }
+
+	public boolean newSectionTpl() {
+		this.sectionTpl = new SectionTemplate();
+		return true;
+	}
+
+	public AliasTemplate getAliasTpl() { return aliasTpl; }
+
+	public boolean newAliasTpl() {
+		aliasTpl = new AliasTemplate();
 		return true;
 	}
 
@@ -62,7 +78,31 @@ public class VeParser extends CommonRules<Object> {
 		return ident;
 	}
 
+	public List<String> getListIdents() { return listIdents; }
+
 // rules
+
+	public Rule RSection() {
+		return Sequence(
+				SkipSpaces(),
+				Ch('['),
+				SkipSpaces(),
+				RIdent(),
+				newSectionTpl(),
+				sectionTpl.setSectionName(ident),
+				SkipSpaces(),
+				Optional(
+						Sequence(
+								RIdent(),
+								sectionTpl.setName(ident),
+								SkipSpaces()
+						)
+				),
+				Ch(']'),
+				SkipSpaces(),
+				EOI
+		);
+	}
 
 	public Rule RveRule() {
 		return Sequence(
@@ -77,7 +117,9 @@ public class VeParser extends CommonRules<Object> {
 				FirstOf(
 					RGroupRule(),
 					RRule()
-				)
+				),
+				SkipSpaces(),
+				EOI
 		);
 	}
 
@@ -215,6 +257,19 @@ public class VeParser extends CommonRules<Object> {
 		);
 	}
 
+	public Rule RAlias() {
+		return Sequence(
+				newAliasTpl(),
+				RIdent(),
+				WhiteSpaces(),
+				aliasTpl.setName(ident),
+				RListIdents(),
+				aliasTpl.setIpSpec(listIdents),
+				SkipSpaces(),
+				EOI
+		);
+	}
+
 	public Rule RIcmpType() {
 		return Sequence(
 				FirstOf(
@@ -231,7 +286,8 @@ public class VeParser extends CommonRules<Object> {
 		return Sequence(
 				FirstOf(
 						IgnoreCase("--proto"),
-						IgnoreCase("-proto")
+						IgnoreCase("-proto"),
+						IgnoreCase("-p")
 				),
 				WhiteSpaces(),
 				RIdent(),

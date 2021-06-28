@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2021, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 import java.util.List;
@@ -11,128 +23,128 @@ import java.util.List;
  */
 public class RuleTemplate {
 
-	protected boolean disabled = false;
-	protected String direction;
-	protected String action;
-	protected String macro;
-	protected List<String> sourceIpSpec;
-	protected List<String> destIpSpec;
-	protected List<String> sourcePortSpec;
-	protected List<String> destPortSpec;
-	protected String icmpType;
-	protected String proto;
-	protected String iface;
-	protected String groupName;
+	protected boolean _disabled = false;
+	protected String _direction;
+	protected String _action;
+	protected String _macro;
+	protected List<String> _sourceIpSpec;
+	protected List<String> _destIpSpec;
+	protected List<String> _sourcePortSpec;
+	protected List<String> _destPortSpec;
+	protected String _icmpType;
+	protected String _proto;
+	protected String _iface;
+	protected String _groupName;
 
 	public boolean isDisabled() {
-		return disabled;
+		return _disabled;
 	}
 
 	public boolean setDisabled(boolean disabled) {
-		this.disabled = disabled;
+		this._disabled = disabled;
 		return true;
 	}
 
 	public String getDirection() {
-		return direction;
+		return _direction;
 	}
 
 	public boolean setDirection(String direction) {
-		this.direction = direction;
+		this._direction = direction;
 		return true;
 	}
 
 	public String getAction() {
-		return action;
+		return _action;
 	}
 
 	public boolean setAction(String action) {
-		this.action = action;
+		this._action = action;
 		return true;
 	}
 
 	public String getMacro() {
-		return macro;
+		return _macro;
 	}
 
 	public boolean setMacro(String macro) {
-		this.macro = macro;
+		this._macro = macro;
 		return true;
 	}
 
 	protected boolean setIcmpType(String s) {
-		icmpType = s;
+		_icmpType = s;
 		return true;
 	}
 
 	protected boolean setProto(String s) {
-		proto = s;
+		_proto = s;
 		return true;
 	}
 
 	protected boolean setIface(String s) {
-		iface = s;
+		_iface = s;
 		return true;
 	}
 
 	public String getIcmpType() {
-		return icmpType;
+		return _icmpType;
 	}
 
 	public String getProto() {
-		return proto;
+		return _proto;
 	}
 
 	public String getIface() {
-		return iface;
+		return _iface;
 	}
 
 	public List<String> getSourcePortSpec() {
-		return sourcePortSpec;
+		return _sourcePortSpec;
 	}
 
 	public boolean setSourcePortSpec(List<String> sourcePortSpec) {
-		this.sourcePortSpec = sourcePortSpec;
+		this._sourcePortSpec = sourcePortSpec;
 		return true;
 	}
 
 	public List<String> getDestPortSpec() {
-		return destPortSpec;
+		return _destPortSpec;
 	}
 
 	public boolean setDestPortSpec(List<String> destPortSpec) {
-		this.destPortSpec = destPortSpec;
+		this._destPortSpec = destPortSpec;
 		return true;
 	}
 
 	public List<String> getSourceIpSpec() {
-		return sourceIpSpec;
+		return _sourceIpSpec;
 	}
 
 	public boolean setSourceIpSpec(List<String> sourceIpSpec) {
-		this.sourceIpSpec = sourceIpSpec;
+		this._sourceIpSpec = sourceIpSpec;
 		return true;
 	}
 
 	public List<String> getDestIpSpec() {
-		return destIpSpec;
+		return _destIpSpec;
 	}
 
 	public boolean setDestIpSpec(List<String> destIpSpec) {
-		this.destIpSpec = destIpSpec;
+		this._destIpSpec = destIpSpec;
 		return true;
 	}
 
 	public String getGroupName() {
-		return groupName;
+		return _groupName;
 	}
 
 	public boolean setGroupName(String groupName) {
-		this.groupName = groupName;
+		this._groupName = groupName;
 		return true;
 	}
 
 	public boolean isGroup() {
-		return groupName != null;
+		return _groupName != null;
 	}
 }

@@ -12,13 +12,9 @@
  */
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
-import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
-import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
-import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,15 +24,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PxHost extends GenericEquipment {
+public class PxHost extends PxEquipment {
+
+	@Override
+	public boolean isHost() { return true; }
 
 	NetworkEquipmentsByName _guests = new NetworkEquipmentsByName();
-
-	/**
-	 * parse context
-	 */
-	 protected ParseContext _parseContext = new ParseContext();
-
 
 	/**
 	 * Create a new {@link PxHost} with this name and this comment.<br/>
@@ -46,27 +39,7 @@ public class PxHost extends GenericEquipment {
 	 * @param configurationFileName name of the configuration file to use (may be null).
 	 */
 	public PxHost(Monitor monitor, String name, String comment, String configurationFileName) {
-		super(monitor, name, comment, configurationFileName);
-	}
-
-	protected void throwCfgException(String msg, boolean context) {
-		String s = "Equipment: " + _name + " ";
-		if (context)
-			s += _parseContext + msg;
-		else
-			s += msg;
-
-		throw new JtaclConfigurationException(s);
-	}
-
-	protected void warnConfig(String msg, boolean context) {
-		String s = "Equipment: " + _name + " ";
-		if (context)
-			s += _parseContext + msg;
-		else
-			s += msg;
-
-		Log.config().warning(s);
+		super(monitor, name, comment, configurationFileName, null);
 	}
 
 	@Override
@@ -119,8 +92,8 @@ public class PxHost extends GenericEquipment {
 
          /* policy */
 		NodeList list = doc.getElementsByTagName("policy");
-		if (list.getLength() < 1) {
-			throwCfgException("At least one policy must be specified", false);
+		if (list.getLength() != 1) {
+			throwCfgException("One policy must be specified", false);
 		}
 
 		List<String> filenames = new ArrayList<>();
@@ -135,6 +108,12 @@ public class PxHost extends GenericEquipment {
         if (filenames.isEmpty()) {
             throwCfgException("Missing policy file name", false);
         }
+
+        famAdd(filenames.get(0));
+        parsePolicy(filenames.get(0));
+        if (_monitor.getOptions().getXref()) {
+        	crossReference();
+		}
 	}
 
 	protected void loadGuests(Document doc) {
@@ -160,25 +139,26 @@ public class PxHost extends GenericEquipment {
 
         for( String f: filenames) {
         	_guests.putAll(createGuestsEquipments(f));
-        	_fam.addFile(f);
+        	famAdd(f);
 		}
-
 	}
 
 	protected NetworkEquipmentsByName createGuestsEquipments(String directory) {
 
 		NetworkEquipmentsByName equipments = new NetworkEquipmentsByName();
-		File file = new File(directory);
-		File[] files = file.listFiles();
+		File dir = new File(directory);
+		File[] files = dir.listFiles();
 		if (files == null) {
 			throwCfgException("Cannot read directory " + directory, false);
 		}
 		for (File f: files) {
-				if (f.isFile()) {
-					NetworkEquipment guest = new PxGuest(_monitor, getName()+ "." + f.getName(), f.getName(), f.getAbsolutePath());
-					guest.configure();
-					equipments.put(guest);
-				}
+				if (!f.isFile() || !f.getAbsolutePath().endsWith(".xml"))
+					continue;
+
+				NetworkEquipment guest = new PxGuest(_monitor, getName()+ "." + f.getName()
+						, f.getName(), dir.getAbsolutePath(), f.getAbsolutePath(), this);
+				guest.configure();
+				equipments.put(guest);
 		}
 		return equipments;
 	}

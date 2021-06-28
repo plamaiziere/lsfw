@@ -13,11 +13,9 @@
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclConfigurationException;
-import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
-import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -27,51 +25,14 @@ import org.w3c.dom.NodeList;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class PxGuest extends GenericEquipment {
+public class PxGuest extends PxEquipment {
 
-	protected class PxgIface {
-		protected Iface _iface;
-		protected String _name;
-		protected String _description;
+	String _directory;
 
-		public PxgIface(Iface iface) {
-			_iface = iface;
-		}
-
-		public Iface getIface() {
-			return _iface;
-		}
-
-		public void setIface(Iface iface) {
-			_iface = iface;
-		}
-
-		public String getDescription() {
-			return _description;
-		}
-
-		public void setDescription(String description) {
-			_description = description;
-		}
-
-		public String getName() {
-			return _name;
-		}
-
-		public void setName(String name) {
-			_name = name;
-		}
-	}
-
-	/**
-	 * interfaces
-	 */
-	protected HashMap<String, PxgIface> _pxgIfaces
-		= new HashMap<>();
-
+	@Override
+	public boolean isHost() { return false; }
 
 	/**
 	 * parse context
@@ -85,28 +46,10 @@ public class PxGuest extends GenericEquipment {
 	 * @param comment a free comment for this equipment.
 	 * @param configurationFileName name of the configuration file to use (may be null).
 	 */
-	public PxGuest(Monitor monitor, String name, String comment, String configurationFileName) {
-		super(monitor, name, comment, configurationFileName);
-	}
-
-	protected void throwCfgException(String msg, boolean context) {
-		String s = "Equipment: " + _name + " ";
-		if (context)
-			s += _parseContext + msg;
-		else
-			s += msg;
-
-		throw new JtaclConfigurationException(s);
-	}
-
-	protected void warnConfig(String msg, boolean context) {
-		String s = "Equipment: " + _name + " ";
-		if (context)
-			s += _parseContext + msg;
-		else
-			s += msg;
-
-		Log.config().warning(s);
+	public PxGuest(Monitor monitor, String name, String comment, String directory, String configurationFileName
+		,  PxEquipment host) {
+		super(monitor, name, comment, configurationFileName, host);
+		_directory = directory;
 	}
 
 	@Override
@@ -121,11 +64,11 @@ public class PxGuest extends GenericEquipment {
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
-		loadConfiguration(doc);
 		loadIfaces(doc);
 		// loopback interface
         Iface iface = addLoopbackIface("loopback", "loopback");
         _pxgIfaces.put("loopback", new PxgIface(iface));
+		loadConfiguration(doc);
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
 
@@ -136,8 +79,8 @@ public class PxGuest extends GenericEquipment {
 
          /* policy */
 		NodeList list = doc.getElementsByTagName("policy");
-		if (list.getLength() < 1) {
-			throwCfgException("At least one policy must be specified", false);
+		if (list.getLength() != 1) {
+			throwCfgException("One policy must be specified", false);
 		}
 
 		List<String> filenames = new ArrayList<>();
@@ -152,6 +95,13 @@ public class PxGuest extends GenericEquipment {
         if (filenames.isEmpty()) {
             throwCfgException("Missing policy file name", false);
         }
+
+        String fileName = _directory + "/" + filenames.get(0);
+       	parsePolicy(fileName);
+       	famAdd(fileName);
+        if (_monitor.getOptions().getXref()) {
+        	crossReference();
+		}
 	}
 
 	protected void loadIfaces(Document doc) {

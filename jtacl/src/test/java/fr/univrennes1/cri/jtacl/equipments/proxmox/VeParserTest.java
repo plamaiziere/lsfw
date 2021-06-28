@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2021, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 import junit.framework.TestCase;
@@ -226,6 +238,35 @@ public class VeParserTest extends TestCase {
 			assertEquals(ruleTpl.getSourcePortSpec().get(0), "81:81");
 		}
 
+		line = "OUT ACCEPT   --source 129.20/16    --dest     alias    --icmp-type    type    --proto    icmp --dport    80:80 --sport   81:81 --log   alert";
+		result = new ReportingParseRunner(parser.RveRule()).run(line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			ruleTpl = parser.getRuleTpl();
+			assertEquals(ruleTpl.getDirection(), "OUT");
+			assertEquals(ruleTpl.getMacro(), null);
+			assertEquals(ruleTpl.getAction(), "ACCEPT");
+			assertEquals(ruleTpl.getSourceIpSpec().get(0), "129.20/16");
+			assertEquals(ruleTpl.getDestIpSpec().get(0), "alias");
+			assertEquals(ruleTpl.getIcmpType(), "type");
+			assertEquals(ruleTpl.getProto(), "icmp");
+			assertEquals(ruleTpl.getDestPortSpec().get(0), "80:80");
+			assertEquals(ruleTpl.getSourcePortSpec().get(0), "81:81");
+		}
+
+		line = "OUT ACCEPT -p icmp -log nolog";
+		result = new ReportingParseRunner(parser.RveRule()).run(line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			ruleTpl = parser.getRuleTpl();
+			assertEquals(ruleTpl.getDirection(), "OUT");
+			assertEquals(ruleTpl.getMacro(), null);
+			assertEquals(ruleTpl.getAction(), "ACCEPT");
+			assertEquals(ruleTpl.getProto(), "icmp");
+		}
+
+
+
 		line = "  GROUp     groupName    ";
 		result = new ReportingParseRunner(parser.RveRule()).run(line);
 		assertTrue(result.matched);
@@ -241,6 +282,67 @@ public class VeParserTest extends TestCase {
 			ruleTpl = parser.getRuleTpl();
 			assertTrue(ruleTpl.isDisabled());
 			assertEquals(ruleTpl.getGroupName(), "groupName");
+		}
+	}
+
+	/**
+	 * Test of section
+	 */
+	public void testSection() {
+		System.out.println("testSectionRule");
+		String line;
+		SectionTemplate section;
+
+		line = "   [   section  ] nnnnn nnnn";
+		result = new ReportingParseRunner(parser.RSection()).run(line);
+		assertFalse(result.matched);
+
+    	line = "   [   section  ]    ";
+		result = new ReportingParseRunner(parser.RSection()).run(line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			section = parser.getSectionTpl();
+			assertEquals(section.getSectionName(), "section");
+			assertEquals(section.getName(), null);
+		}
+
+    	line = "   [   section NAME ]    ";
+		result = new ReportingParseRunner(parser.RSection()).run(line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			section = parser.getSectionTpl();
+			assertEquals(section.getSectionName(), "section");
+			assertEquals(section.getName(), "NAME");
+		}
+
+	}
+
+	/**
+	 * Test of alias
+	 */
+	public void testAlias() {
+		System.out.println("testAliasRule");
+		String line;
+		AliasTemplate alias;
+
+		line = "ident     ip   ";
+		result = new ReportingParseRunner(parser.RAlias()).run(line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			alias = parser.getAliasTpl();
+			assertEquals(alias.getName(), "ident");
+			assertEquals(alias.getIpSpec().get(0), "ip");
+		}
+
+		// not valid / just in case
+		line = "ident     ip,ip2";
+		result = new ReportingParseRunner(parser.RAlias()).run(line);
+		assertTrue(result.matched);
+		if (result.matched) {
+			alias = parser.getAliasTpl();
+			assertEquals(alias.getName(), "ident");
+			assertEquals(alias.getIpSpec().get(0), "ip");
+			assertEquals(alias.getIpSpec().get(1), "ip2");
 		}
 	}
 }
