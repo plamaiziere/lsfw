@@ -34,7 +34,7 @@ where the probe will be injected. The equipment specification specifies the
 name of the equipment, optionally followed by a '|' and the name of an
 interface or an IP address:
 
- equipments-spec: auto | equipment['|'(interface-name | ip address)].
+ equipments-spec: auto | equipment['|'(interface-name | ip address)].
 
   If only the equipment is specified, lsfw tries to find a link on this equipment.
 

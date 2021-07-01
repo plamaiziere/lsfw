@@ -14,7 +14,7 @@
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 /**
- * Prxomox IP specification firewall rule
+ * Proxmox IP specification firewall rule
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PxFwIpSpec {

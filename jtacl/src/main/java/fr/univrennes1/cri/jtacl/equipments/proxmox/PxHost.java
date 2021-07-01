@@ -24,6 +24,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Proxmox host equipment (hyperviser / cluster)
+ *
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ */
 public class PxHost extends PxEquipment {
 
 	@Override
@@ -55,37 +60,18 @@ public class PxHost extends PxEquipment {
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
 		loadConfiguration(doc);
+        if (_monitor.getOptions().getXref()) {
+        	crossReference();
+		}
+
+		// default policy
+		PxRule policyIn = PxRule.ofImplicitRule(null, PxRuleDirection.IN, _options.getPolicyIn());
+		PxRule policyOut = PxRule.ofImplicitRule(null, PxRuleDirection.OUT, _options.getPolicyOut());
+		_rules.add(policyIn);
+		_rules.add(policyOut);
+
 		loadGuests(doc);
-
 		return _guests;
-/*
-
-		loadIfaces(doc);
-		// loopback interface
-        Iface iface = addLoopbackIface("loopback", "loopback");
-        _fgFwIfaces.put("loopback", new FgFw.FgIface(iface));
-
-		loadConfiguration(doc);
-		linkServices();
-		linkNetworkObjects();
-
-		*/
-/*
-		 * routing
-		 *//*
-
-		routeDirectlyConnectedNetworks();
-		loadRoutesFromXML(doc);
-		*/
-/*
-		 * compute cross reference
-		 *//*
-
-		if (_monitorOptions.getXref())
-			CrossReferences();
-
-		return null;
-*/
 	}
 
 	protected void loadConfiguration(Document doc) {
@@ -111,9 +97,6 @@ public class PxHost extends PxEquipment {
 
         famAdd(filenames.get(0));
         parsePolicy(filenames.get(0));
-        if (_monitor.getOptions().getXref()) {
-        	crossReference();
-		}
 	}
 
 	protected void loadGuests(Document doc) {
@@ -155,8 +138,9 @@ public class PxHost extends PxEquipment {
 				if (!f.isFile() || !f.getAbsolutePath().endsWith(".xml"))
 					continue;
 
-				NetworkEquipment guest = new PxGuest(_monitor, getName()+ "." + f.getName()
-						, f.getName(), dir.getAbsolutePath(), f.getAbsolutePath(), this);
+				String name = f.getName().split(".xml")[0];
+				NetworkEquipment guest = new PxGuest(_monitor, getName()+ "." + name
+						, name, dir.getAbsolutePath(), f.getAbsolutePath(), this);
 				guest.configure();
 				equipments.put(guest);
 		}

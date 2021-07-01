@@ -27,6 +27,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Proxmox guest equipment (virtual machine)
+ *
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ */
 public class PxGuest extends PxEquipment {
 
 	String _directory;
@@ -72,6 +77,16 @@ public class PxGuest extends PxEquipment {
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
 
+        if (_monitor.getOptions().getXref()) {
+        	crossReference();
+		}
+
+		// default policy
+		PxRule policyIn = PxRule.ofImplicitRule(null, PxRuleDirection.IN, _options.getPolicyIn());
+		PxRule policyOut = PxRule.ofImplicitRule(null, PxRuleDirection.OUT, _options.getPolicyOut());
+		_rules.add(policyIn);
+		_rules.add(policyOut);
+
 		return null;
 	}
 
@@ -97,11 +112,8 @@ public class PxGuest extends PxEquipment {
         }
 
         String fileName = _directory + "/" + filenames.get(0);
+        famAdd(fileName);
        	parsePolicy(fileName);
-       	famAdd(fileName);
-        if (_monitor.getOptions().getXref()) {
-        	crossReference();
-		}
 	}
 
 	protected void loadIfaces(Document doc) {

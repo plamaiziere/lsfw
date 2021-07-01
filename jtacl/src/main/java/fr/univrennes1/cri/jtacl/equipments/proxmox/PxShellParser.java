@@ -10,7 +10,6 @@
  *
  * See COPYING for more details.
  */
-
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShellParser;

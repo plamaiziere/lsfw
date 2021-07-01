@@ -19,12 +19,12 @@ import org.parboiled.support.ParsingResult;
 
 import java.util.List;
 
-public class VeParserTest extends TestCase {
-	VeParser parser = Parboiled.createParser(VeParser.class);
+public class PxVeParserTest extends TestCase {
+	PxVeParser parser = Parboiled.createParser(PxVeParser.class);
 	// ReportingParseRunner parseRunParse = new ReportingParseRunner(parser.Parse());
 	ParsingResult<?> result;
 
-    public VeParserTest(String testName) {
+    public PxVeParserTest(String testName) {
         super(testName);
     }
 
@@ -168,7 +168,7 @@ public class VeParserTest extends TestCase {
 	public void testRule() {
 		System.out.println("testRuleRule");
 		String line;
-		RuleTemplate ruleTpl;
+		PxRuleTemplate ruleTpl;
 
 		line = "IN SSH(ACCEPT)";
 		result = new ReportingParseRunner(parser.RveRule()).run(line);
@@ -291,7 +291,7 @@ public class VeParserTest extends TestCase {
 	public void testSection() {
 		System.out.println("testSectionRule");
 		String line;
-		SectionTemplate section;
+		PxSectionTemplate section;
 
 		line = "   [   section  ] nnnnn nnnn";
 		result = new ReportingParseRunner(parser.RSection()).run(line);
@@ -323,7 +323,7 @@ public class VeParserTest extends TestCase {
 	public void testAlias() {
 		System.out.println("testAliasRule");
 		String line;
-		AliasTemplate alias;
+		PxAliasTemplate alias;
 
 		line = "ident     ip   ";
 		result = new ReportingParseRunner(parser.RAlias()).run(line);

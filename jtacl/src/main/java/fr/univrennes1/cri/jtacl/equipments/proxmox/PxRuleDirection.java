@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Universite de Rennes 1
+ * Copyright (c) 2013 - 2021, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -13,12 +13,10 @@
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 /**
- * Rule action (accept/drop...)
+ * Rule direction (in/out)
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-
-public enum RuleAction {
-	ACCEPT,
-	DROP
+public enum PxRuleDirection {
+	IN,
+	OUT
 }
-

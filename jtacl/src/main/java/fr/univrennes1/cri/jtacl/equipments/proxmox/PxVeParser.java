@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class VeParser extends CommonRules<Object> {
+public class PxVeParser extends CommonRules<Object> {
 
 	 /*
 	 * characters allowed in ident
@@ -37,31 +37,41 @@ public class VeParser extends CommonRules<Object> {
 
 	protected String ident;
 	protected List<String> listIdents;
-	protected RuleTemplate ruleTpl;
-	protected SectionTemplate sectionTpl;
-	protected AliasTemplate aliasTpl;
+	protected PxRuleTemplate ruleTpl;
+	protected PxSectionTemplate sectionTpl;
+	protected PxAliasTemplate aliasTpl;
+	protected PxOptionTemplate optionTpl;
 
-	public RuleTemplate getRuleTpl() {
+	public PxRuleTemplate getRuleTpl() {
 		return ruleTpl;
 	}
 
 	public boolean newRuleTpl() {
-		this.ruleTpl = new RuleTemplate();
+		this.ruleTpl = new PxRuleTemplate();
 		return true;
 	}
 
-	public SectionTemplate getSectionTpl() { return sectionTpl; }
+	public PxSectionTemplate getSectionTpl() { return sectionTpl; }
 
 	public boolean newSectionTpl() {
-		this.sectionTpl = new SectionTemplate();
+		this.sectionTpl = new PxSectionTemplate();
 		return true;
 	}
 
-	public AliasTemplate getAliasTpl() { return aliasTpl; }
+	public PxAliasTemplate getAliasTpl() { return aliasTpl; }
 
 	public boolean newAliasTpl() {
-		aliasTpl = new AliasTemplate();
+		aliasTpl = new PxAliasTemplate();
 		return true;
+	}
+
+	public boolean newOptionTpl() {
+		optionTpl = new PxOptionTemplate();
+		return true;
+	}
+
+	public PxOptionTemplate getOptionTpl() {
+		return optionTpl;
 	}
 
 	protected boolean setIdent(String i) {
@@ -104,6 +114,50 @@ public class VeParser extends CommonRules<Object> {
 		);
 	}
 
+	public Rule ROption() {
+		return Sequence(
+				newOptionTpl(),
+				SkipSpaces(),
+				FirstOf(
+					ROptionEnable(),
+					ROptionPolicyIn(),
+					ROptionPolicyOut()
+				),
+				SkipSpaces(),
+				EOI
+		);
+	}
+
+	public Rule ROptionEnable() {
+		return Sequence(
+				IgnoreCase("enable:"),
+				optionTpl.setName(match()),
+				SkipSpaces(),
+				RIdent(),
+				optionTpl.setValue(ident)
+		);
+	}
+
+	public Rule ROptionPolicyIn() {
+		return Sequence(
+				IgnoreCase("policy_in:"),
+				optionTpl.setName(match()),
+				SkipSpaces(),
+				RIdent(),
+				optionTpl.setValue(ident)
+		);
+	}
+
+	public Rule ROptionPolicyOut() {
+		return Sequence(
+				IgnoreCase("policy_out:"),
+				optionTpl.setName(match()),
+				SkipSpaces(),
+				RIdent(),
+				optionTpl.setValue(ident)
+		);
+	}
+
 	public Rule RveRule() {
 		return Sequence(
 				newRuleTpl(),
@@ -133,7 +187,7 @@ public class VeParser extends CommonRules<Object> {
 				),
 				SkipSpaces(),
 				Optional(
-					ROptions()
+					RRuleOptions()
 				)
 		);
 	}
@@ -148,11 +202,11 @@ public class VeParser extends CommonRules<Object> {
 		);
 	}
 
-	public Rule ROptions() {
-		return ROptions_();
+	public Rule RRuleOptions() {
+		return RRuleOptions_();
 	}
 
-	public Rule ROptions_() {
+	public Rule RRuleOptions_() {
 		return FirstOf(
 					EOI,
 					Sequence(
@@ -166,7 +220,7 @@ public class VeParser extends CommonRules<Object> {
 								RLog()
 						),
 						WhiteSpacesOrEoi(),
-						ROptions_()
+						RRuleOptions_()
 					)
 		);
 	}

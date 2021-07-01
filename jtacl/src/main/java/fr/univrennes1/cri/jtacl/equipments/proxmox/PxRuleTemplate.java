@@ -17,11 +17,11 @@ import java.util.List;
 /**
  * Template to build rule. This class is used at parsing time
  * as an intermediate storage.
- * @see
+ * @see PxVeParser
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class RuleTemplate {
+public class PxRuleTemplate {
 
 	protected boolean _disabled = false;
 	protected String _direction;

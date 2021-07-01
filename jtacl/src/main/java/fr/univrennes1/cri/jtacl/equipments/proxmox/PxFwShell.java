@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * proxmox fw sub shell command
+ * Proxmox fw sub shell command
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PxFwShell extends GenericEquipmentShell {

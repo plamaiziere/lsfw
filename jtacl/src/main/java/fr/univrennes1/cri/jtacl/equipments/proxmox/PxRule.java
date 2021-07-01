@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2013 - 2021, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
@@ -5,13 +17,19 @@ import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 
+/**
+ * Proxmox fw rule
+ *
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ */
 public class PxRule {
 
-	protected boolean _disabled;
+	protected boolean _disabled = false;
+	protected boolean _implicit = false;
 	protected String _groupIdent;
 	protected PxGroupRules _groupOwner;
-	protected RuleDirection _direction;
-	protected RuleAction _action;
+	protected PxRuleDirection _direction;
+	protected PxRuleAction _action;
 	protected String _ifaceName;
 	protected PxFwIpSpec _addrSource;
 	protected PxFwIpSpec _addrDest;
@@ -21,12 +39,13 @@ public class PxRule {
     protected PortSpec _destPorts;
     protected ParseContext _context;
 
-	public static PxRule ofRule(PxGroupRules groupOwner, boolean disabled, RuleDirection direction, RuleAction action
+	public static PxRule ofRule(PxGroupRules groupOwner, boolean disabled, PxRuleDirection direction, PxRuleAction action
 			, String ifaceName, PxFwIpSpec addrSource, PxFwIpSpec addrDest
 			, ProtocolsSpec protocolsSpec, IPIcmpEnt ipIcmp, PortSpec sourcePorts, PortSpec destPorts
 			, ParseContext context) {
 
 		PxRule rule = new PxRule();
+		rule._implicit = false;
 		rule._groupIdent = null;
 		rule._groupOwner = groupOwner;
 		rule._disabled = disabled;
@@ -55,6 +74,16 @@ public class PxRule {
 		return rule;
 	}
 
+	public static PxRule ofImplicitRule(PxGroupRules groupOwner, PxRuleDirection direction, PxRuleAction action) {
+
+		PxRule rule = new PxRule();
+		rule._implicit = true;
+		rule._groupOwner = groupOwner;
+		rule._direction = direction;
+		rule._action = action;
+		return rule;
+	}
+
 	public String getGroupIdent() { return _groupIdent; }
 
 	public boolean isGroupRule() { return _groupIdent != null; }
@@ -65,11 +94,11 @@ public class PxRule {
 		return _disabled;
 	}
 
-	public RuleDirection getDirection() {
+	public PxRuleDirection getDirection() {
 		return _direction;
 	}
 
-	public RuleAction getAction() {
+	public PxRuleAction getAction() {
 		return _action;
 	}
 
@@ -104,6 +133,13 @@ public class PxRule {
 	public ParseContext getContext() { return _context; }
 
 	public String toText() {
-		return _context.getLine();
+		String s = (_groupOwner != null) ? "(" + _groupOwner.getName() + ") " : "";
+
+		if (isImplicit()) {
+			return s + _direction.name() + " " + _action + " ***implicit policy***";
+		}
+		return s + _context.getLine();
 	}
+
+	public boolean isImplicit() { return  _implicit; }
 }

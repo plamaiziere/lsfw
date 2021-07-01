@@ -1,0 +1,15 @@
+--- Proxmox Shell Help ---
+
+help: this help.
+
+show alias [alias_name]: without parameter, displays all the proxmox aliases.
+  Or displays the alias 'alias_name'.
+
+show ipset [ipset_name]: without parameter, displays all the proxmox ipsets.
+  Or displays the ipset 'ipset_name'.
+
+show rules [group_name]: displays the firewall rules set.
+  If group_name is specified, displays the rules of the security group 'group_name'.
+
+xref ip     :see help xref-ip.
+xref service: see help xref-service.xref ip : see help xref.

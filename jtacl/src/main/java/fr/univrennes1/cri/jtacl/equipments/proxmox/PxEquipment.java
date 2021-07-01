@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2013 - 2021, Universite de Rennes 1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the ESUP-Portail license as published by the
+ * ESUP-Portail consortium.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See COPYING for more details.
+ */
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 import fr.univrennes1.cri.jtacl.analysis.CrossRefContext;
@@ -12,13 +24,22 @@ import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.Iface;
+import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+import fr.univrennes1.cri.jtacl.core.network.Route;
+import fr.univrennes1.cri.jtacl.core.network.Routes;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
+import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
+import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipment;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import org.parboiled.Parboiled;
@@ -31,7 +52,13 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
+/**
+ * Common implementation for PxGuest & PxHost
+ *
+ * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ */
 public abstract class PxEquipment extends GenericEquipment {
 
 	protected class PxgIface {
@@ -74,6 +101,7 @@ public abstract class PxEquipment extends GenericEquipment {
 	protected HashMap<String, PxgIface> _pxgIfaces
 		= new HashMap<>();
 
+	protected PxOptions _options = PxOptions.ofDefault();
 	protected HashMap<String, PxNetworkAlias> _aliases = new HashMap<>();
 	protected HashMap<String, PxNetworkIpSet> _ipsets = new HashMap<>();
 	protected HashMap<String, PxGroupRules> _groupsRules = new HashMap<>();
@@ -87,13 +115,19 @@ public abstract class PxEquipment extends GenericEquipment {
 	/**
 	 * Parser
 	 */
-	protected VeParser _parser = Parboiled.createParser(VeParser.class);
+	protected PxVeParser _parser = Parboiled.createParser(PxVeParser.class);
 
 	/**
 	 * ParseRunner for section
 	 */
 	protected BasicParseRunner _parseRunSection =
 			new BasicParseRunner(_parser.RSection());
+
+	/**
+	 * ParseRunner for options
+	 */
+	protected BasicParseRunner _parseRunOption =
+			new BasicParseRunner(_parser.ROption());
 
 	/**
 	 * ParseRunner for aliases
@@ -196,7 +230,6 @@ public abstract class PxEquipment extends GenericEquipment {
 		parseSections(fileName, lines);
 	}
 
-
 	public void parseSections(String fileName, StringsList lines) {
 		int ln = 0;
 		String sectionName = null;
@@ -205,7 +238,7 @@ public abstract class PxEquipment extends GenericEquipment {
 		for (String l: lines) {
 			ln ++;
 			_parseContext = ParseContext.of(fileName, ln, l);
-			String cl = VeParser.stripComment(l);
+			String cl = filter(PxVeParser.stripComment(l));
 			if (cl.isEmpty())
 				continue;
 
@@ -235,6 +268,11 @@ public abstract class PxEquipment extends GenericEquipment {
 				continue;
 			}
 
+			// OPTIONS
+			if (sectionName.equalsIgnoreCase(PxSectionType.OPTIONS.name())) {
+				parseSectionOptions(cl);
+				continue;
+			}
 
 			// ALIASES
 			if (sectionName.equalsIgnoreCase(PxSectionType.ALIASES.name())) {
@@ -262,11 +300,34 @@ public abstract class PxEquipment extends GenericEquipment {
 		}
 	}
 
+	public void parseSectionOptions(String cl) {
+
+		ParsingResult<?> result = _parseRunOption.run(cl);
+		if (result.matched) {
+			PxOptionTemplate otpl = _parser.getOptionTpl();
+
+			if (otpl.getName().equalsIgnoreCase("enable:")) {
+				_options.setEnable(otpl.getValue().equalsIgnoreCase("1"));
+				return;
+			}
+
+			if (otpl.getName().equalsIgnoreCase("policy_in:")) {
+				_options.setPolicyIn(otpl.getValue().equalsIgnoreCase("ACCEPT") ? PxRuleAction.ACCEPT : PxRuleAction.DROP);
+				return;
+			}
+
+			if (otpl.getName().equalsIgnoreCase("policy_out:")) {
+				_options.setPolicyOut(otpl.getValue().equalsIgnoreCase("ACCEPT") ? PxRuleAction.ACCEPT : PxRuleAction.DROP);
+				return;
+			}
+		}
+	}
+
 	public void parseSectionAliases(String cl) {
 
 		ParsingResult<?> result = _parseRunAlias.run(cl);
 		if (result.matched) {
-			AliasTemplate atpl = _parser.getAliasTpl();
+			PxAliasTemplate atpl = _parser.getAliasTpl();
 			IPRangeable ipRange = parseAlias(atpl);
 			PxNetworkIp pxNetworkIp = new PxNetworkIp(ipRange);
 			PxNetworkAlias pxNetworkAlias = new PxNetworkAlias(atpl.getName(), pxNetworkIp, _parseContext);
@@ -297,7 +358,7 @@ public abstract class PxEquipment extends GenericEquipment {
 		ParsingResult<?> result = _parseRunRule.run(cl);
 		if (result.matched) {
 			PxGroupRules group = _groupsRules.get(sectionIdent);
-			RuleTemplate rtpl = _parser.getRuleTpl();
+			PxRuleTemplate rtpl = _parser.getRuleTpl();
 			PxRule rule = parseRule(group, rtpl);
 			group.add(rule);
 			return;
@@ -310,7 +371,11 @@ public abstract class PxEquipment extends GenericEquipment {
 
 		ParsingResult<?> result = _parseRunRule.run(cl);
 		if (result.matched) {
-			RuleTemplate rtpl = _parser.getRuleTpl();
+			PxRuleTemplate rtpl = _parser.getRuleTpl();
+			if (rtpl.getMacro() != null) {
+				warnConfig("lsfw doesn't handle proxmox macro", true);
+				return;
+			}
 			PxRule rule = parseRule(null, rtpl);
 			_rules.add(rule);
 			return;
@@ -319,7 +384,7 @@ public abstract class PxEquipment extends GenericEquipment {
 		warnConfig("Rule doesnt match parser rule", true);
 	}
 
-	public IPRangeable parseAlias(AliasTemplate aliasTemplate) {
+	public IPRangeable parseAlias(PxAliasTemplate aliasTemplate) {
 
 		IPRangeable ipRange = null;
 		try {
@@ -366,10 +431,10 @@ public abstract class PxEquipment extends GenericEquipment {
 		return nobj;
 	}
 
-	public PxRule parseRule(PxGroupRules group, RuleTemplate rtpl) {
+	public PxRule parseRule(PxGroupRules group, PxRuleTemplate rtpl) {
 		boolean disabled;
-		RuleDirection direction;
-		RuleAction action;
+		PxRuleDirection direction;
+		PxRuleAction action;
 		String ifaceName;
 		PxFwIpSpec addrSource = new PxFwIpSpec();
 		PxFwIpSpec addrDest = new PxFwIpSpec();
@@ -390,8 +455,8 @@ public abstract class PxEquipment extends GenericEquipment {
 			return rule;
 		}
 
-		direction = rtpl.getDirection().equalsIgnoreCase("IN") ? RuleDirection.IN : RuleDirection.OUT;
-		action = rtpl.getAction().equalsIgnoreCase("ACCEPT") ? RuleAction.ACCEPT : RuleAction.DROP;
+		direction = rtpl.getDirection().equalsIgnoreCase("IN") ? PxRuleDirection.IN : PxRuleDirection.OUT;
+		action = rtpl.getAction().equalsIgnoreCase("ACCEPT") ? PxRuleAction.ACCEPT : PxRuleAction.DROP;
 
 		// interface
 		ifaceName = rtpl.getIface();
@@ -527,7 +592,6 @@ public abstract class PxEquipment extends GenericEquipment {
 		return ipsets;
 	}
 
-
 	/*
 	 * compute cross references
 	 */
@@ -602,7 +666,7 @@ public abstract class PxEquipment extends GenericEquipment {
 					crossRefRule(grule);
 				}
 			} else {
-					crossRefRule(rule);
+				crossRefRule(rule);
 			}
 		}
 	}
@@ -668,4 +732,285 @@ public abstract class PxEquipment extends GenericEquipment {
 		_shell.shellCommand(command, output);
 	}
 
+    @Override
+    public void incoming(IfaceLink link, Probe probe) {
+   		if (Log.debug().isLoggable(Level.INFO))
+    		Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
+
+		if (!link.isLoopback()) {
+            probe.decTimeToLive();
+            if (!probe.isAlive()) {
+                probe.killError("TimeToLive expiration");
+                return;
+            }
+
+            /*
+             * Filter in the probe
+             */
+            packetFilter(link, Direction.IN, probe);
+        }
+
+		/*
+		 * Check if the destination of the probe is on this equipment.
+		 */
+		IPNet ipdest = probe.getDestinationAddress().toIPNet();
+		if (ipdest != null) {
+			IfaceLink ilink = getIfaceLink(ipdest);
+			if (ilink != null) {
+				/*
+				 * Set the probe's final position and notify the monitor
+				 */
+				probe.setOutgoingLink(ilink, ipdest);
+				probe.destinationReached("destination reached");
+				return;
+			}
+		}
+		/*
+		 * Route the probe.
+		 */
+		Routes routes;
+		routes = _routingEngine.getRoutes(probe);
+		if (routes.isEmpty()) {
+			probe.killNoRoute("No route to " + probe.getDestinationAddress());
+			return;
+		}
+		probe.routed(probe.getDestinationAddress().toString("i::"));
+
+		if (Log.debug().isLoggable(Level.INFO)) {
+			for (Route r: routes) {
+				Log.debug().info("route: " + r.toString());
+			}
+		}
+
+		/*
+		 * if we have several routes for a destination, we have to probe these
+		 * routes too because our goal is to know if a probe is able to
+		 * reach a destination, regardless of the route taken.
+		 */
+		ArrayList<Probe> probes = new ArrayList<>();
+		probes.add(probe);
+
+		/*
+		 * Create copies of the incoming probe to describe the other routes.
+		 */
+		for (int i = 1; i < routes.size(); i ++) {
+			probes.add(probe.newInstance());
+		}
+
+		/*
+		 * Set the position of the probes.
+		 */
+		for (int i = 0; i < routes.size(); i ++) {
+			//noinspection unchecked
+			Route<IfaceLink> route = routes.get(i);
+			probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
+		}
+
+		/*
+		 * Filter out the probes
+		 */
+		for (Probe p: probes) {
+			packetFilter(p.getOutgoingLink(), Direction.OUT, p);
+		}
+
+		/*
+		 * Send the probes over the network.
+		 */
+		for (Probe p: probes) {
+			/*
+			 * Do not send the probe if the outgoing link is the same as the input.
+			 */
+			if (!p.getOutgoingLink().equals(link))
+				outgoing(p.getOutgoingLink(), p, p.getNextHop());
+			else
+				probe.killLoop("same incoming and outgoing link");
+		}
+	}
+
+	/**
+	 * Packet filter
+	 */
+	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
+
+		PxGroupRules rules = _rules;
+		groupRulesFilter(link, direction, probe, rules);
+	}
+
+	protected void groupRulesFilter(IfaceLink link, Direction direction, Probe probe,
+									PxGroupRules groupRules) {
+
+        String ifaceName = link.getIfaceName();
+        String ifaceComment = link.getIface().getComment();
+        ProbeResults results = probe.getResults();
+
+        MatchResult match;
+		for (PxRule rule: groupRules) {
+			String ruleText = rule.toText();
+
+			if (rule.isGroupRule() && _options.isEnable()) {
+				FwResult aclResult = new FwResult(FwResult.MATCH);
+                results.addMatchingAcl(direction, ruleText,
+                        aclResult);
+                results.setInterface(direction,
+                        ifaceName + " (" + ifaceComment + ")");
+				PxGroupRules next = findGroupRules(rule.getGroupIdent());
+				groupRulesFilter(link, direction, probe, next);
+			} else {
+				if (!_options.isEnable()) {
+					ruleText = "***firewall is disabled***";
+					match = MatchResult.ALL;
+				} else {
+					match = ruleFilter(link, direction, probe, rule);
+				}
+	            if (match != MatchResult.NOT) {
+					/*
+					 * store the result in the probe
+					 */
+					FwResult aclResult = new FwResult();
+					if (match != MatchResult.ALL)
+						aclResult.addResult(FwResult.MAY);
+
+					switch (rule.getAction()) {
+						case ACCEPT: aclResult.addResult(FwResult.ACCEPT); break;
+						case DROP: aclResult.addResult(FwResult.DENY); break;
+					}
+
+					results.addMatchingAcl(direction, ruleText, aclResult);
+
+					results.setInterface(direction,
+							ifaceName + " (" + ifaceComment + ")");
+
+					/*
+					 * the active acl is the acl accepting or denying the packet.
+					 * this is the first acl that match the packet.
+					 */
+					if (results.getActiveAcl(direction).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+						results.addActiveAcl(direction,
+								ruleText,
+								aclResult);
+						results.setAclResult(direction,
+								aclResult);
+					}
+				}
+			}
+		}
+	}
+
+
+	protected MatchResult ruleFilter(IfaceLink link, Direction direction, Probe probe, PxRule rule) {
+		int may = 0;
+
+	    // disabled
+	    if (rule.isDisabled()) return MatchResult.NOT;
+
+	    // direction
+		switch (direction) {
+			case IN: if (rule.getDirection() != PxRuleDirection.IN) return MatchResult.NOT; break;
+			case OUT: if (rule.getDirection() != PxRuleDirection.OUT) return MatchResult.NOT; break;
+			default: return MatchResult.NOT;
+		}
+
+	    // implicit policy
+        if (rule.isImplicit()) return MatchResult.ALL;
+
+        // interface
+        String iface = rule.getIfaceName();
+        if (iface != null) {
+        	if (!link.getIfaceName().equalsIgnoreCase(iface)) return MatchResult.NOT;
+		}
+
+        // source ip
+		PxFwIpSpec ipspec = rule.getAddrSource();
+		MatchResult mIpSource = ipSpecFilter(ipspec, probe.getSourceAddress());
+		if (mIpSource == MatchResult.NOT)
+			return MatchResult.NOT;
+		if (mIpSource != MatchResult.ALL)
+			may++;
+
+		// destination IP
+		ipspec = rule.getAddrDest();
+		MatchResult mIpDest =ipSpecFilter(ipspec, probe.getDestinationAddress());
+		if (mIpDest == MatchResult.NOT)
+			return MatchResult.NOT;
+		if (mIpDest != MatchResult.ALL)
+			may++;
+
+		// check protocol
+		ProtocolsSpec proto = rule.getProtocolsSpec();
+		if (probe.getRequest().getProtocols() != null) {
+			if (proto != null && !proto.isEmpty()) {
+				if (rule.getProtocolsSpec().matches(probe.getRequest().getProtocols()) == MatchResult.NOT) {
+					return MatchResult.NOT;
+				}
+			}
+		}
+
+		// check icmp type
+		IPIcmpEnt icmpEnt = rule.getIpIcmp();
+		if (icmpEnt != null) {
+			MatchResult mIcmpType = icmpTypeFilter(icmpEnt, probe);
+			if (mIcmpType == MatchResult.NOT)
+				return MatchResult.NOT;
+		}
+
+		// check source ports
+		MatchResult mSourcePorts;
+		PortSpec portSpec = rule.getSourcePorts();
+		if (portSpec != null && probe.getRequest().getSourcePort() != null) {
+			mSourcePorts = portSpec.matches(probe.getRequest().getSourcePort());
+			if (mSourcePorts == MatchResult.NOT)
+				return MatchResult.NOT;
+		} else {
+			mSourcePorts = MatchResult.ALL;
+		}
+		if (mSourcePorts != MatchResult.ALL)
+			may++;
+
+		// check destination ports
+		MatchResult mdDestPorts;
+		portSpec = rule.getDestPorts();
+		if (portSpec != null && probe.getRequest().getDestinationPort() != null) {
+			mdDestPorts = portSpec.matches(probe.getRequest().getDestinationPort());
+			if (mdDestPorts == MatchResult.NOT)
+				return MatchResult.NOT;
+		} else {
+			mdDestPorts = MatchResult.ALL;
+		}
+		if (mdDestPorts != MatchResult.ALL)
+			may++;
+
+		return (may > 0) ? MatchResult.MATCH : MatchResult.ALL;
+	}
+
+	protected MatchResult ipSpecFilter(PxFwIpSpec ipSpec, IPRangeable range) {
+
+		if (ipSpec.getNetworks().getBaseObjects().isEmpty())
+			return MatchResult.ALL;
+		MatchResult mres = ipSpec.getNetworks().matches(range);
+		return mres;
+	}
+
+	protected MatchResult icmpTypeFilter(IPIcmpEnt ipIcmpEnt, Probe probe) {
+		/*
+		 * icmp type and code
+		 */
+		Integer icmpType = probe.getRequest().getSubType();
+		if (icmpType == null) {
+			return MatchResult.ALL;
+		}
+
+		if (icmpType != ipIcmpEnt.getIcmp()) {
+			return MatchResult.NOT;
+		}
+
+		Integer icmpCode = probe.getRequest().getCode();
+		if (icmpCode == null) {
+			return MatchResult.ALL;
+		}
+
+		if (icmpCode == ipIcmpEnt.getCode()) {
+			return MatchResult.ALL;
+		}
+		return MatchResult.NOT;
+	}
 }

@@ -12,26 +12,34 @@
  */
 package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
-import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
-
-import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Group of rules (rule section or Group)
+ * Template to build alias. This class is used at parsing time
+ * as an intermediate storage.
+ * @see PxVeParser
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
-public class PxGroupRules extends ArrayList<PxRule> {
+public class PxAliasTemplate {
 	protected String _name;
-	protected ParseContext _context;
+	protected List<String> _ipspec;
 
-	public PxGroupRules(String name, ParseContext context) {
-		super();
-		_name = name;
-		_context = context;
+	public String getName() {
+		return _name;
 	}
 
-	public String getName() { return _name; }
+	public boolean setName(String _name) {
+		this._name = _name;
+		return true;
+	}
 
-	public ParseContext getContext() { return _context; }
+	public List<String> getIpSpec() {
+		return _ipspec;
+	}
+
+	public boolean setIpSpec(List<String> _ipspec) {
+		this._ipspec = _ipspec;
+		return true;
+	}
 }
