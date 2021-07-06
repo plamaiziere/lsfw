@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Universite de Rennes 1
+ * Copyright (c) 2012 - 2021, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -25,7 +25,6 @@ public class ProbeCommandTemplate {
 	protected String _srcAddress;
 	protected String _destAddress;
 	protected String _equipments;
-	protected String _outEquipment;
 	protected String _protoSpecification;
 	protected String _portSource;
 	protected String _portDest;
@@ -67,13 +66,6 @@ public class ProbeCommandTemplate {
 		_equipments = equipments;
 		return true;
 	}
-
-	public String getOutEquipment() { return _outEquipment; }
-
-	public boolean setOutEquipment(String equipment) {
-		_outEquipment = equipment;
-		return true;
-    }
 
 	public String getProtoSpecification() {
 		return _protoSpecification;

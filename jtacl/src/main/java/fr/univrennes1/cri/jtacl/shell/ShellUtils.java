@@ -16,10 +16,23 @@ package fr.univrennes1.cri.jtacl.shell;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclInternalException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclParameterException;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
-import fr.univrennes1.cri.jtacl.core.network.*;
+import fr.univrennes1.cri.jtacl.core.network.Iface;
+import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+import fr.univrennes1.cri.jtacl.core.network.IfaceLinks;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
+import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
+import fr.univrennes1.cri.jtacl.core.network.Route;
+import fr.univrennes1.cri.jtacl.core.network.Routes;
 import fr.univrennes1.cri.jtacl.core.probing.ExpectedProbing;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
-import fr.univrennes1.cri.jtacl.lib.ip.*;
+import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
+import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 
 import java.net.UnknownHostException;
 
@@ -232,9 +245,9 @@ public class ShellUtils {
 	}
 
 	/**
-	 * Returns {@link IfaceLink} list of links that matches the specified IP
-	 * @param ip ip to search and interface link for
-	 * @return a {@link IfaceLink} list of links is found, null otherwise.
+	 * Returns {@link IfaceLink} list of links to a loopback interface of equipments owning the specified IP address
+	 * @param ip ip to search an interface link for
+	 * @return a {@link IfaceLink} list of links to a loopback interface found, null otherwise.
 	 */
 	public static IfaceLinks getLoopBackIfaceLinksByIP(IPNet ip) {
 
@@ -242,30 +255,14 @@ public class ShellUtils {
 		Monitor monitor = Monitor.getInstance();
 		NetworkEquipmentsByName equipments = monitor.getEquipments();
 		for(NetworkEquipment equipment: equipments.values()) {
-		    IfaceLink link = getIfaceLinkLoopback(equipment, ip.getIpVersion());
-		    if (link != null) ilinks.add(link);
+			for (IfaceLink i: equipment.getIfaceLinks()) {
+				if (!i.isLoopback() && i.getIp().contains(ip)) {
+					IfaceLink link = getIfaceLinkOfLoopback(equipment, ip.getIpVersion());
+					if (link != null) ilinks.add(link);
+				}
+			}
         }
 		return ilinks.isEmpty() ? null : ilinks;
-	}
-
-
-	/**
-	 * Returns {@link IfaceLink} link of the loopback iface of an equipment
-	 * @param ipVersion ip version of the loopback link
-	 * @param equipmentName equipment used to filter.
-	 * @return a {@link IfaceLink} if a link is found, null otherwise.
-	 */
-	public static IfaceLink getIfaceLinksByLoopbackEquipment(IPversion ipVersion,
-			String equipmentName) {
-
-		Monitor monitor = Monitor.getInstance();
-		NetworkEquipment equipment = monitor.getEquipments().get(equipmentName);
-		if (equipment == null) {
-			throw new JtaclParameterException(
-					"No such equipment: " + equipmentName);
-		}
-
-		return getIfaceLinkLoopback(equipment, ipVersion);
 	}
 
 	/**
@@ -274,7 +271,7 @@ public class ShellUtils {
 	 * @param equipment equipment used to filter.
 	 * @return a {@link IfaceLink} if a link is found, null otherwise.
 	 */
-	public static IfaceLink getIfaceLinkLoopback(NetworkEquipment equipment, IPversion ipVersion) {
+	public static IfaceLink getIfaceLinkOfLoopback(NetworkEquipment equipment, IPversion ipVersion) {
 
 		/*
 		 * filter the iface links
@@ -335,6 +332,37 @@ public class ShellUtils {
 			return null;
 		else
 			return res.get(0);
+	}
+
+	protected static IfaceLinks searchIfacelinksByAddress(NetworkLinks networkLinks, IPNet linkAddress) {
+
+		/*
+		 * try to find a network link that matches the source IP address.
+		 */
+		Monitor monitor = Monitor.getInstance();
+		IfaceLinks ilinks = null;
+
+		if (networkLinks.isEmpty()) {
+			/*
+			 * use the DFLTEQUIPMENT variable if defined.
+			 */
+			String defaultEquipment;
+			if (linkAddress.isIPv4())
+				defaultEquipment = monitor.getDefines().get("DFLTEQUIPMENT");
+			else
+				defaultEquipment = monitor.getDefines().get("DFLTEQUIPMENT6");
+			if (defaultEquipment != null) {
+				ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(
+						linkAddress, defaultEquipment);
+			}
+			return ilinks;
+		}
+
+		ilinks = new IfaceLinks();
+		for (NetworkLink nlink: networkLinks) {
+			ilinks.addAll(nlink.getIfaceLinks());
+		}
+		return ilinks;
 	}
 
 }

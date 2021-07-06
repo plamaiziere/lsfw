@@ -21,10 +21,20 @@ import fr.univrennes1.cri.jtacl.core.probing.ProbeOptions;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
 import fr.univrennes1.cri.jtacl.core.probing.Probing;
-import fr.univrennes1.cri.jtacl.core.topology.NetworkLink;
 import fr.univrennes1.cri.jtacl.core.topology.NetworkLinks;
-import fr.univrennes1.cri.jtacl.core.topology.Topology;
-import fr.univrennes1.cri.jtacl.lib.ip.*;
+import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp;
+import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
+import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp6;
+import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
+import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
+import fr.univrennes1.cri.jtacl.lib.ip.IPProtocols;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 
 import java.net.UnknownHostException;
@@ -42,170 +52,72 @@ public class ProbeCommand {
 	protected IPRangeable _sourceAddress;
 	protected IPRangeable _destinationAddress;
 
+	protected class ProbeAddresses {
+		public IPRangeable sourceAddress; // source
+		public IPRangeable destAddress;   // destination
+		public IPNet linkSourceAddress;   // where to inject
+	}
+
+	protected enum SearchLinkBy {
+		NONE,
+		EQMT,
+		AUTOLINK,
+		AUTO
+	}
+
 	public void buildRequest(ProbeCommandTemplate probeCmd) {
 
-		IPversion ipVersion = probeCmd.getProbe6flag() ? IPversion.IPV6 : IPversion.IPV4;
-
-		String sSourceAddress = probeCmd.getSrcAddress();
-		/*
-		 * =host or =addresse in source addresse
-		 */
-		boolean equalSourceAddress;
-		if (sSourceAddress.startsWith("=")) {
-			equalSourceAddress = true;
-			sSourceAddress = sSourceAddress.substring(1);
-		} else {
-			equalSourceAddress = false;
-		}
-
-		IPRangeable sourceAddress;
-		IPNet isourceAddress = null;
-		if (equalSourceAddress) {
-			try {
-				isourceAddress = new IPNet(sSourceAddress);
-			} catch (UnknownHostException ex) {
-				try {
-					// not an IP try to resolve as a host.
-					isourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
-				} catch (UnknownHostException ex1) {
-					throw new JtaclParameterException("Error in source address: " +
-							sSourceAddress + " " +  ex1.getMessage());
-				}
-			}
-		}
-		try {
-			sourceAddress = new IPRange(sSourceAddress);
-		} catch (UnknownHostException ex) {
-			try {
-				// not an IP try to resolve as a host.
-				sourceAddress = IPNet.getByName(sSourceAddress, ipVersion);
-			} catch (UnknownHostException ex1) {
-				throw new JtaclParameterException("Error in source address: " +
-						sSourceAddress + " " +  ex1.getMessage());
-			}
-		}
-
-		String sDestAddress = probeCmd.getDestAddress();
-		IPRangeable destAddress;
-		try {
-			destAddress = new IPRange(sDestAddress);
-		} catch (UnknownHostException ex) {
-			try {
-				// not an IP try to resolve as a host.
-				destAddress = IPNet.getByName(sDestAddress, ipVersion);
-			} catch (UnknownHostException ex1) {
-				throw new JtaclParameterException("Error in destination address: " +
-					 sDestAddress + ex1.getMessage());
-			}
-		}
-
-		/*
-		 * Check address family
-		 */
-		if (!sourceAddress.sameIPVersion(destAddress)) {
-			throw new JtaclParameterException(
-					"Error: source address and destination address" +
-					" must have the same address family");
-		}
+		// addresses
+		ProbeAddresses paddr = parseAddresses(probeCmd);
 
 		/*
 		 * We can specify where we want to inject the probes.
 		 */
-		NetworkLink nlink = null;
-		IfaceLinks ilinks;
+		NetworkLinks nlinks = _monitor.getTopology().getNetworkLinksByIP(paddr.linkSourceAddress);
+		IfaceLinks ilinks = null;
+
 		String onEquipment = probeCmd.getEquipments();
-		String outEquipment = probeCmd.getOutEquipment();
-		boolean autolink = onEquipment != null && onEquipment.equalsIgnoreCase("auto");
-		boolean autoout = outEquipment != null && outEquipment.equalsIgnoreCase("auto");
-		if (onEquipment != null && outEquipment != null)
-        	throw new JtaclParameterException("cannot specify 'on' and 'out' equipment at the same time");
+		SearchLinkBy sby = SearchLinkBy.NONE;
+		if (onEquipment != null) {
+			switch (onEquipment.toLowerCase()) {
+				case "autolink": sby = SearchLinkBy.AUTOLINK; break;
+				case "auto": sby = SearchLinkBy.AUTO; break;
+				default: sby = SearchLinkBy.EQMT;
+			}
+		}
 
-		if (onEquipment != null && !autolink) {
-             // on equipment-name
-			ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(sourceAddress.nearestNetwork(),
-					onEquipment);
-			// error
-			if (ilinks == null)
-				throw new JtaclParameterException("no links found");
-		} else
-                if (outEquipment != null && !autoout) {
-                    // out equipment-name
-                    IfaceLink link = ShellUtils.getIfaceLinksByLoopbackEquipment(sourceAddress.getIpVersion(),
-                        outEquipment);
-                    // error
-                    if (link == null)
-                        throw new JtaclParameterException("no links found");
-                    else {
-                        ilinks = new IfaceLinks();
-                        ilinks.add(link);
-                    }
-                } else if (autoout) {
-                    // out auto
-                    ilinks = ShellUtils.getLoopBackIfaceLinksByIP(sourceAddress.nearestNetwork());
-                    // error
-                    if (ilinks == null)
-                        throw new JtaclParameterException("no link found");
-                    else {
-                        if (ilinks.size() > 1)
-                            throw new JtaclParameterException("too many links");
-                    }
+		switch (sby) {
+			case NONE: ilinks = ShellUtils.searchIfacelinksByAddress(nlinks, paddr.linkSourceAddress); break;
 
-                } else {
-                        /*
-                         * try to find a network link that matches the source IP address.
-                         */
-                        NetworkLinks nlinks;
-                        Topology topology = _monitor.getTopology();
-                        if (!equalSourceAddress) {
-                            nlinks = topology.getNetworkLinksByIP(sourceAddress.nearestNetwork());
-                        } else {
-                            nlinks = topology.getNetworkLinksByIP(isourceAddress.hostAddress());
-                        }
-                        if (nlinks.isEmpty()) {
-                            /*
-                             * use the DFLTEQUIPMENT variable if defined.
-                             */
-                            String defaultEquipment;
-                            if (sourceAddress.isIPv4())
-                                 defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT");
-                            else
-                                defaultEquipment = _monitor.getDefines().get("DFLTEQUIPMENT6");
-                            if (defaultEquipment != null) {
-                                ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(
-                                        sourceAddress.nearestNetwork(), defaultEquipment);
-                                // error
-                                if (ilinks == null)
-                                    throw new JtaclParameterException("no links found");
-                            } else {
-                                throw new JtaclParameterException("No network matches");
-                            }
-                        } else {
-                            if (nlinks.size() > 1) {
-                                throw new JtaclParameterException(
-                                    "Too many networks match this source IP address");
-                            }
-                            nlink = nlinks.get(0);
-                            ilinks = nlink.getIfaceLinks();
-                        }
-                    }
+			case EQMT: ilinks = ShellUtils.getIfaceLinksByEquipmentSpec(paddr.linkSourceAddress.nearestNetwork(),
+					onEquipment); break;
 
-		if (ilinks.isEmpty()) {
+			case AUTO: ilinks = ShellUtils.getLoopBackIfaceLinksByIP(paddr.linkSourceAddress);
+					   if (ilinks != null) break; // if no links continue as AUTOLINK
+
+			case AUTOLINK: ilinks = ShellUtils.searchIfacelinksByAddress(nlinks, paddr.linkSourceAddress);
+						   if (ilinks.size() > 1) {
+								/*
+								 * try to find a suitable link to reach the destination
+								 */
+							    if (nlinks.size() > 1)
+							    	  throw new JtaclParameterException("Too many networks match this source IP address");
+
+								IfaceLink ilink = ShellUtils.findOnRouteIfaceLink(nlinks.get(0), paddr.destAddress);
+								if (ilink != null) {
+									ilinks = new IfaceLinks();
+									ilinks.add(ilink);
+								}
+						   }
+						   break;
+		}
+
+		if (ilinks == null || ilinks.isEmpty()) {
 			throw new JtaclParameterException("No link found");
 		}
 
 		if (ilinks.size() > 1) {
-			if (autolink) {
-				/*
-				 * try to find a suitable link to reach the destination
-				 */
-				IfaceLink ilink = ShellUtils.findOnRouteIfaceLink(nlink, destAddress);
-				if (ilink == null)
-					throw new JtaclParameterException("Too many links");
-				ilinks = new IfaceLinks();
-				ilinks.add(ilink);
-			} else {
-				throw new JtaclParameterException("Too many links");
-			}
+			throw new JtaclParameterException("Two many links found");
 		}
 
 		/*
@@ -237,7 +149,7 @@ public class ProbeCommand {
 				/*
 				 * if tcp or udp we want to match ip too.
 				 */
-				if (sourceAddress.isIPv4())
+				if (paddr.sourceAddress.isIPv4())
 					protocols.add(Protocols.IP);
 				else
 					protocols.add(Protocols.IPV6);
@@ -337,8 +249,8 @@ public class ProbeCommand {
 
 		_ilink = ilinks.get(0);
 		_request = request;
-		_sourceAddress = sourceAddress;
-		_destinationAddress = destAddress;
+		_sourceAddress = paddr.sourceAddress;
+		_destinationAddress = paddr.destAddress;
 	}
 
 	public void runCommand() {
@@ -371,4 +283,68 @@ public class ProbeCommand {
 		return _destinationAddress;
 	}
 
+	protected ProbeAddresses parseAddresses(ProbeCommandTemplate probeCmd) {
+
+		IPversion ipVersion = probeCmd.getProbe6flag() ? IPversion.IPV6 : IPversion.IPV4;
+
+		String sSourceAddress = probeCmd.getSrcAddress();
+		ProbeAddresses paddr = new ProbeAddresses();
+
+		/*
+		 * =host or =addresse in source addresse
+		 */
+		boolean equalSourceAddress = sSourceAddress.startsWith("=");
+		if (equalSourceAddress) {
+			sSourceAddress = sSourceAddress.substring(1);
+			paddr.sourceAddress = parseRangeAddress(sSourceAddress, ipVersion);
+			paddr.linkSourceAddress = parseIpAddress(sSourceAddress, ipVersion).hostAddress();
+		} else {
+			paddr.sourceAddress = parseRangeAddress(sSourceAddress, ipVersion);
+			paddr.linkSourceAddress = parseRangeAddress(sSourceAddress, ipVersion).nearestNetwork();
+		}
+
+		String sDestAddress = probeCmd.getDestAddress();
+		paddr.destAddress = parseRangeAddress(sDestAddress, ipVersion);
+
+		/*
+		 * Check address family
+		 */
+		if (!paddr.sourceAddress.sameIPVersion(paddr.destAddress)) {
+			throw new JtaclParameterException(
+					"Error: source address and destination address must have the same address family");
+		}
+		return paddr;
+	}
+
+	protected IPRangeable parseRangeAddress(String address, IPversion ipVersion) {
+		IPRangeable addr;
+		try {
+			addr = new IPRange(address);
+		} catch (UnknownHostException ex) {
+			try {
+				// not an IP try to resolve as a host.
+				addr = IPNet.getByName(address, ipVersion);
+			} catch (UnknownHostException ex1) {
+				throw new JtaclParameterException("Error in probe address: " +
+						address + " " +  ex1.getMessage());
+			}
+		}
+		return addr;
+	}
+
+	protected IPNet parseIpAddress(String address, IPversion ipVersion) {
+		IPNet addr;
+		try {
+			addr = new IPNet(address);
+		} catch (UnknownHostException ex) {
+			try {
+				// not an IP try to resolve as a host.
+				addr = IPNet.getByName(address, ipVersion);
+			} catch (UnknownHostException ex1) {
+				throw new JtaclParameterException("Error in probe address: " +
+						address + " " +  ex1.getMessage());
+			}
+		}
+		return addr;
+	}
 }

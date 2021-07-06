@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Universite de Rennes 1
+ * Copyright (c) 2010 - 2021, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -15,8 +15,9 @@ package fr.univrennes1.cri.jtacl.shell;
 
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.parsers.CommonRules;
-import java.util.HashMap;
 import org.parboiled.Rule;
+
+import java.util.HashMap;
 
 /**
  *
@@ -309,7 +310,6 @@ public class ShellParser extends CommonRules<Object> {
 				FirstOf(
 					ProbeExpect(),
 					OnEquipments(),
-					OutEquipment(),
 					OptNoAction(),
 					OptVerbose(),
 					OptActive(),
@@ -349,20 +349,6 @@ public class ShellParser extends CommonRules<Object> {
 			WhiteSpaces()
 		);
 	}
-
-	/*
-	 * out atom
-	 */
-	public Rule OutEquipment() {
-		return Sequence(
-			IgnoreCase("out"),
-			WhiteSpaces(),
-			StringAtom(),
-			_probeCmdTemplate.setOutEquipment(match()),
-			WhiteSpaces()
-		);
-	}
-
 
 	/*
 	 * OptNoAction: no-action | na
