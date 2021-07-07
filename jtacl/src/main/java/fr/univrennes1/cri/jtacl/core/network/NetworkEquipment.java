@@ -63,6 +63,11 @@ public class NetworkEquipment {
 	protected Options _monitorOptions;
 
 	/**
+	 * child equipments of this equipment
+	 */
+	protected NetworkEquipmentsByName _childEquipments = new NetworkEquipmentsByName();
+
+	/**
 	 * Create a new {@link NetworkEquipment} with this name and this comment.<br/>
 	 * @param monitor the {@link Monitor} monitor associated with this equipment.
 	 * @param name the name of the equipment.
@@ -263,6 +268,15 @@ public class NetworkEquipment {
 	}
 
 	/**
+	 * Returns true if this equipment can be reloaded.
+	 * This is used by the monitor to allow the reloading of an equipment.
+	 * @return true if this equipment can be reloaded.
+	 */
+	public boolean canReload() {
+		return true;
+	}
+
+	/**
 	 * Returns the routes on this equipment that match the nearest network
 	 * including this destination range.
 	 * @param destination the {@link IPRangeable} IP range of the destination.
@@ -272,5 +286,14 @@ public class NetworkEquipment {
 	 */
 	public Routes getRoutes(IPRangeable destination) throws JtaclRoutingException {
 		return null;
+	}
+
+	/**
+	 * Returns the child equipments of this equipment
+	 * @return a {@link NetworkEquipmentsByName} map containing the child equipments. The map could be
+	 * empty but not null.
+	 */
+	public NetworkEquipmentsByName getChildEquipments() {
+		return _childEquipments;
 	}
 }

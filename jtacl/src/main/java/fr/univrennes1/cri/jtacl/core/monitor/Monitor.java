@@ -464,7 +464,10 @@ public class Monitor {
 		for (String name : equipments) {
 			NetworkEquipment eq = _equipments.get(name);
 			NetworkEquipmentsByName subEq = eq.configure();
-			if (subEq != null) _equipments.putAll(subEq);
+			if (subEq != null) {
+				eq.getChildEquipments().putAll(subEq);
+				_equipments.putAll(subEq);
+			}
 		}
 
 		for(String name : _equipments.keySet()) {
@@ -493,6 +496,13 @@ public class Monitor {
 	public void reloadEquipment(NetworkEquipment equipment) {
 
 		/*
+		 * if equipment has child, remove them
+		 */
+		for (NetworkEquipment eq: equipment.getChildEquipments().values()) {
+			_equipments.remove(eq);
+		}
+
+		/*
 		 * new configuration
 		 */
 		Topology topology = new Topology();
@@ -509,6 +519,7 @@ public class Monitor {
 			);
 
 		NetworkEquipmentsByName subEq = newEq.configure();
+		if (subEq != null) newEq.getChildEquipments().putAll(subEq);
 
 		/*
 		 * build the topology
@@ -523,7 +534,7 @@ public class Monitor {
 		}
 
 		for (NetworkEquipment eq: _equipments.values()) {
-			if (eq == equipment)
+			if (eq == equipment || topology.isRegistered(eq))
 				continue;
 			topology.registerNetworkequipment(eq);
 			equipments.put(eq);

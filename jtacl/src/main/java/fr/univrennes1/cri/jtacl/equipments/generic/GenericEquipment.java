@@ -34,6 +34,10 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPServices;
 import fr.univrennes1.cri.jtacl.lib.misc.FilesMonitor;
 import fr.univrennes1.cri.jtacl.lib.misc.KeyValue;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -44,9 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * The generic equipment provides common methods and services for an equipment.
@@ -360,6 +361,10 @@ public class GenericEquipment extends NetworkEquipment {
 				Route<IfaceLink> route = new Route<>(network, network, 0, link);
 				Log.debug().info("add route on " + getName() + " " + route.toString());
 				_routingEngine.addRoute(route);
+
+				Route<IfaceLink> self = new Route<>(link.getIp(), link.getIp(), 0, link);
+				Log.debug().info("add route on " + getName() + " " + self.toString());
+				_routingEngine.addRoute(self);
 			}
 		}
 	}

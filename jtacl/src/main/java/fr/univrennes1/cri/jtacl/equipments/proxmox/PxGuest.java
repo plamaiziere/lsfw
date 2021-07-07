@@ -65,7 +65,6 @@ public class PxGuest extends PxEquipment {
 		/*
 		 * Read the XML configuration file
 		 */
-		famAdd(_configurationFileName);
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 		loadOptionsFromXML(doc);
 		loadFiltersFromXML(doc);
@@ -112,7 +111,7 @@ public class PxGuest extends PxEquipment {
         }
 
         String fileName = _directory + "/" + filenames.get(0);
-        famAdd(fileName);
+        _host.getFam().addFile(fileName);
        	parsePolicy(fileName);
 	}
 
@@ -174,4 +173,8 @@ public class PxGuest extends PxEquipment {
 		}
 	}
 
+	@Override
+	public boolean canReload() {
+		return false;
+	}
 }
