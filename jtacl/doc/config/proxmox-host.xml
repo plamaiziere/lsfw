@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!--
+         Document   : proxmox-host.xml
+         Created on : 9 juin 2021
+         Author     : Patrick Lamaiziere
+         Description:
+            Template of the Proxmox Host FW configuration.
+            See https://groupes.renater.fr/wiki/jtacl/public/proxmox
+-->
+
+<equipment>
+
+    <!-- cluster wide firewall policy file -->
+	<policy filename="./cluster.fw" />
+
+    <!-- directory containing promox guests configuration files
+         the host auto creates the guests declared by .xml files in this directory.
+     -->
+    <guests directory="./guests" />
+</equipment>

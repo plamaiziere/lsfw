@@ -34,13 +34,15 @@ where the probe will be injected. The equipment specification specifies the
 name of the equipment, optionally followed by a '|' and the name of an
 interface or an IP address:
 
- equipments-spec: auto | equipment['|'(interface-name | ip address)].
+ equipments-spec: auto | autolink | equipment['|'(interface-name | ip address)].
 
   If only the equipment is specified, lsfw tries to find a link on this equipment.
 
   If an interface name is specified, lsfw uses the first link available on this
 interface, regardless of the source IP address of the probe (a link describes
 one network connected to an interface).
+  The special interface named "loopback" can be use to inject a probe in an equipment, as
+  if the probe is sent by the equipment itself.
 
   If an IP address is specified, lsfw uses this IP address to find the link,
 regardless of the source IP address of the probe.
@@ -51,8 +53,12 @@ equipment specification when no candidate link is found for IPv4 addresses.
   If the DFLTEQUIPMENT6 variable is defined, lsfw uses this variable as a default
 equipment specification when no candidate link is found for IPv6 addresses.
 
-  If the keyword "auto" is specified, lsfw uses the routing tables of the
-equipments to select the equipment where the probe should be injected.
+  If the keyword "auto" is specified, lsfw tries to find and equipment which has
+the source ip address on one of its interfaces, and then injects the probe on the
+loopback interface of the equipment. If no equipment is found, lsfw reverts to "autolink".
+
+  If the keyword "autolink" is specified, lsfw uses the destination ip address and the routing
+tables of the equipments to select the equipment where the probe should be injected.
 
 expect expected-result
 ----------------------
@@ -189,6 +195,10 @@ Examples:
   Probe from the equipment "router1", interface 'if0' using an equipment
   specification
   lsfw> probe on router1|if0 192.168.1.2/24 1.2.3.4 icmp echo
+
+  Probe from the equipment "router1", interface 'loopback' using an equipment
+  specification
+  lsfw> probe on router1|loopback 192.168.1.2/24 1.2.3.4 icmp echo
 
   Probe from "www.afnic.fr" (IpV4), applying a netmask.
   lsfw> probe www.afnic.fr/16 1.2.3.4

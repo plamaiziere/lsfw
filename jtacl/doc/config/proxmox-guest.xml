@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!--
+         Document   : proxmox-guest.xml
+         Created on : 9 juin 2021
+         Author     : Patrick Lamaiziere
+         Description:
+            Template of the Proxmox Guest FW configuration.
+            See https://groupes.renater.fr/wiki/jtacl/public/proxmox
+-->
+<equipment>
+
+	<!-- proxmox guest firewall policy file
+         the path of this file is relative to the directory specified in the proxmox host
+         "guests directory"
+    -->
+    <policy filename="./guest.fw" />
+
+	<!-- interfaces -->
+	<iface name="net0" comment="Proxmox virtual interface" ip="IPaddress" network="IPaddress/Netmask"/>
+	<!-- when adding an IP to an already defined interface, "comment" attribute is optional -->
+	<iface name="net0" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<iface name="net1" comment="interface 1" ip="IPaddress" network="IPaddress/Netmask"/>
+
+	<!-- routing engine -->
+	<routing>
+		<!--
+			Add routing engine definitions here.
+			See the file routing.xml
+			https://groupes.renater.fr/wiki/jtacl/public/commonrouting
+		-->
+	</routing>
+</equipment>
