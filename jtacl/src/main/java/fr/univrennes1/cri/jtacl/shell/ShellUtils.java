@@ -320,18 +320,21 @@ public class ShellUtils {
 		 */
 		for (IfaceLink l: ilinks) {
 			NetworkEquipment eq = l.getEquipment();
-			Routes routes = eq.getRoutes(destination);
-			//noinspection unchecked
-			for (Route<IfaceLink> r: routes) {
-				IfaceLink rilink = r.getLink();
-				if (rilink != null && rilink.getNetworkLink() != link)
-					res.add(l);
+			// check if destination is directly connected
+			if (l.getIp().contains(destination)) {
+				res.add(l);
+			} else {
+				// try to route
+				Routes routes = eq.getRoutes(destination);
+				//noinspection unchecked
+				for (Route<IfaceLink> r: routes) {
+					IfaceLink rilink = r.getLink();
+					if (rilink != null && rilink.getNetworkLink() != link)
+						res.add(l);
+				}
 			}
 		}
-		if (res.size() != 1)
-			return null;
-		else
-			return res.get(0);
+		return (res.size() != 1) ? null : res.get(0);
 	}
 
 	protected static IfaceLinks searchIfacelinksByAddress(NetworkLinks networkLinks, IPNet linkAddress) {

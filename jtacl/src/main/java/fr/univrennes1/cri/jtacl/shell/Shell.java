@@ -22,8 +22,8 @@ import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.monitor.Options;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipmentsByName;
-import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.ExpectedProbing;
+import fr.univrennes1.cri.jtacl.core.probing.FwResult;
 import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.probing.Probing;
 import fr.univrennes1.cri.jtacl.core.probing.RoutingResult;
@@ -33,11 +33,15 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
-import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
-import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import groovy.lang.Binding;
 import groovy.ui.Console;
 import groovy.util.GroovyScriptEngine;
+import org.parboiled.Parboiled;
+import org.parboiled.buffers.InputBuffer;
+import org.parboiled.errors.ParseError;
+import org.parboiled.parserunners.ReportingParseRunner;
+import org.parboiled.support.ParsingResult;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -49,13 +53,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Collections;
 import java.util.logging.Level;
-import org.parboiled.Parboiled;
-import org.parboiled.buffers.InputBuffer;
-import org.parboiled.errors.ParseError;
-import org.parboiled.parserunners.ReportingParseRunner;
-import org.parboiled.support.ParsingResult;
 
 /**
  * lsfw shell
@@ -98,7 +97,7 @@ public class Shell {
 
 			NetworkEquipment equipment =
 					_monitor.getEquipments().get(eqName);
-			if (equipment.hasChanged()) {
+			if (equipment.canReload() && equipment.hasChanged()) {
 				Log.debug().info("reloading " + eqName);
 				try {
 					_monitor.reloadEquipment(equipment);
@@ -323,7 +322,7 @@ public class Shell {
 		}
 
 		try {
-			_monitor.reloadEquipment(equipment);
+			if (equipment.canReload()) _monitor.reloadEquipment(equipment);
 		} catch (JtaclRuntimeException ex) {
 			System.err.println("Error: " + ex.getMessage());
 		}
