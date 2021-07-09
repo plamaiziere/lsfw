@@ -617,7 +617,7 @@ public abstract class PxEquipment extends GenericEquipment {
 		for (PxNetworkIpSet is: _ipsets.values()) {
 				ParseContext pc = is.getContext();
 				CrossRefContext refContext =
-					new CrossRefContext("ipset", is.getName(), pc.getLine(), pc.getFileName(), pc.getLineNumber());
+					new CrossRefContext(pc.getLine(), "ipset", is.getName(), pc.getFileName(), pc.getLineNumber());
 
 			crossRefIpSet(is, refContext);
 		}
@@ -678,7 +678,7 @@ public abstract class PxEquipment extends GenericEquipment {
 
 		ParseContext pc = rule.getContext();
 		CrossRefContext refContext =
-			new CrossRefContext("rule", rule.getAction().name(), pc.getLine(), pc.getFileName(), pc.getLineNumber());
+			new CrossRefContext(pc.getLine(), "rule", rule.getAction().name(), pc.getFileName(), pc.getLineNumber());
 
 		PxFwIpSpec spec = rule.getAddrSource();
 		if (spec != null)
