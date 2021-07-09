@@ -197,7 +197,11 @@ public class ShellUtils {
 				 * try with an interface
 				 */
 				ifaceName = specSplit[1];
-				iface = equipment.getIface(ifaceName);
+				if (ifaceName.equalsIgnoreCase("loopback")) {
+					iface = equipment.getLoopbackIface();
+				} else {
+					iface = equipment.getIface(ifaceName);
+				}
 				if (iface == null) {
 					throw new JtaclParameterException(
 						"No such interface: " + ifaceName);

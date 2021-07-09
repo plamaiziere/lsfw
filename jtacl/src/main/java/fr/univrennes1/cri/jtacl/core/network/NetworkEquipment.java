@@ -112,6 +112,18 @@ public class NetworkEquipment {
 	}
 
 	/**
+	 * Return the loopback interface {@link Iface} of this equipment. Null if the equipment has no loopback
+	 *
+	 * @return the {@link Iface} loopback interface
+	 */
+	public Iface getLoopbackIface() {
+		for (Iface iface: _ifaces.values()) {
+			if (iface.isLoopback()) return iface;
+		}
+		return null;
+	}
+
+	/**
 	 * Returns the name of this {@link NetworkEquipment} equipment.
 	 * @return name of this {@link NetworkEquipment} equipment.
 	 */
