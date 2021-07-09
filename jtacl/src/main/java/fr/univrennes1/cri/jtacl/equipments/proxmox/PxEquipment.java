@@ -833,7 +833,12 @@ public abstract class PxEquipment extends GenericEquipment {
 	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
 
 		PxGroupRules rules = _rules;
-		groupRulesFilter(link, direction, probe, rules);
+		if (!_options.isEnable()) {
+			addRuleResult(direction, link.getIface(), MatchResult.ALL, probe.getResults(), PxRuleAction.ACCEPT,
+					"***firewall is disabled***");
+		} else {
+			groupRulesFilter(link, direction, probe, rules);
+		}
 	}
 
 	protected void groupRulesFilter(IfaceLink link, Direction direction, Probe probe,
@@ -847,7 +852,7 @@ public abstract class PxEquipment extends GenericEquipment {
 		for (PxRule rule: groupRules) {
 			String ruleText = rule.toText();
 
-			if (rule.isGroupRule() && _options.isEnable()) {
+			if (rule.isGroupRule()) {
 				FwResult aclResult = new FwResult(FwResult.MATCH);
                 results.addMatchingAcl(direction, ruleText,
                         aclResult);
@@ -856,46 +861,45 @@ public abstract class PxEquipment extends GenericEquipment {
 				PxGroupRules next = findGroupRules(rule.getGroupIdent());
 				groupRulesFilter(link, direction, probe, next);
 			} else {
-				if (!_options.isEnable()) {
-					ruleText = "***firewall is disabled***";
-					match = MatchResult.ALL;
-				} else {
 					match = ruleFilter(link, direction, probe, rule);
-				}
-	            if (match != MatchResult.NOT) {
-					/*
-					 * store the result in the probe
-					 */
-					FwResult aclResult = new FwResult();
-					if (match != MatchResult.ALL)
-						aclResult.addResult(FwResult.MAY);
-
-					switch (rule.getAction()) {
-						case ACCEPT: aclResult.addResult(FwResult.ACCEPT); break;
-						case DROP: aclResult.addResult(FwResult.DENY); break;
+					if (match != MatchResult.NOT) {
+	            		addRuleResult(direction, link.getIface(), match, results, rule.getAction(), ruleText);
 					}
-
-					results.addMatchingAcl(direction, ruleText, aclResult);
-
-					results.setInterface(direction,
-							ifaceName + " (" + ifaceComment + ")");
-
-					/*
-					 * the active acl is the acl accepting or denying the packet.
-					 * this is the first acl that match the packet.
-					 */
-					if (results.getActiveAcl(direction).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
-						results.addActiveAcl(direction,
-								ruleText,
-								aclResult);
-						results.setAclResult(direction,
-								aclResult);
-					}
-				}
 			}
 		}
 	}
 
+	protected void addRuleResult(Direction direction, Iface iface, MatchResult match
+			, ProbeResults probeResults, PxRuleAction action, String ruleText) {
+		/*
+		 * store the result in the probe
+		 */
+		FwResult aclResult = new FwResult();
+		if (match != MatchResult.ALL)
+			aclResult.addResult(FwResult.MAY);
+
+		switch (action) {
+			case ACCEPT: aclResult.addResult(FwResult.ACCEPT); break;
+			case DROP: aclResult.addResult(FwResult.DENY); break;
+		}
+
+		probeResults.addMatchingAcl(direction, ruleText, aclResult);
+
+		probeResults.setInterface(direction,
+				iface.getName() + " (" + iface.getComment() + ")");
+
+		/*
+		 * the active acl is the acl accepting or denying the packet.
+		 * this is the first acl that match the packet.
+		 */
+		if (probeResults.getActiveAcl(direction).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+			probeResults.addActiveAcl(direction,
+					ruleText,
+					aclResult);
+			probeResults.setAclResult(direction,
+					aclResult);
+		}
+	}
 
 	protected MatchResult ruleFilter(IfaceLink link, Direction direction, Probe probe, PxRule rule) {
 		int may = 0;
