@@ -41,7 +41,7 @@ interface or an IP address:
   If an interface name is specified, lsfw uses the first link available on this
 interface, regardless of the source IP address of the probe (a link describes
 one network connected to an interface).
-  The special interface named "loopback" can be use to inject a probe in an equipment, as
+  The special interface name "loopback" can be use to inject a probe in an equipment, as
   if the probe is sent by the equipment itself.
 
   If an IP address is specified, lsfw uses this IP address to find the link,
