@@ -236,6 +236,9 @@ public abstract class PxEquipment extends GenericEquipment {
 		String sectionIdent = "";
 		ParsingResult<?> result;
 		for (String l: lines) {
+			if (Log.debug().isLoggable(Level.INFO) && !l.isEmpty()) {
+				Log.debug().info("line: " + l);
+			}
 			ln ++;
 			_parseContext = ParseContext.of(fileName, ln, l);
 			String cl = filter(PxVeParser.stripComment(l));
