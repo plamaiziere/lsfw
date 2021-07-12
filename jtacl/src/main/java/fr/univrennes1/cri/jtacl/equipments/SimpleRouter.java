@@ -169,6 +169,13 @@ public class SimpleRouter extends GenericEquipment {
 		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
 
 		loadIfaces(doc);
+		// loopback interface
+		Iface iface = addLoopbackIface("loopback", "loopback");
+		for (IfaceLink ilink: iface.getLinks().values()) {
+			SimpleRouterLink slink = new SimpleRouterLink(ilink, false);
+			_srlinks.put(ilink, slink);
+		}
+
 		routeDirectlyConnectedNetworks();
 		loadRoutesFromXML(doc);
 		loadAcl(doc);

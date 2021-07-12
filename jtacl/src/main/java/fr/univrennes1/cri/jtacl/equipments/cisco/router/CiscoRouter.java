@@ -860,6 +860,18 @@ public class CiscoRouter extends GenericEquipment {
 				addInterface(csIface);
 		}
 
+		// loopback interface
+        Iface iface = addLoopbackIface("loopback", "loopback");
+		CiscoIface csIface = new CiscoIface();
+		csIface.setIface(iface);
+		csIface.setName(iface.getName());
+		csIface.setDescription(iface.getComment());
+		csIface.setShutdown(false);
+		for (IfaceLink ilink: iface.getLinks().values()) {
+			csIface.getIpAddresses().add(ilink.getIp());
+		}
+		_ciscoIfaces.put(csIface.getName(), csIface);
+
 		/*
 		 * parse ACL
 		 */
@@ -1001,16 +1013,18 @@ public class CiscoRouter extends GenericEquipment {
 		if (Log.debug().isLoggable(Level.INFO))
 			Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
 
-		probe.decTimeToLive();
-		if (!probe.isAlive()) {
-			probe.killError("TimeToLive expiration");
-			return;
-		}
+		if (!link.isLoopback()) {
+			probe.decTimeToLive();
+			if (!probe.isAlive()) {
+				probe.killError("TimeToLive expiration");
+				return;
+			}
 
-		/*
-		 * Filter in the probe
-		 */
-		packetFilter(link, Direction.IN, probe);
+			/*
+			 * Filter in the probe
+			 */
+			packetFilter(link, Direction.IN, probe);
+		}
 
 		/*
 		 * Check if the destination of the probe is on this equipment.
