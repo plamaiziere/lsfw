@@ -54,7 +54,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * lsfw shell
@@ -293,13 +295,27 @@ public class Shell {
 	public void equipmentCommand(ShellParser command) {
 
 		String equipmentName = command.getString("Equipments");
-		NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
-		if (equipment == null) {
-			_outStream.println("No such equipment: " + equipmentName);
-			return;
-		}
+		if (equipmentName != null) {
+			NetworkEquipment equipment = _monitor.getEquipments().get(equipmentName);
+			if (equipment == null) {
+				_outStream.println("No such equipment: " + equipmentName);
+				return;
+			}
 
-		equipment.runShell(command.getString("SubCommand"), _outStream);
+			equipment.runShell(command.getString("SubCommand"), _outStream);
+		} else {
+			NetworkEquipmentsByName equipments = _monitor.getEquipments();
+			List<String> equipmentsName = _monitor.getEquipments().keySet().stream().sorted().collect(Collectors.toList());
+
+			for (String nname: equipmentsName) {
+				NetworkEquipment equipment = equipments.get(nname);
+				_outStream.println("Equipment " + equipment.getName());
+				List<String> ifacesName = equipment.getIfaces().keySet().stream().sorted().collect(Collectors.toList());
+				for (String niface: ifacesName) {
+					_outStream.println("    " + niface + ", " + equipment.getIface(niface).getLinks().values().toString());
+				}
+			}
+		}
 	}
 
 	public void reloadCommand(ShellParser command) {

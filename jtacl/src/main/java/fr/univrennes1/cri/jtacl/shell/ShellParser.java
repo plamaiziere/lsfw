@@ -235,12 +235,17 @@ public class ShellParser extends CommonRules<Object> {
 				IgnoreCase("equipment"),
 				IgnoreCase("eq")
 			),
-			WhiteSpaces(),
-			StringAtom(),
-			setString("Equipments", match()),
-			SkipSpaces(),
-			UntilEOI(),
-			setString("SubCommand", match()),
+			FirstOf(
+				Sequence(SkipSpaces(), EOI),
+				Sequence(
+					WhiteSpaces(),
+					StringAtom(),
+					setString("Equipments", match()),
+					SkipSpaces(),
+					UntilEOI(),
+					setString("SubCommand", match())
+				)
+			),
 			setString("Command", "equipment")
 		);
 	}

@@ -1,11 +1,18 @@
 --- equipment ---
-equipment | eq equipment-name command : Runs a command on the specified equipment.
+equipment | eq <equipment-name command> : Runs a command on the specified equipment.
 
   The equipment command allows to runs a specific command on one equipment.
   The commands allowed depend on the type of the equipment.
+  Whithout parameter, the command displays a list of all the equipments with their interfaces
 
 Example:
 --------
+Example
+  lsfw> equipment
+        Equipment fg100f-20
+            Zone_Admin_DMZ, [Zone_Admin_DMZ - 10.0.22.1 - 10.0.22.0/24]
+            loopback, [loopback - 0:0:0:0:0:0:0:1 - 0:0:0:0:0:0:0:1, loopback - 127.0.0.1 - 127.0.0.0/8]
+        ...
 
 Example with a PacketFilter equipment named "PF".
   lsfw> equipment PF xref ip short
