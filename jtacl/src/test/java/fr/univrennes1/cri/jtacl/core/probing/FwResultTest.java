@@ -14,6 +14,10 @@ package fr.univrennes1.cri.jtacl.core.probing;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * tests for FwResult
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
@@ -166,6 +170,127 @@ public class FwResultTest extends TestCase {
 		 */
 		r = a2.sumPath(a1);
 		assertEquals(new FwResult(FwResult.MAY | FwResult.ACCEPT), r);
+
+	}
+
+	public void testReduceFwResults() {
+		List<FwResult> results = new ArrayList<>(
+				Arrays.asList(
+					// MAY ACCEPT / ACCEPT -> ACCEPT
+					new FwResult(FwResult.ACCEPT | FwResult.MAY)
+					, new FwResult(FwResult.ACCEPT)
+				)
+		);
+
+		FwResult r = FwResult.reduceFwResults(results);
+		assertTrue(r.isCertainlyAccept());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY DENY / DENY -> DENY
+						new FwResult(FwResult.DENY | FwResult.MAY)
+						, new FwResult(FwResult.DENY)
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.isCertainlyDeny());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY DENY / ACCEPT -> MAY DENY
+						new FwResult(FwResult.DENY | FwResult.MAY)
+						, new FwResult(FwResult.ACCEPT)
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.hasDeny() && !r.isCertainlyDeny());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY DENY / ACCEPT / DENY -> MAY DENY
+						new FwResult(FwResult.DENY | FwResult.MAY)
+						, new FwResult(FwResult.ACCEPT)
+						, new FwResult(FwResult.DENY)
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.hasDeny() && !r.isCertainlyDeny());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY ACCEPT / DENY -> MAY ACCEPT
+						new FwResult(FwResult.ACCEPT | FwResult.MAY)
+						, new FwResult(FwResult.DENY)
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.hasAccept() && !r.isCertainlyAccept());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY ACCEPT / DENY / ACCEPT -> MAY ACCEPT
+						new FwResult(FwResult.ACCEPT | FwResult.MAY)
+						, new FwResult(FwResult.DENY)
+						, new FwResult(FwResult.ACCEPT)
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.hasAccept() && !r.isCertainlyAccept());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY ACCEPT / MAY ACCEPT / ACCEPT -> ACCEPT
+						new FwResult(FwResult.ACCEPT | FwResult.MAY)
+						, new FwResult(FwResult.ACCEPT | FwResult.MAY )
+						, new FwResult(FwResult.ACCEPT)
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.isCertainlyAccept());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY DENY / MAY DENY / DENY / MAY DENY-> DENY
+						new FwResult(FwResult.DENY | FwResult.MAY)
+						, new FwResult(FwResult.DENY | FwResult.MAY )
+						, new FwResult(FwResult.DENY)
+						, new FwResult(FwResult.DENY | FwResult.MAY )
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.isCertainlyDeny());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY DENY / MATCH / DENY / MAY DENY-> DENY
+						new FwResult(FwResult.DENY | FwResult.MAY)
+						, new FwResult(FwResult.MATCH)
+						, new FwResult(FwResult.DENY)
+						, new FwResult(FwResult.DENY | FwResult.MAY )
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.isCertainlyDeny());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY DENY / MAY DENY -> MAY DENY
+						new FwResult(FwResult.DENY | FwResult.MAY)
+						, new FwResult(FwResult.DENY | FwResult.MAY )
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.hasDeny() && !r.isCertainlyDeny());
+
+		results = new ArrayList<>(
+					Arrays.asList(
+						// MAY ACCEPT / MAY ACCEPT -> MAY ACCEPT
+						new FwResult(FwResult.ACCEPT | FwResult.MAY)
+						, new FwResult(FwResult.ACCEPT | FwResult.MAY )
+					)
+		);
+		r = FwResult.reduceFwResults(results);
+		assertTrue(r.hasAccept() && !r.isCertainlyAccept());
 
 	}
 

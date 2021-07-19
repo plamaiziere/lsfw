@@ -833,7 +833,7 @@ public abstract class PxEquipment extends GenericEquipment {
 	/**
 	 * Packet filter
 	 */
-	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
+	protected void packetFilter(IfaceLink link, Direction direction, Probe probe) {
 
 		PxGroupRules rules = _rules;
 		if (!_options.isEnable()) {
@@ -842,6 +842,8 @@ public abstract class PxEquipment extends GenericEquipment {
 		} else {
 			groupRulesFilter(link, direction, probe, rules);
 		}
+		ProbeResults results = probe.getResults();
+		results.setAclResult(direction, results.reduceMatchingFwResults(direction));
 	}
 
 	protected void groupRulesFilter(IfaceLink link, Direction direction, Probe probe,
@@ -898,8 +900,6 @@ public abstract class PxEquipment extends GenericEquipment {
 		if (probeResults.getActiveAcl(direction).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
 			probeResults.addActiveAcl(direction,
 					ruleText,
-					aclResult);
-			probeResults.setAclResult(direction,
 					aclResult);
 		}
 	}

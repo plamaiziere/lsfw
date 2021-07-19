@@ -628,7 +628,7 @@ public class Monitor {
 		 * quick deny: stop if the probe is denied
 		 */
 		if (probe.getRequest().getProbeOptions().hasQuickDeny()) {
-			FwResult aclresult = probe.getResults().getAclResult();
+			FwResult aclresult = probe.getResults().getProbeResult();
 			if (aclresult.isCertainlyDeny()) {
 				probe.destinationReached("quick denied");
 				return;

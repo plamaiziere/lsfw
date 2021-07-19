@@ -14,7 +14,9 @@
 package fr.univrennes1.cri.jtacl.core.probing;
 
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is responsible to track all results associated to one
@@ -152,7 +154,7 @@ public class ProbeResults {
 		return _matchingAclsOut;
 	}
 
-	public FwResult getAclResult() {
+	public FwResult getProbeResult() {
 		return _resultIn.concat(_resultOut);
 	}
 
@@ -199,6 +201,21 @@ public class ProbeResults {
 		pr._interfaceIn = _interfaceIn;
 		pr._interfaceOut = _interfaceOut;
 		return pr;
+	}
+
+	public FwResult reduceActiveFwResults(Direction direction) {
+		return direction == Direction.IN ? reduceAclFwResults(_activesAclsIn) : reduceAclFwResults(_activesAclsOut);
+	}
+
+	public FwResult reduceMatchingFwResults(Direction direction) {
+		return direction == Direction.IN ? reduceAclFwResults(_matchingAclsIn) : reduceAclFwResults(_matchingAclsOut);
+	}
+
+	public static FwResult reduceAclFwResults(List<AccessControlList> acls) {
+		List<FwResult> results = new ArrayList<>();
+		for (AccessControlList acl: acls)
+			results.add(acl.getResult());
+		return FwResult.reduceFwResults(results);
 	}
 
 }

@@ -1246,10 +1246,9 @@ public class FgFw extends GenericEquipment {
                     results.addActiveAcl(direction,
                             ruleText,
                             aclResult);
-                    results.setAclResult(direction,
-                            aclResult);
                 }
             }
         }
+		results.setAclResult(direction, results.reduceMatchingFwResults(direction));
     }
 }

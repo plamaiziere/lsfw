@@ -1390,13 +1390,12 @@ public class CiscoRouter extends GenericEquipment {
 						results.addActiveAcl(direction,
 								ace.getConfigurationLine(),
 								aclResult);
-						results.setAclResult(direction,
-								aclResult);
 						first = false;
 					}
 				}
 			}
 		}
+		results.setAclResult(direction,	results.reduceMatchingFwResults(direction));
 	}
 
 	@Override

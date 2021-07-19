@@ -13,14 +13,15 @@
 
 package fr.univrennes1.cri.jtacl.shell;
 
-import fr.univrennes1.cri.jtacl.core.probing.Probe;
-import fr.univrennes1.cri.jtacl.core.probing.ProbesByUid;
-import fr.univrennes1.cri.jtacl.core.probing.ProbesList;
-import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.core.probing.AccessControlList;
+import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeResults;
+import fr.univrennes1.cri.jtacl.core.probing.ProbesByUid;
+import fr.univrennes1.cri.jtacl.core.probing.ProbesList;
+import fr.univrennes1.cri.jtacl.core.probing.ProbesTracker;
+
 import java.io.CharArrayWriter;
 import java.io.PrintWriter;
 import java.util.List;
@@ -117,7 +118,7 @@ public class ShellReport {
 			writer.println();
 			writer.print("Routing Result: " + probe.getResults().getRoutingResult());
 			writer.println(" " + probe.getResults().getRoutingMessage());
-			writer.println("ACL Result: " + probe.getResults().getAclResult());
+			writer.println("ACL Result: " + probe.getResults().getProbeResult());
 		}
 
 		writer.println(showAclResults(probe.getResults()));

@@ -15,6 +15,7 @@ package fr.univrennes1.cri.jtacl.core.probing;
 
 import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -273,7 +274,7 @@ public class ProbesTracker {
 			probes.add(finalProbe);
 			FwResult pathResult = new FwResult(FwResult.ACCEPT);
 			for (Probe probe : probes) {
-				FwResult probeResult = probe.getResults().getAclResult();
+				FwResult probeResult = probe.getResults().getProbeResult();
 				pathResult = pathResult.concat(probeResult);
 			}
 			pathResults.add(pathResult);

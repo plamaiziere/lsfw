@@ -13,11 +13,49 @@
 
 package fr.univrennes1.cri.jtacl.core.probing;
 
+import java.util.List;
+
 /**
  * The result of a firewalling rule (accept, deny, match) : a set of flags.
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class FwResult {
+
+	/**
+	 * 'Reduces' a list of results to a single result
+	 * @param results list of results to reduce
+	 * @return a single result, return ACCEPT  if the result list is empty
+	 */
+	public static FwResult reduceFwResults(List<FwResult> results) {
+		FwResult last = null;
+		for (FwResult cur: results) {
+			if (cur.hasMatch()) continue;
+			if (last == null) {
+				if (cur.isCertainlyAccept())
+					return new FwResult(FwResult.ACCEPT);
+				if (cur.isCertainlyDeny())
+					return new FwResult(FwResult.DENY);
+				last = cur;
+			} else {
+				if (last.hasAccept() && cur.isCertainlyAccept())
+					return new FwResult(FwResult.ACCEPT);
+
+				if (last.hasDeny() && cur.isCertainlyDeny())
+					return new FwResult(FwResult.DENY);
+
+				if (last.hasAccept() && cur.hasAccept()) {
+					last = cur;
+					continue;
+				}
+				if (last.hasDeny() && cur.hasDeny()) {
+					last = cur;
+					continue;
+				}
+				return last.newInstance();
+			}
+		}
+		return last == null ? new FwResult(FwResult.ACCEPT) : last.newInstance();
+	}
 
 	/**
 	 * the result
