@@ -27,7 +27,7 @@ configuration:
 """
 
 '''
-Copyright (c) 2020  Universite de Rennes 1
+Copyright (c) 2020-2022  Universite de Rennes 1
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met:
@@ -53,8 +53,9 @@ author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
 
 import getopt
 import json
-import pyfortiapi
 import sys
+
+import pyfortiapi
 
 # tool's config
 cfg = {}
@@ -112,6 +113,7 @@ def main():
     getopts()
 
     device = pyfortiapi.FortiGate(ipaddr=cfg['host'], username=cfg['user'], password=cfg['password'], port=cfg['port'], vdom=cfg['vdom'])
+
     addresses = device.get_firewall_address()
     if testresult(addresses):
         fg['addresses'] = addresses
@@ -132,9 +134,21 @@ def main():
     if testresult(rules):
         fg['rules'] = rules
 
-    #internet_services = device.get_internet_services()
-    #if testresult(internet_services):
-    #    fg['internet_services'] = internet_services
+#    internet_services = device.get_internet_services()
+#    if testresult(internet_services):
+#        fg['internet_services'] = internet_services
+
+    central_snat_map = device.get_central_snat_map()
+    if testresult(central_snat_map):
+        fg['central_snat_map'] = central_snat_map
+
+    router_policy = device.get_router_policy()
+    if testresult(router_policy):
+        fg['router_policy'] = router_policy
+
+    external_resource = device.get_external_resource()
+    if testresult(external_resource):
+        fg['external_ressources'] = external_resource
 
     jenc = json.JSONEncoder(indent = 2)
     js = jenc.encode(fg)

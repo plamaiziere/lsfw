@@ -4,6 +4,8 @@ __copyright__ = "Copyright 2017, James Simpson"
 __license__ = "MIT"
 __version__ = "0.2.0"
 
+# nb: with modifications from Université de Rennes 1
+
 import logging
 import requests
 # Disable requests' warnings for insecure connections
@@ -626,4 +628,62 @@ class FortiGate:
             api_url += "?filter=" + filters
         results = self.get(api_url)
         return results
+ 
+   # SNAT policies read
+    def get_central_snat_map(self, specific=False, filters=False):
+        """
+        Get central SNAT policies.
+
+        :param specific: If provided, a specific object will be returned. 
+        :param filters: If provided, the raw filter is appended to the API call.
+        
+        :return: JSON data for all objects in scope of request, nested in a list.
+        """
+        api_url = self.urlbase + "api/v2/cmdb/firewall/central-snat-map/"
+        if specific:
+            api_url += str(specific)
+        elif filters:
+            api_url += "?filter=" + filters
+        results = self.get(api_url)
+        return results
+
+    # Routing policies read
+    def get_router_policy(self, specific=False, filters=False):
+        """
+        Get Routing policies.
+
+        :param specific: If provided, a specific object will be returned. 
+        :param filters: If provided, the raw filter is appended to the API call.
+        
+        :return: JSON data for all objects in scope of request, nested in a list.
+        """
+        api_url = self.urlbase + "api/v2/cmdb/router/policy/"
+        if specific:
+            api_url += str(specific)
+        elif filters:
+            api_url += "?filter=" + filters
+        results = self.get(api_url)
+        return results
+
+
+    # external resource.
+    def get_external_resource(self, specific=False, filters=False):
+        """
+        Get external resource.
+
+        :param specific: If provided, a specific object will be returned. 
+        :param filters: If provided, the raw filter is appended to the API call.
+        
+        :return: JSON data for all objects in scope of request, nested in a list.
+        """
+        api_url = self.urlbase + "api/v2/cmdb/system/external-resource/"
+        if specific:
+            api_url += str(specific)
+        elif filters:
+            api_url += "?filter=" + filters
+        results = self.get(api_url)
+        return results
+
+
+
 
