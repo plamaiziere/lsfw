@@ -148,7 +148,7 @@ def main():
 
     external_resource = device.get_external_resource()
     if testresult(external_resource):
-        fg['external_ressources'] = external_resource
+        fg['external_resources'] = external_resource
 
     jenc = json.JSONEncoder(indent = 2)
     js = jenc.encode(fg)
