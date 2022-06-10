@@ -13,7 +13,16 @@
 
 package fr.univrennes1.cri.jtacl.lib.ip;
 
-import org.xbill.DNS.*;
+import org.xbill.DNS.DClass;
+import org.xbill.DNS.ExtendedResolver;
+import org.xbill.DNS.Message;
+import org.xbill.DNS.Name;
+import org.xbill.DNS.PTRRecord;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.Resolver;
+import org.xbill.DNS.ReverseMap;
+import org.xbill.DNS.Section;
+import org.xbill.DNS.Type;
 
 import java.io.IOException;
 import java.math.BigInteger;
