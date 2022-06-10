@@ -176,12 +176,18 @@ public class IPRange implements IPRangeable {
 
 	@Override
 	public String toString() {
-		return _ipFirst.toString("i::") + "-" + _ipLast.toString("i::");
+		StringBuilder sb = new StringBuilder(_ipFirst.toString("i::"))
+				.append("-")
+				.append(_ipLast.toString("i::"));
+		return sb.toString();
 	}
 
 	@Override
 	public String toString(String format) {
-		return _ipFirst.toString(format) + "-" + _ipLast.toString(format);
+		StringBuilder sb = new StringBuilder(_ipFirst.toString(format))
+				.append("-")
+				.append(_ipLast.toString(format));
+		return sb.toString();
 	}
 
 	@Override
