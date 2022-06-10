@@ -47,6 +47,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
+import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,6 +56,8 @@ import org.w3c.dom.NodeList;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -320,6 +323,23 @@ public class FgFw extends GenericEquipment {
 
 	protected void loadConfiguration(Document doc) {
 
+		/* resource directory */
+		NodeList external = doc.getElementsByTagName("external");
+		List<String> extDirectories = new ArrayList<>();
+		for (int i = 0; i < external.getLength(); i++) {
+            Element e = (Element) external.item(i);
+            String directory = e.getAttribute("directory");
+            if (!directory.isEmpty()) {
+                extDirectories.add(directory);
+            }
+        }
+
+		String externalDirectory = null;
+		if (extDirectories.size() == 1) {
+			externalDirectory = extDirectories.get(0);
+			famAdd(externalDirectory);
+		}
+
          /* fwpolicy */
 		NodeList list = doc.getElementsByTagName("fwpolicy");
 		if (list.getLength() < 1) {
@@ -361,6 +381,9 @@ public class FgFw extends GenericEquipment {
 
             dictNode = rootNode.path("addr_groups");
             loadJsonNetworkGroup(dictNode);
+
+			dictNode = rootNode.path("external_resources");
+			loadJsonExternalResources(dictNode, externalDirectory);
 
             dictNode = rootNode.path("rules");
             loadJsonFwRules(dictNode);
@@ -500,13 +523,12 @@ public class FgFw extends GenericEquipment {
         return ips;
 	}
 
-	List<IPRangeable> parseServiceIpRange(String iprange) {
-	    List<IPRangeable> ips = new LinkedList<>();
-
+	IPRangeable parseIpRange(String iprange) {
+	    IPRangeable ips = null;
 	    IPNet ip;
 	    try {
 	        ip = new IPNet(iprange);
-	        ips.add(new IPRange(ip, ip));
+	        ips = new IPRange(ip, ip);
         } catch (UnknownHostException e) {
             throwCfgException("invalid IP " + iprange, true);
         }
@@ -759,7 +781,7 @@ public class FgFw extends GenericEquipment {
             } else sfqdn = null;
 
 	        if (!siprange.equals("0.0.0.0")) {
-	            ips.addAll(parseServiceIpRange(siprange));
+	            ips.add(parseIpRange(siprange));
             }
 
 	        FgAddressService service = null;
@@ -832,6 +854,64 @@ public class FgFw extends GenericEquipment {
         }
     }
 
+	/*
+	 * parse and load external resources objects from JSON
+	 */
+	protected void loadJsonExternalResources(JsonNode jExternalResource, String resourceDirectory) {
+
+	    Iterator<JsonNode> it = jExternalResource.elements();
+	    while (it.hasNext()) {
+			JsonNode n = it.next();
+            String sname = n.path("name").textValue();
+            String soriginKey = n.path("q_origin_key").textValue();
+			String sstatus = n.path("status").textValue();
+			String stype = n.path("type").textValue();
+	        String scomment = n.path("comments").textValue();
+			String sresource = n.path("resource").textValue();
+			if (!stype.equalsIgnoreCase("address")) {
+				continue;
+			}
+			FgNetworkExternalResource resource = new FgNetworkExternalResource(sname, soriginKey, scomment
+					, null, sresource, sstatus.equalsIgnoreCase("enable"));
+			URL url = null;
+			try {
+				url = new URL(sresource);
+			} catch (MalformedURLException e) {
+				throwCfgException("Invalid resource URL ! resource: " + sname + " URL: " + sresource, false);
+			}
+			if (resourceDirectory == null) {
+				throwCfgException("Directory for external resources files not configured !", false);
+			}
+			String sf = (url.getHost() + "_" + url.getPath()).replaceAll("/", "");
+			loadExternalResources(resource, resourceDirectory + "/" + sf);
+			_fgNetworks.put(resource.getOriginKey(), resource);
+		}
+	}
+
+	protected void loadExternalResources(FgNetworkExternalResource resource, String fileName) {
+		StringsList lines = new StringsList();
+		try {
+			lines.readFromFile(fileName);
+		} catch (IOException e) {
+			throwCfgException("Cannot read resource file ! resource: " + resource.getName() + " file: " + fileName, false);
+		}
+		for (String l: lines) {
+            _parseContext = new ParseContext();
+            _parseContext.setLine(l);
+			String sl = l.trim();
+			// comment
+			sl = sl.replaceAll("#.*", "").trim();
+			if (sl.isEmpty()) continue;
+
+			IPRangeable ipr = null;
+			try {
+				ipr = new IPRange(sl);
+			} catch (UnknownHostException e) {
+	              warnConfig("cannot parse ip : " + sl + " resource: " + resource.getName() + " file: " + fileName, false);
+			}
+			if (ipr != null) resource.getIpRanges().add(ipr);
+		}
+	}
 
 	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
 		if (!_monitorOptions.getXref())
@@ -945,6 +1025,22 @@ public class FgFw extends GenericEquipment {
     protected void crossRefNetworkLink(IPCrossRef ipNetRef,
 			Object obj) {
 
+		if (obj instanceof FgNetworkExternalResource) {
+			FgNetworkExternalResource nobj = (FgNetworkExternalResource) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref NetworkExternalResource: " + nobj.getName());
+			}
+			CrossRefContext refContext =
+				new CrossRefContext("name: " + nobj.getName() + ", enabled: " + nobj.getStatus()
+						+ ", url: " + nobj.getResource(), nobj.getType().toString(),
+					nobj.getName(), null, 0);
+			ipNetRef.addContext(refContext);
+			for (Object linkobj: nobj.getLinkedTo()) {
+				crossRefNetworkLink(ipNetRef, linkobj);
+			}
+			return;
+		}
+
 		if (obj instanceof FgNetworkObject) {
 			FgNetworkObject nobj = (FgNetworkObject) obj;
 			if (Log.debug().isLoggable(Level.INFO)) {
@@ -957,7 +1053,9 @@ public class FgFw extends GenericEquipment {
 			for (Object linkobj: nobj.getLinkedTo()) {
 				crossRefNetworkLink(ipNetRef, linkobj);
 			}
+			return;
 		}
+
 		if (obj instanceof FgAddressService) {
 		    FgAddressService nobj = (FgAddressService) obj;
             if (Log.debug().isLoggable(Level.INFO)) {
@@ -969,6 +1067,7 @@ public class FgFw extends GenericEquipment {
 			for (Object linkobj: nobj.getLinkedTo()) {
 				crossRefNetworkLink(ipNetRef, linkobj);
 			}
+			return;
         }
 
 		if (obj instanceof FgFwRule) {
@@ -979,6 +1078,7 @@ public class FgFw extends GenericEquipment {
 			CrossRefContext refContext =
 				new CrossRefContext(rule.toText(), "RULE", "", null, 0);
 			ipNetRef.addContext(refContext);
+			return;
 		}
 	}
 
@@ -1010,6 +1110,12 @@ public class FgFw extends GenericEquipment {
                                 crossRefNetworkLink(ipNetRef6, nobj);
                             }
                             break;
+				case EXTERNAL_RESOURCE: FgNetworkExternalResource ner = (FgNetworkExternalResource) nobj;
+							for (IPRangeable ipr: ner.getIpRanges()) {
+									ipNetRef = getIPNetCrossRef(ipr);
+									crossRefNetworkLink(ipNetRef, nobj);
+							}
+							break;
 		    }
         }
 
