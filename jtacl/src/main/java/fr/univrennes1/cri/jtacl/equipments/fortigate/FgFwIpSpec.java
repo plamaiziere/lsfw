@@ -29,7 +29,7 @@ public class FgFwIpSpec {
 		_networks.addBaseReference(name, networkObject);
 	}
 
-	public void linkTo(FgFwRule fwrule) {
+	public void linkTo(FgObject fwrule) {
 		for (FgNetworkObject nobj: _networks.getBaseObjects().values()) {
 			nobj.linkWith(fwrule);
 		}

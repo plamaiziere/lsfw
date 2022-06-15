@@ -61,7 +61,8 @@ public class FgFwShellParser extends GenericEquipmentShellParser {
 					CommandXrefService(),
 					CommandShowService(),
 					CommandShowNetwork(),
-					CommandShowRules()
+					CommandShowRules(),
+					CommandShowPolicyRoutes()
 				)
 			);
 	}
@@ -110,4 +111,15 @@ public class FgFwShellParser extends GenericEquipmentShellParser {
 		);
 	}
 
+	public Rule CommandShowPolicyRoutes() {
+		return
+			Sequence(
+				IgnoreCase("show"),
+				WhiteSpaces(),
+				IgnoreCase("policy-routes"),
+				SkipSpaces(),
+				EOI,
+				setCommand("show-policy-routes")
+		);
+	}
 }

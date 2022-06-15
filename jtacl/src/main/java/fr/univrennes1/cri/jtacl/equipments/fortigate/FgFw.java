@@ -41,6 +41,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
+import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
 import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
@@ -150,12 +151,12 @@ public class FgFw extends GenericEquipment {
 	protected HashMap<String, FgNetworkObject> _fgNetworks
 			= new HashMap<>();
 
-    public HashMap<String, FgService> getFgServices() {
-        return _fgServices;
-    }
-
     public HashMap<String, FgNetworkObject> getFgNetworks() {
         return _fgNetworks;
+    }
+
+    public HashMap<String, FgService> getFgServices() {
+        return _fgServices;
     }
 
 	/*
@@ -164,6 +165,12 @@ public class FgFw extends GenericEquipment {
 	protected List <FgFwRule> _fgRules = new LinkedList<>();
 
 	public List<FgFwRule> getFgRules() { return _fgRules; }
+
+	/*
+	 * Policy Route rules
+	 */
+	protected List <FgPolicyRouteRule> _fgPolicyRouteRules = new LinkedList<>();
+	public List <FgPolicyRouteRule> getPolicyRoutesRules() { return _fgPolicyRouteRules; }
 
 	/**
 	 * Sorted list of services by orgin key
@@ -382,16 +389,22 @@ public class FgFw extends GenericEquipment {
             dictNode = rootNode.path("addr_groups");
             loadJsonNetworkGroup(dictNode);
 
-			dictNode = rootNode.path("external_resources");
+			dictNode = rootNode.path("external_resource");
 			loadJsonExternalResources(dictNode, externalDirectory);
 
             dictNode = rootNode.path("rules");
             loadJsonFwRules(dictNode);
-        }
 
+            dictNode = rootNode.path("router_policy");
+            loadJsonPolicyRouteRules(dictNode);
+
+        }
         // implicit drop rule at the end of the rules
         FgFwRule fwdrop = FgFwRule.newImplicitDropRule();
         _fgRules.add(fwdrop);
+
+		// sort policy routes
+		_fgPolicyRouteRules.sort(new FgPolicyRouteRule.PolicyRouteRuleComparator());
     }
 
     protected void linkServices() {
@@ -562,7 +575,7 @@ public class FgFw extends GenericEquipment {
     protected void checkFwRuleIface(FgIfacesSpec ifaces) {
 	    for (String intf: ifaces) {
 	        if (!intf.equals("any") && !_fgFwIfaces.containsKey(intf))
-                throwCfgException("Unknown interface " + intf, true);
+                warnConfig("Unknown interface " + intf, true);
         }
 	}
 
@@ -574,6 +587,21 @@ public class FgFw extends GenericEquipment {
             list.add(n.path("q_origin_key").textValue());
         }
 	    return list;
+	}
+
+	protected FgFwIpSpec parseJsonPolicyRouteRulesAddresses(JsonNode node) {
+        FgFwIpSpec ipSpec = new FgFwIpSpec();
+	    Iterator<JsonNode> it = node.elements();
+	    while(it.hasNext()) {
+	        JsonNode n = it.next();
+			String ssubnet = n.path("subnet").textValue().replaceAll("/", " ");
+            String soriginKey = n.path("q_origin_key").textValue();
+			IPRangeable ip = parseAddressSubnet(ssubnet);
+			FgNetworkIP fgIP = ip.isIPv4() ? new FgNetworkIP(ssubnet, soriginKey, "", "", ip, null)
+										   : new FgNetworkIP(ssubnet, soriginKey, "", "", null, ip);
+			ipSpec.addReference(soriginKey, fgIP);
+        }
+	    return ipSpec;
 	}
 
 	protected FgFwIpSpec parseJsonFwRulesAddresses(JsonNode n) {
@@ -608,7 +636,7 @@ public class FgFw extends GenericEquipment {
      * parse and load fw rules from JSON
      */
     protected void loadJsonFwRules(JsonNode jrules) {
-        int number = 0;
+        int number = 1;
         Iterator<JsonNode> it = jrules.elements();
         while (it.hasNext()) {
             JsonNode n = it.next();
@@ -656,6 +684,90 @@ public class FgFw extends GenericEquipment {
             servSpec.linkTo(rule);
             _fgRules.add(rule);
             number++;
+        }
+    }
+
+    /*
+     * parse and load policy routes rules from JSON
+     */
+    protected void loadJsonPolicyRouteRules(JsonNode jrules) {
+        Iterator<JsonNode> it = jrules.elements();
+        while (it.hasNext()) {
+            JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+			Integer iseqNum = n.path("seq-num").asInt();
+            String soriginKey = n.path("q_origin_key").textValue();
+            String scomment = n.path("comments").textValue();
+
+            /* input interfaces */
+			String sinputDevNegate = n.path("input-device-negate").textValue();
+            FgIfacesSpec srcIfaces = new FgIfacesSpec(!sinputDevNegate.equalsIgnoreCase("disable"));
+            srcIfaces.addAll(parseJsonOriginKeyList(n.path("input-device")));
+            checkFwRuleIface(srcIfaces);
+
+            /* addresses */
+			FgFwIpSpec src = parseJsonPolicyRouteRulesAddresses(n.path("src"));
+			_fgNetworks.putAll(src.getNetworks().getBaseObjects());
+
+            FgFwIpSpec srcAddresses = parseJsonFwRulesAddresses(n.path("srcaddr"));
+			/* merge the two addresses spec */
+			src.getNetworks().getBaseObjects().putAll(srcAddresses.getNetworks().getBaseObjects());
+            src.setNotIn(!n.path("src-negate").textValue().equals("disable"));
+
+			FgFwIpSpec dst = parseJsonPolicyRouteRulesAddresses(n.path("dst"));
+			_fgNetworks.putAll(dst.getNetworks().getBaseObjects());
+
+            FgFwIpSpec dstAddresses = parseJsonFwRulesAddresses(n.path("dstaddr"));
+			/* merge the two addresses spec */
+			dst.getNetworks().getBaseObjects().putAll(dstAddresses.getNetworks().getBaseObjects());
+            dst.setNotIn(!n.path("dst-negate").textValue().equals("disable"));
+
+			/* protocol */
+			Integer iprotocol = n.path("protocol").asInt(0);
+			ProtocolsSpec protocolsSpec = new ProtocolsSpec();
+			protocolsSpec.add(iprotocol);
+
+			/* ports */
+			Integer startSrcPort = n.path("start-source-port").asInt(0);
+			Integer endSrcPort = n.path("end-source-port").asInt(PortRange.MAX);
+			PortSpec srcPorts = new PortSpec(PortOperator.RANGE, startSrcPort, endSrcPort);
+
+			Integer startDstPort = n.path("start-port").asInt(0);
+			Integer endDstPort = n.path("end-port").asInt(PortRange.MAX);
+			PortSpec dstPorts = new PortSpec(PortOperator.RANGE, startDstPort, endDstPort);
+			FgPortsSpec portsSpec = new FgPortsSpec(srcPorts, dstPorts);
+
+			/* gateway */
+			String sgateway = n.path("gateway").textValue();
+			IPNet gateway;
+			try {
+				gateway = new IPNet(sgateway);
+			} catch (UnknownHostException e) {
+				warnConfig("invalid gateway: " + sgateway, true);
+				continue;
+			}
+
+			/* output device */
+			String soutputIface = n.path("output-device").textValue();
+			FgIfacesSpec fgI = new FgIfacesSpec();
+			fgI.add(soutputIface);
+			checkFwRuleIface(fgI);
+
+            /* misc */
+            boolean disable = !n.path("status").textValue().equals("enable");
+            String saction = n.path("action").textValue();
+            FgFwRuleAction action = null;
+            if (saction.equals("accept")) action =FgFwRuleAction.ACCEPT;
+            if (saction.equals("deny")) action = FgFwRuleAction.DROP;
+            //TODO if (action == null) throwCfgException("Unknown action " + saction, true);
+
+			FgPolicyRouteRule rule = FgPolicyRouteRule.newPolicyRouteRule(soriginKey, scomment, iseqNum, disable
+				, srcIfaces, src, dst, protocolsSpec, portsSpec, gateway, soutputIface);
+
+            src.linkTo(rule);
+            dst.linkTo(rule);
+            _fgPolicyRouteRules.add(rule);
         }
     }
 
@@ -954,7 +1066,7 @@ public class FgFw extends GenericEquipment {
 						xrefType, group.toString(),
 						group.getType().toString(),
 						group.getName(),
-						null,
+						getName(),
 						0);
 			ServiceCrossRef serv = getServiceCrossRef(range);
 			serv.addContext(nrefctx);
@@ -969,7 +1081,7 @@ public class FgFw extends GenericEquipment {
 			}
 			ServiceCrossRefContext nrefctx =
 				new ServiceCrossRefContext(protoSpec,
-						xrefType, rule.toText(), "RULE", "", null, 0);
+						xrefType, rule.toText(), "RULE", "", getName(), 0);
 			ServiceCrossRef serv = getServiceCrossRef(range);
 			serv.addContext(nrefctx);
 		}
@@ -1011,7 +1123,7 @@ public class FgFw extends GenericEquipment {
                     serviceCrossRefType, service.toString(),
                     service.getType().toString(),
                     service.getName(),
-                    null,
+                    getName(),
                     0);
         for (PortRange range: portSpec.getRanges()) {
             ServiceCrossRef xref = getServiceCrossRef(range);
@@ -1033,7 +1145,7 @@ public class FgFw extends GenericEquipment {
 			CrossRefContext refContext =
 				new CrossRefContext("name: " + nobj.getName() + ", enabled: " + nobj.getStatus()
 						+ ", url: " + nobj.getResource(), nobj.getType().toString(),
-					nobj.getName(), null, 0);
+					nobj.getName(), getName(), 0);
 			ipNetRef.addContext(refContext);
 			for (Object linkobj: nobj.getLinkedTo()) {
 				crossRefNetworkLink(ipNetRef, linkobj);
@@ -1048,7 +1160,7 @@ public class FgFw extends GenericEquipment {
 			}
 			CrossRefContext refContext =
 				new CrossRefContext(nobj.toString(), nobj.getType().toString(),
-					nobj.getName(), null, 0);
+					nobj.getName(), getName(), 0);
 			ipNetRef.addContext(refContext);
 			for (Object linkobj: nobj.getLinkedTo()) {
 				crossRefNetworkLink(ipNetRef, linkobj);
@@ -1062,7 +1174,7 @@ public class FgFw extends GenericEquipment {
                 Log.debug().info("xref NetworkLink/Service: " + nobj.toString());
             }
             CrossRefContext refContext = new CrossRefContext(nobj.toString(), nobj.getType().toString(),
-                nobj.getName(), null, 0);
+                nobj.getName(), getName(), 0);
 			ipNetRef.addContext(refContext);
 			for (Object linkobj: nobj.getLinkedTo()) {
 				crossRefNetworkLink(ipNetRef, linkobj);
@@ -1076,10 +1188,22 @@ public class FgFw extends GenericEquipment {
 				Log.debug().info("xref NetworkLink/rule: " + rule.toText());
 			}
 			CrossRefContext refContext =
-				new CrossRefContext(rule.toText(), "RULE", "", null, 0);
+				new CrossRefContext(rule.toText(), "RULE", "", getName(), 0);
 			ipNetRef.addContext(refContext);
 			return;
 		}
+
+		if (obj instanceof FgPolicyRouteRule) {
+			FgPolicyRouteRule rule = (FgPolicyRouteRule) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref NetworkLink/rpolicy-route: " + rule.toText());
+			}
+			CrossRefContext refContext =
+				new CrossRefContext(rule.toText(), "POLICY_ROUTE", "", getName(), 0);
+			ipNetRef.addContext(refContext);
+			return;
+		}
+
 	}
 
 
@@ -1175,8 +1299,41 @@ public class FgFw extends GenericEquipment {
 		/*
 		 * Route the probe.
 		 */
-		Routes routes;
-		routes = _routingEngine.getRoutes(probe);
+		Routes routes = new Routes();
+
+		/* Policy routes */
+		Route<String> policyRoute = policyRouteFilter(link, probe);
+		if (policyRoute != null) {
+			String ifaceName = policyRoute.getLink();
+			Iface iface = null;
+			if (ifaceName != null) {
+				iface = getIface(ifaceName);
+				if (iface == null) {
+					probe.killNoRoute("Unknown interface " + ifaceName + " No route to " + probe.getDestinationAddress());
+					return;
+				}
+			} else {
+				// find an interface
+				iface = getIfaceConnectedTo(policyRoute.getNextHop());
+				if (iface == null) {
+					probe.killNoRoute("No route to " + probe.getDestinationAddress() +
+							" no interface for gateway " + policyRoute.getNextHop().toString("::i"));
+					return;
+				}
+			}
+			// find a link
+			IfaceLink ilink = iface.getLinkConnectedTo(policyRoute.getNextHop());
+			if (ilink == null) {
+				probe.killNoRoute("No route to " + probe.getDestinationAddress() +
+						" no link for gateway " + policyRoute.getNextHop().toString("::i"));
+				return;
+			}
+			routes.add(new Route(policyRoute.getPrefix(), policyRoute.getNextHop(), 0, ilink));
+		} else {
+			// default routing
+			routes.addAll(_routingEngine.getRoutes(probe));
+		}
+
 		if (routes.isEmpty()) {
 			probe.killNoRoute("No route to " + probe.getDestinationAddress());
 			return;
@@ -1235,8 +1392,9 @@ public class FgFw extends GenericEquipment {
 	}
 
 	protected MatchResult interfaceFilter(IfaceLink link, FgIfacesSpec ifacesSpec) {
-	    return ifacesSpec.isAny() ? MatchResult.ALL
+	    MatchResult mr = ifacesSpec.isAny() ? MatchResult.ALL
                                   : (ifacesSpec.contains(link.getIfaceName()) ? MatchResult.ALL : MatchResult.NOT);
+		return ifacesSpec.hasNegate() ? mr.not() : mr;
     }
 
 	protected MatchResult ipSpecFilter(FgFwIpSpec ipSpec, IPRangeable range) {
@@ -1357,4 +1515,122 @@ public class FgFw extends GenericEquipment {
         }
 		results.setAclResult(direction, results.reduceMatchingFwResults(direction));
     }
+
+	/**
+	 * Policy routes filter
+	 */
+	protected Route<String> policyRouteFilter (IfaceLink link, Probe probe) {
+		Route<String> route = null;
+
+        String ifaceName = link.getIfaceName();
+        String ifaceComment = link.getIface().getComment();
+        ProbeResults results = probe.getResults();
+
+        MatchResult match;
+        for (FgPolicyRouteRule rule : _fgPolicyRouteRules) {
+            String ruleText = rule.toText();
+            match = policyRouteRuleFilter(link, probe, rule);
+
+			if (match == MatchResult.ALL) {
+				IPNet prefix = null;
+				try {
+					prefix = rule.getGateway().isIPv4() ? new IPNet("0/0") : new IPNet("0::0/0");
+				} catch (UnknownHostException e) {
+					// XXX
+				}
+				if(route == null) {
+					route = new Route<String>(prefix, rule.getGateway(), 0, rule.getOutputIface()); }
+			}
+
+            /* if the rule matches */
+            if (match != MatchResult.NOT) {
+                /*
+                 * store the result in the probe
+                 */
+                FwResult aclResult = new FwResult();
+				aclResult.addResult(FwResult.MATCH);
+
+                /* may be */
+                if (match == MatchResult.MATCH || match == MatchResult.UNKNOWN)
+                    aclResult.addResult(FwResult.MAY);
+
+                results.addMatchingAcl(Direction.IN, ruleText,
+                        aclResult);
+
+                results.setInterface(Direction.IN,
+                        ifaceName + " (" + ifaceComment + ")");
+
+                /*
+                 * the active ace is the ace accepting or denying the packet.
+                 * this is the first ace that match the packet.
+                 */
+                if (results.getActiveAcl(Direction.IN).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+                    results.addActiveAcl(Direction.IN,
+                            ruleText,
+                            aclResult);
+                }
+            }
+        }
+		return route;
+		//results.setAclResult(Direction.IN, results.reduceMatchingFwResults(Direction.IN));
+    }
+
+	protected MatchResult policyRouteRuleFilter(IfaceLink link, Probe probe, FgPolicyRouteRule rule) {
+	    /*
+	     * disabled
+	     */
+	    if (rule.isDisabled()) return MatchResult.NOT;
+
+	    /*
+	     * interfaces
+	     */
+        FgIfacesSpec ifacesSpec = rule.getSourceIfaces();
+/*
+
+        if (interfaceFilter(link, ifacesSpec) == MatchResult.NOT)
+			return MatchResult.NOT;
+*/
+
+        /*
+		 * check source IP
+		 */
+		FgFwIpSpec ipspec = rule.getSourceIp();
+		MatchResult mIpSource = ipSpecFilter(ipspec, probe.getSourceAddress());
+		if (mIpSource == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		/*
+		 * check destination IP
+		 */
+		ipspec = rule.getDestIp();
+		MatchResult mIpDest =ipSpecFilter(ipspec, probe.getDestinationAddress());
+		if (mIpDest == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		/*
+		 * check protocol
+		 */
+		MatchResult mProto;
+		if (probe.getRequest().getProtocols() != null) {
+			mProto = probe.getRequest().getProtocols().matches(rule.getProtocol());
+			if (mProto == MatchResult.NOT)
+				return MatchResult.NOT;
+		} else {
+			mProto = MatchResult.ALL;
+		}
+
+		/*
+		 * check ports
+		 */
+		MatchResult mPorts = rule.getportsSpec().matches(probe.getRequest());
+		if (mPorts == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
+				mProto == MatchResult.ALL && mPorts == MatchResult.ALL)
+			return MatchResult.ALL;
+
+		return MatchResult.MATCH;
+    }
+
 }

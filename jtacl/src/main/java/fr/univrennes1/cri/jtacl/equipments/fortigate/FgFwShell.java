@@ -96,6 +96,12 @@ public class FgFwShell extends GenericEquipmentShell {
         }
 	}
 
+	public void commandShowPolicyRouteRules(PrintStream output, FgFwShellParser parser)
+    {
+        for(FgPolicyRouteRule r: _fgfw.getPolicyRoutesRules()) {
+            output.println(r.toText());
+        }
+	}
 
 	@Override
 	public void shellCommand(String command, PrintStream output) {
@@ -127,6 +133,8 @@ public class FgFwShell extends GenericEquipmentShell {
 			commandShowNetwork(_outStream, _shellParser);
 		if (shellCmd.equals("show-rules"))
 			commandShowRules(_outStream, _shellParser);
+		if (shellCmd.equals("show-policy-routes"))
+			commandShowPolicyRouteRules(_outStream, _shellParser);
 
 	}
 

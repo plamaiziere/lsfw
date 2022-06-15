@@ -17,7 +17,10 @@ import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.core.probing.Probe;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeRequest;
 import fr.univrennes1.cri.jtacl.core.probing.ProbeTcpFlags;
-import fr.univrennes1.cri.jtacl.lib.ip.*;
+import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
+import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
+import fr.univrennes1.cri.jtacl.lib.ip.TcpFlags;
 
 import java.util.List;
 
@@ -156,7 +159,7 @@ public class FgTcpUdpSctpService extends FgAddressService {
         int may = 0;
 
         for (FgPortsSpec portsSpec: portsSpecs) {
-            MatchResult mres = matchPortsSrcDest(request, portsSpec.getSourcePorts(), portsSpec.getDestPorts());
+            MatchResult mres = portsSpec.matches(request);
             switch (mres) {
                 case ALL: all++; break;
                 case MATCH: may++; break;
@@ -165,49 +168,5 @@ public class FgTcpUdpSctpService extends FgAddressService {
         if (all > 0) return MatchResult.ALL;
         if (may > 0) return MatchResult.MATCH;
         return MatchResult.NOT;
-    }
-
-	protected MatchResult matchPortsSrcDest(ProbeRequest request, PortSpec sourcePort, PortSpec destPort) {
-
-		/*
-		 * source port
-		 */
-		PortSpec port = request.getSourcePort();
-		int sourceMay = 0;
-		MatchResult mres = MatchResult.ALL;
-		if (port != null && sourcePort != null) {
-			mres = sourcePort.matches(port);
-			/*
-			 * does not match at all
-			 */
-			if (mres == MatchResult.NOT) {
-				return MatchResult.NOT;
-			}
-		}
-		if (mres != MatchResult.ALL)
-			sourceMay++;
-
-		/*
-		 * destination port
-		 */
-		port = request.getDestinationPort();
-		int destMay = 0;
-		mres = MatchResult.ALL;
-		if (port != null && destPort != null) {
-			mres = destPort.matches(port);
-			/*
-			 * does not match at all
-			 */
-			if (mres == MatchResult.NOT) {
-				return MatchResult.NOT;
-			}
-		}
-		if (mres != MatchResult.ALL)
-			destMay++;
-		if (sourceMay == 0 && destMay == 0) {
-			return MatchResult.ALL;
-		}
-
-		return MatchResult.MATCH;
     }
 }
