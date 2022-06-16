@@ -1308,14 +1308,14 @@ public class FgFw extends GenericEquipment {
 			if (ifaceName != null) {
 				iface = getIface(ifaceName);
 				if (iface == null) {
-					probe.killNoRoute("Unknown interface " + ifaceName + " No route to " + probe.getDestinationAddress());
+					probe.killNoRoute("Unknown interface " + ifaceName + " No route to " + probe.getDestinationAddress().toNetString("::i"));
 					return;
 				}
 			} else {
 				// find an interface
 				iface = getIfaceConnectedTo(policyRoute.getNextHop());
 				if (iface == null) {
-					probe.killNoRoute("No route to " + probe.getDestinationAddress() +
+					probe.killNoRoute("No route to " + probe.getDestinationAddress().toNetString("::i") +
 							" no interface for gateway " + policyRoute.getNextHop().toString("::i"));
 					return;
 				}
@@ -1323,7 +1323,7 @@ public class FgFw extends GenericEquipment {
 			// find a link
 			IfaceLink ilink = iface.getLinkConnectedTo(policyRoute.getNextHop());
 			if (ilink == null) {
-				probe.killNoRoute("No route to " + probe.getDestinationAddress() +
+				probe.killNoRoute("No route to " + probe.getDestinationAddress().toNetString("::i") +
 						" no link for gateway " + policyRoute.getNextHop().toString("::i"));
 				return;
 			}
@@ -1335,16 +1335,16 @@ public class FgFw extends GenericEquipment {
 				routes.addAll(_routingEngine.getRoutes(probe));
 			}
 			if (matchPolicyRoute == MatchResult.MATCH) {
-				probe.killNoRoute("Cannot policy route to " + probe.getDestinationAddress() + " a rule matches partially" );
+				probe.killNoRoute("Cannot policy route to " + probe.getDestinationAddress().toNetString("::i") + " a rule matches partially" );
 				return;
 			}
 		}
 
 		if (routes.isEmpty()) {
-			probe.killNoRoute("No route to " + probe.getDestinationAddress());
+			probe.killNoRoute("No route to " + probe.getDestinationAddress().toNetString("::i"));
 			return;
 		}
-		probe.routed(probe.getDestinationAddress().toString("i::"));
+		probe.routed(probe.getDestinationAddress().toNetString("i::"));
 
 		if (Log.debug().isLoggable(Level.INFO)) {
 			for (Route r: routes) {
@@ -1617,11 +1617,8 @@ public class FgFw extends GenericEquipment {
 	     * interfaces
 	     */
         FgIfacesSpec ifacesSpec = rule.getSourceIfaces();
-/*
-
-        if (interfaceFilter(link, ifacesSpec) == MatchResult.NOT)
+        if (!rule.getSourceIfaces().isEmpty() && interfaceFilter(link, ifacesSpec) == MatchResult.NOT)
 			return MatchResult.NOT;
-*/
 
         /*
 		 * check source IP
