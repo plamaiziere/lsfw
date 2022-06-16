@@ -47,6 +47,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
 import fr.univrennes1.cri.jtacl.lib.ip.Protocols;
 import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 import fr.univrennes1.cri.jtacl.lib.misc.Direction;
+import fr.univrennes1.cri.jtacl.lib.misc.Pair;
 import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
 import fr.univrennes1.cri.jtacl.lib.xml.XMLUtils;
@@ -1298,8 +1299,10 @@ public class FgFw extends GenericEquipment {
 		Routes routes = new Routes();
 
 		/* Policy routes */
-		Route<String> policyRoute = policyRouteFilter(link, probe);
-		if (policyRoute != null) {
+		Pair<MatchResult, Route<String>> pPolicyRoute = policyRouteFilter(link, probe);
+
+		if (pPolicyRoute.get2() != null) {
+			Route <String> policyRoute = pPolicyRoute.get2();
 			String ifaceName = policyRoute.getLink();
 			Iface iface = null;
 			if (ifaceName != null) {
@@ -1326,8 +1329,15 @@ public class FgFw extends GenericEquipment {
 			}
 			routes.add(new Route(policyRoute.getPrefix(), policyRoute.getNextHop(), 0, ilink));
 		} else {
-			// default routing
-			routes.addAll(_routingEngine.getRoutes(probe));
+			MatchResult matchPolicyRoute = pPolicyRoute.get1();
+			if (matchPolicyRoute == MatchResult.NOT) {
+				// default routing
+				routes.addAll(_routingEngine.getRoutes(probe));
+			}
+			if (matchPolicyRoute == MatchResult.MATCH) {
+				probe.killNoRoute("Cannot policy route to " + probe.getDestinationAddress() + " a rule matches partially" );
+				return;
+			}
 		}
 
 		if (routes.isEmpty()) {
@@ -1372,7 +1382,7 @@ public class FgFw extends GenericEquipment {
 		for (Probe p: probes) {
 			packetFilter(link, p.getOutgoingLink(), p);
 			// XXX accepted by a policy route rule
-			if (policyRoute != null) {
+			if (pPolicyRoute.get1() == MatchResult.ALL) {
 				p.getResults().setAclResultIn(new FwResult(FwResult.ACCEPT));
 				p.getResults().setAclResultOut(new FwResult(FwResult.ACCEPT));
 			}
@@ -1533,7 +1543,7 @@ public class FgFw extends GenericEquipment {
 	/**
 	 * Policy routes filter
 	 */
-	protected Route<String> policyRouteFilter (IfaceLink link, Probe probe) {
+	protected Pair<MatchResult, Route<String>> policyRouteFilter (IfaceLink link, Probe probe) {
 		Route<String> route = null;
 
         String ifaceName = link.getIfaceName();
@@ -1553,8 +1563,9 @@ public class FgFw extends GenericEquipment {
 				} catch (UnknownHostException e) {
 					// XXX
 				}
-				if(route == null) {
-					route = new Route<String>(prefix, rule.getGateway(), 0, rule.getOutputIface()); }
+				if (route == null && may == 0) {
+					route = new Route<String>(prefix, rule.getGateway(), 0, rule.getOutputIface());
+				}
 			}
 
             /* if the rule matches */
@@ -1567,7 +1578,7 @@ public class FgFw extends GenericEquipment {
 
                 /* may be */
                 if (match == MatchResult.MATCH || match == MatchResult.UNKNOWN) {
-					may++;
+					if (route == null) may++;
                     aclResult.addResult(FwResult.MAY);
 				}
 
@@ -1588,7 +1599,12 @@ public class FgFw extends GenericEquipment {
                 }
             }
         }
-		return may == 0 ? route : null;
+		if (may >0)
+			return new Pair<>(MatchResult.MATCH, null);
+
+		if (route != null)
+			return new Pair<>(MatchResult.ALL, route);
+		return new Pair<>(MatchResult.NOT, null);
     }
 
 	protected MatchResult policyRouteRuleFilter(IfaceLink link, Probe probe, FgPolicyRouteRule rule) {
