@@ -1274,11 +1274,6 @@ public class FgFw extends GenericEquipment {
                 probe.killError("TimeToLive expiration");
                 return;
             }
-
-            /*
-             * Filter in the probe
-             */
-            packetFilter(link, Direction.IN, probe);
         }
 
 		/*
@@ -1289,8 +1284,9 @@ public class FgFw extends GenericEquipment {
 			IfaceLink ilink = getIfaceLink(ipdest);
 			if (ilink != null) {
 				/*
-				 * Set the probe's final position and notify the monitor
+				 * Filter and set the probe's final position and notify the monitor
 				 */
+				packetFilter(link, link, probe);
 				probe.setOutgoingLink(ilink, ipdest);
 				probe.destinationReached("destination reached");
 				return;
@@ -1374,7 +1370,12 @@ public class FgFw extends GenericEquipment {
 		 * Filter out the probes
 		 */
 		for (Probe p: probes) {
-			packetFilter(p.getOutgoingLink(), Direction.OUT, p);
+			packetFilter(link, p.getOutgoingLink(), p);
+			// XXX accepted by a policy route rule
+			if (policyRoute != null) {
+				p.getResults().setAclResultIn(new FwResult(FwResult.ACCEPT));
+				p.getResults().setAclResultOut(new FwResult(FwResult.ACCEPT));
+			}
 		}
 
 		/*
@@ -1415,7 +1416,7 @@ public class FgFw extends GenericEquipment {
 		return mres;
 	}
 
-	protected MatchResult ruleFilter(IfaceLink link, Direction direction, Probe probe, FgFwRule rule) {
+	protected MatchResult ruleFilter(IfaceLink linkIn, IfaceLink linkOut, Probe probe, FgFwRule rule) {
 	    /*
 	     * disabled
 	     */
@@ -1427,8 +1428,8 @@ public class FgFw extends GenericEquipment {
 	    /*
 	     * interfaces
 	     */
-        FgIfacesSpec ifacesSpec = direction == Direction.IN ? rule._sourceIfaces : rule._destIfaces;
-        if (interfaceFilter(link, ifacesSpec) == MatchResult.NOT) return MatchResult.NOT;
+        if (interfaceFilter(linkIn, rule.getSourceIfaces()) == MatchResult.NOT) return MatchResult.NOT;
+		if (interfaceFilter(linkOut, rule.getDestIfaces()) == MatchResult.NOT) return MatchResult.NOT;
 
         /*
 		 * check source IP
@@ -1469,15 +1470,18 @@ public class FgFw extends GenericEquipment {
 	/**
 	 * Packet filter
 	 */
-	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
-        String ifaceName = link.getIfaceName();
-        String ifaceComment = link.getIface().getComment();
+	protected void packetFilter (IfaceLink linkIn, IfaceLink linkOut, Probe probe) {
+        String ifaceNameIn = linkIn.getIfaceName();
+        String ifaceCommentIn = linkIn.getIface().getComment();
+        String ifaceNameOut = linkOut.getIfaceName();
+        String ifaceCommentOut = linkOut.getIface().getComment();
+
         ProbeResults results = probe.getResults();
 
         MatchResult match;
         for (FgFwRule rule : _fgRules) {
             String ruleText = rule.toText();
-            match = ruleFilter(link, direction, probe, rule);
+            match = ruleFilter(linkIn, linkOut, probe, rule);
             /* if the rule matches */
             if (match != MatchResult.NOT) {
                 /*
@@ -1496,24 +1500,34 @@ public class FgFw extends GenericEquipment {
                 if (match == MatchResult.MATCH || match == MatchResult.UNKNOWN)
                     aclResult.addResult(FwResult.MAY);
 
-                results.addMatchingAcl(direction, ruleText,
+                results.addMatchingAcl(Direction.IN, ruleText,
+                        aclResult);
+                results.addMatchingAcl(Direction.OUT, ruleText,
                         aclResult);
 
-                results.setInterface(direction,
-                        ifaceName + " (" + ifaceComment + ")");
+                results.setInterface(Direction.IN,
+                        ifaceNameIn + " (" + ifaceCommentIn + ")");
+                results.setInterface(Direction.OUT,
+                        ifaceNameOut + " (" + ifaceCommentOut + ")");
 
                 /*
                  * the active ace is the ace accepting or denying the packet.
                  * this is the first ace that match the packet.
                  */
-                if (results.getActiveAcl(direction).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
-                    results.addActiveAcl(direction,
+                if (results.getActiveAcl(Direction.IN).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+                    results.addActiveAcl(Direction.IN,
+                            ruleText,
+                            aclResult);
+                }
+               if (results.getActiveAcl(Direction.OUT).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+                    results.addActiveAcl(Direction.OUT,
                             ruleText,
                             aclResult);
                 }
             }
         }
-		results.setAclResult(direction, results.reduceMatchingFwResults(direction));
+		results.setAclResult(Direction.IN, results.reduceMatchingFwResults(Direction.IN));
+		results.setAclResult(Direction.OUT, results.reduceMatchingFwResults(Direction.OUT));
     }
 
 	/**
@@ -1527,6 +1541,7 @@ public class FgFw extends GenericEquipment {
         ProbeResults results = probe.getResults();
 
         MatchResult match;
+		int may = 0;
         for (FgPolicyRouteRule rule : _fgPolicyRouteRules) {
             String ruleText = rule.toText();
             match = policyRouteRuleFilter(link, probe, rule);
@@ -1548,11 +1563,13 @@ public class FgFw extends GenericEquipment {
                  * store the result in the probe
                  */
                 FwResult aclResult = new FwResult();
-				aclResult.addResult(FwResult.MATCH);
+				aclResult.addResult(FwResult.ACCEPT);
 
                 /* may be */
-                if (match == MatchResult.MATCH || match == MatchResult.UNKNOWN)
+                if (match == MatchResult.MATCH || match == MatchResult.UNKNOWN) {
+					may++;
                     aclResult.addResult(FwResult.MAY);
+				}
 
                 results.addMatchingAcl(Direction.IN, ruleText,
                         aclResult);
@@ -1571,8 +1588,7 @@ public class FgFw extends GenericEquipment {
                 }
             }
         }
-		return route;
-		//results.setAclResult(Direction.IN, results.reduceMatchingFwResults(Direction.IN));
+		return may == 0 ? route : null;
     }
 
 	protected MatchResult policyRouteRuleFilter(IfaceLink link, Probe probe, FgPolicyRouteRule rule) {
