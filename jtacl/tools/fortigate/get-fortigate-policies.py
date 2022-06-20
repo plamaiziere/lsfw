@@ -27,7 +27,7 @@ configuration:
 """
 
 '''
-Copyright (c) 2020-2022  Universite de Rennes 1
+Copyright (c) 2020 - 2022  Universite de Rennes 1
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met:
@@ -138,6 +138,10 @@ def main():
 #    if testresult(internet_services):
 #        fg['internet_services'] = internet_services
 
+    ippools = device.get_ippool()
+    if testresult(ippools):
+        fg['ippools'] = ippools
+
     central_snat_map = device.get_central_snat_map()
     if testresult(central_snat_map):
         fg['central_snat_map'] = central_snat_map
@@ -148,7 +152,7 @@ def main():
 
     external_resource = device.get_external_resource()
     if testresult(external_resource):
-        fg['external_resources'] = external_resource
+        fg['external_resource'] = external_resource
 
     jenc = json.JSONEncoder(indent = 2)
     js = jenc.encode(fg)

@@ -4,9 +4,8 @@ __copyright__ = "Copyright 2017, James Simpson"
 __license__ = "MIT"
 __version__ = "0.2.0"
 
-# nb: with modifications from Université de Rennes 1
-
 import logging
+# with modifications from Université de Rennes 1
 import requests
 # Disable requests' warnings for insecure connections
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -684,6 +683,21 @@ class FortiGate:
         results = self.get(api_url)
         return results
 
+    # ippool.
+    def get_ippool(self, specific=False, filters=False):
+        """
+        Get ippool.
 
-
+        :param specific: If provided, a specific object will be returned. 
+        :param filters: If provided, the raw filter is appended to the API call.
+        
+        :return: JSON data for all objects in scope of request, nested in a list.
+        """
+        api_url = self.urlbase + "api/v2/cmdb/firewall/ippool"
+        if specific:
+            api_url += str(specific)
+        elif filters:
+            api_url += "?filter=" + filters
+        results = self.get(api_url)
+        return results
 
