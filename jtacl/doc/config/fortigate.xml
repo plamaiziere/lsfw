@@ -21,6 +21,9 @@
 	<!-- policies -->
 	<fwpolicies filename="/path/to/policy.json" />
 
+    <!-- external resources directory -->
+    <external directory="/path/to/resources/directory" />
+
 	<!-- routing engine -->
 	<routing>
 		<!--
