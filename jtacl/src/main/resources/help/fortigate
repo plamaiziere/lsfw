@@ -5,10 +5,14 @@ help: this help.
 show network [network_name]: without parameter, displays all the checkpoint
   network objects. Or displays the network object 'network_name'.
 
+show policy-routes: displays the policy route rules set
+
 show rules: displays the firewall rules set.
 
 show service [service_name]: without parameter, displays all the checkpoint
   services. Or displays the service 'service_name'.
+
+show snat-rules: displays the central SNAT rules set
 
 xref ip     :see help xref-ip.
 xref service: see help xref-service.xref ip : see help xref.

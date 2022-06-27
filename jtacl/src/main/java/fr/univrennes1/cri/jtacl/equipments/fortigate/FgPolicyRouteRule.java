@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ * Copyright (c) 2022, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -26,7 +26,6 @@ public class FgPolicyRouteRule extends FgObject {
 
 	protected Integer _number;
 	protected boolean _disabled;
-	protected FgFwRuleAction _ruleAction;
 	protected FgFwIpSpec _sourceIp;
 	protected FgFwIpSpec _destIp;
 	protected ProtocolsSpec _protocol;
@@ -36,28 +35,12 @@ public class FgPolicyRouteRule extends FgObject {
 	protected IPNet _gateway;
 	protected String _outputIface;
 
-    protected String ruleActionTxt() {
-        return _ruleAction.toString();
-    }
-
 	public Integer getNumber() {
 		return _number;
 	}
 
 	public boolean isDisabled() {
 		return _disabled;
-	}
-
-	public FgFwRuleAction getRuleAction() {
-		return _ruleAction;
-	}
-
-	public void setRuleAction(FgFwRuleAction ruleAction) {
-		_ruleAction = ruleAction;
-	}
-
-    public boolean ruleActionIsAccept() {
-		return _ruleAction != null && _ruleAction == FgFwRuleAction.ACCEPT;
 	}
 
     public FgFwIpSpec getSourceIp() {
@@ -98,7 +81,6 @@ public class FgPolicyRouteRule extends FgObject {
 	 * @param portsSpec source ports / destination ports specififcation
 	 * @param gateway route's gateway
 	 * @param outputIface route's output iface
-//     * @param ruleAction rule action (Accept, drop etc)
      * @return new policy route rule
      */
     static public FgPolicyRouteRule newPolicyRouteRule(String originKey, String comment,
@@ -120,7 +102,6 @@ public class FgPolicyRouteRule extends FgObject {
 		rule._portsSpec = portsSpec;
 		rule._gateway = gateway;
 		rule._outputIface = outputIface;
-//        rule._ruleAction = ruleAction;
         return rule;
     }
 
@@ -135,13 +116,17 @@ public class FgPolicyRouteRule extends FgObject {
 
 	@Override
 	public String toString() {
-	    String s = "rule name=" + _name + ", originKey=" + _originKey
+	    String s = "Route rule name=" + _name + ", originKey=" + _originKey
 				+ ", comment=" + _comment;
 	    s+= ", number=" + _number
                 + ", disabled=" + _disabled
-				+ ", ruleAction=" + _ruleAction
-                + ", srcIfaces=" + _sourceIfaces
-				+ ", sourceIp=" + _sourceIp;
+				+ ", srcIfaces: " + _sourceIfaces
+				+ ", from: " + _sourceIp
+			    + ", to: " + _destIp
+		        + ", protocol: " + _protocol.toString()
+			    + ", " + _portsSpec
+			    + ", gateway: " + _gateway.toString("::i")
+			    + ", outputIface: " + _outputIface;
 	    return s;
 	}
 

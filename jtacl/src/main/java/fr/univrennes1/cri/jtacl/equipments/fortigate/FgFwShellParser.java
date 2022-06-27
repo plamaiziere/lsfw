@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ * Copyright (c) 2013 - 2022, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -62,7 +62,8 @@ public class FgFwShellParser extends GenericEquipmentShellParser {
 					CommandShowService(),
 					CommandShowNetwork(),
 					CommandShowRules(),
-					CommandShowPolicyRoutes()
+					CommandShowPolicyRoutes(),
+					CommandShowSnatRules()
 				)
 			);
 	}
@@ -120,6 +121,18 @@ public class FgFwShellParser extends GenericEquipmentShellParser {
 				SkipSpaces(),
 				EOI,
 				setCommand("show-policy-routes")
+		);
+	}
+
+	public Rule CommandShowSnatRules() {
+		return
+			Sequence(
+				IgnoreCase("show"),
+				WhiteSpaces(),
+				IgnoreCase("snat-rules"),
+				SkipSpaces(),
+				EOI,
+				setCommand("show-snat-rules")
 		);
 	}
 }

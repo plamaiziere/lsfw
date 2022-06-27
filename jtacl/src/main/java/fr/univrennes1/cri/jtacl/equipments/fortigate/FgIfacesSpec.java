@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ * Copyright (c) 2022, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -25,4 +25,9 @@ public class FgIfacesSpec extends LinkedList<String> {
 		this._negate = negate;
 	}
 	public boolean hasNegate() { return _negate; }
+
+	@Override
+	public String toString() {
+		return _negate ? "!" + super.toString() : super.toString();
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ * Copyright (c) 2013 - 2022, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -17,5 +17,6 @@ public enum FgNetworkType {
     UNHANDLED,
     IPRANGE,
     GROUP,
-	EXTERNAL_RESOURCE
+	EXTERNAL_RESOURCE,
+	IPPOOL
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ * Copyright (c) 2013 - 2022, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -103,6 +103,13 @@ public class FgFwShell extends GenericEquipmentShell {
         }
 	}
 
+	public void commandShowSnatRules(PrintStream output, FgFwShellParser parser)
+    {
+        for(FgSnatRule r: _fgfw.getSnatRules()) {
+            output.println(r.toText());
+        }
+	}
+
 	@Override
 	public void shellCommand(String command, PrintStream output) {
 		_outStream = output;
@@ -135,7 +142,8 @@ public class FgFwShell extends GenericEquipmentShell {
 			commandShowRules(_outStream, _shellParser);
 		if (shellCmd.equals("show-policy-routes"))
 			commandShowPolicyRouteRules(_outStream, _shellParser);
-
+		if (shellCmd.equals("show-snat-rules"))
+			commandShowSnatRules(_outStream, _shellParser);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 - 2020, Universite de Rennes 1
+ * Copyright (c) 2013 - 2022, Universite de Rennes 1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the ESUP-Portail license as published by the
@@ -172,6 +172,12 @@ public class FgFw extends GenericEquipment {
 	 */
 	protected List <FgPolicyRouteRule> _fgPolicyRouteRules = new LinkedList<>();
 	public List <FgPolicyRouteRule> getPolicyRoutesRules() { return _fgPolicyRouteRules; }
+
+	/*
+	 * SNAT Route rules
+	 */
+	protected List <FgSnatRule> _fgSnatRules = new LinkedList<>();
+	public List <FgSnatRule> getSnatRules() { return _fgSnatRules; }
 
 	/**
 	 * Sorted list of services by orgin key
@@ -390,6 +396,9 @@ public class FgFw extends GenericEquipment {
             dictNode = rootNode.path("addr_groups");
             loadJsonNetworkGroup(dictNode);
 
+            dictNode = rootNode.path("ippools");
+            loadJsonIpPools(dictNode);
+
 			dictNode = rootNode.path("external_resource");
 			loadJsonExternalResources(dictNode, externalDirectory);
 
@@ -399,6 +408,9 @@ public class FgFw extends GenericEquipment {
             dictNode = rootNode.path("router_policy");
             loadJsonPolicyRouteRules(dictNode);
 
+			dictNode = rootNode.path("central_snat_map");
+            loadJsonSnatRules(dictNode);
+
         }
         // implicit drop rule at the end of the rules
         FgFwRule fwdrop = FgFwRule.newImplicitDropRule();
@@ -406,6 +418,9 @@ public class FgFw extends GenericEquipment {
 
 		// sort policy routes
 		_fgPolicyRouteRules.sort(new FgPolicyRouteRule.PolicyRouteRuleComparator());
+
+		// sort snat rules
+		_fgSnatRules.sort(new FgSnatRule.FgSnatRuleComparator());
     }
 
     protected void linkServices() {
@@ -433,7 +448,7 @@ public class FgFw extends GenericEquipment {
         }
     }
 
-   /*
+    /*
      * Resolve network groups references
      */
 	protected void linkNetworkObjects() {
@@ -619,6 +634,20 @@ public class FgFw extends GenericEquipment {
         return ipSpec;
 	}
 
+	protected FgIpPoolSpec parseJsonFwIppools(JsonNode n) {
+        FgIpPoolSpec ipPoolSpec = new FgIpPoolSpec();
+        List<String> sippools = parseJsonOriginKeyList(n);
+        for (String sippool: sippools) {
+            FgNetworkObject address = _fgNetworks.get(sippool);
+            if (address == null || ! (address instanceof FgNetworkIpPool)) {
+                warnConfig("Unknown ip pool object " + sippool, true);
+            } else {
+                ipPoolSpec.getIpPools().add((FgNetworkIpPool) address);
+            }
+        }
+        return ipPoolSpec;
+	}
+
 	protected FgFwServicesSpec parseJsonFwRulesServices(JsonNode n) {
         FgFwServicesSpec servSpec = new FgFwServicesSpec();
         List<String> sservices = parseJsonOriginKeyList(n);
@@ -685,6 +714,51 @@ public class FgFw extends GenericEquipment {
             servSpec.linkTo(rule);
             _fgRules.add(rule);
             number++;
+        }
+    }
+
+    /*
+     * parse and load central SNAT rules from JSON
+     */
+    protected void loadJsonSnatRules(JsonNode jrules) {
+        Iterator<JsonNode> it = jrules.elements();
+        while (it.hasNext()) {
+            JsonNode n = it.next();
+			int number = n.path("policyid").asInt();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String suid = n.path("uuid").asText();
+            String soriginKey = n.path("q_origin_key").textValue();
+            String scomment = n.path("comment").textValue();
+			boolean ipv4 = n.path("type").textValue().equals("ipv4");
+
+            /* Interfaces */
+            FgIfacesSpec srcIfaces = new FgIfacesSpec();
+            srcIfaces.addAll(parseJsonOriginKeyList(n.path("srcintf")));
+            checkFwRuleIface(srcIfaces);
+
+            FgIfacesSpec dstIfaces = new FgIfacesSpec();
+            dstIfaces.addAll(parseJsonOriginKeyList(n.path("dstintf")));
+            checkFwRuleIface(dstIfaces);
+
+            /* addresses */
+            FgFwIpSpec srcAddresses = parseJsonFwRulesAddresses(n.path(ipv4 ? "orig-addr" : "orig-addr6"));
+
+            FgFwIpSpec dstAddresses = parseJsonFwRulesAddresses(n.path(ipv4 ? "dst-addr" : "dst-addr6"));
+
+            /* nat pool */
+            FgIpPoolSpec poolSpec = parseJsonFwIppools(n.path(ipv4 ? "nat-ippool" : "nat-ippool6"));
+
+            /* misc */
+            boolean disable = !n.path("status").textValue().equals("enable");
+
+            FgSnatRule rule = FgSnatRule.newSnatRule(soriginKey, scomment, suid, number
+                , disable, srcIfaces, dstIfaces, srcAddresses, dstAddresses, poolSpec);
+
+            srcAddresses.linkTo(rule);
+            dstAddresses.linkTo(rule);
+            poolSpec.linkTo(rule);
+            _fgSnatRules.add(rule);
         }
     }
 
@@ -807,6 +881,29 @@ public class FgFw extends GenericEquipment {
 
             }
 	        _fgNetworks.put(soriginKey, address);
+        }
+    }
+
+	/*
+	 * parse and load Ippools from JSON
+	 */
+	protected void loadJsonIpPools(JsonNode jIppool) {
+        Iterator<JsonNode> it = jIppool.elements();
+	    while (it.hasNext()) {
+	        JsonNode n = it.next();
+            _parseContext = new ParseContext();
+            _parseContext.setLine(n.toString());
+            String sname = n.path("name").textValue();
+            String soriginKey = n.path("q_origin_key").textValue();
+	        String scomment = n.path("comment").textValue();
+	        String stype = n.path("type").textValue();
+
+			String start = n.path("startip").textValue();
+			String end = n.path("endip").textValue();
+			IPRangeable r = parseAddressIPRange(start, end);
+			FgNetworkIpPool ippool = new FgNetworkIpPool(sname, soriginKey, scomment, r);
+
+	        _fgNetworks.put(soriginKey, ippool);
         }
     }
 
@@ -1008,6 +1105,8 @@ public class FgFw extends GenericEquipment {
 		} catch (IOException e) {
 			throwCfgException("Cannot read resource file ! resource: " + resource.getName() + " file: " + fileName, false);
 		}
+		famAdd(fileName);
+
 		for (String l: lines) {
             _parseContext = new ParseContext();
             _parseContext.setLine(l);
@@ -1197,7 +1296,7 @@ public class FgFw extends GenericEquipment {
 		if (obj instanceof FgPolicyRouteRule) {
 			FgPolicyRouteRule rule = (FgPolicyRouteRule) obj;
 			if (Log.debug().isLoggable(Level.INFO)) {
-				Log.debug().info("xref NetworkLink/rpolicy-route: " + rule.toText());
+				Log.debug().info("xref NetworkLink/policy-route: " + rule.toText());
 			}
 			CrossRefContext refContext =
 				new CrossRefContext(rule.toText(), "POLICY_ROUTE", "", getName(), 0);
@@ -1205,6 +1304,16 @@ public class FgFw extends GenericEquipment {
 			return;
 		}
 
+		if (obj instanceof FgSnatRule) {
+			FgSnatRule rule = (FgSnatRule) obj;
+			if (Log.debug().isLoggable(Level.INFO)) {
+				Log.debug().info("xref NetworkLink/snat rule: " + rule.toText());
+			}
+			CrossRefContext refContext =
+				new CrossRefContext(rule.toText(), "SNAT_RULE", "", getName(), 0);
+			ipNetRef.addContext(refContext);
+			return;
+		}
 	}
 
 
@@ -1235,6 +1344,15 @@ public class FgFw extends GenericEquipment {
                                 crossRefNetworkLink(ipNetRef6, nobj);
                             }
                             break;
+
+				case IPPOOL: FgNetworkIpPool nipp = (FgNetworkIpPool) nobj;
+							ip = nipp.getIpRange();
+							if (ip != null) {
+                                ipNetRef = getIPNetCrossRef(ip);
+                                crossRefNetworkLink(ipNetRef, nobj);
+                            }
+                            break;
+
 				case EXTERNAL_RESOURCE: FgNetworkExternalResource ner = (FgNetworkExternalResource) nobj;
 							for (IPRangeable ipr: ner.getIpRanges()) {
 									ipNetRef = getIPNetCrossRef(ipr);
@@ -1308,6 +1426,10 @@ public class FgFw extends GenericEquipment {
 			if (ifaceName != null) {
 				iface = getIface(ifaceName);
 				if (iface == null) {
+					String msg = "ROUTE: Unknown interface " + ifaceName
+							+ " No route to " + probe.getDestinationAddress().toNetString("::i");
+
+					probe.getResults().addMatchingAcl(Direction.IN, msg, new FwResult(FwResult.ACCEPT));
 					probe.killNoRoute("Unknown interface " + ifaceName + " No route to " + probe.getDestinationAddress().toNetString("::i"));
 					return;
 				}
@@ -1315,19 +1437,28 @@ public class FgFw extends GenericEquipment {
 				// find an interface
 				iface = getIfaceConnectedTo(policyRoute.getNextHop());
 				if (iface == null) {
-					probe.killNoRoute("No route to " + probe.getDestinationAddress().toNetString("::i") +
-							" no interface for gateway " + policyRoute.getNextHop().toString("::i"));
+					String msg = "ROUTE: No route to " + probe.getDestinationAddress().toNetString("::i")
+							+ " no interface for gateway " + policyRoute.getNextHop().toString("::i");
+
+					probe.getResults().addMatchingAcl(Direction.IN, msg, new FwResult(FwResult.ACCEPT));
+					probe.killNoRoute(msg);
 					return;
 				}
 			}
 			// find a link
 			IfaceLink ilink = iface.getLinkConnectedTo(policyRoute.getNextHop());
 			if (ilink == null) {
-				probe.killNoRoute("No route to " + probe.getDestinationAddress().toNetString("::i") +
-						" no link for gateway " + policyRoute.getNextHop().toString("::i"));
+				String msg = "ROUTE: No route to " + probe.getDestinationAddress().toNetString("::i")
+						+ " no link for gateway " + policyRoute.getNextHop().toString("::i");
+
+				probe.getResults().addMatchingAcl(Direction.IN, msg, new FwResult(FwResult.ACCEPT));
+				probe.killNoRoute(msg);
 				return;
 			}
 			routes.add(new Route(policyRoute.getPrefix(), policyRoute.getNextHop(), 0, ilink));
+			probe.getResults().addMatchingAcl(Direction.IN,
+					"ROUTE: Probe routed to "
+							+ policyRoute.getNextHop().toNetString("i::"), new FwResult(FwResult.ACCEPT));
 		} else {
 			MatchResult matchPolicyRoute = pPolicyRoute.get1();
 			if (matchPolicyRoute == MatchResult.NOT) {
@@ -1335,7 +1466,11 @@ public class FgFw extends GenericEquipment {
 				routes.addAll(_routingEngine.getRoutes(probe));
 			}
 			if (matchPolicyRoute == MatchResult.MATCH) {
-				probe.killNoRoute("Cannot policy route to " + probe.getDestinationAddress().toNetString("::i") + " a rule matches partially" );
+				String msg = "ROUTE: Cannot policy route to "
+						+ probe.getDestinationAddress().toNetString("::i") + " : a policy routing rule matches partially";
+
+				probe.getResults().addMatchingAcl(Direction.IN, msg, new FwResult(FwResult.ACCEPT, FwResult.MAY));
+				probe.killNoRoute(msg);
 				return;
 			}
 		}
@@ -1381,10 +1516,30 @@ public class FgFw extends GenericEquipment {
 		 */
 		for (Probe p: probes) {
 			packetFilter(link, p.getOutgoingLink(), p);
+			// SNAT
+			FwResult fwResult = p.getResults().getProbeResult();
+			Pair<MatchResult, FgIpPoolSpec> pIpPool = snatFilter(link, p.getOutgoingLink(), p);
+
 			// XXX accepted by a policy route rule
 			if (pPolicyRoute.get1() == MatchResult.ALL) {
 				p.getResults().setAclResultIn(new FwResult(FwResult.ACCEPT));
 				p.getResults().setAclResultOut(new FwResult(FwResult.ACCEPT));
+			} else {
+				// Do SNAT
+				if (fwResult.isCertainlyAccept()) {
+					// only if match all
+					if (pIpPool.get1() == MatchResult.ALL) {
+						FgIpPoolSpec ipPoolSpec = pIpPool.get2();
+						if (!ipPoolSpec.getIpPools().isEmpty()) {
+							// we use the first ip pool range as source address
+							IPRangeable sourceAddr = ipPoolSpec.getIpPools().get(0).getIpRange();
+							probe.getResults().addMatchingAcl(Direction.OUT,
+					"SNAT: Source addresse changed from: " + probe.getSourceAddress().toNetString("::i")
+									+ " to: " + sourceAddr.toString("::i") , new FwResult(FwResult.ACCEPT));
+							p.setSourceAddress(sourceAddr);
+						}
+					}
+				}
 			}
 		}
 
@@ -1657,6 +1812,108 @@ public class FgFw extends GenericEquipment {
 
 		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
 				mProto == MatchResult.ALL && mPorts == MatchResult.ALL)
+			return MatchResult.ALL;
+
+		return MatchResult.MATCH;
+    }
+
+	/**
+	 * SNAT filter
+	 */
+	protected Pair<MatchResult, FgIpPoolSpec> snatFilter (IfaceLink linkIn, IfaceLink linkOut, Probe probe) {
+		FgIpPoolSpec ipPoolSpec = null;
+
+        String ifaceNameOut = linkOut.getIfaceName();
+        String ifaceCommentOut = linkOut.getIface().getComment();
+        ProbeResults results = probe.getResults();
+
+        MatchResult match;
+		int may = 0;
+        for (FgSnatRule rule : _fgSnatRules) {
+            String ruleText = rule.toText();
+            match = sNatRuleFilter(linkIn, linkOut, probe, rule);
+
+			if (match == MatchResult.ALL) {
+				ipPoolSpec = rule.getIpPools();
+			}
+
+            /* if the rule matches */
+            if (match != MatchResult.NOT) {
+                /*
+                 * store the result in the probe
+                 */
+                FwResult aclResult = new FwResult();
+				aclResult.addResult(FwResult.ACCEPT);
+
+                /* may be */
+                if (match == MatchResult.MATCH || match == MatchResult.UNKNOWN) {
+					if (ipPoolSpec == null) may++;
+                    aclResult.addResult(FwResult.MAY);
+				}
+
+                results.addMatchingAcl(Direction.OUT, ruleText,
+                        aclResult);
+
+                results.setInterface(Direction.OUT,
+                        ifaceNameOut + " (" + ifaceCommentOut + ")");
+
+/*
+                */
+/*
+                 * the active ace is the ace accepting or denying the packet.
+                 * this is the first ace that match the packet.
+                 *//*
+
+                if (results.getActiveAcl(Direction.IN).isEmpty() && (aclResult.hasAccept() || aclResult.hasDeny())) {
+                    results.addActiveAcl(Direction.IN,
+                            ruleText,
+                            aclResult);
+                }
+*/
+            }
+        }
+		if (may >0)
+			return new Pair<>(MatchResult.MATCH, null);
+
+		if (ipPoolSpec != null)
+			return new Pair<>(MatchResult.ALL, ipPoolSpec);
+		return new Pair<>(MatchResult.NOT, null);
+    }
+
+	protected MatchResult sNatRuleFilter(IfaceLink linkIn, IfaceLink linkOut, Probe probe, FgSnatRule rule) {
+	    /*
+	     * disabled
+	     */
+	    if (rule.isDisabled()) return MatchResult.NOT;
+
+	    /*
+	     * interfaces
+	     */
+        FgIfacesSpec ifacesSpec = rule.getSourceIfaces();
+        if (!ifacesSpec.isEmpty() && interfaceFilter(linkIn, ifacesSpec) == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		ifacesSpec = rule.getDestIfaces();
+        if (!ifacesSpec.isEmpty() && interfaceFilter(linkIn, ifacesSpec) == MatchResult.NOT)
+			return MatchResult.NOT;
+
+        /*
+		 * check source IP
+		 */
+		FgFwIpSpec ipspec = rule.getSourceIp();
+		MatchResult mIpSource = ipSpecFilter(ipspec, probe.getSourceAddress());
+		if (mIpSource == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		/*
+		 * check destination IP
+		 */
+		ipspec = rule.getDestIp();
+		MatchResult mIpDest =ipSpecFilter(ipspec, probe.getDestinationAddress());
+		if (mIpDest == MatchResult.NOT)
+			return MatchResult.NOT;
+
+		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL)
 			return MatchResult.ALL;
 
 		return MatchResult.MATCH;
