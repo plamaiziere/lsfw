@@ -117,7 +117,7 @@ public class ProbeCommand {
 		}
 
 		if (ilinks.size() > 1) {
-			throw new JtaclParameterException("Two many links found");
+			throw new JtaclParameterException("Too many links found");
 		}
 
 		/*
