@@ -52,7 +52,7 @@ public class PixShellParser extends GenericEquipmentShellParser {
 				IgnoreCase("protocol-group"),
 				IgnoreCase("service-group")
 			),
-			setCommand("show-" + match().toLowerCase()),
+			setCommand("show-".concat(match().toLowerCase())),
 			Optional(
 				Sequence(
 					WhiteSpace(),

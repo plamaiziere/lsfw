@@ -887,7 +887,7 @@ public class IOSParser extends CommonRules<Object> {
 					String("syn"),
 					String("urg")
 				),
-				_ace.getTcpFlags().add("+" + match()),
+				_ace.getTcpFlags().add("+".concat(match())),
 				_ace.setTcpKeyword("match-any"),
 				SkipSpaces()
 			);

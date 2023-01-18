@@ -2427,8 +2427,9 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					Ch('/'),
 					SkipSpaces(),
 					PfString(),
-					_pfXhost.setFirstAddress(_pfXhost.getFirstAddress() + "/" +
-						_pfString)
+					_pfXhost.setFirstAddress(_pfXhost.getFirstAddress()
+														.concat("/")
+														.concat(_pfString))
 				),
 				/*
 				 * '<' STRING '>'
@@ -3175,7 +3176,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXIMUM(),
 						WhiteSpaces(),
 						PfString(),
-						setPfStateOptItem("MAXIMUM " + _pfString)
+						setPfStateOptItem("MAXIMUM ".concat(_pfString))
 					),
 					/*
 					 * NOSYNC
@@ -3191,7 +3192,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCSTATES(),
 						WhiteSpaces(),
 						PfString(),
-						setPfStateOptItem("MAXSRCSTATES " + _pfString)
+						setPfStateOptItem("MAXSRCSTATES ".concat(_pfString))
 					),
 					/*
 					 * MAXSRCCONN NUMBER
@@ -3200,7 +3201,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCCONN(),
 						WhiteSpaces(),
 						PfString(),
-						setPfStateOptItem("MAXSRCCONN " + _pfString)
+						setPfStateOptItem("MAXSRCCONN ".concat(_pfString))
 					),
 					/*
 					 * MAXSRCCONNRATE NUMBER '/' NUMBER
@@ -3209,12 +3210,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCCONNRATE(),
 						WhiteSpaces(),
 						PfString(),
-						setPfStateOptItem("MAXSRCCONNRATE " + _pfString),
+						setPfStateOptItem("MAXSRCCONNRATE ".concat(_pfString)),
 						SkipSpaces(),
 						Ch('/'),
 						SkipSpaces(),
 						PfString(),
-						setPfStateOptItem(_pfStateOptItem + " " + _pfString)
+						setPfStateOptItem(_pfStateOptItem.concat(" ").concat(_pfString))
 					),
 					/*
 					 * OVERLOAD '<' STRING '>' flush
@@ -3227,13 +3228,12 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						PfString(),
 						SkipSpaces(),
 						Ch('>'),
-						setPfStateOptItem("OVERLOAD " + "<" + _pfString + ">"),
+						setPfStateOptItem("OVERLOAD ".concat("<").concat(_pfString).concat(">")),
 						SkipSpaces(),
 						Optional(
 							Sequence(
 								PfFlush(),
-								setPfStateOptItem(_pfStateOptItem +	" "
-									+ match())
+								setPfStateOptItem(_pfStateOptItem.concat(" ").concat(match()))
 							)
 						)
 					),
@@ -3244,7 +3244,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 						MAXSRCNODES(),
 						WhiteSpaces(),
 						PfString(),
-						setPfStateOptItem("MAXSRCNODES " + _pfString)
+						setPfStateOptItem("MAXSRCNODES ".concat(_pfString))
 					),
 					/*
 					 * SOURCETRACK sourcetrack
@@ -3256,8 +3256,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 							Sequence(
 								WhiteSpaces(),
 								PfSourceTrack(),
-								setPfStateOptItem(_pfStateOptItem + " "
-									+ match())
+								setPfStateOptItem(_pfStateOptItem.concat(" ").concat(match()))
 							)
 						)
 					),
@@ -3266,7 +3265,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					 */
 					Sequence(
 						PfStateLock(),
-						setPfStateOptItem("STATELOCK " + match())
+						setPfStateOptItem("STATELOCK ".concat(match()))
 					),
 					/*
 					 * SLOPPY
@@ -3287,10 +3286,10 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					 */
 					Sequence(
 						PfString(),
-						setPfStateOptItem("STRING " + _pfString),
+						setPfStateOptItem("STRING ".concat(_pfString)),
 						WhiteSpaces(),
 						PfString(),
-						setPfStateOptItem(_pfStateOptItem +	" " +  _pfString)
+						setPfStateOptItem(_pfStateOptItem.concat(" ").concat(_pfString))
 					)
 				),
 				_pfRule.getFilterOpts().getOptions().add(_pfStateOptItem)
@@ -3565,8 +3564,7 @@ public class PacketFilterParser extends PacketFilterBaseParser {
 					_pfXhost.setFirstAddress(_pfString),
 					Ch('/'),
 					PfString(),
-					_pfXhost.setFirstAddress(_pfXhost.getFirstAddress() +
-							"/" + _pfString)
+					_pfXhost.setFirstAddress(_pfXhost.getFirstAddress().concat("/".concat(_pfString)))
 				),
 				/*
 				 * '<' STRING '>'
