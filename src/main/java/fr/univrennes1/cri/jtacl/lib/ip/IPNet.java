@@ -94,7 +94,7 @@ public final class IPNet implements Comparable, IPRangeable {
 			while (true) {
 				collect();
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(1000);
 				} catch (InterruptedException ex) {
 					//
 				}
