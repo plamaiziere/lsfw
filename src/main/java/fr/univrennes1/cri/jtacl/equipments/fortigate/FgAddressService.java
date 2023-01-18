@@ -15,8 +15,6 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.univrennes1.cri.jtacl.equipments.fortigate.FgNetworkFQDN.resolveFQDN;
-
 public abstract class FgAddressService extends FgService {
 	protected String _comment;
     private List<IPRangeable> _ipRanges;
@@ -28,7 +26,7 @@ public abstract class FgAddressService extends FgService {
             int may = 0;
 
 			var ips = new ArrayList<IPRangeable>(_ipRanges);
-			if (hasFqdn()) ips.addAll(resolveFQDN(_fqdn));
+			if (hasFqdn()) ips.addAll(FgNetworkFQDN.resolveFQDN(_fqdn));
 
             for (IPRangeable r: ips) {
                 if (r.contains(range)) all++;
@@ -65,7 +63,7 @@ public abstract class FgAddressService extends FgService {
         if (hasRanges()) s += ", ipRanges=" + _ipRanges;
         if (hasFqdn()) {
 			s += ", fqdn= " + _fqdn;
-			s += ", fqdnIps= [" + IPRangeable.formatCollection(resolveFQDN(_fqdn), "::i") + ']';
+			s += ", fqdnIps= [" + IPRangeable.formatCollection(FgNetworkFQDN.resolveFQDN(_fqdn), "::i") + ']';
 		}
         return s;
     }
