@@ -36,7 +36,6 @@ import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
-import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.lib.ip.PortOperator;
 import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
 import fr.univrennes1.cri.jtacl.lib.ip.PortSpec;
@@ -535,18 +534,6 @@ public class FgFw extends GenericEquipment {
         return portSpec;
 	}
 
-	List<IPRangeable> parseFqdn(String fqdn) {
-	    List<IPRangeable> ips = new LinkedList<>();
-        try {
-            List<IPNet> lip = IPNet.getAllByName(fqdn, IPversion.IPV4);
-            for (IPNet ip: lip) {
-                ips.add(new IPRange(ip));
-            }
-        } catch (UnknownHostException e) {
-            throwCfgException("cannot resolve FQDN: " + fqdn, true);
-        }
-        return ips;
-	}
 
 	IPRangeable parseIpRange(String iprange) {
 	    IPRangeable ips = null;
@@ -871,6 +858,18 @@ public class FgFw extends GenericEquipment {
 	            address = new FgNetworkIP(sname, soriginKey, scomment, suid, r, null);
             }
 
+			if (stype.equals("fqdn")) {
+				String sfqdn = n.path("fqdn").textValue();
+				// XXX: don't handle wildcard FQDN
+				if (!sfqdn.startsWith("*")) {
+					var lips = FgNetworkFQDN.resolveFQDN(sfqdn);
+					if (lips.isEmpty()) {
+						warnConfig("FQDN does not resolve: " + sfqdn, true);
+					}
+					address = new FgNetworkFQDN(sname, soriginKey, scomment, suid, sfqdn);
+				}
+			}
+
 	        if (address == null) {
                 address = new FgUnhandledNetwork(sname, soriginKey, scomment, suid);
                 warnConfig("address is unhandled: " + address, false);
@@ -983,7 +982,10 @@ public class FgFw extends GenericEquipment {
 
 	        List<IPRangeable> ips = null;
 	        if (!sfqdn.isEmpty()) {
-	            ips = parseFqdn(sfqdn);
+				var lips = FgNetworkFQDN.resolveFQDN(sfqdn);
+				if (lips.isEmpty()) {
+					warnConfig("Fqdn does not resolve: " + sfqdn, true);
+				}
             } else sfqdn = null;
 
 	        if (!siprange.equals("0.0.0.0")) {
@@ -1355,6 +1357,13 @@ public class FgFw extends GenericEquipment {
 									crossRefNetworkLink(ipNetRef, nobj);
 							}
 							break;
+
+				case FQDN: FgNetworkFQDN nfqdn = (FgNetworkFQDN) nobj;
+							for (IPRangeable ipr: FgNetworkFQDN.resolveFQDN(nfqdn.getFqdn())) {
+									ipNetRef = getIPNetCrossRef(ipr);
+									crossRefNetworkLink(ipNetRef, nobj);
+							}
+							break;
 		    }
         }
 
@@ -1367,13 +1376,17 @@ public class FgFw extends GenericEquipment {
             }
 		    if (sobj instanceof FgAddressService) {
 		        FgAddressService nserv = (FgAddressService) sobj;
+				List<IPRangeable> ips = new ArrayList<>();
 		        if (nserv.hasRanges()) {
-                    List<IPRangeable> ranges = nserv.getipRanges();
-                    for (IPRangeable range: ranges) {
-                        IPCrossRef ipNetRef = getIPNetCrossRef(range);
-                        crossRefNetworkLink(ipNetRef, sobj);
-                    }
-                }
+                    ips.addAll(nserv.getipRanges());
+				}
+		        if (nserv.hasFqdn()) {
+                    ips.addAll(FgNetworkFQDN.resolveFQDN(nserv.getFqdn()));
+				}
+				for (IPRangeable range: ips) {
+					IPCrossRef ipNetRef = getIPNetCrossRef(range);
+					crossRefNetworkLink(ipNetRef, sobj);
+				}
             }
 		}
 	}

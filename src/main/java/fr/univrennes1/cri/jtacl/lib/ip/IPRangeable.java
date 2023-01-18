@@ -10,6 +10,7 @@
 package fr.univrennes1.cri.jtacl.lib.ip;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * interface for IP range. A range of ip addresses
@@ -128,4 +129,20 @@ public interface IPRangeable {
 	 * @return the length of this range.
 	 */
     BigInteger length();
+
+	/**
+	 * Format a collection of IPRangeable to String
+	 * @param ips collection of IPRangeable
+	 * @param format format to use
+	 * @return a String representation of the collection
+	 */
+	static String formatCollection(Collection<IPRangeable> ips, String format) {
+		StringBuilder sb = new StringBuilder();
+		boolean start = true;
+		for (IPRangeable ipr: ips) {
+			if (!start) sb.append(", "); else start = false;
+			sb.append(ipr.toNetString(format));
+		}
+		return sb.toString();
+	}
 }

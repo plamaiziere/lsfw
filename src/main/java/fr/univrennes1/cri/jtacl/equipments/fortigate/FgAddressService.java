@@ -12,7 +12,10 @@ package fr.univrennes1.cri.jtacl.equipments.fortigate;
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static fr.univrennes1.cri.jtacl.equipments.fortigate.FgNetworkFQDN.resolveFQDN;
 
 public abstract class FgAddressService extends FgService {
 	protected String _comment;
@@ -20,11 +23,14 @@ public abstract class FgAddressService extends FgService {
     private String _fqdn;
 
 	protected  MatchResult matchAddress(IPRangeable range) {
-            if (_ipRanges == null) return MatchResult.ALL;
+            if (_ipRanges == null && ! hasFqdn()) return MatchResult.ALL;
             int all = 0;
             int may = 0;
 
-            for (IPRangeable r: _ipRanges) {
+			var ips = new ArrayList<IPRangeable>(_ipRanges);
+			if (hasFqdn()) ips.addAll(resolveFQDN(_fqdn));
+
+            for (IPRangeable r: ips) {
                 if (r.contains(range)) all++;
                 if (r.overlaps(range)) may++;
             }
@@ -32,7 +38,6 @@ public abstract class FgAddressService extends FgService {
             if (may > 0) return MatchResult.MATCH;
             return MatchResult.NOT;
     }
-
 
 	public FgAddressService(String name, String originKey, String comment, List<IPRangeable> ipRanges, String fqdn, FgServiceType type) {
 
@@ -51,13 +56,17 @@ public abstract class FgAddressService extends FgService {
 	public boolean hasRanges() { return _ipRanges != null; }
 
 	public String getFqdn() { return _fqdn; }
+
 	public boolean hasFqdn() { return _fqdn != null; }
 
     @Override
     public String toString() {
         String s = _name + ", " + _originKey + ", " + _comment + ", " + _type;
         if (hasRanges()) s += ", ipRanges=" + _ipRanges;
-        if (hasFqdn()) s += ", fqdn = " + _fqdn;
+        if (hasFqdn()) {
+			s += ", fqdn= " + _fqdn;
+			s += ", fqdnIps= [" + IPRangeable.formatCollection(resolveFQDN(_fqdn), "::i") + ']';
+		}
         return s;
     }
 }

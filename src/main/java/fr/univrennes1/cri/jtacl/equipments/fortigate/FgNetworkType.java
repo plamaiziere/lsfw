@@ -14,5 +14,6 @@ public enum FgNetworkType {
     IPRANGE,
     GROUP,
 	EXTERNAL_RESOURCE,
-	IPPOOL
+	IPPOOL,
+	FQDN
 }
