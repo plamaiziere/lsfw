@@ -17,6 +17,6 @@ Lsfw implements:
 *  Fortinet Fortigate 6.X
 *  Proxmox VE Firewall 7.0
 
-Full documentation at https://groupes.renater.fr/wiki/jtacl/index
+Full documentation at https://github.com/plamaiziere/lsfw/wiki
 
 Lsfw is developed by and used at Université de Rennes 1 / France, see COPYING for licenses
