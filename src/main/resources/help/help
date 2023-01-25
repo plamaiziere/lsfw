@@ -19,4 +19,4 @@ topology     : shows the topology of the network.
 xref-ip      : shows IP cross-references on an equipment.
 xref-service : shows service cross-references on an equipment.
 
-See also https://groupes.renater.fr/wiki/jtacl/index
+See also https://github.com/plamaiziere/lsfw/wiki
