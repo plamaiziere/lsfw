@@ -11,6 +11,7 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 
 import java.math.BigInteger;
 import java.net.UnknownHostException;
+import java.util.Objects;
 
 /**
  * IP range. A range of ip addresses
@@ -168,6 +169,14 @@ public class IPRange implements IPRangeable {
 				_ipLast.isBetweenIP(firstOther, lastOther) ||
 				firstOther.isBetweenIP(_ipFirst, _ipLast) ||
 				lastOther.isBetweenIP(_ipFirst, _ipLast);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		IPRange ipRange = (IPRange) o;
+		return _ipFirst.equals(ipRange._ipFirst) && _ipLast.equals(ipRange._ipLast);
 	}
 
 	@Override
