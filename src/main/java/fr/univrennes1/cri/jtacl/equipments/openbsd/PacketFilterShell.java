@@ -9,6 +9,7 @@
 
 package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
+import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
 import java.io.PrintStream;
@@ -66,6 +67,14 @@ public class PacketFilterShell extends GenericEquipmentShell {
 		if (shellCmd.equals("xref-service"))
 			printXrefService(_outStream, _pf.getServiceCrossRef(), _shellParser);
 
+		if (shellCmd.equals("to-fortigate")) {
+			try {
+				PacketFilterToFortiConverter pfconv = new PacketFilterToFortiConverter(_pf, _shellParser.fortiEqname, output);
+				pfconv.convert();
+			} catch (JtaclRuntimeException ex) {
+				_outStream.println("Error: " + ex.getMessage());
+			}
+		}
 	}
 
 	@Override

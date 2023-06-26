@@ -18,9 +18,17 @@ import org.parboiled.Rule;
  */
 public class PacketFilterShellParser extends GenericEquipmentShellParser {
 
+	protected String fortiEqname;
+
 	@Override
 	protected boolean clear() {
+		fortiEqname = null;
 		return super.clear();
+	}
+
+	protected boolean setFortiEqName(String s) {
+		fortiEqname = s;
+		return true;
 	}
 
 	public Rule CommandLine() {
@@ -30,9 +38,20 @@ public class PacketFilterShellParser extends GenericEquipmentShellParser {
 				FirstOf(
 					CommandHelp(),
 					CommandXrefIp(),
-					CommandXrefService()
+					CommandXrefService(),
+					CommandConvert()
 				)
 			);
+	}
+
+	public Rule CommandConvert() {
+		return Sequence(
+			IgnoreCase("to-fortigate"),
+			WhiteSpaces(),
+			StringAtom(),
+			setCommand("to-fortigate"),
+			setFortiEqName(match())
+		);
 	}
 
 }
