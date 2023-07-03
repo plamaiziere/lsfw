@@ -29,7 +29,7 @@ import java.util.HashMap;
  */
 public class RoutingEngine implements ShowableRoutes {
 
-	class RoutingTableItem implements Comparable {
+	public class RoutingTableItem implements Comparable {
 		IPNet _prefix;
 		Routes _routes = new Routes();
 
@@ -45,9 +45,13 @@ public class RoutingEngine implements ShowableRoutes {
 			return _prefix.compareTo(item._prefix);
 		}
 
+		public Routes getRoutes() {
+			return _routes;
+		}
+
 	}
 
-	class RoutingTable extends HashMap<Integer, RoutingTableItem> {
+	public class RoutingTable extends HashMap<Integer, RoutingTableItem> {
 
 	}
 
@@ -248,6 +252,22 @@ public class RoutingEngine implements ShowableRoutes {
 			return sourceRoutes;
 
 		return getRoutes(probe.getDestinationAddress());
+	}
+
+	public RoutingTable getRoutingTableIPv4() {
+		return _routingTableIPv4;
+	}
+
+	public RoutingTable getRoutingTableIPv6() {
+		return _routingTableIPv6;
+	}
+
+	public RoutingTable getSourceRoutingTableIPv4() {
+		return _sourceRoutingTableIPv4;
+	}
+
+	public RoutingTable getSourceRoutingTableIPv6() {
+		return _sourceRoutingTableIPv6;
 	}
 
 	@Override

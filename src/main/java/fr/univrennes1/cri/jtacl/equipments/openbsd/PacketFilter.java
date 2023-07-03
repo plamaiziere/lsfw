@@ -299,6 +299,13 @@ public class PacketFilter extends GenericEquipment {
 	protected RoutingEngine _routeToEngine = null;
 
 	/**
+	 * routing engine.
+	 */
+	protected RoutingEngine getRoutingEngine()  {
+		return _routingEngine;
+	}
+
+	/**
 	 * filtering flag done, used at filtering time.
 	 */
 	protected boolean _filteringDone = false;
