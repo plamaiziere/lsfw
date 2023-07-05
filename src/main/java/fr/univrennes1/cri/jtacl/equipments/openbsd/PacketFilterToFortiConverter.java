@@ -11,7 +11,6 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 import fr.univrennes1.cri.jtacl.analysis.IPCrossRef;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclParameterException;
 import fr.univrennes1.cri.jtacl.core.exceptions.JtaclRuntimeException;
-import fr.univrennes1.cri.jtacl.core.monitor.Log;
 import fr.univrennes1.cri.jtacl.core.monitor.Monitor;
 import fr.univrennes1.cri.jtacl.core.network.IfaceLink;
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
@@ -32,7 +31,6 @@ import fr.univrennes1.cri.jtacl.equipments.fortigate.FgTcpUdpSctpService;
 import fr.univrennes1.cri.jtacl.lib.ip.AddressFamily;
 import fr.univrennes1.cri.jtacl.lib.ip.IP;
 import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
-import fr.univrennes1.cri.jtacl.lib.ip.IPProtoEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRange;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
@@ -50,7 +48,6 @@ import java.math.BigInteger;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -88,38 +85,10 @@ public class PacketFilterToFortiConverter {
 	protected String defaultRouteIface;
 	protected IPNet IP_1234;
 
-	protected HashMap<String, List<IPNet>> computeNetworksByLink() {
-		HashMap<String, List<IPNet>> nbl = new HashMap<>();
-
-		RoutingEngine.RoutingTable routingTable = pf.getRoutingEngine().getRoutingTableIPv4();
-		for (RoutingEngine.RoutingTableItem rti: routingTable.values()) {
-			for (Route<IfaceLink> route: rti.getRoutes()) {
-				if (route.isNullRoute()) continue;
-				if (route.getLink().isLoopback()) continue;
-				var listNetworks = nbl.get(route.getLink().getIfaceName());
-				if (listNetworks == null) { listNetworks = new ArrayList<>(); }
-				if (!route.getPrefix().isHost()) {
-					if(rangeIsAny(route.getPrefix())) {
-						defaultRouteIface = route.getLink().getIfaceName();
-						continue;
-					}
-					listNetworks.add(route.getPrefix());
-				}
-
-				nbl.put(route.getLink().getIfaceName(), listNetworks);
-			}
-		}
-		return nbl;
-	}
-
-	protected static boolean rangeIsAny(IPRangeable range) {
-		try {
-			return range.contains(new IPRange("0/0"));
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
+	// initialize the converter using a PacketFilter equipment and a Fortigate equipment (by name)
+	// the specified Fortigate equipment is used as a database for services and networks object, because
+	// the database is shared by several Fortigate and we don't want to override an existing object
+	// that may be tuned (for session or TTL by example)
 	public PacketFilterToFortiConverter(PacketFilter pf, String fortigateName, PrintStream output) {
 		this.pf = pf;
 		this.output = output;
@@ -147,8 +116,9 @@ public class PacketFilterToFortiConverter {
 			throw new JtaclParameterException("no such equipment");
 		}
 
-		String d = "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
 
+		// files generated
+		String d = "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
 		try {
 			cliFileAddresses = new BufferedWriter(new FileWriter("lsfw_fortigate_addresses" + d));
 			cliFileAddressesGroup = new BufferedWriter(new FileWriter("lsfw_fortigate_addresses_groups" + d));
@@ -163,6 +133,7 @@ public class PacketFilterToFortiConverter {
 		}
 	}
 
+	// here we go
 	public void convert() {
 		printLnFile(cliFileAddresses, "config firewall address");
 		printLnFile(cliFileAddressesGroup, "config firewall addrgrp");
@@ -175,61 +146,71 @@ public class PacketFilterToFortiConverter {
 			if (! (rule instanceof PfRule)) continue;
 			var pfrule = (PfRule) rule;
 			logOut("RULE " + pfRuleToText(pfrule));
-			if (ruleIsHandled(pfrule)) {
-				try {
-					var pfFromIpSpec = pfrule.getFromIpSpec();
-					boolean hasFromIPNegation = pfFromIpSpec
-							.stream()
-							.anyMatch(pfNodeHost -> pfNodeHost.isNot());
-					if (hasFromIPNegation && pfFromIpSpec.size() > 1) {
-						throw new JtaclPfToFortiException("from: cannot negate more than one ip specification");
-					}
 
-					var pfToIpSpec = pfrule.getToIpSpec();
-					boolean hasToIPNegation = pfToIpSpec
-							.stream()
-							.anyMatch(pfNodeHost -> pfNodeHost.isNot());
-					if (hasToIPNegation && pfToIpSpec.size() > 1) {
+			try {
+				ruleIsHandled(pfrule);
+
+				var inIfacesName = pfrule.getIfList()
+						.stream()
+						.map(pfIfSpec -> pfIfSpec.getIfName())
+						.collect(Collectors.toList());
+
+				var pfFromIpSpec = pfrule.getFromIpSpec();
+				boolean hasFromIPNegation = pfFromIpSpec
+						.stream()
+						.anyMatch(pfNodeHost -> pfNodeHost.isNot());
+				if (hasFromIPNegation) {
+					throw new JtaclPfToFortiException("from: cannot negate ip specification");
+				}
+
+				var pfToIpSpec = pfrule.getToIpSpec();
+				boolean hasToIPNegation = pfToIpSpec
+						.stream()
+						.anyMatch(pfNodeHost -> pfNodeHost.isNot());
+				if (hasToIPNegation) {
+					if (pfToIpSpec.size() > 1) {
 						throw new JtaclPfToFortiException("to: cannot negate more than one ip specification");
 					}
-
-					var fgNetObjFrom = pfIpspecToFortigate(pfrule.getFromIpSpec());
-					var fgNetObTo = pfIpspecToFortigate(pfrule.getToIpSpec());
-					if (fgNetObTo.isEmpty())
-						throw new JtaclPfToFortiException("to addresses is empty (self rule?)");
-					boolean udp = pfrule.getProtocols().contains(Protocols.UDP);
-					boolean tcp = pfrule.getProtocols().contains(Protocols.TCP);
-					var fgServices = pfPortSpecToFortigate(pfrule.getToPortSpec(), udp, tcp);
-					var action = pfrule.getAction().equals("pass") ? FgFwRuleAction.ACCEPT : FgFwRuleAction.DROP;
-					var sourcesIntf = pfrule.getIfList()
-							.stream()
-							.map(pfIfSpec -> "PFINTERFACE_" + pfIfSpec.getIfName())
-							.collect(Collectors.toList());
-
-					generateCLIFwPolicy(ruleNumber.toString()
-							, action
-							, sourcesIntf
-							, fgNetObjFrom
-							, hasFromIPNegation
-							, fgNetObTo
-							, hasToIPNegation
-							, fgServices
-							, pfRuleToText(pfrule));
-
-					var probeIfaces = pfrule.getIfList()
-							.stream()
-							.map(pfIfSpec -> pfIfSpec.getIfName())
-							.collect(Collectors.toList());
-
-					generateProbe(probeIfaces, hasFromIPNegation, fgNetObjFrom, hasToIPNegation, fgNetObTo, fgServices, action, udp, tcp, pfrule);
-
-					ruleNumber += 100;
-
-				} catch (JtaclPfToFortiException e) {
-					logError("#!#!#! rule " + pfRuleToText(pfrule)
-							+  " => Error: " + e.getMessage());
+					if (inIfacesName.contains(defaultRouteIface)) {
+						throw new JtaclPfToFortiException("to: cannot negate if input interface is the default route interface");
+					}
 				}
+
+				var fgNetObjFrom = pfIpspecToFortigate(pfrule.getFromIpSpec());
+				if (fgNetObjFrom.isEmpty())
+					throw new JtaclPfToFortiException("from addresses is empty (self rule?)");
+
+				var fgNetObTo = pfIpspecToFortigate(pfrule.getToIpSpec());
+				if (fgNetObTo.isEmpty())
+					throw new JtaclPfToFortiException("to addresses is empty (self rule?)");
+
+				boolean udp = pfrule.getProtocols().contains(Protocols.UDP);
+				boolean tcp = pfrule.getProtocols().contains(Protocols.TCP);
+				var fgServices = pfPortSpecToFortigate(pfrule.getToPortSpec(), udp, tcp);
+				var action = pfrule.getAction().equals("pass") ? FgFwRuleAction.ACCEPT : FgFwRuleAction.DROP;
+
+				generateCLIFwPolicy(ruleNumber.toString()
+						, action
+						, inIfacesName
+						, fgNetObjFrom
+						, hasFromIPNegation
+						, fgNetObTo
+						, hasToIPNegation
+						, fgServices
+						, pfRuleToText(pfrule)
+						, pfrule.getText());
+
+				generateProbe(inIfacesName, fgNetObjFrom, hasToIPNegation, fgNetObTo, fgServices, action, udp, tcp, pfrule);
+
+				ruleNumber += 100;
+
+			} catch (JtaclPfToFortiException e) {
+				var s = "#!#!#! rule " + pfRuleToText(pfrule) +  " => Error: " + e.getMessage();
+				logError(s);
+				printLnFile(cliFileRules, s);
+				printLnFile(cliFileRules);
 			}
+			logOut("");
 		}
 
 		printLnFile(cliFileAddresses, "end");
@@ -239,13 +220,52 @@ public class PacketFilterToFortiConverter {
 		printLnFile(cliFileRules, "end");
 	}
 
+	protected HashMap<String, List<IPNet>> computeNetworksByLink() {
+		HashMap<String, List<IPNet>> nbl = new HashMap<>();
+
+		RoutingEngine.RoutingTable routingTable = pf.getRoutingEngine().getRoutingTableIPv4();
+		for (RoutingEngine.RoutingTableItem rti: routingTable.values()) {
+			for (Route<IfaceLink> route: rti.getRoutes()) {
+				if (route.isNullRoute()) {
+					continue;
+				}
+				if (route.getLink().isLoopback()) {
+					continue;
+				}
+				var listNetworks = nbl.get(route.getLink().getIfaceName());
+				if (listNetworks == null) { listNetworks = new ArrayList<>(); }
+				if (!route.getPrefix().isHost()) {
+					if(rangeIsAny(route.getPrefix())) {
+						defaultRouteIface = route.getLink().getIfaceName();
+						continue;
+					}
+					listNetworks.add(route.getPrefix());
+				}
+
+				nbl.put(route.getLink().getIfaceName(), listNetworks);
+			}
+		}
+		return nbl;
+	}
+
+	protected static boolean rangeIsAny(IPRangeable range) {
+		try {
+			return range.contains(new IPRange("0/0"));
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	protected List<IPNet> reduceAny(List<IPNet> ipNetList) {
-		return ipNetList
+		var ips = ipNetList
 			.stream()
 			.map(ipNet -> {
 				try {
 					if (ipNet.isHost()) return ipNet;
+					// on networks do not use '.0' addresses and '.255' and '.254' addresses
+					// (because they are filtered in our ruleset)
 					IPNet ip = new IPNet(ipNet.getIP().add(BigInteger.ONE), IPversion.IPV4);
+					// search for an unreferenced IP address to avoid to match a rule using this address
 					for(;;) {
 						IPCrossRef xref = pf.getNetCrossRef().get(ip);
 						if (xref == null) {
@@ -257,10 +277,55 @@ public class PacketFilterToFortiConverter {
 					throw new RuntimeException(e);
 				}
 			})
+			.filter(ipNet -> {
+				// avoid directly connected network
+				return pf.getIfaceConnectedTo(ipNet) == null;
+			})
 			.collect(Collectors.toList());
+		return ips;
 	}
 
-	protected void generateProbe(List<String> sourceIfaces, boolean negateFrom, List<FgNetworkObject> from
+	protected List<IPRangeable> collectIpAndReduce(List<IPNet> reduces, List<FgNetworkObject> fgNetworkObjects, boolean negate) {
+
+		List<IPRangeable> ips = collectAddresses(fgNetworkObjects)
+					.stream()
+					.map(ipNet -> rangeIsAny(ipNet) ? reduceAny(reduces) : List.of(ipNet))
+					.flatMap(l -> l.stream())
+					.collect(Collectors.toList());
+
+     	if (negate) {
+			 // try to find a random ip address that is not in the 'ips' collected addresses and not in the
+			// internal networks of the equipment
+			// works only on egress rule (to internet)
+			var r = new Random();
+			IPNet ip;
+			for (;;) {
+				int rand = r.nextInt();
+				rand = rand >= 0 ? rand : -rand;
+				BigInteger iip = BigInteger.valueOf(rand);
+				try {
+					ip = new IPNet(iip, IPversion.IPV4);
+					final var lip = ip;
+					boolean ok = ips
+									.stream()
+									.allMatch(ipNet -> !ipNet.contains(lip) && ! this.internalNetworks.contains(lip)
+									);
+					if (ok) {
+						ip = lip;
+						break;
+					}
+				} catch (UnknownHostException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			ips = List.of(ip);
+		}
+		return ips;
+	}
+
+	// generates test cases for this rule
+	// the cases will be replayed on the new fortinet equipment as regression tests using lsfw
+	protected void generateProbe(List<String> sourceIfaces, List<FgNetworkObject> from
 			, boolean negateTo, List<FgNetworkObject> to
 			, List<FgService> services
 			, FgFwRuleAction action
@@ -269,6 +334,8 @@ public class PacketFilterToFortiConverter {
 
 		printLnFile(probesFile, "### " + pfRuleToText(rule));
 
+		// the meaning of 'any' depends on the interface used in input
+		// => reduces 'any' to a set of networks addresses
 		List<IPNet> reduceAnyFrom;
 		if (!sourceIfaces.contains(defaultRouteIface)) {
 			reduceAnyFrom = sourceIfaces
@@ -278,36 +345,10 @@ public class PacketFilterToFortiConverter {
 				.collect(Collectors.toList());
 		} else reduceAnyFrom = List.of(IP_1234);
 
-		List<IPNet> fromIps = collectAddresses(from)
-					.stream()
-					.map(ipNet -> rangeIsAny(ipNet) ? reduceAny(reduceAnyFrom) : List.of(ipNet))
-					.flatMap(l -> l.stream())
-					.collect(Collectors.toList());
+		List<IPRangeable> fromIps = collectIpAndReduce(reduceAnyFrom, from, false);
 
-     	if (negateFrom) {
-			var r = new Random();
-			IPNet ip = null;
-			for (;;) {
-				int rand = r.nextInt();
-				rand = rand >= 0 ? rand : -rand;
-				BigInteger iip = BigInteger.valueOf(rand);
-				try {
-					ip = new IPNet(iip, IPversion.IPV4);
-					final var lip = ip;
-					boolean ok = fromIps
-									.stream()
-									.allMatch(ipNet -> !ipNet.contains(lip));
-					if (ok) {
-						ip = lip;
-						break;
-					}
-				} catch (UnknownHostException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			fromIps = List.of(ip);
-		}
-
+		// the meaning of 'any' depends on the interface used in input
+		// => reduces 'any' to a set of networks addresses
 		List<IPNet> reduceAnyTo;
 		if (sourceIfaces.contains(defaultRouteIface)) {
 			reduceAnyTo = networksByLink.values()
@@ -316,35 +357,7 @@ public class PacketFilterToFortiConverter {
 					.collect(Collectors.toList());
 		} else reduceAnyTo = new ArrayList<>();
 
-		var toIps = collectAddresses(to)
-				.stream()
-				.map(ipNet -> rangeIsAny(ipNet) ? reduceAny(reduceAnyTo) : List.of(ipNet))
-				.flatMap(l -> l.stream())
-				.collect(Collectors.toList());
-
-     	if (negateTo) {
-			var r = new Random();
-			IPNet ip = null;
-			for (;;) {
-				int rand = r.nextInt();
-				rand = rand >= 0 ? rand : -rand;
-				BigInteger iip = BigInteger.valueOf(rand);
-				try {
-					ip = new IPNet(iip, IPversion.IPV4);
-					final var lip = ip;
-					boolean ok = toIps
-									.stream()
-									.allMatch(ipNet -> !ipNet.contains(lip));
-					if (ok) {
-						ip = lip;
-						break;
-					}
-				} catch (UnknownHostException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			toIps = List.of(ip);
-		}
+		List<IPRangeable> toIps = collectIpAndReduce(reduceAnyTo, to, negateTo);
 
 		var udpServices = (udp) ? collectServices(services, Protocols.UDP) : null;
 		var tcpServices = (tcp) ? collectServices(services, Protocols.TCP) : null;
@@ -355,8 +368,8 @@ public class PacketFilterToFortiConverter {
 		var expect = action == FgFwRuleAction.ACCEPT ? "accept" : "deny";
 		var probe = "probe expect " + expect + " on " + pf.getName() + "|" + sourceIfaces.get(0) + " ";
 
-		for (IPNet fip: fromIps) {
-			for (IPNet tip: toIps ) {
+		for (IPNet fip: collectRanges(fromIps)) {
+			for (IPNet tip: collectRanges(toIps) ) {
 				if (udp) {
 					for (Integer ns: udpServices) {
 						var s = probe + fip.toString("s") + " " + tip.toString("s") + " udp "  + "dyn:" + ns;
@@ -370,10 +383,10 @@ public class PacketFilterToFortiConverter {
 					}
 				}
 				if (!udp && !tcp) {
-					var s = probe + fip.toString("s") + " " + tip.toString("s") + " udp ";
+					var s = probe + fip.toString("s") + " " + tip.toString("s") + " udp dyn:dyn";
 					printLnFile(probesFile, s);
 
-					s = probe + fip.toString("s") + " " + tip.toString("s") + " tcp " + " flags Sa";
+					s = probe + fip.toString("s") + " " + tip.toString("s") + " tcp dyn:dyn" + " flags Sa";
 					printLnFile(probesFile, s);
 				}
 			}
@@ -389,12 +402,12 @@ public class PacketFilterToFortiConverter {
 				if (protocol == Protocols.UDP && s.isUdp()) {
 					var pr = s.getUdpPortsSpec().get(0).getDestPorts().getRanges().get(0);
 					ports.add(pr.getFirstPort());
-					ports.add(pr.getLastPort());
+					if (pr.getLastPort() != pr.getFirstPort()) ports.add(pr.getLastPort());
 				}
 				if (protocol == Protocols.TCP && s.isTcp()) {
 					var pr = s.getTcpPortsSpec().get(0).getDestPorts().getRanges().get(0);
 					ports.add(pr.getFirstPort());
-					ports.add(pr.getLastPort());
+					if (pr.getLastPort() != pr.getFirstPort()) ports.add(pr.getLastPort());
 				}
 			}
 			if (fg instanceof FgServicesGroup) {
@@ -405,32 +418,46 @@ public class PacketFilterToFortiConverter {
 		return ports;
 	}
 
-	protected List<IPNet> collectRange(IPRangeable range) {
-		if (range.isHost()) return List.of(range.getIpFirst());
+	protected List<IPNet> collectRanges(List<IPRangeable> ranges) {
 		List<IPNet> ips = new ArrayList<>();
-		boolean internal = internalNetworks.stream().anyMatch(ipNet -> ipNet.contains(range));
-		if (internal) {
-			try {
-				ips.add(new IPNet(range.getIpFirst().getIP().add(BigInteger.ONE), IPversion.IPV4));
-				ips.add(new IPNet(range.getIpLast().getIP().subtract(BigInteger.TWO), IPversion.IPV4));
-			} catch (UnknownHostException e) {
-				throw new RuntimeException(e);
+		for (IPRangeable range: ranges) {
+			if (range.isHost()) {
+				ips.add(range.getIpFirst());
+				continue;
 			}
-		} else {
-			ips.add(range.getIpFirst());
-			ips.add(range.getIpLast());
+
+			boolean internal = internalNetworks.stream().anyMatch(ipNet -> ipNet.contains(range));
+			if (internal) {
+				try {
+					var biIp1 = range.getIpFirst().getIP().add(BigInteger.ONE);
+					ips.add(new IPNet(biIp1, IPversion.IPV4));
+
+					var biIp2 = range.getIpLast().getIP().subtract(BigInteger.TWO);
+					int c = biIp2.compareTo(biIp1);
+					if (c == 1) {
+						ips.add(new IPNet(biIp2, IPversion.IPV4));
+					}
+				} catch (UnknownHostException e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				ips.add(range.getIpFirst());
+				ips.add(range.getIpLast());
+			}
 		}
 		return ips;
 	}
 
-	protected List<IPNet> collectAddresses(Collection<FgNetworkObject> networkObjects) {
-		List<IPNet> ips = new ArrayList<>();
+	protected List<IPRangeable> collectAddresses(Collection<FgNetworkObject> networkObjects) {
+		List<IPRangeable> ips = new ArrayList<>();
 
 		for (FgNetworkObject fg: networkObjects) {
 			if (fg instanceof FgNetworkIP) {
 				IPRangeable range = ((FgNetworkIP) fg).getIpRange();
-				ips.addAll(collectRange(range));
+				ips.add(range);
 			}
+
+			// for groups, takes only the first item to reduce the tests
 			if (fg instanceof FgNetworkGroup) {
 				var group = (FgNetworkGroup) fg;
 				var baseIPs = collectAddresses(group.getBaseObjects().values());
@@ -438,74 +465,58 @@ public class PacketFilterToFortiConverter {
 			}
 			if (fg instanceof FgNetworkExternalResource) {
 				var ext = (FgNetworkExternalResource) fg;
-				var extIps = ext.getIpRanges()
-									.stream()
-									.flatMap(ipRangeable -> collectRange(ipRangeable).stream())
-									.collect(Collectors.toList());
+				var extIps = ext.getIpRanges();
 				ips.addAll(List.of(extIps.get(0)));
 			}
 		}
 		return ips;
 	}
 
-	protected boolean ruleIsHandled(PfRule pfrule) {
+	protected void ruleIsHandled(PfRule pfrule) {
 		// checks
 		if (pfrule.getAf() == AddressFamily.INET6) {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "INET6 unhandled");
-			return false;
+			throw new JtaclPfToFortiException("INET6 unhandled");
 		}
 
 		if ((pfrule.getProtocols().size() > 0) && (pfrule.getProtocols().contains(Protocols.IPV6)
 				|| (!pfrule.getProtocols().contains(Protocols.IP)
 					&& !pfrule.getProtocols().contains(Protocols.UDP)
 					&& !pfrule.getProtocols().contains(Protocols.TCP)))) {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "protocol unhandled");
-			return false;
+			throw new JtaclPfToFortiException("protocol unhandled");
 
 		}
+
 		if (!pfrule.getIcmpspec().isEmpty()) {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "icmp unhandled");
-			return false;
+			throw new JtaclPfToFortiException("icmp unhandled");
 		}
+
 		if (pfrule.getDirection() == Direction.OUT) {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "out rule unhandled");
-			return false;
+			throw new JtaclPfToFortiException("out rule unhandled");
 		}
+
 		if (pfrule.getRouteOpts() != null) {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "route option unhandled");
-			return false;
+			throw new JtaclPfToFortiException("route option unhandled");
 		}
+
 		if (pfrule.getFromPortSpec().size() > 0) {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "source port unhandled");
-			return false;
+			throw new JtaclPfToFortiException("source port unhandled");
 		}
+
 		if (pfrule.isAll()) {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "'all' rule unhandled");
-			return false;
+			throw new JtaclPfToFortiException("'all' rule unhandled");
 		}
+
 		if (!pfrule.isQuick())  {
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "'no quick' rule unhandled");
-			return false;
+			throw new JtaclPfToFortiException("'no quick' rule unhandled");
 		}
+
 		if (pfrule.getIfList()
 				.stream()
 				.filter(pfIfSpec -> pfIfSpec.isIfNot())
 				.collect(Collectors.toList())
 				.size() > 0) {
-
-			logError("#!#!#! rule " + pfRuleToText(pfrule)
-				+  " => warning: " + "'not (!) interface unhandled");
-			return false;
+					throw new JtaclPfToFortiException("'not (!)' interface unhandled");
 		}
-		return true;
 	}
 
 	protected static String pfRuleToText(PfRule pfRule) {
@@ -599,11 +610,13 @@ public class PacketFilterToFortiConverter {
 		return null;
 	}
 
+	// convert a PacketFilter ipspec to Fortigate network objects
 	protected List<FgNetworkObject> pfIpspecToFortigate (PfIpSpec ipSpec) {
 		List<FgNetworkObject> rObj = new ArrayList<>();
 
 		for (PfNodeHost pfNodeHost: ipSpec) {
 
+			// 'any' => 'all'
 			if (pfNodeHost.isAddrAny()) {
 				var o = fgNetworks.get("all");
 				if (o == null) {
@@ -615,6 +628,7 @@ public class PacketFilterToFortiConverter {
 				continue;
 			}
 
+			// host or network to address object
 			if (pfNodeHost.isAddrMask()) {
 				var addr = new IPRange(pfNodeHost.getAddr().get(0));
 				if (addr.isIPv4()) {
@@ -624,6 +638,7 @@ public class PacketFilterToFortiConverter {
 				continue;
 			}
 
+			// range address to address object
 			if (pfNodeHost.isAddrRange()) {
 				var addr = new IPRange(pfNodeHost.getAddr().get(0), pfNodeHost.getRangeAddr().get(1));
 				if (addr.isIPv4()) {
@@ -633,6 +648,7 @@ public class PacketFilterToFortiConverter {
 				continue;
 			}
 
+			// table to addresses group or external ressource (if persist table)
 			if (pfNodeHost.isAddrTable()) {
 				String name = pfNodeHost.getTblName();
 				PfTable table = pf._rootAnchor.findTable(name);
@@ -712,7 +728,6 @@ public class PacketFilterToFortiConverter {
 		return null;
 	}
 
-
 	protected FgNetworkGroup findFortigateNetworkGroup(List<FgNetworkObject> members, HashMap<String, FgNetworkObject> fgNetworksObjs) {
 		for (FgNetworkObject fg: fgNetworksObjs.values()) {
 			if (fg.getType() != FgNetworkType.GROUP) continue;
@@ -748,12 +763,16 @@ public class PacketFilterToFortiConverter {
 		return null;
 	}
 
+	// create a Fortigate network object with our name convention
 	protected  FgNetworkIP createFortigateAddressRange(IPRangeable ipRangeable) {
 		String name = null;
+
+		// host
 		if (ipRangeable.isHost()) {
 			name = "M_" + ipRangeable.toNetString("s");
 		}
 
+		// network and mask
 		if (!ipRangeable.isHost() && ipRangeable.isNetwork()) {
 			var ss = ipRangeable.getIpFirst().toString("s").split("\\.");
 			var net = "";
@@ -774,6 +793,7 @@ public class PacketFilterToFortiConverter {
 			name = "R_" + net;
 		}
 
+		// other => range of addresses
 		if (name == null) {
 			var sb = ipRangeable.getIpFirst().toString("s").split(":");
 			var ssb = ipRangeable.getIpLast().toString("s").split(":");
@@ -819,10 +839,6 @@ public class PacketFilterToFortiConverter {
 		logOut("SERVICE create: " + fgService.getName() + " " + fgService.toString());
 	}
 
-	private void storeFgNetworks(List<FgNetworkObject> fgNetworkObjects) {
-		for (FgNetworkObject f: fgNetworkObjects) storeFgNetwork(f);
-	}
-
 	private void generateCLIExternalResource(FgNetworkExternalResource resource) {
 
 		printLnFile(cliFileExternalResource, "    edit " + quote(resource.getName()));
@@ -840,10 +856,11 @@ public class PacketFilterToFortiConverter {
 			, List<FgNetworkObject> dstAddresses
 			, boolean negateDstAddresses
 			, List<FgService> services
-			, String context) {
+			, String context
+			, String ruleText) {
 
 		//
-		printLnFile(cliFileRules, "");
+		printLnFile(cliFileRules);
 		printLnFile(cliFileRules, "    #### " + context);
 		// rule number
 		printLnFile(cliFileRules, "    edit " + name);
@@ -853,7 +870,7 @@ public class PacketFilterToFortiConverter {
 		if (!srcIntf.isEmpty()) {
 			ssrcint = "";
 			for (String s: srcIntf) {
-				ssrcint += quote(s) + " ";
+				ssrcint += quote("PFINTERFACE_" + srcIntf) + " ";
 			}
 		}
 		printLnFile(cliFileRules, "        set scrintf " + ssrcint);
@@ -897,7 +914,7 @@ public class PacketFilterToFortiConverter {
 		if (!services.isEmpty()) printLnFile(cliFileRules, "        set service " + sservices);
 
 		printLnFile(cliFileRules, "        set logtraffic all");
-		printLnFile(cliFileRules, "        set comments " + LSFW_COMMENT);
+		printLnFile(cliFileRules, "        set comments " + quote(ruleText));
 		printLnFile(cliFileRules, "    next");
 	}
 
@@ -941,7 +958,7 @@ public class PacketFilterToFortiConverter {
 
 		printLnFile(cliFileAddressesGroup, "    edit " + quote(group.getName()));
 		String members = "";
-		for (FgNetworkObject o: group.getBaseObjects().values()) members += quote(o.getName());
+		for (FgNetworkObject o: group.getBaseObjects().values()) members += quote(o.getName()) + " ";
 		printLnFile(cliFileAddressesGroup, "        set member " + members);
 		printLnFile(cliFileAddressesGroup, "        set comments " + LSFW_COMMENT);
 		printLnFile(cliFileAddressesGroup, "    next");
@@ -966,8 +983,12 @@ public class PacketFilterToFortiConverter {
 		}
 	}
 
+	private static void printLnFile(BufferedWriter writer) {
+		printLnFile(writer, "");
+	}
+
 	private static String quote(String s) {
-		return "\"" + s + "\"";
+		return "\"" + s.replaceAll("\"", "") + "\"";
 	}
 
 }
