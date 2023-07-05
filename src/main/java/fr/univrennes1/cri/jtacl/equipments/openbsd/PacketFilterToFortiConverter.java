@@ -84,9 +84,10 @@ public class PacketFilterToFortiConverter {
 	protected List<IPNet> internalNetworks;
 	protected String defaultRouteIface;
 	protected IPNet IP_1234;
+	protected IPRangeable ANY;
 
 	// initialize the converter using a PacketFilter equipment and a Fortigate equipment (by name)
-	// the specified Fortigate equipment is used as a database for services and networks object, because
+	// the specified Fortigate equipment is used as a database for services and network objects, because
 	// the database is shared by several Fortigate and we don't want to override an existing object
 	// that may be tuned (for session or TTL by example)
 	public PacketFilterToFortiConverter(PacketFilter pf, String fortigateName, PrintStream output) {
@@ -99,6 +100,11 @@ public class PacketFilterToFortiConverter {
 		}
 		try {
 			IP_1234 = new IPNet("1.2.3.4");
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
+		try {
+			ANY = new IPRange("0/0");
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		}
@@ -115,7 +121,6 @@ public class PacketFilterToFortiConverter {
 		} else {
 			throw new JtaclParameterException("no such equipment");
 		}
-
 
 		// files generated
 		String d = "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
@@ -248,12 +253,8 @@ public class PacketFilterToFortiConverter {
 		return nbl;
 	}
 
-	protected static boolean rangeIsAny(IPRangeable range) {
-		try {
-			return range.contains(new IPRange("0/0"));
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
-		}
+	protected boolean rangeIsAny(IPRangeable range) {
+		return range.contains(ANY);
 	}
 
 	protected List<IPNet> reduceAny(List<IPNet> ipNetList) {
