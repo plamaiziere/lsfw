@@ -870,7 +870,7 @@ public class PacketFilterToFortiConverter {
 		if (!srcIntf.isEmpty()) {
 			ssrcint = "";
 			for (String s: srcIntf) {
-				ssrcint += quote("PFINTERFACE_" + srcIntf) + " ";
+				ssrcint += quote("PFINTERFACE_" + s) + " ";
 			}
 		}
 		printLnFile(cliFileRules, "        set scrintf " + ssrcint);
