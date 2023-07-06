@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
  */
 public class PacketFilterToFortiConverter {
 
-	private static final String LSFW_COMMENT  = quote("# by LSFW");
+	private static final String LSFW_COMMENT  = quote("#MigrationFucop");
 
 	protected PacketFilter pf;
 	protected FgFw fortigate;
@@ -91,6 +91,17 @@ public class PacketFilterToFortiConverter {
 	// the database is shared by several Fortigate and we don't want to override an existing object
 	// that may be tuned (for session or TTL by example)
 	public PacketFilterToFortiConverter(PacketFilter pf, String fortigateName, PrintStream output) {
+		try {
+			IP_1234 = new IPNet("1.2.3.4");
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
+		try {
+			ANY = new IPRange("0/0");
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
+
 		this.pf = pf;
 		this.output = output;
 		this.networksByLink = computeNetworksByLink();
@@ -203,7 +214,7 @@ public class PacketFilterToFortiConverter {
 						, hasToIPNegation
 						, fgServices
 						, pfRuleToText(pfrule)
-						, pfrule.getText());
+						, " #" + pfrule.getParseContext().getLineNumber() + ", " + pfrule.getText());
 
 				generateProbe(inIfacesName, fgNetObjFrom, hasToIPNegation, fgNetObTo, fgServices, action, udp, tcp, pfrule);
 
@@ -864,7 +875,9 @@ public class PacketFilterToFortiConverter {
 		printLnFile(cliFileRules);
 		printLnFile(cliFileRules, "    #### " + context);
 		// rule number
-		printLnFile(cliFileRules, "    edit " + name);
+		//printLnFile(cliFileRules, "    edit " + name);
+		printLnFile(cliFileRules, "    edit 0");
+
 
 		// source interfaces
 		var ssrcint = quote("any");
@@ -914,8 +927,7 @@ public class PacketFilterToFortiConverter {
 		}
 		if (!services.isEmpty()) printLnFile(cliFileRules, "        set service " + sservices);
 
-		printLnFile(cliFileRules, "        set logtraffic all");
-		printLnFile(cliFileRules, "        set comments " + quote(ruleText));
+		printLnFile(cliFileRules, "        set comments " + quote(LSFW_COMMENT + " " + ruleText));
 		printLnFile(cliFileRules, "    next");
 	}
 
