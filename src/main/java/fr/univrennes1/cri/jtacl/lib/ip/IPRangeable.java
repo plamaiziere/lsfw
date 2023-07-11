@@ -125,6 +125,18 @@ public interface IPRangeable {
     boolean sameIPVersion(IPRangeable range);
 
 	/**
+	 * Compare if two ranges are the same range
+	 * @param range Range object to compare.
+	 * @return true if the two ranges are equal
+	 */
+	default boolean same(IPRangeable range) {
+		return sameIPVersion(range)
+				&& range.getIpFirst().getIP().compareTo(getIpFirst().getIP()) == 0
+				&& range.getIpLast().getIP().compareTo(getIpLast().getIP()) == 0;
+	};
+
+
+	/**
 	 * Returns the length of this range.
 	 * @return the length of this range.
 	 */

@@ -666,7 +666,19 @@ public class PacketFilterToFortiConverter {
 				PfTable table = pf._rootAnchor.findTable(name);
 				// not persist
 				if (table.getFileNames().isEmpty()) {
-					var tableObj = pfIpspecToFortigate(table.getIpspec());
+					var tableSpec = pfIpspecToFortigate(table.getIpspec()).stream().map(o -> (FgNetworkIP) o).collect(Collectors.toList());
+					List<FgNetworkIP> tableObj = new ArrayList<>();
+					for (FgNetworkIP ip: tableSpec) {
+						boolean finded = false;
+						for (FgNetworkIP tob: tableObj) {
+							if (ip.getIpRange().same(tob.getIpRange())) {
+								finded = true;
+								break;
+							}
+						}
+						if (!finded) tableObj.add(ip);
+					}
+
 					if (!tableObj.isEmpty()) {
 						var group = findFortigateNetworkGroup(tableObj, fgNetworks);
 						if (group != null) {
@@ -700,7 +712,7 @@ public class PacketFilterToFortiConverter {
 							logOut("NETWORK table " + table.getName() + " => " + fg.getName() + s);
 					} else {
 						var gname = "G_" + name;
-						var fgExternal = new FgNetworkExternalResource(name, name, null, null, "https://TABLE_" + table.getName(), true);
+						var fgExternal = new FgNetworkExternalResource(gname, gname, null, null, "https://TABLE_" + table.getName(), true);
 						fgExternal.getIpRanges().addAll(ips);
 						rObj.add(fgExternal);
 						storeFgNetwork(fgExternal);
@@ -725,7 +737,10 @@ public class PacketFilterToFortiConverter {
 				for (IPRangeable ip: ips) {
 					boolean finded = false;
 					for (IPRangeable eip: er.getIpRanges()) {
-						if (ip.getIpFirst().equals(eip.getIpFirst()) && ip.getIpLast().equals(eip.getIpLast())) finded = true;
+						if (ip.same(eip)) {
+							finded = true;
+							break;
+						}
 					}
 					if (!finded) {
 						match = false;
@@ -740,20 +755,45 @@ public class PacketFilterToFortiConverter {
 		return null;
 	}
 
-	protected FgNetworkGroup findFortigateNetworkGroup(List<FgNetworkObject> members, HashMap<String, FgNetworkObject> fgNetworksObjs) {
+	protected List<FgNetworkIP> flatFgNetworkGroup(FgNetworkGroup group) {
+		List<FgNetworkIP> ips = new ArrayList<>();
+		for (FgNetworkObject obj: group.getBaseObjects().values()) {
+			if (obj.getType() == FgNetworkType.IPRANGE) {
+				var o = (FgNetworkIP) obj;
+				ips.add(o);
+			}
+			if (obj.getType() == FgNetworkType.GROUP) {
+				var g = (FgNetworkGroup) obj;
+				ips.addAll(flatFgNetworkGroup(g));
+			}
+
+		}
+		return ips;
+	}
+
+	protected FgNetworkGroup findFortigateNetworkGroup(List<FgNetworkIP> members, HashMap<String, FgNetworkObject> fgNetworksObjs) {
 		for (FgNetworkObject fg: fgNetworksObjs.values()) {
 			if (fg.getType() != FgNetworkType.GROUP) continue;
 			var fgGroup = (FgNetworkGroup) fg;
 			if (fgGroup.getExcludedObjects().size() > 0) continue;
-			if (fgGroup.getBaseObjects().size() != members.size()) continue;
-			boolean match = true;
-			for (FgNetworkObject member: members) {
-				if (fgGroup.getBaseObjects().get(member.getName()) == null) {
-					match = false;
+			var groupValues = flatFgNetworkGroup(fgGroup);
+			if (groupValues.size() != members.size()) continue;
+
+			boolean matchAll = true;
+			for (FgNetworkIP member: members) {
+				boolean match = false;
+				for (FgNetworkIP groupMember: groupValues) {
+					if (member.getIpRange().same(groupMember.getIpRange())) {
+						match = true;
+						break;
+					}
+				}
+				if (!match) {
+					matchAll = false;
 					break;
 				}
 			}
-			if (match) {
+			if (matchAll) {
 				return fgGroup;
 			}
 		}
@@ -765,7 +805,7 @@ public class PacketFilterToFortiConverter {
 			if (fg.getType() == FgNetworkType.IPRANGE) {
 				var nfg = (FgNetworkIP)fg;
 				var fgAddress = nfg.getIpRange();
-				if (range.equals(fgAddress)) {
+				if (range.same(fgAddress)) {
 					var s = fgCreatedNetworks.get(nfg.getName()) == null ? " (" + fortigate.getName() + ")" : " (created)";
 					logOut("NETWORK " + range.toNetString("::i") + " => " + nfg.getName() + s);
 					return (FgNetworkIP) fg;
@@ -832,7 +872,7 @@ public class PacketFilterToFortiConverter {
 		var name = fgNetworkObject.getName();
 		var check = fgNetworks.get(name);
 		if (check != null) {
-			throw new JtaclPfToFortiException("conflict! PF: " + check.toString() + " --!!-- " + fortigate.getName() + ": " + fgNetworkObject.toString());
+			throw new JtaclPfToFortiException("conflict! PF: " + fgNetworkObject.toString() + " --!!-- " + fortigate.getName() + ": " + check.toString());
 		}
 		fgNetworks.put(fgNetworkObject.getName(), fgNetworkObject);
 		fgCreatedNetworks.put(fgNetworkObject.getName(), fgNetworkObject);
@@ -843,7 +883,7 @@ public class PacketFilterToFortiConverter {
 		var name = fgService.getName();
 		var check = fgServices.get(name);
 		if (check != null) {
-			throw new JtaclPfToFortiException("conflict! PF: " + check.toString() + " --!!-- " + fortigate.getName() + ": " + fgService.toString());
+			throw new JtaclPfToFortiException("conflict! PF: " + fgService.toString() + " --!!-- " + fortigate.getName() + ": " + check.toString());
 		}
 		fgServices.put(fgService.getName(), fgService);
 		fgCreatedServices.put(fgService.getName(), fgService);
