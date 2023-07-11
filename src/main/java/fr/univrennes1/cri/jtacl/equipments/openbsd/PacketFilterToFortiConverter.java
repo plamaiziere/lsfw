@@ -986,7 +986,7 @@ public class PacketFilterToFortiConverter {
 			printLnFile(cliFileServices, "        set udp-portrange " + s);
 		}
 		printLnFile(cliFileServices, "        set session-ttl 8101");
-		printLnFile(cliFileServices, "        set comments " + LSFW_COMMENT);
+		printLnFile(cliFileServices, "        set comment " + LSFW_COMMENT);
 		printLnFile(cliFileServices, "    next");
 	}
 
@@ -1003,7 +1003,7 @@ public class PacketFilterToFortiConverter {
 			printLnFile(cliFileAddresses, "        set start-ip " + range.getIpFirst().toString("s"));
 			printLnFile(cliFileAddresses, "        set end-ip " + range.getIpLast().toString("s"));
 		}
-		printLnFile(cliFileAddresses, "        set comments " + LSFW_COMMENT);
+		printLnFile(cliFileAddresses, "        set comment " + LSFW_COMMENT);
 		printLnFile(cliFileAddresses, "    next");
 	}
 
@@ -1013,7 +1013,7 @@ public class PacketFilterToFortiConverter {
 		String members = "";
 		for (FgNetworkObject o: group.getBaseObjects().values()) members += quote(o.getName()) + " ";
 		printLnFile(cliFileAddressesGroup, "        set member " + members);
-		printLnFile(cliFileAddressesGroup, "        set comments " + LSFW_COMMENT);
+		printLnFile(cliFileAddressesGroup, "        set comment " + LSFW_COMMENT);
 		printLnFile(cliFileAddressesGroup, "    next");
 	}
 
