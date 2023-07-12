@@ -927,7 +927,7 @@ public class PacketFilterToFortiConverter {
 				ssrcint += quote("PFINTERFACE_" + s) + " ";
 			}
 		}
-		printLnFile(cliFileRules, "        set scrintf " + ssrcint);
+		printLnFile(cliFileRules, "        set srcintf " + ssrcint);
 
 		// destination interfaces
 		var sdestint = quote("any");
