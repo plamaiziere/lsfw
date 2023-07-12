@@ -965,7 +965,17 @@ public class PacketFilterToFortiConverter {
 		for (FgService fs: services) {
 			sservices += quote(fs.getName()) + " ";
 		}
-		if (!services.isEmpty()) printLnFile(cliFileRules, "        set service " + sservices);
+		if (!services.isEmpty()) {
+			printLnFile(cliFileRules, "        set service " + sservices);
+		} else {
+			printLnFile(cliFileRules, "        set service " + quote("ALL"));
+		}
+
+		// log
+		if (action != FgFwRuleAction.ACCEPT) {
+			printLnFile(cliFileRules, "        set logtraffic all");
+		}
+
 
 		printLnFile(cliFileRules, "        set comments " + quote(LSFW_COMMENT + " " + ruleText));
 		printLnFile(cliFileRules, "    next");
