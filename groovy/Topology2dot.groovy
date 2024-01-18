@@ -49,14 +49,14 @@ class Topo2dot {
 		NetworkEquipmentsByName equipments = nlink.getEquipments()
 		equipments.each() {
 			equipment ->
-				name = equipment.getKey()
+				def name = equipment.getKey()
 				listeq.add(name)
 		}
 		List<SimpleLink> slinks = new ArrayList<SimpleLink>()
 
 		for (int i = 0; i < listeq.size() - 1; i++) {
 			String eq1 = listeq[i]
-			for (int j = i + 1; j < listeq.size; j++) {
+			for (int j = i + 1; j < listeq.size(); j++) {
 				SimpleLink slink = new SimpleLink(eq1, listeq[j])
 				slink.addNetworkLink(nlink)
 				slinks.add(slink)
