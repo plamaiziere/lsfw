@@ -321,7 +321,7 @@ public class IOSParserTest extends TestCase {
 		AclTemplate acl;
 		AceTemplate ace;
 
-		line = "permit udp any any gt PORT";
+		line = "10 permit udp any any gt PORT";
 		context.setAclType(AclType.IPEXT);
 		context.setIpVersion(IPversion.IPV4);
 
@@ -627,6 +627,10 @@ public class IOSParserTest extends TestCase {
 				new ReportingParseRunner(parser.InAclContext());
 
 		line = "permit   ";
+		result = parseRunner.run(line);
+		assertTrue(result.matched);
+
+		line = "20    permit   ";
 		result = parseRunner.run(line);
 		assertTrue(result.matched);
 

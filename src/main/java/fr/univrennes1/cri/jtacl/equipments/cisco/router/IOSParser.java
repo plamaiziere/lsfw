@@ -14,6 +14,7 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPIcmp4;
 import fr.univrennes1.cri.jtacl.lib.ip.IPIcmpEnt;
 import fr.univrennes1.cri.jtacl.lib.ip.IPversion;
 import fr.univrennes1.cri.jtacl.parsers.CommonRules;
+import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
 
@@ -341,7 +342,7 @@ public class IOSParser extends CommonRules<Object> {
 	}
 
 	/**
-	 * Matches IOS command 'decription'
+	 * Matches IOS command 'description'
 	 * @return a {@link Rule}
 	 */
 	public Rule IfDescription() {
@@ -496,6 +497,12 @@ public class IOSParser extends CommonRules<Object> {
 	@SuppressSubnodes
 	public Rule InAclContext() {
 		return Sequence(
+					Optional(
+							Sequence(
+								Number()
+								, WhiteSpaces()
+							)
+					),
 					Optional(
 						Sequence(
 							String("no"),
@@ -951,7 +958,7 @@ public class IOSParser extends CommonRules<Object> {
 	/**
 	 * Matches an extended access-list element. <br/>
 	 * reference: <br/>
-	 *	{deny | permit} protocol source source-wildcard<br/>
+	 *	[number] {deny | permit} protocol source source-wildcard<br/>
 	 * destination destination-wildcard<br/>
 	 * [precedence precedence] <br/>
 	 * [tos tos] <br/>
@@ -960,7 +967,7 @@ public class IOSParser extends CommonRules<Object> {
 	 * [log [word] | log-input [word]]<br/>
 	 * <br/>
 	 * ICMP:<br/>
-	 * {deny | permit} icmp source source-wildcard<br/>
+	 * [number] {deny | permit} icmp source source-wildcard<br/>
 	 * destination destination-wildcard<br/>
 	 * [icmp-type [icmp-code] | icmp-message]<br/>
 	 * [precedence precedence]<br/>
@@ -970,7 +977,7 @@ public class IOSParser extends CommonRules<Object> {
 	 * [log [word] | log-input [word]]<br/>
 	 *<br/>
 	 * IGMP:<br/>
-	 * {deny | permit} igmp source source-wildcard<br/>
+	 * [number] {deny | permit} igmp source source-wildcard<br/>
 	 * destination destination-wildcard <br/>
 	 * [igmp-type]<br/>
 	 * [precedence precedence]<br/>
@@ -980,7 +987,7 @@ public class IOSParser extends CommonRules<Object> {
 	 * [log [word] | log-input [word]]<br/>
 	 * <br/>
 	 * TCP/UDP (established for TCP only):<br/>
-	 * {deny | permit} tcp source source-wildcard [operator [port]]<br/>
+	 * [number] {deny | permit} tcp source source-wildcard [operator [port]]<br/>
 	 * destination destination-wildcard [operator [port]]<br/>
 	 * [established]<br/>
 	 * [precedence precedence]<br/>
@@ -995,6 +1002,13 @@ public class IOSParser extends CommonRules<Object> {
 		return
 			Sequence(
 				newAceTemplate(),
+				// rule number
+				Optional(
+						Sequence(
+							Number(),
+							WhiteSpaces()
+						)
+				),
 				// permit | deny
 				FirstOf(
 					String("permit"),
