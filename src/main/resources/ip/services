@@ -264,8 +264,8 @@ statsrv		133/tcp	   #Statistics Service
 statsrv		133/udp	   #Statistics Service
 ingres-net	134/tcp	   #INGRES-NET Service
 ingres-net	134/udp	   #INGRES-NET Service
-loc-srv		135/tcp	   epmap	#Location Service
-loc-srv		135/udp	   epmap	#Location Service
+loc-srv		135/tcp	   epmap msrpc	#Location Service / MSRPC
+loc-srv		135/udp	   epmap msrpc	#Location Service / MSRPC
 profile		136/tcp	   #PROFILE Naming System
 profile		136/udp	   #PROFILE Naming System
 netbios-ns	137/tcp	   #NETBIOS Name Service
