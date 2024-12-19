@@ -11,7 +11,9 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
 import fr.univrennes1.cri.jtacl.core.network.NetworkEquipment;
 import fr.univrennes1.cri.jtacl.equipments.generic.GenericEquipmentShell;
+
 import java.io.PrintStream;
+
 import org.parboiled.Parboiled;
 import org.parboiled.buffers.InputBuffer;
 import org.parboiled.errors.ParseError;
@@ -20,56 +22,57 @@ import org.parboiled.support.ParsingResult;
 
 /**
  * Cisco router sub shell command
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IOSShell extends GenericEquipmentShell {
 
-	protected CiscoRouter _router;
-	protected IOSShellParser _shellParser;
-	protected ReportingParseRunner _parseRunner;
-	protected PrintStream _outStream;
+    protected CiscoRouter _router;
+    protected IOSShellParser _shellParser;
+    protected ReportingParseRunner _parseRunner;
+    protected PrintStream _outStream;
 
-	@Override
-	public void shellHelp(PrintStream output) {
-		printHelp(output, "/help/ciscorouter");
-	}
+    @Override
+    public void shellHelp(PrintStream output) {
+        printHelp(output, "/help/ciscorouter");
+    }
 
-	public IOSShell(CiscoRouter router) {
-		_router = router;
-		_shellParser = Parboiled.createParser(IOSShellParser.class);
-		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
-	}
+    public IOSShell(CiscoRouter router) {
+        _router = router;
+        _shellParser = Parboiled.createParser(IOSShellParser.class);
+        _parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
+    }
 
-	@Override
-	public void shellCommand(String command, PrintStream output) {
-		_outStream = output;
-		_parseRunner.getParseErrors().clear();
-		ParsingResult<?> result = _parseRunner.run(command);
+    @Override
+    public void shellCommand(String command, PrintStream output) {
+        _outStream = output;
+        _parseRunner.getParseErrors().clear();
+        ParsingResult<?> result = _parseRunner.run(command);
 
-		if (!result.matched) {
-			if (result.hasErrors()) {
-				ParseError error = result.parseErrors.get(0);
-				InputBuffer buf = error.getInputBuffer();
-				_outStream.println("Syntax error: " +
-					buf.extract(0, error.getStartIndex()));
-			}
-			return;
-		}
+        if (!result.matched) {
+            if (result.hasErrors()) {
+                ParseError error = result.parseErrors.get(0);
+                InputBuffer buf = error.getInputBuffer();
+                _outStream.println("Syntax error: " +
+                        buf.extract(0, error.getStartIndex()));
+            }
+            return;
+        }
 
-		String shellCmd = _shellParser.getCommand();
+        String shellCmd = _shellParser.getCommand();
 
-		if (shellCmd.equals("help"))
-			shellHelp(_outStream);
-		if (shellCmd.equals("xref-ip"))
-			printXrefIp(_outStream, _router.getNetCrossRef(), _shellParser);
-		if (shellCmd.equals("xref-service"))
-			printXrefService(_outStream, _router.getServiceCrossRef(), _shellParser);
-		
-	}
+        if (shellCmd.equals("help"))
+            shellHelp(_outStream);
+        if (shellCmd.equals("xref-ip"))
+            printXrefIp(_outStream, _router.getNetCrossRef(), _shellParser);
+        if (shellCmd.equals("xref-service"))
+            printXrefService(_outStream, _router.getServiceCrossRef(), _shellParser);
 
-	@Override
-	public NetworkEquipment getEquipment() {
-		return _router;
-	}
+    }
+
+    @Override
+    public NetworkEquipment getEquipment() {
+        return _router;
+    }
 
 }

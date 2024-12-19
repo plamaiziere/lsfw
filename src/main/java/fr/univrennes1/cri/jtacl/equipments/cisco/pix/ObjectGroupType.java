@@ -15,24 +15,24 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum ObjectGroupType {
-	/**
-	 * network object-group
-	 */
-	NETWORK,
-	/**
-	 * service object-group
-	 */
-	SERVICE,
-	/**
-	 * enhanced service object-group
-	 */
-	ENHANCED,
-	/**
-	 * protocol object-group
-	 */
-	PROTOCOL,
-	/**
-	 * icmp object-group
-	 */
-	ICMP
+    /**
+     * network object-group
+     */
+    NETWORK,
+    /**
+     * service object-group
+     */
+    SERVICE,
+    /**
+     * enhanced service object-group
+     */
+    ENHANCED,
+    /**
+     * protocol object-group
+     */
+    PROTOCOL,
+    /**
+     * icmp object-group
+     */
+    ICMP
 }

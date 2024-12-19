@@ -11,22 +11,23 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 /**
  * PF tag option.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PfTagOpt {
 
-	private String _tag;
+    private String _tag;
 
-	public PfTagOpt(String tag) {
-		_tag = tag;
-	}
+    public PfTagOpt(String tag) {
+        _tag = tag;
+    }
 
-	public String getTag() {
-		return _tag;
-	}
+    public String getTag() {
+        return _tag;
+    }
 
-	@Override
-	public String toString() {
-		return _tag;
-	}
+    @Override
+    public String toString() {
+        return _tag;
+    }
 }

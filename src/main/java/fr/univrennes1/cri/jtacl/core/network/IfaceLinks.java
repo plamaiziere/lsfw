@@ -12,7 +12,8 @@ package fr.univrennes1.cri.jtacl.core.network;
 import java.util.ArrayList;
 
 /**
- *	A list of {@link IfaceLink} items
+ * A list of {@link IfaceLink} items
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IfaceLinks extends ArrayList<IfaceLink> {

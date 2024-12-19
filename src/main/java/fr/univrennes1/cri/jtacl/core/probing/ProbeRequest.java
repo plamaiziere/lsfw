@@ -15,170 +15,176 @@ import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 /**
  * Describes what we want to check in a probe
  * (protocol, icmp type, source port...).
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ProbeRequest {
 
-	/**
-	 * protocols we should match (null: any)
-	 */
-	protected ProtocolsSpec _protocols;
+    /**
+     * protocols we should match (null: any)
+     */
+    protected ProtocolsSpec _protocols;
 
-	/**
-	 * Sub type of the protocol, the value depends of the protocol.
-	 * For example, for icmp the subType is the icmp-type (echo, echo-reply...)
-	 */
-	protected Integer _subType;
+    /**
+     * Sub type of the protocol, the value depends of the protocol.
+     * For example, for icmp the subType is the icmp-type (echo, echo-reply...)
+     */
+    protected Integer _subType;
 
-	/**
-	 * Code of the protocol, the value depends of the protocol.
-	 * For example, for icmp the code is the icmp code message.
-	 */
-	protected Integer _code;
+    /**
+     * Code of the protocol, the value depends of the protocol.
+     * For example, for icmp the code is the icmp code message.
+     */
+    protected Integer _code;
 
-	/**
-	 * The source port specification.
-	 *
-	 */
-	protected PortSpec _sourcePort;
+    /**
+     * The source port specification.
+     */
+    protected PortSpec _sourcePort;
 
-	/**
-	 * The destination port specification
-	 *
-	 */
-	protected PortSpec _destPort;
+    /**
+     * The destination port specification
+     */
+    protected PortSpec _destPort;
 
-	/**
-	 * TCP flags we should match (null: any)
-	 */
-	protected ProbeTcpFlags _tcpFlags;
+    /**
+     * TCP flags we should match (null: any)
+     */
+    protected ProbeTcpFlags _tcpFlags;
 
-	/**
-	 * Probe options
-	 */
-	protected ProbeOptions _probeOptions = new ProbeOptions();
+    /**
+     * Probe options
+     */
+    protected ProbeOptions _probeOptions = new ProbeOptions();
 
-	/**
-	 * Returns the internet protocols we should match.
-	 * (null = any)
-	 * @return the internet protocol,
-	 * null if "any".
-	 */
-	public ProtocolsSpec getProtocols() {
-		return _protocols;
-	}
+    /**
+     * Returns the internet protocols we should match.
+     * (null = any)
+     *
+     * @return the internet protocol,
+     * null if "any".
+     */
+    public ProtocolsSpec getProtocols() {
+        return _protocols;
+    }
 
-	/**
-	 * Sets the internet protocols we should match.
-	 * @param protocols protocols value to set. Null designates any protocol.
-	 */
-	public void setProtocols(ProtocolsSpec protocols) {
-		_protocols = protocols;
-	}
+    /**
+     * Sets the internet protocols we should match.
+     *
+     * @param protocols protocols value to set. Null designates any protocol.
+     */
+    public void setProtocols(ProtocolsSpec protocols) {
+        _protocols = protocols;
+    }
 
-	/**
-	 * Returns the sub-type of the protocol. The value depends on the protocol,
-	 * For example, for icmp the subType is the icmp-type (echo, echo-reply...)
-	 * (null = any)
-	 * @return the sub-type of the protocol.
-	 * null if "any".
-	 */
-	public Integer getSubType() {
-		return _subType;
-	}
+    /**
+     * Returns the sub-type of the protocol. The value depends on the protocol,
+     * For example, for icmp the subType is the icmp-type (echo, echo-reply...)
+     * (null = any)
+     *
+     * @return the sub-type of the protocol.
+     * null if "any".
+     */
+    public Integer getSubType() {
+        return _subType;
+    }
 
-	/**
-	 * Sets the sub-type of the protocol. The value depends on the protocol,
-	 * For example, for icmp the subType is the icmp-type (echo, echo-reply...)
-	 * @param subType value to set. Null designates any type.
-	 */
-	public void setSubType(Integer subType) {
-		_subType = subType;
-	}
+    /**
+     * Sets the sub-type of the protocol. The value depends on the protocol,
+     * For example, for icmp the subType is the icmp-type (echo, echo-reply...)
+     *
+     * @param subType value to set. Null designates any type.
+     */
+    public void setSubType(Integer subType) {
+        _subType = subType;
+    }
 
-	/**
-	 * Returns the code of the protocol. The value depends of the protocol.
-	 * For example, for icmp the code is the icmp code message.
-	 * @return the code of the protocol.
-	 * null if "any".
-	 */
-	public Integer getCode() {
-		return _code;
-	}
+    /**
+     * Returns the code of the protocol. The value depends of the protocol.
+     * For example, for icmp the code is the icmp code message.
+     *
+     * @return the code of the protocol.
+     * null if "any".
+     */
+    public Integer getCode() {
+        return _code;
+    }
 
-	/**
-	 * Sets the code of the protocol. The value depends of the protocol.
-	 * For example, for icmp the code is the icmp code message.
-	 * @param code value to set. Null designates any code.
-	 */
-	public void setCode(Integer code) {
-		_code = code;
-	}
+    /**
+     * Sets the code of the protocol. The value depends of the protocol.
+     * For example, for icmp the code is the icmp code message.
+     *
+     * @param code value to set. Null designates any code.
+     */
+    public void setCode(Integer code) {
+        _code = code;
+    }
 
 
-	/**
-	 * Returns the source port specification
-	 *
-	 * @return the source port specification.
-	 *
-	 */
-	public PortSpec getSourcePort() {
-		return _sourcePort;
-	}
+    /**
+     * Returns the source port specification
+     *
+     * @return the source port specification.
+     */
+    public PortSpec getSourcePort() {
+        return _sourcePort;
+    }
 
-	/**
-	 * Sets the source port specification.
-	 * @param port port value to set.
-	 */
-	public void setSourcePort(PortSpec port) {
-		_sourcePort = port;
-	}
+    /**
+     * Sets the source port specification.
+     *
+     * @param port port value to set.
+     */
+    public void setSourcePort(PortSpec port) {
+        _sourcePort = port;
+    }
 
-	/**
-	 * Returns the destination port specification.
-	 *
-	 * @return the destination port specification.
-	 *
-	 */
-	public PortSpec getDestinationPort() {
-		return _destPort;
-	}
+    /**
+     * Returns the destination port specification.
+     *
+     * @return the destination port specification.
+     */
+    public PortSpec getDestinationPort() {
+        return _destPort;
+    }
 
-	/**
-	 * Sets the destination port specification.
-	 * @param port port value to set..
-	 */
-	public void setDestinationPort(PortSpec port) {
-		_destPort = port;
-	}
+    /**
+     * Sets the destination port specification.
+     *
+     * @param port port value to set..
+     */
+    public void setDestinationPort(PortSpec port) {
+        _destPort = port;
+    }
 
-	public ProbeTcpFlags getTcpFlags() {
-		return _tcpFlags;
-	}
+    public ProbeTcpFlags getTcpFlags() {
+        return _tcpFlags;
+    }
 
-	public void setTcpFlags(ProbeTcpFlags tcpFlags) {
-		_tcpFlags = tcpFlags;
-	}
+    public void setTcpFlags(ProbeTcpFlags tcpFlags) {
+        _tcpFlags = tcpFlags;
+    }
 
-	public ProbeOptions getProbeOptions() {
-		return _probeOptions;
-	}
+    public ProbeOptions getProbeOptions() {
+        return _probeOptions;
+    }
 
-	/**
-	 * Creates and returns a new copy of this instance.
-	 * @return a new copy of this instance.
-	 */
-	public ProbeRequest newInstance() {
-		ProbeRequest req = new ProbeRequest();
-		req._protocols = _protocols;
-		req._subType = _subType;
-		req._code = _code;
-		req._sourcePort = _sourcePort;
-		req._destPort = _destPort;
-		req._tcpFlags = _tcpFlags;
-		req._probeOptions.setFlags(_probeOptions.getFlags());
-		return req;
-	}
+    /**
+     * Creates and returns a new copy of this instance.
+     *
+     * @return a new copy of this instance.
+     */
+    public ProbeRequest newInstance() {
+        ProbeRequest req = new ProbeRequest();
+        req._protocols = _protocols;
+        req._subType = _subType;
+        req._code = _code;
+        req._sourcePort = _sourcePort;
+        req._destPort = _destPort;
+        req._tcpFlags = _tcpFlags;
+        req._probeOptions.setFlags(_probeOptions.getFlags());
+        return req;
+    }
 
 
 }

@@ -13,28 +13,29 @@ import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 
 /**
  * Match results for Checkpoint service
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
 public class CpServiceMatch {
-	protected MatchResult _matchResult;
-	protected CpService _service;
+    protected MatchResult _matchResult;
+    protected CpService _service;
 
-	public CpServiceMatch(CpService service, MatchResult result) {
-		_service = service;
-		_matchResult = result;
-	}
+    public CpServiceMatch(CpService service, MatchResult result) {
+        _service = service;
+        _matchResult = result;
+    }
 
-	public MatchResult getMatchResult() {
-		return _matchResult;
-	}
+    public MatchResult getMatchResult() {
+        return _matchResult;
+    }
 
-	public CpService getService() {
-		return _service;
-	}
+    public CpService getService() {
+        return _service;
+    }
 
-	public boolean isInspected() {
-		return _service.hasProtocolType();
-	}
+    public boolean isInspected() {
+        return _service.hasProtocolType();
+    }
 
 }

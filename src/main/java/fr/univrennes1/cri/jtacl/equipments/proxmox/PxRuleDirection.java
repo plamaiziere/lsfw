@@ -10,9 +10,10 @@ package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 /**
  * Rule direction (in/out)
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum PxRuleDirection {
-	IN,
-	OUT
+    IN,
+    OUT
 }

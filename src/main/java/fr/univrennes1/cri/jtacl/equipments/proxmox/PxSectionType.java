@@ -10,12 +10,13 @@ package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 /**
  * Proxmox section names
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum PxSectionType {
-	OPTIONS,
-	ALIASES,
-	IPSET,
-	GROUP,
-	RULES
+    OPTIONS,
+    ALIASES,
+    IPSET,
+    GROUP,
+    RULES
 }

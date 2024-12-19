@@ -22,12 +22,12 @@ public class CpAny extends CpObject {
     protected CpGroupService _anyService;
     protected CpNetworkGroup _anyNetwork;
 
-	public CpAny(String name, String className, String comment, String uid) {
+    public CpAny(String name, String className, String comment, String uid) {
 
-		super(name, className, comment, uid);
-		_anyService = new CpGroupService(name, className, comment, uid);
-		_anyNetwork = new CpNetworkGroup(name, className, comment, uid);
-	}
+        super(name, className, comment, uid);
+        _anyService = new CpGroupService(name, className, comment, uid);
+        _anyNetwork = new CpNetworkGroup(name, className, comment, uid);
+    }
 
     public CpGroupService getAnyService() {
         return _anyService;

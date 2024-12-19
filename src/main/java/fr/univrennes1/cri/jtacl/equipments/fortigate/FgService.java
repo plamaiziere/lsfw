@@ -25,25 +25,26 @@ public abstract class FgService extends FgObject {
         _type = type;
     }
 
-	public List<Object> getLinkedTo() {
-		return _linkedTo;
-	}
+    public List<Object> getLinkedTo() {
+        return _linkedTo;
+    }
 
-	public void linkWith(Object obj) {
-		if (!_linkedTo.contains(obj)) {
-			_linkedTo.add(obj);
-		}
-	}
+    public void linkWith(Object obj) {
+        if (!_linkedTo.contains(obj)) {
+            _linkedTo.add(obj);
+        }
+    }
 
-	public FgServiceType getType() {
-		return _type;
-	}
+    public FgServiceType getType() {
+        return _type;
+    }
 
     /**
-	 * Returns the {@link FgServicesMatch} of the given {@link ProbeRequest}.
-	 * @param probe the probe to test.
-	 * @return the FgServicesMatch of the given ProbeRequest.
-	 */
-	public abstract FgServicesMatch matches(Probe probe);
+     * Returns the {@link FgServicesMatch} of the given {@link ProbeRequest}.
+     *
+     * @param probe the probe to test.
+     * @return the FgServicesMatch of the given ProbeRequest.
+     */
+    public abstract FgServicesMatch matches(Probe probe);
 
 }

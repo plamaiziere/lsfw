@@ -9,11 +9,11 @@
 -->
 
 <jtacl>
-	<equipments>"
-		<equipment classname="fr.univrennes1.cri.jtacl.equipments.SimpleRouter"
-				   name="router1"
-				   comment="router #1"
-				   filename="foo"
-		/>"
-	</equipments>
+    <equipments>"
+        <equipment classname="fr.univrennes1.cri.jtacl.equipments.SimpleRouter"
+                   name="router1"
+                   comment="router #1"
+                   filename="foo"
+        />"
+    </equipments>
 </jtacl>

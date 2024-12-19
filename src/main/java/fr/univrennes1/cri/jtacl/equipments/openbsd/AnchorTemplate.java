@@ -12,42 +12,42 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 /**
  * Template to build anchor rule. This class is used at parsing time
  * as an intermediate storage.
- * @see PfAnchorRule
- * 
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @see PfAnchorRule
  */
 public class AnchorTemplate {
 
-	private String _name;
-	private RuleTemplate _rule;
-	private boolean _inlined;
+    private String _name;
+    private RuleTemplate _rule;
+    private boolean _inlined;
 
-	public boolean isInlined() {
-		return _inlined;
-	}
+    public boolean isInlined() {
+        return _inlined;
+    }
 
-	public boolean setInlined(boolean inlined) {
-		_inlined = inlined;
-		return true;
-	}
+    public boolean setInlined(boolean inlined) {
+        _inlined = inlined;
+        return true;
+    }
 
-	public String getName() {
-		return _name;
-	}
+    public String getName() {
+        return _name;
+    }
 
-	public boolean setName(String name) {
-		_name = name;
-		return true;
-	}
+    public boolean setName(String name) {
+        _name = name;
+        return true;
+    }
 
-	public RuleTemplate getRule() {
-		return _rule;
-	}
+    public RuleTemplate getRule() {
+        return _rule;
+    }
 
-	public boolean setRule(RuleTemplate rule) {
-		_rule = rule;
-		return true;
-	}
+    public boolean setRule(RuleTemplate rule) {
+        _rule = rule;
+        return true;
+    }
 
 
 }

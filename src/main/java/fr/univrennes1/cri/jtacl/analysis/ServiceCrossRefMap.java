@@ -10,19 +10,22 @@
 package fr.univrennes1.cri.jtacl.analysis;
 
 import fr.univrennes1.cri.jtacl.lib.ip.PortRange;
+
 import java.util.HashMap;
 
 /**
  * Map of services cross references
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ServiceCrossRefMap extends HashMap<PortRange, ServiceCrossRef> {
 
-	/**
-	 * put a reference into the map
-	 * @param ref reference to put
-	 */
-	public void put(ServiceCrossRef ref) {
-		put(ref.getPortRange(), ref);
-	}
+    /**
+     * put a reference into the map
+     *
+     * @param ref reference to put
+     */
+    public void put(ServiceCrossRef ref) {
+        put(ref.getPortRange(), ref);
+    }
 }

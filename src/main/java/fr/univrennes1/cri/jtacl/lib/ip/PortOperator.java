@@ -11,62 +11,63 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 
 /**
  * Port operators.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum PortOperator {
-	/**
-	 * Operator "ANY"
-	 */
-	ANY,
+    /**
+     * Operator "ANY"
+     */
+    ANY,
 
-	/**
-	 * Operator "NONE"
-	 */
-	NONE,
+    /**
+     * Operator "NONE"
+     */
+    NONE,
 
-	/**
-	 * Operator equal
-	 */
-	EQ,
+    /**
+     * Operator equal
+     */
+    EQ,
 
-	/**
-	 * Operator not equal
-	 */
-	NEQ,
+    /**
+     * Operator not equal
+     */
+    NEQ,
 
-	/**
-	 * Operator less than
-	 */
-	LT,
+    /**
+     * Operator less than
+     */
+    LT,
 
-	/**
-	 * Operator less than or equal
-	 */
-	LTE,
+    /**
+     * Operator less than or equal
+     */
+    LTE,
 
-	/**
-	 * Operator greater than
-	 */
-	GT,
+    /**
+     * Operator greater than
+     */
+    GT,
 
-	/**
-	 * Operator greater than or equal
-	 */
-	GTE,
+    /**
+     * Operator greater than or equal
+     */
+    GTE,
 
-	/**
-	 * Operator range including boundaries
-	 */
-	RANGE,
+    /**
+     * Operator range including boundaries
+     */
+    RANGE,
 
-	/**
-	 * Operator range, excluding boundaries
-	 */
-	RANGEEX,
+    /**
+     * Operator range, excluding boundaries
+     */
+    RANGEEX,
 
-	/**
-	 * Operator exclude range
-	 */
-	EXCLUDE
+    /**
+     * Operator exclude range
+     */
+    EXCLUDE
 
 }

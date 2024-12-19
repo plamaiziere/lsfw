@@ -11,9 +11,10 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 
 /**
  * IP version (v4, v6).
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum IPversion {
-	IPV4,
-	IPV6
+    IPV4,
+    IPV6
 }

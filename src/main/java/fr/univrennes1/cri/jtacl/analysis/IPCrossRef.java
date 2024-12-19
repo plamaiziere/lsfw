@@ -10,38 +10,40 @@
 package fr.univrennes1.cri.jtacl.analysis;
 
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Cross reference of an IP.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IPCrossRef {
-	protected IPRangeable _ip;
+    protected IPRangeable _ip;
 
-	protected List<CrossRefContext> _contexts;
+    protected List<CrossRefContext> _contexts;
 
-	public IPCrossRef(IPRangeable ip) {
-		_ip = ip;
-		_contexts = new ArrayList<>();
-	}
+    public IPCrossRef(IPRangeable ip) {
+        _ip = ip;
+        _contexts = new ArrayList<>();
+    }
 
-	public List<CrossRefContext> getContexts() {
-		return _contexts;
-	}
+    public List<CrossRefContext> getContexts() {
+        return _contexts;
+    }
 
-	public void addContext(CrossRefContext context) {
-		_contexts.add(context);
-	}
+    public void addContext(CrossRefContext context) {
+        _contexts.add(context);
+    }
 
-	public IPRangeable getIP() {
-		return _ip;
-	}
+    public IPRangeable getIP() {
+        return _ip;
+    }
 
-	@Override
-	public String toString() {
-		return "IPCrossRef [_ip=" + _ip + ", _contexts=" + _contexts + "]";
-	}
+    @Override
+    public String toString() {
+        return "IPCrossRef [_ip=" + _ip + ", _contexts=" + _contexts + "]";
+    }
 
 }

@@ -65,101 +65,102 @@ import java.util.logging.Level;
 
 /**
  * Checkpoint Firewall >= R80
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpFw extends GenericEquipment {
 
-	protected class CPfwIface {
-		protected Iface _iface;
-		protected String _name;
-		protected String _description;
+    protected class CPfwIface {
+        protected Iface _iface;
+        protected String _name;
+        protected String _description;
 
-		public CPfwIface(Iface iface) {
-			_iface = iface;
-		}
+        public CPfwIface(Iface iface) {
+            _iface = iface;
+        }
 
-		public Iface getIface() {
-			return _iface;
-		}
+        public Iface getIface() {
+            return _iface;
+        }
 
-		public void setIface(Iface iface) {
-			_iface = iface;
-		}
+        public void setIface(Iface iface) {
+            _iface = iface;
+        }
 
-		public String getDescription() {
-			return _description;
-		}
+        public String getDescription() {
+            return _description;
+        }
 
-		public void setDescription(String description) {
-			_description = description;
-		}
+        public void setDescription(String description) {
+            _description = description;
+        }
 
-		public String getName() {
-			return _name;
-		}
+        public String getName() {
+            return _name;
+        }
 
-		public void setName(String name) {
-			_name = name;
-		}
-	}
+        public void setName(String name) {
+            _name = name;
+        }
+    }
 
-	protected class CpFwFilter {
-		protected boolean _serviceInspected;
+    protected class CpFwFilter {
+        protected boolean _serviceInspected;
 
-		public boolean hasServiceInspected() {
-			return _serviceInspected;
-		}
+        public boolean hasServiceInspected() {
+            return _serviceInspected;
+        }
 
-		public void setServiceInspected(boolean serviceInspected) {
-			_serviceInspected = serviceInspected;
-		}
-	}
+        public void setServiceInspected(boolean serviceInspected) {
+            _serviceInspected = serviceInspected;
+        }
+    }
 
-	/**
-	 * Parser
-	 */
-	protected CpParser _parser = Parboiled.createParser(CpParser.class);
+    /**
+     * Parser
+     */
+    protected CpParser _parser = Parboiled.createParser(CpParser.class);
 
-	/**
-	 * interfaces
-	 */
-	protected HashMap<String, CPfwIface> _cpfwIfaces
-		= new HashMap<>();
+    /**
+     * interfaces
+     */
+    protected HashMap<String, CPfwIface> _cpfwIfaces
+            = new HashMap<>();
 
-	/**
-	 * IP cross references map
-	 */
-	protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
+    /**
+     * IP cross references map
+     */
+    protected IPCrossRefMap _netCrossRef = new IPCrossRefMap();
 
-	/**
-	 * Services cross references map
-	 */
-	protected ServiceCrossRefMap _serviceCrossRef = new ServiceCrossRefMap();
+    /**
+     * Services cross references map
+     */
+    protected ServiceCrossRefMap _serviceCrossRef = new ServiceCrossRefMap();
 
-	/**
-	 * parse context
-	 */
-	 protected ParseContext _parseContext = new ParseContext();
+    /**
+     * parse context
+     */
+    protected ParseContext _parseContext = new ParseContext();
 
-	/**
-	 * name of the gateway for rule installation
-	 */
-	protected String _gatewayName;
+    /**
+     * name of the gateway for rule installation
+     */
+    protected String _gatewayName;
 
-	/**
-	 * name of the fw policy
-	 */
-	protected String _policyName;
+    /**
+     * name of the fw policy
+     */
+    protected String _policyName;
 
     /*
      * name of layers to skip (by default 'Application')
      */
-	protected List<String> _skippedLayers = new ArrayList<>();
+    protected List<String> _skippedLayers = new ArrayList<>();
 
     /*
      * Checkpoint objects keyed by uid
      */
-	protected HashMap<String, CpObject> _cpObjects
+    protected HashMap<String, CpObject> _cpObjects
             = new HashMap<>();
 
     /*
@@ -172,65 +173,68 @@ public class CpFw extends GenericEquipment {
      */
     protected CpLayer _rootLayer;
 
-    public CpLayer getRootLayer() { return _rootLayer; }
-
-    /*
-	 * rule base actions keyed by name
-	 */
-	protected HashMap<String, CpFwRuleBaseAction> _cpActions = new HashMap<>();
-
-	/*
-	 * services keyed by name
-	 */
-	protected HashMap<String, CpService> _cpServices
-			= new HashMap<>();
-
-	/*
-	 * network objects keyed by name
-	 */
-	protected HashMap<String, CpNetworkObject> _cpNetworks
-			= new HashMap<>();
-
-	/*
-	 * firewall rules
-	 */
-	protected LinkedList <CpFwRule> _fwRules = new LinkedList<>();
-
-	/**
-	 * IP cross references map
-	 */
-	IPCrossRefMap getNetCrossRef() {
-		return _netCrossRef;
-	}
-
-	/**
-	 * service cross references map
-	 */
-	ServiceCrossRefMap getServiceCrossRef() {
-		return _serviceCrossRef;
-	}
-
-	CpFwShell _shell = new CpFwShell(this);
-
-	/**
-	 * Create a new {@link CpFw} with this name and this comment.<br/>
-	 * @param monitor the {@link Monitor} monitor associated with this equipment.
-	 * @param name the name of the equipment.
-	 * @param comment a free comment for this equipment.
-	 * @param configurationFileName name of the configuration file to use (may be null).
-	 */
-	public CpFw(Monitor monitor, String name, String comment, String configurationFileName) {
-		super(monitor, name, comment, configurationFileName);
-	}
-
-	protected boolean StringNullOrEmpty(String s) {
-	    return s == null || s.isEmpty();
+    public CpLayer getRootLayer() {
+        return _rootLayer;
     }
 
-	protected IPNet parseIpAddress(String ipAddress) {
-	    IPNet ip = null;
-	    if (ipAddress == null)
-            throwCfgException("invalid IP address (is null)" , true);
+    /*
+     * rule base actions keyed by name
+     */
+    protected HashMap<String, CpFwRuleBaseAction> _cpActions = new HashMap<>();
+
+    /*
+     * services keyed by name
+     */
+    protected HashMap<String, CpService> _cpServices
+            = new HashMap<>();
+
+    /*
+     * network objects keyed by name
+     */
+    protected HashMap<String, CpNetworkObject> _cpNetworks
+            = new HashMap<>();
+
+    /*
+     * firewall rules
+     */
+    protected LinkedList<CpFwRule> _fwRules = new LinkedList<>();
+
+    /**
+     * IP cross references map
+     */
+    IPCrossRefMap getNetCrossRef() {
+        return _netCrossRef;
+    }
+
+    /**
+     * service cross references map
+     */
+    ServiceCrossRefMap getServiceCrossRef() {
+        return _serviceCrossRef;
+    }
+
+    CpFwShell _shell = new CpFwShell(this);
+
+    /**
+     * Create a new {@link CpFw} with this name and this comment.<br/>
+     *
+     * @param monitor               the {@link Monitor} monitor associated with this equipment.
+     * @param name                  the name of the equipment.
+     * @param comment               a free comment for this equipment.
+     * @param configurationFileName name of the configuration file to use (may be null).
+     */
+    public CpFw(Monitor monitor, String name, String comment, String configurationFileName) {
+        super(monitor, name, comment, configurationFileName);
+    }
+
+    protected boolean StringNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
+    }
+
+    protected IPNet parseIpAddress(String ipAddress) {
+        IPNet ip = null;
+        if (ipAddress == null)
+            throwCfgException("invalid IP address (is null)", true);
         try {
             ip = new IPNet(ipAddress);
         } catch (UnknownHostException ex) {
@@ -242,9 +246,9 @@ public class CpFw extends GenericEquipment {
     protected IPRange parseIpRange(String ipAddressFirst, String ipAddressLast) {
 
         if (ipAddressFirst == null)
-            throwCfgException("invalid IP address (ipAddressFirst is null)" , true);
+            throwCfgException("invalid IP address (ipAddressFirst is null)", true);
         if (ipAddressLast == null)
-            throwCfgException("invalid IP address (ipAddressLast is null)" , true);
+            throwCfgException("invalid IP address (ipAddressLast is null)", true);
 
         IPNet ipFirst = parseIpAddress(ipAddressFirst);
         IPNet ipLast = parseIpAddress(ipAddressLast);
@@ -252,7 +256,7 @@ public class CpFw extends GenericEquipment {
     }
 
     protected int parsePortNumber(String port) {
-	    int i = 0;
+        int i = 0;
         try {
             i = Integer.parseInt(port);
         } catch (NumberFormatException ex) {
@@ -261,137 +265,137 @@ public class CpFw extends GenericEquipment {
         return i;
     }
 
-	protected CpPortItem parsePort(String sPorts) {
+    protected CpPortItem parsePort(String sPorts) {
 
-		ParsingResult<?> result = new BasicParseRunner(
-			_parser.CpPortItem()).run(sPorts);
-		if (!result.matched)
-			throwCfgException("invalid port specification: " + sPorts, true);
+        ParsingResult<?> result = new BasicParseRunner(
+                _parser.CpPortItem()).run(sPorts);
+        if (!result.matched)
+            throwCfgException("invalid port specification: " + sPorts, true);
 
-		PortItemTemplate port = _parser.getPortItem();
+        PortItemTemplate port = _parser.getPortItem();
 
-		String sfirst = port.getFirstPort();
-		String slast = port.getLastPort();
-		int first = parsePortNumber(sfirst);
-		int last = slast != null ? parsePortNumber(slast) : -1;
+        String sfirst = port.getFirstPort();
+        String slast = port.getLastPort();
+        int first = parsePortNumber(sfirst);
+        int last = slast != null ? parsePortNumber(slast) : -1;
 
-		String operator = port.getOperator();
-		if (operator == null)
-			operator = "=";
+        String operator = port.getOperator();
+        if (operator == null)
+            operator = "=";
 
-		CpPortItem portItem;
-		if (last != -1) {
-			portItem = new CpPortItem(operator, first, last);
-		} else {
-			portItem = new CpPortItem(operator, first);
-		}
-		return portItem;
-	}
+        CpPortItem portItem;
+        if (last != -1) {
+            portItem = new CpPortItem(operator, first, last);
+        } else {
+            portItem = new CpPortItem(operator, first);
+        }
+        return portItem;
+    }
 
-	protected CpService parseTcpUdpService(String name, String className, String comment, String uid, JsonNode n) {
+    protected CpService parseTcpUdpService(String name, String className, String comment, String uid, JsonNode n) {
 
-	    String sPort = n.path("port").textValue();
-	    String sSourcePort = n.path("source-port").textValue();
-	    String sProtocol = n.path("protocol").textValue();
-		boolean inAny = n.path("match-for-any").asBoolean();
+        String sPort = n.path("port").textValue();
+        String sSourcePort = n.path("source-port").textValue();
+        String sProtocol = n.path("protocol").textValue();
+        boolean inAny = n.path("match-for-any").asBoolean();
 
-		/*
-		 * ports
-		 */
-		CpPortItem portItem = parsePort(sPort);
-		CpPortItem srcPortItem =
-			sSourcePort == null ? null : parsePort(sSourcePort);
+        /*
+         * ports
+         */
+        CpPortItem portItem = parsePort(sPort);
+        CpPortItem srcPortItem =
+                sSourcePort == null ? null : parsePort(sSourcePort);
 
-		/*
-		 * service type
-		 */
-		CpService service = null;
-		if (className.equalsIgnoreCase("service-tcp"))
-			service = new CpTcpService(name, comment, uid, portItem, srcPortItem, sProtocol, inAny);
-		if (className.equalsIgnoreCase("service-udp"))
-			service = new CpUdpService(name, comment, uid, portItem, srcPortItem, sProtocol, inAny);
+        /*
+         * service type
+         */
+        CpService service = null;
+        if (className.equalsIgnoreCase("service-tcp"))
+            service = new CpTcpService(name, comment, uid, portItem, srcPortItem, sProtocol, inAny);
+        if (className.equalsIgnoreCase("service-udp"))
+            service = new CpUdpService(name, comment, uid, portItem, srcPortItem, sProtocol, inAny);
 
-		return service;
-	}
+        return service;
+    }
 
-	protected CpService parseIcmpService(String name, String className, String comment, String uid, JsonNode n) {
+    protected CpService parseIcmpService(String name, String className, String comment, String uid, JsonNode n) {
 
         /*
          * icmp code and type
          */
-		int icmpType = n.path("icmp-type").asInt();
-		int icmpCode = n.path("icmp-code").asInt();
+        int icmpType = n.path("icmp-type").asInt();
+        int icmpCode = n.path("icmp-code").asInt();
 
-		/*
-		 * address family
-		 */
-		AddressFamily af = AddressFamily.INET;
-		if (className.equalsIgnoreCase("service-icmpv6"))
-			af = AddressFamily.INET6;
+        /*
+         * address family
+         */
+        AddressFamily af = AddressFamily.INET;
+        if (className.equalsIgnoreCase("service-icmpv6"))
+            af = AddressFamily.INET6;
 
-		CpService service = new CpIcmpService(name, comment, uid, af, icmpType, icmpCode);
-		return service;
-	}
+        CpService service = new CpIcmpService(name, comment, uid, af, icmpType, icmpCode);
+        return service;
+    }
 
-	protected CpService parseOtherService(String name, String className, String comment, String uid, JsonNode n) {
+    protected CpService parseOtherService(String name, String className, String comment, String uid, JsonNode n) {
 
         int protocol = n.path("ip-protocol").asInt();
-		String sAction = n.path("action").textValue();
-		boolean inAny = n.path("match-for-any").asBoolean();
+        String sAction = n.path("action").textValue();
+        boolean inAny = n.path("match-for-any").asBoolean();
 
-		CpService service =
-			new CpOtherService(name, comment, uid, protocol, sAction,null, inAny);
+        CpService service =
+                new CpOtherService(name, comment, uid, protocol, sAction, null, inAny);
 
-		return service;
-	}
+        return service;
+    }
 
-	protected CpService parseServiceGroup(String name, String className, String comment, String uid, JsonNode n) {
+    protected CpService parseServiceGroup(String name, String className, String comment, String uid, JsonNode n) {
 
-		CpGroupService service = new CpGroupService(name, className, comment, uid);
+        CpGroupService service = new CpGroupService(name, className, comment, uid);
 
-		/*
-		 * members of this group (should be one member)
-		 */
-		JsonNode members = n.path("members");
+        /*
+         * members of this group (should be one member)
+         */
+        JsonNode members = n.path("members");
         Iterator<JsonNode> it = members.elements();
         while (it.hasNext()) {
             JsonNode m = it.next();
             String mname = m.path("name").textValue();
             /* XXXX: references are resolved later */
-			service.addReference(mname, null);
-		}
+            service.addReference(mname, null);
+        }
 
-		return service;
-	}
+        return service;
+    }
 
-	protected CpService parseUnhandledService(String name, String className, String comment, String uid, JsonNode n) {
+    protected CpService parseUnhandledService(String name, String className, String comment, String uid, JsonNode n) {
 
-		return new CpUnhandledService(name, className, comment, uid, false);
-	}
+        return new CpUnhandledService(name, className, comment, uid, false);
+    }
 
-	protected CpNetworkObject parseSimpleGateway(String name, String className, String comment, String uid, JsonNode n) {
-		CpNetworkIPs networkIPs = new CpNetworkIPs(name, className, comment, uid);
+    protected CpNetworkObject parseSimpleGateway(String name, String className, String comment, String uid, JsonNode n) {
+        CpNetworkIPs networkIPs = new CpNetworkIPs(name, className, comment, uid);
 
-		/*
-		 * interfaces
-		 */
-		JsonNode interfaces = n.path("interfaces");
-		Iterator<JsonNode> it = interfaces.elements();
-		while (it.hasNext()) {
-			JsonNode iface = it.next();
-			String sIp = iface.path("ipv4-address").textValue();
-			if (!StringNullOrEmpty(sIp)) {
-				IPNet ip = parseIpAddress(sIp);
-				networkIPs.addIp(ip);
-			}
-			String sIp6 = iface.path("ipv6-address").textValue();
-			if (!StringNullOrEmpty(sIp6)) {
-				IPNet ip6 = parseIpAddress(sIp6);
-				networkIPs.addIp(ip6);
-			}
-		}
-		return networkIPs;
-	}
+        /*
+         * interfaces
+         */
+        JsonNode interfaces = n.path("interfaces");
+        Iterator<JsonNode> it = interfaces.elements();
+        while (it.hasNext()) {
+            JsonNode iface = it.next();
+            String sIp = iface.path("ipv4-address").textValue();
+            if (!StringNullOrEmpty(sIp)) {
+                IPNet ip = parseIpAddress(sIp);
+                networkIPs.addIp(ip);
+            }
+            String sIp6 = iface.path("ipv6-address").textValue();
+            if (!StringNullOrEmpty(sIp6)) {
+                IPNet ip6 = parseIpAddress(sIp6);
+                networkIPs.addIp(ip6);
+            }
+        }
+        return networkIPs;
+    }
 
     protected CpNetworkObject parseHost(String name, String className, String comment, String uid, JsonNode n) {
 
@@ -407,7 +411,7 @@ public class CpFw extends GenericEquipment {
             ip6 = parseIpAddress(sIp6);
         }
 
-        CpNetworkIP networkobj = new CpNetworkIP(name, className, comment, uid, ip, ip6,false);
+        CpNetworkIP networkobj = new CpNetworkIP(name, className, comment, uid, ip, ip6, false);
         return networkobj;
     }
 
@@ -429,19 +433,19 @@ public class CpFw extends GenericEquipment {
             ip = parseIpAddress(sIp);
         }
         if (!StringNullOrEmpty(sIp6)) {
-            sIp6 += "/"  + sNetmask6.toString();
+            sIp6 += "/" + sNetmask6.toString();
             ip6 = parseIpAddress(sIp6);
         }
 
-		CpNetworkIP networkobj = new CpNetworkIP(name, className, comment, uid, ip, ip6, broadcast);
-		return networkobj;
-	}
+        CpNetworkIP networkobj = new CpNetworkIP(name, className, comment, uid, ip, ip6, broadcast);
+        return networkobj;
+    }
 
-	protected CpNetworkObject parseNetworkGroup(String name, String className, String comment, String uid, JsonNode n) {
+    protected CpNetworkObject parseNetworkGroup(String name, String className, String comment, String uid, JsonNode n) {
 
-		CpNetworkGroup ngroup = new CpNetworkGroup(name, className, comment, uid);
+        CpNetworkGroup ngroup = new CpNetworkGroup(name, className, comment, uid);
 
-		if (className.equalsIgnoreCase("group")) {
+        if (className.equalsIgnoreCase("group")) {
             /*
              * members of this group (should be one member)
              */
@@ -453,26 +457,26 @@ public class CpFw extends GenericEquipment {
                 /* XXXX: references are resolved later */
                 ngroup.addBaseReference(mname, null);
             }
-		}
+        }
 
-		if (className.equalsIgnoreCase("group-with-exclusion")) {
-		    /* include */
+        if (className.equalsIgnoreCase("group-with-exclusion")) {
+            /* include */
             JsonNode inc = n.path("include");
-			String refname = inc.path("name").textValue();
+            String refname = inc.path("name").textValue();
             /* XXXX: references are resolved later */
-			ngroup.addBaseReference(refname, null);
-			/* exclude */
-			JsonNode exc = n.path("except");
+            ngroup.addBaseReference(refname, null);
+            /* exclude */
+            JsonNode exc = n.path("except");
             String exceptName = exc.path("name").textValue();
-			ngroup.addExcludedReference(exceptName, null);
-		}
-		return ngroup;
-	}
+            ngroup.addExcludedReference(exceptName, null);
+        }
+        return ngroup;
+    }
 
-	protected CpNetworkObject parseNetworkRange(String name, String className, String comment, String uid, JsonNode n) {
+    protected CpNetworkObject parseNetworkRange(String name, String className, String comment, String uid, JsonNode n) {
 
-		String sIpFirst = n.path("ipv4-address-first").textValue();
-		String sIpLast = n.path("ipv4-address-last").textValue();
+        String sIpFirst = n.path("ipv4-address-first").textValue();
+        String sIpLast = n.path("ipv4-address-last").textValue();
         String sIpFirst6 = n.path("ipv6-address-first").textValue();
         String sIpLast6 = n.path("ipv6-address-last").textValue();
 
@@ -485,22 +489,22 @@ public class CpFw extends GenericEquipment {
             ipRange6 = parseIpRange(sIpFirst6, sIpLast6);
         }
 
-		CpNetworkRange networkobj = new CpNetworkRange(name, className, comment, uid, ipRange, ipRange6);
-		return networkobj;
-	}
+        CpNetworkRange networkobj = new CpNetworkRange(name, className, comment, uid, ipRange, ipRange6);
+        return networkobj;
+    }
 
-	/*
-	 * Resolve Any and service groups references
-	 */
-	protected void linkServices() {
+    /*
+     * Resolve Any and service groups references
+     */
+    protected void linkServices() {
 
-	    // Any
+        // Any
         CpGroupService any = (CpGroupService) _cpServices.get("Any");
 
-		/*
-		 * each service
-		 */
-		for (String serviceName: _cpServices.keySet()) {
+        /*
+         * each service
+         */
+        for (String serviceName : _cpServices.keySet()) {
             CpService service = _cpServices.get(serviceName);
             if (service.isInAny()) {
                 any.addReference(serviceName, service);
@@ -523,36 +527,36 @@ public class CpFw extends GenericEquipment {
                 }
             }
         }
-	}
+    }
 
-	/*
-	 * parse and load objects from JSON
-	 */
-	protected void loadJsonCpObjects(JsonNode objectsDictionary) {
+    /*
+     * parse and load objects from JSON
+     */
+    protected void loadJsonCpObjects(JsonNode objectsDictionary) {
 
-	    Iterator<JsonNode> it = objectsDictionary.elements();
-	    while (it.hasNext()) {
-	        JsonNode n = it.next();
+        Iterator<JsonNode> it = objectsDictionary.elements();
+        while (it.hasNext()) {
+            JsonNode n = it.next();
             _parseContext = new ParseContext();
             _parseContext.setLine(n.toString());
-	        String uid = n.path("uid").textValue();
+            String uid = n.path("uid").textValue();
             String name = n.path("name").textValue();
-	        String className = n.path("type").textValue();
-	        String comment = n.path("comments").textValue();
+            String className = n.path("type").textValue();
+            String comment = n.path("comments").textValue();
 
-	        CpService service = null;
-	        CpNetworkObject network = null;
-	        CpFwRuleBaseAction action = null;
-	        CpObject obj = null;
-	        CpAny any = null;
-	        CpLayer layer = null;
-	        switch (className) {
+            CpService service = null;
+            CpNetworkObject network = null;
+            CpFwRuleBaseAction action = null;
+            CpObject obj = null;
+            CpAny any = null;
+            CpLayer layer = null;
+            switch (className) {
                 /*
                  * actions objects
                  */
                 case "Global":
                 case "RulebaseAction":
-                   switch (name) {
+                    switch (name) {
                         case "Accept":
                             action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.ACCEPT);
                             break;
@@ -565,13 +569,13 @@ public class CpFw extends GenericEquipment {
                         case "Auth": /*TODO */
                             action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.AUTH);
                             break;
-                       case "Inner Layer":
-                           action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.LAYER_CALL);
-                           break;
-                       case "Policy Targets":
-                           /* used in install on */
-                           obj = new CpObject(name, className, comment, uid);
-                           break;
+                        case "Inner Layer":
+                            action = new CpFwRuleBaseAction(name, className, comment, uid, CpFwRuleAction.LAYER_CALL);
+                            break;
+                        case "Policy Targets":
+                            /* used in install on */
+                            obj = new CpObject(name, className, comment, uid);
+                            break;
                     }
                     break;
                 /*
@@ -624,9 +628,9 @@ public class CpFw extends GenericEquipment {
                 case "group-with-exclusion":
                     network = parseNetworkGroup(name, className, comment, uid, n);
                     break;
-				case "simple-gateway":
-					network = parseSimpleGateway(name, className, comment, uid, n);
-					break;
+                case "simple-gateway":
+                    network = parseSimpleGateway(name, className, comment, uid, n);
+                    break;
                 /*
                  * Layers
                  */
@@ -642,9 +646,9 @@ public class CpFw extends GenericEquipment {
                 _cpNetworks.put(name, any.getAnyNetwork());
             }
 
-	        if (action != null) {
-	            obj = action;
-	            _cpActions.put(name, action);
+            if (action != null) {
+                obj = action;
+                _cpActions.put(name, action);
             }
             if (service != null) {
                 obj = service;
@@ -675,11 +679,11 @@ public class CpFw extends GenericEquipment {
     /*
      * Resolve network groups references
      */
-	protected void linkNetworkObjects() {
-		/*
-		 * each network object
-		 */
-		for (String objectName: _cpNetworks.keySet()) {
+    protected void linkNetworkObjects() {
+        /*
+         * each network object
+         */
+        for (String objectName : _cpNetworks.keySet()) {
             CpNetworkObject nobj = _cpNetworks.get(objectName);
             if (nobj.getType() == CpNetworkType.GROUP) {
                 /*
@@ -712,13 +716,13 @@ public class CpFw extends GenericEquipment {
                 }
             }
         }
-	}
+    }
 
-	/*
-	 * parse fw rules
-	 */
-	protected void parseCpRules(CpLayer layer, JsonNode l) {
-	    CpFwRule lastSection = null;
+    /*
+     * parse fw rules
+     */
+    protected void parseCpRules(CpLayer layer, JsonNode l) {
+        CpFwRule lastSection = null;
 
         Iterator<JsonNode> it = l.elements();
         while (it.hasNext()) {
@@ -735,7 +739,7 @@ public class CpFw extends GenericEquipment {
                     /* XXX Access section contains rules */
                     rule = parseFwAccessSection(name, className, comment, uid, layer, n);
                     /* same section can be repeated */
-                    if (lastSection == null || (lastSection != null && ! name.equals(lastSection.getName())
+                    if (lastSection == null || (lastSection != null && !name.equals(lastSection.getName())
                             && lastSection.getNumber() != rule.getNumber())) {
                         layer.getRules().add(rule);
                     }
@@ -781,7 +785,7 @@ public class CpFw extends GenericEquipment {
      * parse rule's "install-on"
      */
     protected List<String> parseFWInstallGateway(JsonNode n) {
-	    List<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         Iterator<JsonNode> it = n.elements();
         while (it.hasNext()) {
             JsonNode rn = it.next();
@@ -823,7 +827,7 @@ public class CpFw extends GenericEquipment {
             }
         }
         return servicesSpec;
-	}
+    }
 
     /*
      * parse rule's IP specification (source or destination)
@@ -857,11 +861,11 @@ public class CpFw extends GenericEquipment {
      * parse access-section rule
      */
     protected CpFwRule parseFwAccessSection(String name
-                                            , String className
-                                            , String comment
-                                            , String uid
-                                            , CpLayer layer
-                                            , JsonNode n) {
+            , String className
+            , String comment
+            , String uid
+            , CpLayer layer
+            , JsonNode n) {
 
         Integer ruleNumber = n.path("from").asInt();
         Integer toNumber = n.path("to").asInt();
@@ -925,7 +929,7 @@ public class CpFw extends GenericEquipment {
         List<String> installgw = parseFWInstallGateway(inst);
 
         CpFwRule fwrule = CpFwRule.newSecurityRule(name, className, comment, uid, layer, ruleNumber
-            , !enabled, sourceSpec, destSpec, servSpec, ruleAction, layerCall, installgw);
+                , !enabled, sourceSpec, destSpec, servSpec, ruleAction, layerCall, installgw);
 
         /*
          * track references
@@ -937,42 +941,42 @@ public class CpFw extends GenericEquipment {
             Log.debug().info("CpFwRule: " + fwrule);
         }
         return fwrule;
-	}
+    }
 
-	/*
-	 * compute the order of the layers calls
-	 */
-	protected void computeLayersCalls(CpLayer layer) {
-	    for (CpFwRule rule: layer.getRules()) {
-	        if (rule.isSecurityRule() && (rule.getRuleAction() == CpFwRuleAction.LAYER_CALL)) {
-	            Integer ruleNumber = rule.getNumber();
-	            String layerCall = rule.getLayerCall();
-	            CpLayer nlayer = _cpLayers.get(layerCall);
-	            nlayer.setParentLayer(layer);
-	            nlayer.setLayerCallRuleNumber(ruleNumber);
+    /*
+     * compute the order of the layers calls
+     */
+    protected void computeLayersCalls(CpLayer layer) {
+        for (CpFwRule rule : layer.getRules()) {
+            if (rule.isSecurityRule() && (rule.getRuleAction() == CpFwRuleAction.LAYER_CALL)) {
+                Integer ruleNumber = rule.getNumber();
+                String layerCall = rule.getLayerCall();
+                CpLayer nlayer = _cpLayers.get(layerCall);
+                nlayer.setParentLayer(layer);
+                nlayer.setLayerCallRuleNumber(ruleNumber);
             }
         }
         /* warn if a layer is never called */
-        for (CpLayer l: _cpLayers.values()) {
+        for (CpLayer l : _cpLayers.values()) {
             if (l != _rootLayer) {
-                if (! l.hasParentLayer()) {
+                if (!l.hasParentLayer()) {
                     warnConfig("layer: " + l.getName() + " uid: " + l.getUid() + " is never called.", false);
                 }
             }
         }
     }
 
-	protected void loadConfiguration(Document doc) {
+    protected void loadConfiguration(Document doc) {
 
-         /* fwpolicy */
-		NodeList list = doc.getElementsByTagName("fwpolicy");
-		if (list.getLength() < 1) {
-			throwCfgException("At least one fwpolicy must be specified", false);
-		}
+        /* fwpolicy */
+        NodeList list = doc.getElementsByTagName("fwpolicy");
+        if (list.getLength() < 1) {
+            throwCfgException("At least one fwpolicy must be specified", false);
+        }
 
-		List<String> filenames = new ArrayList<>();
-		String fwpolicy = null;
-		for (int i = 0; i < list.getLength(); i++) {
+        List<String> filenames = new ArrayList<>();
+        String fwpolicy = null;
+        for (int i = 0; i < list.getLength(); i++) {
             Element e = (Element) list.item(i);
             String filename = e.getAttribute("filename");
             if (!filename.isEmpty()) {
@@ -1006,7 +1010,7 @@ public class CpFw extends GenericEquipment {
             throwCfgException("gateway name must be specified", false);
         }
 
-        for (String f: filenames) {
+        for (String f : filenames) {
             famAdd(f);
             FileReader jf;
             JsonNode rootNode = null;
@@ -1036,348 +1040,351 @@ public class CpFw extends GenericEquipment {
 
     }
 
-	protected void loadIfaces(Document doc) {
+    protected void loadIfaces(Document doc) {
 
-		NodeList list = doc.getElementsByTagName("iface");
-		for (int i = 0; i < list.getLength(); i++) {
-			Element e = (Element) list.item(i);
-			String name = e.getAttribute("name");
-			String comment = e.getAttribute("comment");
-			String ifIp = e.getAttribute("ip");
-			String ifNetwork = e.getAttribute("network");
+        NodeList list = doc.getElementsByTagName("iface");
+        for (int i = 0; i < list.getLength(); i++) {
+            Element e = (Element) list.item(i);
+            String name = e.getAttribute("name");
+            String comment = e.getAttribute("comment");
+            String ifIp = e.getAttribute("ip");
+            String ifNetwork = e.getAttribute("network");
 
-			String s = "name: " + name + " comment: " + comment +
-					" IP: " + ifIp + " network: " + ifNetwork;
+            String s = "name: " + name + " comment: " + comment +
+                    " IP: " + ifIp + " network: " + ifNetwork;
 
-			if (name.isEmpty())
-				throwCfgException("Missing interface name: " + s, false);
+            if (name.isEmpty())
+                throwCfgException("Missing interface name: " + s, false);
 
-			if (ifIp.isEmpty())
-				throwCfgException("Missing interface IP: " + s, false);
+            if (ifIp.isEmpty())
+                throwCfgException("Missing interface IP: " + s, false);
 
-			IPNet ip = null;
-			try {
-				ip = new IPNet(ifIp);
-				ip = ip.hostAddress();
-			} catch (UnknownHostException ex) {
-				throwCfgException("Invalid interface IP: " + s, false);
-			}
+            IPNet ip = null;
+            try {
+                ip = new IPNet(ifIp);
+                ip = ip.hostAddress();
+            } catch (UnknownHostException ex) {
+                throwCfgException("Invalid interface IP: " + s, false);
+            }
 
-			IPNet network = null;
-			try {
-				/*
-				 * If network attribute is empty, use the network address of the IP
-				 * instead.
-				 */
-				if (ifNetwork.isEmpty())
-					network = new IPNet(ifIp);
-				else
-					network = new IPNet(ifNetwork);
-				network = network.networkAddress();
-			} catch (UnknownHostException ex) {
-				throwCfgException("Invalid interface network: " + s, false);
-			}
+            IPNet network = null;
+            try {
+                /*
+                 * If network attribute is empty, use the network address of the IP
+                 * instead.
+                 */
+                if (ifNetwork.isEmpty())
+                    network = new IPNet(ifIp);
+                else
+                    network = new IPNet(ifNetwork);
+                network = network.networkAddress();
+            } catch (UnknownHostException ex) {
+                throwCfgException("Invalid interface network: " + s, false);
+            }
 
-			/*
-			 * Append the link to an existing Iface or create a new one.
-			 */
-			CPfwIface cpfwIface;
-			Iface iface = getIface(name);
-			if (iface == null) {
-				if (comment.isEmpty())
-					throwCfgException("Missing interface comment: " + s, false);
-				iface = addIface(name, comment);
-				cpfwIface = new CPfwIface(iface);
-				_cpfwIfaces.put(name, cpfwIface);
-			}
-			iface.addLink(ip, network);
-		}
-	}
+            /*
+             * Append the link to an existing Iface or create a new one.
+             */
+            CPfwIface cpfwIface;
+            Iface iface = getIface(name);
+            if (iface == null) {
+                if (comment.isEmpty())
+                    throwCfgException("Missing interface comment: " + s, false);
+                iface = addIface(name, comment);
+                cpfwIface = new CPfwIface(iface);
+                _cpfwIfaces.put(name, cpfwIface);
+            }
+            iface.addLink(ip, network);
+        }
+    }
 
-	protected void throwCfgException(String msg, boolean context) {
-		String s = "Equipment: " + _name + " ";
-		if (context)
-			s += _parseContext + msg;
-		else
-			s += msg;
+    protected void throwCfgException(String msg, boolean context) {
+        String s = "Equipment: " + _name + " ";
+        if (context)
+            s += _parseContext + msg;
+        else
+            s += msg;
 
-		throw new JtaclConfigurationException(s);
-	}
+        throw new JtaclConfigurationException(s);
+    }
 
-	protected void warnConfig(String msg, boolean context) {
-		String s = "Equipment: " + _name + " ";
-		if (context)
-			s += _parseContext + msg;
-		else
-			s += msg;
+    protected void warnConfig(String msg, boolean context) {
+        String s = "Equipment: " + _name + " ";
+        if (context)
+            s += _parseContext + msg;
+        else
+            s += msg;
 
-		Log.config().warning(s);
-	}
+        Log.config().warning(s);
+    }
 
-	@Override
-	public NetworkEquipmentsByName configure() {
-		if (_configurationFileName.isEmpty())
-			return null;
+    @Override
+    public NetworkEquipmentsByName configure() {
+        if (_configurationFileName.isEmpty())
+            return null;
 
-		/*
-		 * Read the XML configuration file
-		 */
-		famAdd(_configurationFileName);
-		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
-		loadOptionsFromXML(doc);
-		loadFiltersFromXML(doc);
+        /*
+         * Read the XML configuration file
+         */
+        famAdd(_configurationFileName);
+        Document doc = XMLUtils.getXMLDocument(_configurationFileName);
+        loadOptionsFromXML(doc);
+        loadFiltersFromXML(doc);
 
-		loadIfaces(doc);
-		// loopback interface
+        loadIfaces(doc);
+        // loopback interface
         Iface iface = addLoopbackIface("loopback", "loopback");
         _cpfwIfaces.put("loopback", new CpFw.CPfwIface(iface));
 
-		loadConfiguration(doc);
+        loadConfiguration(doc);
 
-		linkServices();
-		linkNetworkObjects();
+        linkServices();
+        linkNetworkObjects();
 
-		computeLayersCalls(_rootLayer);
+        computeLayersCalls(_rootLayer);
 
-		/*
-		 * routing
-		 */
-		routeDirectlyConnectedNetworks();
-		loadRoutesFromXML(doc);
-		/*
-		 * compute cross reference
-		 */
-		if (_monitorOptions.getXref())
-			CrossReferences();
+        /*
+         * routing
+         */
+        routeDirectlyConnectedNetworks();
+        loadRoutesFromXML(doc);
+        /*
+         * compute cross reference
+         */
+        if (_monitorOptions.getXref())
+            CrossReferences();
 
-		return null;
-	}
+        return null;
+    }
 
-	protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
-		if (!_monitorOptions.getXref())
-			throw new JtaclInternalException(
-					"Cross reference computing without crossreference option set");
-		IPCrossRef ref = _netCrossRef.get(iprange);
-		if (ref == null) {
-			ref = new IPCrossRef(iprange);
-			_netCrossRef.put(ref);
-		}
-		return ref;
-	}
+    protected IPCrossRef getIPNetCrossRef(IPRangeable iprange) {
+        if (!_monitorOptions.getXref())
+            throw new JtaclInternalException(
+                    "Cross reference computing without crossreference option set");
+        IPCrossRef ref = _netCrossRef.get(iprange);
+        if (ref == null) {
+            ref = new IPCrossRef(iprange);
+            _netCrossRef.put(ref);
+        }
+        return ref;
+    }
 
-	protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
-		if (!_monitorOptions.getXref())
-			throw new JtaclInternalException(
-					"Cross reference computing without crossreference option set");
-		ServiceCrossRef ref = _serviceCrossRef.get(portrange);
-		if (ref == null) {
-			ref = new ServiceCrossRef(portrange);
-			_serviceCrossRef.put(ref);
-		}
-		return ref;
-	}
+    protected ServiceCrossRef getServiceCrossRef(PortRange portrange) {
+        if (!_monitorOptions.getXref())
+            throw new JtaclInternalException(
+                    "Cross reference computing without crossreference option set");
+        ServiceCrossRef ref = _serviceCrossRef.get(portrange);
+        if (ref == null) {
+            ref = new ServiceCrossRef(portrange);
+            _serviceCrossRef.put(ref);
+        }
+        return ref;
+    }
 
-	protected void crossRefOwnerService(PortRange range,
-			ServiceCrossRefContext refctx, Object obj) {
+    protected void crossRefOwnerService(PortRange range,
+                                        ServiceCrossRefContext refctx, Object obj) {
 
-		ProtocolsSpec protoSpec = refctx.getProtoSpec();
-		ServiceCrossRefType xrefType = refctx.getType();
+        ProtocolsSpec protoSpec = refctx.getProtoSpec();
+        ServiceCrossRefType xrefType = refctx.getType();
 
-		if (obj instanceof CpGroupService) {
-			CpGroupService group = (CpGroupService) obj;
-			if (Log.debug().isLoggable(Level.INFO)) {
-				Log.debug().info("xref owner service/group: " + group.toString());
-			}
+        if (obj instanceof CpGroupService) {
+            CpGroupService group = (CpGroupService) obj;
+            if (Log.debug().isLoggable(Level.INFO)) {
+                Log.debug().info("xref owner service/group: " + group.toString());
+            }
 
-			ServiceCrossRefContext nrefctx =
-				new ServiceCrossRefContext(protoSpec,
-						xrefType, group.toString(),
-						group.getType().toString(),
-						group.getName(),
-						null,
-						0);
-			ServiceCrossRef serv = getServiceCrossRef(range);
-			serv.addContext(nrefctx);
-			for (Object owner: group.getLinkedTo())
-				crossRefOwnerService(range, refctx, owner);
-		}
+            ServiceCrossRefContext nrefctx =
+                    new ServiceCrossRefContext(protoSpec,
+                            xrefType, group.toString(),
+                            group.getType().toString(),
+                            group.getName(),
+                            null,
+                            0);
+            ServiceCrossRef serv = getServiceCrossRef(range);
+            serv.addContext(nrefctx);
+            for (Object owner : group.getLinkedTo())
+                crossRefOwnerService(range, refctx, owner);
+        }
 
-		if (obj instanceof CpFwRule) {
-			CpFwRule rule = (CpFwRule) obj;
-			if (Log.debug().isLoggable(Level.INFO)) {
-				Log.debug().info("xref owner service/rule: " + rule.toString());
-			}
-			ServiceCrossRefContext nrefctx =
-				new ServiceCrossRefContext(protoSpec,
-						xrefType, rule.toText(), "rule", "", null, 0);
-			ServiceCrossRef serv = getServiceCrossRef(range);
-			serv.addContext(nrefctx);
-		}
+        if (obj instanceof CpFwRule) {
+            CpFwRule rule = (CpFwRule) obj;
+            if (Log.debug().isLoggable(Level.INFO)) {
+                Log.debug().info("xref owner service/rule: " + rule.toString());
+            }
+            ServiceCrossRefContext nrefctx =
+                    new ServiceCrossRefContext(protoSpec,
+                            xrefType, rule.toText(), "rule", "", null, 0);
+            ServiceCrossRef serv = getServiceCrossRef(range);
+            serv.addContext(nrefctx);
+        }
 
-	}
+    }
 
-	protected void crossRefTcpUdpService(CpService service) {
+    protected void crossRefTcpUdpService(CpService service) {
 
-		PortSpec sourcePortSpec = null;
-		PortSpec destPortSpec = null;
-		ProtocolsSpec protoSpec = null;
-		List<Object> owners = null;
+        PortSpec sourcePortSpec = null;
+        PortSpec destPortSpec = null;
+        ProtocolsSpec protoSpec = null;
+        List<Object> owners = null;
 
-		if (Log.debug().isLoggable(Level.INFO)) {
-			Log.debug().info("xref tcp/udp service: " + service.toString());
-		}
+        if (Log.debug().isLoggable(Level.INFO)) {
+            Log.debug().info("xref tcp/udp service: " + service.toString());
+        }
 
-		if (service instanceof CpTcpService) {
-			CpTcpService sobj = (CpTcpService) service;
-			protoSpec = new ProtocolsSpec();
-			protoSpec.add(Protocols.TCP);
-			if (sobj.getSourcePort() != null)
-				sourcePortSpec = sobj.getSourcePort().getPortSpec();
-			if (sobj.getPort() != null)
-					destPortSpec = sobj.getPort().getPortSpec();
-			owners = sobj.getLinkedTo();
-		}
+        if (service instanceof CpTcpService) {
+            CpTcpService sobj = (CpTcpService) service;
+            protoSpec = new ProtocolsSpec();
+            protoSpec.add(Protocols.TCP);
+            if (sobj.getSourcePort() != null)
+                sourcePortSpec = sobj.getSourcePort().getPortSpec();
+            if (sobj.getPort() != null)
+                destPortSpec = sobj.getPort().getPortSpec();
+            owners = sobj.getLinkedTo();
+        }
 
-		if (service instanceof CpUdpService) {
-			CpUdpService sobj = (CpUdpService) service;
-			protoSpec = new ProtocolsSpec();
-			protoSpec.add(Protocols.UDP);
-			if (sobj.getSourcePort() != null)
-				sourcePortSpec = sobj.getSourcePort().getPortSpec();
-			if (sobj.getPort() != null)
-				destPortSpec = sobj.getPort().getPortSpec();
-			owners = sobj.getLinkedTo();
-		}
+        if (service instanceof CpUdpService) {
+            CpUdpService sobj = (CpUdpService) service;
+            protoSpec = new ProtocolsSpec();
+            protoSpec.add(Protocols.UDP);
+            if (sobj.getSourcePort() != null)
+                sourcePortSpec = sobj.getSourcePort().getPortSpec();
+            if (sobj.getPort() != null)
+                destPortSpec = sobj.getPort().getPortSpec();
+            owners = sobj.getLinkedTo();
+        }
 
-		if (sourcePortSpec != null) {
-			ServiceCrossRefContext refctx =
-				new ServiceCrossRefContext(protoSpec,
-						ServiceCrossRefType.FROM, service.toString(),
-						service.getType().toString(),
-						service.getName(),
-						null,
-						0);
-			for (PortRange range: sourcePortSpec.getRanges()) {
-				ServiceCrossRef xref = getServiceCrossRef(range);
-				xref.addContext(refctx);
-				for (Object owner: owners) {
-					crossRefOwnerService(range, refctx, owner);
-				}
-			}
-		}
+        if (sourcePortSpec != null) {
+            ServiceCrossRefContext refctx =
+                    new ServiceCrossRefContext(protoSpec,
+                            ServiceCrossRefType.FROM, service.toString(),
+                            service.getType().toString(),
+                            service.getName(),
+                            null,
+                            0);
+            for (PortRange range : sourcePortSpec.getRanges()) {
+                ServiceCrossRef xref = getServiceCrossRef(range);
+                xref.addContext(refctx);
+                for (Object owner : owners) {
+                    crossRefOwnerService(range, refctx, owner);
+                }
+            }
+        }
 
-		if (destPortSpec != null) {
-			ServiceCrossRefContext refctx =
-				new ServiceCrossRefContext(protoSpec,
-						ServiceCrossRefType.TO, service.toString(),
-						service.getType().toString(),
-						service.getName(),
-						null,
-						0);
-			for (PortRange range: destPortSpec.getRanges()) {
-				ServiceCrossRef xref = getServiceCrossRef(range);
-				xref.addContext(refctx);
-				for (Object owner: owners) {
-					crossRefOwnerService(range, refctx, owner);
-				}
-			}
-		}
-	}
+        if (destPortSpec != null) {
+            ServiceCrossRefContext refctx =
+                    new ServiceCrossRefContext(protoSpec,
+                            ServiceCrossRefType.TO, service.toString(),
+                            service.getType().toString(),
+                            service.getName(),
+                            null,
+                            0);
+            for (PortRange range : destPortSpec.getRanges()) {
+                ServiceCrossRef xref = getServiceCrossRef(range);
+                xref.addContext(refctx);
+                for (Object owner : owners) {
+                    crossRefOwnerService(range, refctx, owner);
+                }
+            }
+        }
+    }
 
-	protected void crossRefNetworkLink(IPCrossRef ipNetRef,
-			Object obj) {
+    protected void crossRefNetworkLink(IPCrossRef ipNetRef,
+                                       Object obj) {
 
-		if (obj instanceof CpNetworkObject) {
-			CpNetworkObject nobj = (CpNetworkObject) obj;
-			if (Log.debug().isLoggable(Level.INFO)) {
-				Log.debug().info("xref NetworkLink/Network: " + nobj.toString());
-			}
-			CrossRefContext refContext =
-				new CrossRefContext(nobj.toString(), nobj.getType().toString(),
-					nobj.getName(), null, 0);
-			ipNetRef.addContext(refContext);
-			for (Object linkobj: nobj.getLinkedTo()) {
-				crossRefNetworkLink(ipNetRef, linkobj);
-			}
-		}
-		if (obj instanceof CpFwRule) {
-			CpFwRule rule = (CpFwRule) obj;
-			if (Log.debug().isLoggable(Level.INFO)) {
-				Log.debug().info("xref NetworkLink/rule: " + rule.toText());
-			}
-			CrossRefContext refContext =
-				new CrossRefContext(rule.toText(), "rule", "", null, 0);
-			ipNetRef.addContext(refContext);
+        if (obj instanceof CpNetworkObject) {
+            CpNetworkObject nobj = (CpNetworkObject) obj;
+            if (Log.debug().isLoggable(Level.INFO)) {
+                Log.debug().info("xref NetworkLink/Network: " + nobj.toString());
+            }
+            CrossRefContext refContext =
+                    new CrossRefContext(nobj.toString(), nobj.getType().toString(),
+                            nobj.getName(), null, 0);
+            ipNetRef.addContext(refContext);
+            for (Object linkobj : nobj.getLinkedTo()) {
+                crossRefNetworkLink(ipNetRef, linkobj);
+            }
+        }
+        if (obj instanceof CpFwRule) {
+            CpFwRule rule = (CpFwRule) obj;
+            if (Log.debug().isLoggable(Level.INFO)) {
+                Log.debug().info("xref NetworkLink/rule: " + rule.toText());
+            }
+            CrossRefContext refContext =
+                    new CrossRefContext(rule.toText(), "rule", "", null, 0);
+            ipNetRef.addContext(refContext);
 
-		}
-	}
+        }
+    }
 
-	/**
-	 * Compute cross references
-	 */
-	protected void CrossReferences() {
-		/*
-		 * network object
-		 */
-		for (CpNetworkObject nobj: _cpNetworks.values()) {
+    /**
+     * Compute cross references
+     */
+    protected void CrossReferences() {
+        /*
+         * network object
+         */
+        for (CpNetworkObject nobj : _cpNetworks.values()) {
 
-			IPRangeable ip;
-			IPRangeable ip6;
-			IPCrossRef ipNetRef;
+            IPRangeable ip;
+            IPRangeable ip6;
+            IPCrossRef ipNetRef;
             IPCrossRef ipNetRef6;
 
-			switch (nobj.getType()) {
-				case IP	:   CpNetworkIP nip = (CpNetworkIP) nobj;
-							ip = nip.getIpRange();
-							if (ip != null) {
-                                ipNetRef = getIPNetCrossRef(ip);
-                                crossRefNetworkLink(ipNetRef, nobj);
-                            }
-                            ip6 = nip.getIpRange6();
-                            if (ip6 != null) {
-                                ipNetRef6 = getIPNetCrossRef(ip6);
-                                crossRefNetworkLink(ipNetRef6, nobj);
-                            }
-                            break;
-				case RANGE: CpNetworkRange nrange = (CpNetworkRange) nobj;
-							ip = nrange.getIpRange();
-							if (ip != null) {
-                                ipNetRef = getIPNetCrossRef(ip);
-                                crossRefNetworkLink(ipNetRef, nobj);
-                            }
-                            ip6 = nrange.getIpRange6();
-                            if (ip6 != null) {
-                                ipNetRef6 = getIPNetCrossRef(ip6);
-                                crossRefNetworkLink(ipNetRef6, nobj);
-                            }
-							break;
-				case IPS:   CpNetworkIPs member = (CpNetworkIPs) nobj;
-							for (IPRange ipr : member.getIpRanges()) {
-								ipNetRef = getIPNetCrossRef(ipr);
-								crossRefNetworkLink(ipNetRef, nobj);
-							}
-							break;
-			}
-		}
+            switch (nobj.getType()) {
+                case IP:
+                    CpNetworkIP nip = (CpNetworkIP) nobj;
+                    ip = nip.getIpRange();
+                    if (ip != null) {
+                        ipNetRef = getIPNetCrossRef(ip);
+                        crossRefNetworkLink(ipNetRef, nobj);
+                    }
+                    ip6 = nip.getIpRange6();
+                    if (ip6 != null) {
+                        ipNetRef6 = getIPNetCrossRef(ip6);
+                        crossRefNetworkLink(ipNetRef6, nobj);
+                    }
+                    break;
+                case RANGE:
+                    CpNetworkRange nrange = (CpNetworkRange) nobj;
+                    ip = nrange.getIpRange();
+                    if (ip != null) {
+                        ipNetRef = getIPNetCrossRef(ip);
+                        crossRefNetworkLink(ipNetRef, nobj);
+                    }
+                    ip6 = nrange.getIpRange6();
+                    if (ip6 != null) {
+                        ipNetRef6 = getIPNetCrossRef(ip6);
+                        crossRefNetworkLink(ipNetRef6, nobj);
+                    }
+                    break;
+                case IPS:
+                    CpNetworkIPs member = (CpNetworkIPs) nobj;
+                    for (IPRange ipr : member.getIpRanges()) {
+                        ipNetRef = getIPNetCrossRef(ipr);
+                        crossRefNetworkLink(ipNetRef, nobj);
+                    }
+                    break;
+            }
+        }
 
-		/*
-		 * services object
-		 */
-		for (CpService sobj: _cpServices.values()) {
-			if (sobj.getType() != CpServiceType.TCP &&
-					sobj.getType() != CpServiceType.UDP)
-				continue;
-			crossRefTcpUdpService(sobj);
-		}
-	}
+        /*
+         * services object
+         */
+        for (CpService sobj : _cpServices.values()) {
+            if (sobj.getType() != CpServiceType.TCP &&
+                    sobj.getType() != CpServiceType.UDP)
+                continue;
+            crossRefTcpUdpService(sobj);
+        }
+    }
 
-	@Override
-	public void incoming(IfaceLink link, Probe probe) {
+    @Override
+    public void incoming(IfaceLink link, Probe probe) {
 
-		if (Log.debug().isLoggable(Level.INFO))
-			Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
+        if (Log.debug().isLoggable(Level.INFO))
+            Log.debug().info("probe" + probe.uidToString() + " incoming on " + _name);
 
-		if (!link.isLoopback()) {
+        if (!link.isLoopback()) {
             probe.decTimeToLive();
             if (!probe.isAlive()) {
                 probe.killError("TimeToLive expiration");
@@ -1390,119 +1397,119 @@ public class CpFw extends GenericEquipment {
             packetFilter(link, Direction.IN, probe);
         }
 
-		/*
-		 * Check if the destination of the probe is on this equipment.
-		 */
-		IPNet ipdest = probe.getDestinationAddress().toIPNet();
-		if (ipdest != null) {
-			IfaceLink ilink = getIfaceLink(ipdest);
-			if (ilink != null) {
-				/*
-				 * Set the probe's final position and notify the monitor
-				 */
-				probe.setOutgoingLink(ilink, ipdest);
-				probe.destinationReached("destination reached");
-				return;
-			}
-		}
-		/*
-		 * Route the probe.
-		 */
-		Routes routes = _routingEngine.getRoutes(probe);
-		if (routes.isEmpty()) {
-			probe.killNoRoute("No route to " + probe.getDestinationAddress());
-			return;
-		}
-		probe.routed(probe.getDestinationAddress().toString("i::"));
+        /*
+         * Check if the destination of the probe is on this equipment.
+         */
+        IPNet ipdest = probe.getDestinationAddress().toIPNet();
+        if (ipdest != null) {
+            IfaceLink ilink = getIfaceLink(ipdest);
+            if (ilink != null) {
+                /*
+                 * Set the probe's final position and notify the monitor
+                 */
+                probe.setOutgoingLink(ilink, ipdest);
+                probe.destinationReached("destination reached");
+                return;
+            }
+        }
+        /*
+         * Route the probe.
+         */
+        Routes routes = _routingEngine.getRoutes(probe);
+        if (routes.isEmpty()) {
+            probe.killNoRoute("No route to " + probe.getDestinationAddress());
+            return;
+        }
+        probe.routed(probe.getDestinationAddress().toString("i::"));
 
-		if (Log.debug().isLoggable(Level.INFO)) {
-			for (Route r: routes) {
-				Log.debug().info("route: " + r.toString());
-			}
-		}
+        if (Log.debug().isLoggable(Level.INFO)) {
+            for (Route r : routes) {
+                Log.debug().info("route: " + r.toString());
+            }
+        }
 
-		/*
-		 * if we have several routes for a destination, we have to probe these
-		 * routes too because our goal is to know if a probe is able to
-		 * reach a destination, regardless of the route taken.
-		 */
-		ArrayList<Probe> probes = new ArrayList<>();
-		probes.add(probe);
+        /*
+         * if we have several routes for a destination, we have to probe these
+         * routes too because our goal is to know if a probe is able to
+         * reach a destination, regardless of the route taken.
+         */
+        ArrayList<Probe> probes = new ArrayList<>();
+        probes.add(probe);
 
-		/*
-		 * Create copies of the incoming probe to describe the other routes.
-		 */
-		for (int i = 1; i < routes.size(); i ++) {
-			probes.add(probe.newInstance());
-		}
+        /*
+         * Create copies of the incoming probe to describe the other routes.
+         */
+        for (int i = 1; i < routes.size(); i++) {
+            probes.add(probe.newInstance());
+        }
 
-		/*
-		 * Set the position of the probes.
-		 */
-		for (int i = 0; i < routes.size(); i ++) {
-			//noinspection unchecked
-			Route<IfaceLink> route = routes.get(i);
-			probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
-		}
+        /*
+         * Set the position of the probes.
+         */
+        for (int i = 0; i < routes.size(); i++) {
+            //noinspection unchecked
+            Route<IfaceLink> route = routes.get(i);
+            probes.get(i).setOutgoingLink(route.getLink(), route.getNextHop());
+        }
 
-		/*
-		 * Filter out the probes
-		 */
-		for (Probe p: probes) {
-			packetFilter(p.getOutgoingLink(), Direction.OUT, p);
-		}
+        /*
+         * Filter out the probes
+         */
+        for (Probe p : probes) {
+            packetFilter(p.getOutgoingLink(), Direction.OUT, p);
+        }
 
-		/*
-		 * Send the probes over the network.
-		 */
-		for (Probe p: probes) {
-			/*
-			 * Do not send the probe if the outgoing link is the same as the input.
-			 */
-			if (!p.getOutgoingLink().equals(link))
-				outgoing(p.getOutgoingLink(), p, p.getNextHop());
-			else
-				probe.killLoop("same incoming and outgoing link");
-		}
-	}
+        /*
+         * Send the probes over the network.
+         */
+        for (Probe p : probes) {
+            /*
+             * Do not send the probe if the outgoing link is the same as the input.
+             */
+            if (!p.getOutgoingLink().equals(link))
+                outgoing(p.getOutgoingLink(), p, p.getNextHop());
+            else
+                probe.killLoop("same incoming and outgoing link");
+        }
+    }
 
-	protected MatchResult ipSpecFilter(CpFwIpSpec ipSpec, IPRangeable range) {
+    protected MatchResult ipSpecFilter(CpFwIpSpec ipSpec, IPRangeable range) {
 
-		MatchResult mres = ipSpec.getNetworks().matches(range);
-		if (ipSpec.isNotIn())
-			mres = mres.not();
-		return mres;
-	}
+        MatchResult mres = ipSpec.getNetworks().matches(range);
+        if (ipSpec.isNotIn())
+            mres = mres.not();
+        return mres;
+    }
 
-	protected MatchResult servicesSpecFilter(CpFwFilter filter,
-			CpFwServicesSpec servicesSpec,
-			ProbeRequest request) {
+    protected MatchResult servicesSpecFilter(CpFwFilter filter,
+                                             CpFwServicesSpec servicesSpec,
+                                             ProbeRequest request) {
 
-		CpServicesMatch smatch = servicesSpec.getServices().matches(request);
-		MatchResult mres = smatch.getMatchResult();
-		if (servicesSpec.isNotIn())
-			mres = mres.not();
-		if (smatch.isInspected())
-			filter.setServiceInspected(true);
-		return mres;
-	}
+        CpServicesMatch smatch = servicesSpec.getServices().matches(request);
+        MatchResult mres = smatch.getMatchResult();
+        if (servicesSpec.isNotIn())
+            mres = mres.not();
+        if (smatch.isInspected())
+            filter.setServiceInspected(true);
+        return mres;
+    }
 
-	protected MatchResult ruleFilter(CpFwFilter filter, Probe probe, CpFwRule rule) {
+    protected MatchResult ruleFilter(CpFwFilter filter, Probe probe, CpFwRule rule) {
 
-		ProbeRequest request = probe.getRequest();
+        ProbeRequest request = probe.getRequest();
 
-		/*
-		 * applied on this gateway?
-		 */
-		List<String> gateways = rule.getInstallGateway();
-		if (gateways != null && !gateways.contains(_gatewayName) && ! gateways.contains("Policy Targets"))
-		    return MatchResult.NOT;
+        /*
+         * applied on this gateway?
+         */
+        List<String> gateways = rule.getInstallGateway();
+        if (gateways != null && !gateways.contains(_gatewayName) && !gateways.contains("Policy Targets"))
+            return MatchResult.NOT;
 
-		/*
-		 * disabled
-		 */
-		if (rule.isDisabled())
-			return MatchResult.NOT;
+        /*
+         * disabled
+         */
+        if (rule.isDisabled())
+            return MatchResult.NOT;
 
         /*
          * implicit drop rule
@@ -1511,40 +1518,40 @@ public class CpFw extends GenericEquipment {
             return MatchResult.ALL;
 
         /*
-		 * check source IP
-		 */
-		CpFwIpSpec ipspec = rule.getSourceIp();
-		MatchResult mIpSource = ipSpecFilter(ipspec, probe.getSourceAddress());
-		if (mIpSource == MatchResult.NOT)
-			return MatchResult.NOT;
+         * check source IP
+         */
+        CpFwIpSpec ipspec = rule.getSourceIp();
+        MatchResult mIpSource = ipSpecFilter(ipspec, probe.getSourceAddress());
+        if (mIpSource == MatchResult.NOT)
+            return MatchResult.NOT;
 
-		/*
-		 * check destination IP
-		 */
-		ipspec = rule.getDestIp();
-		MatchResult mIpDest =ipSpecFilter(ipspec, probe.getDestinationAddress());
-		if (mIpDest == MatchResult.NOT)
-			return MatchResult.NOT;
+        /*
+         * check destination IP
+         */
+        ipspec = rule.getDestIp();
+        MatchResult mIpDest = ipSpecFilter(ipspec, probe.getDestinationAddress());
+        if (mIpDest == MatchResult.NOT)
+            return MatchResult.NOT;
 
-		/*
-		 * check services
-		 */
-		MatchResult mService;
-		if (request.getProtocols() != null) {
-			CpFwServicesSpec services = rule.getServices();
-			mService = servicesSpecFilter(filter, services, request);
-			if (mService == MatchResult.NOT)
-				return MatchResult.NOT;
-		} else {
-			mService = MatchResult.ALL;
-		}
+        /*
+         * check services
+         */
+        MatchResult mService;
+        if (request.getProtocols() != null) {
+            CpFwServicesSpec services = rule.getServices();
+            mService = servicesSpecFilter(filter, services, request);
+            if (mService == MatchResult.NOT)
+                return MatchResult.NOT;
+        } else {
+            mService = MatchResult.ALL;
+        }
 
-		if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
-				mService == MatchResult.ALL)
-			return MatchResult.ALL;
+        if (mIpSource == MatchResult.ALL && mIpDest == MatchResult.ALL &&
+                mService == MatchResult.ALL)
+            return MatchResult.ALL;
 
-		return MatchResult.MATCH;
-	}
+        return MatchResult.MATCH;
+    }
 
     /**
      * per layer filter
@@ -1627,24 +1634,24 @@ public class CpFw extends GenericEquipment {
         }
     }
 
-	/**
-	 * Packet filter
-	 */
-	protected void packetFilter (IfaceLink link, Direction direction, Probe probe) {
+    /**
+     * Packet filter
+     */
+    protected void packetFilter(IfaceLink link, Direction direction, Probe probe) {
 
-	    CpLayer layer = _rootLayer;
-	    FwResult r = new FwResult();
-	    layerFilter(link, direction, probe, layer, r);
-	}
+        CpLayer layer = _rootLayer;
+        FwResult r = new FwResult();
+        layerFilter(link, direction, probe, layer, r);
+    }
 
 
-	@Override
-	public void runShell(String command, PrintStream output) {
-		_shell.shellCommand(command, output);
-	}
+    @Override
+    public void runShell(String command, PrintStream output) {
+        _shell.shellCommand(command, output);
+    }
 
-	public HashMap<String, CpObject> getCpObjets() {
-	    return _cpObjects;
+    public HashMap<String, CpObject> getCpObjets() {
+        return _cpObjects;
     }
 
     public HashMap<String, CpFwRuleBaseAction> getCpActions() {
@@ -1652,44 +1659,46 @@ public class CpFw extends GenericEquipment {
     }
 
     public HashMap<String, CpLayer> getCpLayers() {
-	    return _cpLayers;
+        return _cpLayers;
     }
 
     public HashMap<String, CpService> getCpServices() {
-		return _cpServices;
-	}
+        return _cpServices;
+    }
 
-	public HashMap<String, CpNetworkObject> getCpNetwork() {
-		return _cpNetworks;
-	}
+    public HashMap<String, CpNetworkObject> getCpNetwork() {
+        return _cpNetworks;
+    }
 
-	public LinkedList<CpFwRule> getFwRules() {
-		return _fwRules;
-	}
+    public LinkedList<CpFwRule> getFwRules() {
+        return _fwRules;
+    }
 
-	/**
-	 * Sorted list of services name
-	 * @return a sorted list of services name.
-	 */
-	public List<String> getServicesName() {
+    /**
+     * Sorted list of services name
+     *
+     * @return a sorted list of services name.
+     */
+    public List<String> getServicesName() {
 
-		List<String> list = new LinkedList<>();
-		list.addAll(_cpServices.keySet());
-		Collections.sort(list);
-		return list;
-	}
+        List<String> list = new LinkedList<>();
+        list.addAll(_cpServices.keySet());
+        Collections.sort(list);
+        return list;
+    }
 
-	/**
-	 * Sorted list of networks name
-	 * @return a sorted list of networks name.
-	 */
-	public List<String> getNetworksName() {
+    /**
+     * Sorted list of networks name
+     *
+     * @return a sorted list of networks name.
+     */
+    public List<String> getNetworksName() {
 
-		List<String> list = new LinkedList<>();
-		list.addAll(_cpNetworks.keySet());
-		Collections.sort(list);
-		return list;
-	}
+        List<String> list = new LinkedList<>();
+        list.addAll(_cpNetworks.keySet());
+        Collections.sort(list);
+        return list;
+    }
 
 
 }

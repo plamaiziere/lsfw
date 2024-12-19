@@ -17,37 +17,38 @@ import java.util.Map;
 
 /**
  * A basic and simple File Alteration Monitor.
+ *
  * @author patrick.lamaiziere@univ-rennes1.fr
  */
 public class FilesMonitor {
 
-	protected Map<String, Long> _filesMap = new HashMap<>();
+    protected Map<String, Long> _filesMap = new HashMap<>();
 
-	public void addFile(String filename) {
-		File file = new File(filename);
-		Long date = file.lastModified();
-		Long df = _filesMap. get(filename);
-		if (df != null)
-			_filesMap.remove(filename);
-		_filesMap.put(filename, date);
-	}
+    public void addFile(String filename) {
+        File file = new File(filename);
+        Long date = file.lastModified();
+        Long df = _filesMap.get(filename);
+        if (df != null)
+            _filesMap.remove(filename);
+        _filesMap.put(filename, date);
+    }
 
-	public List<String> checkFiles() {
-		ArrayList<String> files = new ArrayList<>();
+    public List<String> checkFiles() {
+        ArrayList<String> files = new ArrayList<>();
 
-		for (String filename: _filesMap.keySet()) {
-			Long date = _filesMap.get(filename);
-			File file = new File(filename);
-			long df = file.lastModified();
-			if (date != df)
-				files.add(filename);
-		}
+        for (String filename : _filesMap.keySet()) {
+            Long date = _filesMap.get(filename);
+            File file = new File(filename);
+            long df = file.lastModified();
+            if (date != df)
+                files.add(filename);
+        }
 
-		return files;
-	}
-	
-	public Map<String, Long> getFiles() {
-		return _filesMap;
-	}
+        return files;
+    }
+
+    public Map<String, Long> getFiles() {
+        return _filesMap;
+    }
 
 }

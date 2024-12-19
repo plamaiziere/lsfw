@@ -17,26 +17,27 @@ import java.util.List;
 
 /**
  * Fortigate service left unhandled by lsfw
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class FgUnhandledService extends FgAddressService {
 
-	public FgUnhandledService(String name, String originKey, String comment, List<IPRangeable> ipRanges, String fqdn) {
-		super(name, originKey, comment, ipRanges, fqdn, FgServiceType.UNHANDLED);
-	}
+    public FgUnhandledService(String name, String originKey, String comment, List<IPRangeable> ipRanges, String fqdn) {
+        super(name, originKey, comment, ipRanges, fqdn, FgServiceType.UNHANDLED);
+    }
 
-	@Override
-	public FgServicesMatch matches(Probe probe) {
-    	FgServicesMatch servicesMatch = new FgServicesMatch();
-    	MatchResult mres = matchAddress(probe.getDestinationAddress());
-	    if (mres == MatchResult.NOT) {
-	        servicesMatch.setMatchResult(MatchResult.NOT);
-	        return servicesMatch;
+    @Override
+    public FgServicesMatch matches(Probe probe) {
+        FgServicesMatch servicesMatch = new FgServicesMatch();
+        MatchResult mres = matchAddress(probe.getDestinationAddress());
+        if (mres == MatchResult.NOT) {
+            servicesMatch.setMatchResult(MatchResult.NOT);
+            return servicesMatch;
         }
 
-	    servicesMatch.setMatchResult(MatchResult.UNKNOWN);
-		servicesMatch.add(new FgServiceMatch(this, MatchResult.UNKNOWN));
-		return servicesMatch;
-	}
+        servicesMatch.setMatchResult(MatchResult.UNKNOWN);
+        servicesMatch.add(new FgServiceMatch(this, MatchResult.UNKNOWN));
+        return servicesMatch;
+    }
 
 }

@@ -15,46 +15,46 @@ import java.util.List;
 /**
  * Template to build redirection spec options. This class is used at parsing
  * time as an intermediate storage.
- * 
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class RedirSpecTemplate {
-	/*
-	 * redirection
-	 */
-	private String _portstar;
-	private List<Xhost> _hosts = new ArrayList<>();
+    /*
+     * redirection
+     */
+    private String _portstar;
+    private List<Xhost> _hosts = new ArrayList<>();
 
-	/*
-	 * pool options
-	 */
-	private PoolOptsTemplate _poolOpts;
+    /*
+     * pool options
+     */
+    private PoolOptsTemplate _poolOpts;
 
-	public List<Xhost> getHosts() {
-		return _hosts;
-	}
+    public List<Xhost> getHosts() {
+        return _hosts;
+    }
 
-	public boolean addHost(List<Xhost> host) {
-		_hosts.addAll(host);
-		return true;
-	}
+    public boolean addHost(List<Xhost> host) {
+        _hosts.addAll(host);
+        return true;
+    }
 
-	public PoolOptsTemplate getPoolOpts() {
-		return _poolOpts;
-	}
+    public PoolOptsTemplate getPoolOpts() {
+        return _poolOpts;
+    }
 
-	public boolean setPoolOpts(PoolOptsTemplate poolOpts) {
-		_poolOpts = poolOpts;
-		return true;
-	}
+    public boolean setPoolOpts(PoolOptsTemplate poolOpts) {
+        _poolOpts = poolOpts;
+        return true;
+    }
 
-	public String getPortstar() {
-		return _portstar;
-	}
+    public String getPortstar() {
+        return _portstar;
+    }
 
-	public boolean setPortstar(String portstar) {
-		_portstar = portstar;
-		return true;
-	}
+    public boolean setPortstar(String portstar) {
+        _portstar = portstar;
+        return true;
+    }
 
 }

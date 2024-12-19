@@ -11,44 +11,46 @@ package fr.univrennes1.cri.jtacl.core.probing;
 
 /**
  * The result of a match.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum MatchResult {
-	/**
-	 * Match totally.
-	 */
-	ALL,
-	/**
-	 * Don't match at all.
-	 */
-	NOT,
-	/**
-	 * Match partially.
-	 */
-	MATCH,
-	/**
-	 * Unknown result.
-	 */
-	UNKNOWN;
-	
-	/**
-	 * Negates this result.
-	 * @return the negated result of this enum instance.
-	 */
-	public MatchResult not() {
-		
-		switch (this) {
-			case ALL:
-				return MatchResult.NOT;
-			case NOT:
-				return MatchResult.ALL;
-			case MATCH:
-				return MatchResult.MATCH;
-			case UNKNOWN:
-				return MatchResult.UNKNOWN;
-			default:
-				return MatchResult.UNKNOWN;
-		}
-	}
+    /**
+     * Match totally.
+     */
+    ALL,
+    /**
+     * Don't match at all.
+     */
+    NOT,
+    /**
+     * Match partially.
+     */
+    MATCH,
+    /**
+     * Unknown result.
+     */
+    UNKNOWN;
+
+    /**
+     * Negates this result.
+     *
+     * @return the negated result of this enum instance.
+     */
+    public MatchResult not() {
+
+        switch (this) {
+            case ALL:
+                return MatchResult.NOT;
+            case NOT:
+                return MatchResult.ALL;
+            case MATCH:
+                return MatchResult.MATCH;
+            case UNKNOWN:
+                return MatchResult.UNKNOWN;
+            default:
+                return MatchResult.UNKNOWN;
+        }
+    }
 
 }

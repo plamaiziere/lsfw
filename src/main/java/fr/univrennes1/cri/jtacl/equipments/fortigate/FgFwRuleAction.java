@@ -11,9 +11,10 @@ package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 /**
  * Fortigate rule action (accept/drop...)
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum FgFwRuleAction {
-	ACCEPT,
-	DROP
+    ACCEPT,
+    DROP
 }

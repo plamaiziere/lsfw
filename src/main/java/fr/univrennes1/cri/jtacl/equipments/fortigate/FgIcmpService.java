@@ -19,7 +19,12 @@ import java.util.List;
 public class FgIcmpService extends FgAddressService {
     private IPIcmpEnt _icmp;
     private AddressFamily _af;
-    public boolean hasIcmp() { return _icmp != null; };
+
+    public boolean hasIcmp() {
+        return _icmp != null;
+    }
+
+    ;
 
     public FgIcmpService(String name, String originKey, String comment
             , List<IPRangeable> ipRanges
@@ -38,34 +43,34 @@ public class FgIcmpService extends FgAddressService {
     @Override
     public FgServicesMatch matches(Probe probe) {
         ProbeRequest request = probe.getRequest();
-		ProtocolsSpec reqProto = request.getProtocols();
-		FgServicesMatch servicesMatch = new FgServicesMatch();
+        ProtocolsSpec reqProto = request.getProtocols();
+        FgServicesMatch servicesMatch = new FgServicesMatch();
 
-		/*
-		 * address family
-		 */
-		if (_af == AddressFamily.INET && !reqProto.contains(Protocols.ICMP)) {
-			servicesMatch.setMatchResult(MatchResult.NOT);
-			return servicesMatch;
-		}
+        /*
+         * address family
+         */
+        if (_af == AddressFamily.INET && !reqProto.contains(Protocols.ICMP)) {
+            servicesMatch.setMatchResult(MatchResult.NOT);
+            return servicesMatch;
+        }
 
-		if (_af == AddressFamily.INET6 && !reqProto.contains(Protocols.ICMP6)) {
-			servicesMatch.setMatchResult(MatchResult.NOT);
-			return servicesMatch;
-		}
+        if (_af == AddressFamily.INET6 && !reqProto.contains(Protocols.ICMP6)) {
+            servicesMatch.setMatchResult(MatchResult.NOT);
+            return servicesMatch;
+        }
 
-		/* icmp and address */
-		MatchResult mres = matchIcmp(request);
-		if (mres == MatchResult.ALL) {
+        /* icmp and address */
+        MatchResult mres = matchIcmp(request);
+        if (mres == MatchResult.ALL) {
             mres = matchAddress(probe.getDestinationAddress());
         }
-		if (mres == MatchResult.NOT) {
-		    servicesMatch.setMatchResult(MatchResult.NOT);
-		    return servicesMatch;
+        if (mres == MatchResult.NOT) {
+            servicesMatch.setMatchResult(MatchResult.NOT);
+            return servicesMatch;
         }
-		servicesMatch.setMatchResult(mres);
-		servicesMatch.add(new FgServiceMatch(this, mres));
-		return servicesMatch;
+        servicesMatch.setMatchResult(mres);
+        servicesMatch.add(new FgServiceMatch(this, mres));
+        return servicesMatch;
     }
 
     protected MatchResult matchIcmp(ProbeRequest request) {
@@ -75,29 +80,29 @@ public class FgIcmpService extends FgAddressService {
          */
         if (!hasIcmp()) return MatchResult.ALL;
 
-		/*
-		 * icmp type and code
-		 */
-		Integer icmpType = request.getSubType();
-		if (icmpType == null) {
-		    return MatchResult.ALL;
-		}
+        /*
+         * icmp type and code
+         */
+        Integer icmpType = request.getSubType();
+        if (icmpType == null) {
+            return MatchResult.ALL;
+        }
 
-		if (icmpType != _icmp.getIcmp()) {
-			return MatchResult.NOT;
-		}
+        if (icmpType != _icmp.getIcmp()) {
+            return MatchResult.NOT;
+        }
 
-		Integer icmpCode = request.getCode();
-		if (icmpCode == null) {
-			return MatchResult.ALL;
-		}
+        Integer icmpCode = request.getCode();
+        if (icmpCode == null) {
+            return MatchResult.ALL;
+        }
 
-		if (icmpCode == _icmp.getCode()) {
-		    return MatchResult.ALL;
-		}
+        if (icmpCode == _icmp.getCode()) {
+            return MatchResult.ALL;
+        }
 
-		return MatchResult.NOT;
-	}
+        return MatchResult.NOT;
+    }
 
     @Override
     public String toString() {

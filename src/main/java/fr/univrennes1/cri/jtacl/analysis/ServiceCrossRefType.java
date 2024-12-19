@@ -11,21 +11,22 @@ package fr.univrennes1.cri.jtacl.analysis;
 
 /**
  * services cross reference type
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum ServiceCrossRefType {
-	/**
-	 * other use
-	 */
-	OTHER,
+    /**
+     * other use
+     */
+    OTHER,
 
-	/**
-	 * source
-	 */
-	FROM,
+    /**
+     * source
+     */
+    FROM,
 
-	/**
-	 * destination
-	 */
-	TO
+    /**
+     * destination
+     */
+    TO
 }

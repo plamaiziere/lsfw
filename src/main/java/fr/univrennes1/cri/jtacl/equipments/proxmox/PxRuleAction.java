@@ -10,10 +10,11 @@ package fr.univrennes1.cri.jtacl.equipments.proxmox;
 
 /**
  * Rule action (accept/drop...)
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum PxRuleAction {
-	ACCEPT,
-	DROP
+    ACCEPT,
+    DROP
 }
 

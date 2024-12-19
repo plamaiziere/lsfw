@@ -11,37 +11,38 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
 
 /**
  * PIX name
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PixName {
 
-	protected  String _name;
-	protected String _ipValue;
-	protected int _refCount;
+    protected String _name;
+    protected String _ipValue;
+    protected int _refCount;
 
-	public PixName(String name, String ipValue) {
-		_name = name;
-		_ipValue = ipValue;
-	}
+    public PixName(String name, String ipValue) {
+        _name = name;
+        _ipValue = ipValue;
+    }
 
-	public String getName() {
-		return _name;
-	}
+    public String getName() {
+        return _name;
+    }
 
-	public String getIpValue() {
-		return _ipValue;
-	}
+    public String getIpValue() {
+        return _ipValue;
+    }
 
-	public int getRefCount() {
-		return _refCount;
-	}
+    public int getRefCount() {
+        return _refCount;
+    }
 
-	public void incRefCount() {
-		_refCount++;
-	}
+    public void incRefCount() {
+        _refCount++;
+    }
 
-	public boolean isUsed() {
-		return _refCount > 0;
-	}
+    public boolean isUsed() {
+        return _refCount > 0;
+    }
 
 }

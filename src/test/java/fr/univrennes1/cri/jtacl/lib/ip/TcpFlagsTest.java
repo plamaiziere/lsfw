@@ -13,10 +13,11 @@ import junit.framework.TestCase;
 
 /**
  * Tests for TcpFlags
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class TcpFlagsTest extends TestCase {
-    
+
     public TcpFlagsTest(String testName) {
         super(testName);
     }
@@ -31,74 +32,74 @@ public class TcpFlagsTest extends TestCase {
         super.tearDown();
     }
 
-	/**
-	 * Test of flags.
-	 */
-	public void testFlags() {
-		System.out.println("flags");
-		TcpFlags flags = new TcpFlags();
-		flags.setFlags(-1);
-		assertEquals(-1, flags.getFlags());
-		flags.clearAll();
-		assertEquals(0, flags.getFlags());
-	}
+    /**
+     * Test of flags.
+     */
+    public void testFlags() {
+        System.out.println("flags");
+        TcpFlags flags = new TcpFlags();
+        flags.setFlags(-1);
+        assertEquals(-1, flags.getFlags());
+        flags.clearAll();
+        assertEquals(0, flags.getFlags());
+    }
 
-	/**
-	 * Test of URG
-	 */
-	public void testURG() {
-		System.out.println("Test URG");
-		TcpFlags flags = new TcpFlags();
-		assertEquals(false, flags.hasURG());
-		flags.setURG();
-		assertEquals(true, flags.hasURG());
-		flags.clearURG();
-		assertEquals(false, flags.hasURG());
-	}
+    /**
+     * Test of URG
+     */
+    public void testURG() {
+        System.out.println("Test URG");
+        TcpFlags flags = new TcpFlags();
+        assertEquals(false, flags.hasURG());
+        flags.setURG();
+        assertEquals(true, flags.hasURG());
+        flags.clearURG();
+        assertEquals(false, flags.hasURG());
+    }
 
-	/**
-	 * Test of String op
-	 */
-	public void testString() {
-		System.out.println("Test String");
-		TcpFlags flags = new TcpFlags("");
-		assertEquals(0, flags.getFlags());
-		assertEquals("", flags.toString());
+    /**
+     * Test of String op
+     */
+    public void testString() {
+        System.out.println("Test String");
+        TcpFlags flags = new TcpFlags("");
+        assertEquals(0, flags.getFlags());
+        assertEquals("", flags.toString());
 
-		flags = new TcpFlags("WEUAPRSF");
-		assertEquals("WEUAPRSF", flags.toString());
-	}
+        flags = new TcpFlags("WEUAPRSF");
+        assertEquals("WEUAPRSF", flags.toString());
+    }
 
-	/**
-	 * Test testFlagsAll()
-	 */
-	public void testFlagsAll() {
-		System.out.println("Test flags all");
-		TcpFlags flags = new TcpFlags("ASRU");
+    /**
+     * Test testFlagsAll()
+     */
+    public void testFlagsAll() {
+        System.out.println("Test flags all");
+        TcpFlags flags = new TcpFlags("ASRU");
 
-		assertEquals(true, flags.testFlagsAll(""));
-		assertEquals(true, flags.testFlagsAll("AS"));
-		assertEquals(true, flags.testFlagsAll("ASw"));
-		assertEquals(false, flags.testFlagsAll("PU"));
+        assertEquals(true, flags.testFlagsAll(""));
+        assertEquals(true, flags.testFlagsAll("AS"));
+        assertEquals(true, flags.testFlagsAll("ASw"));
+        assertEquals(false, flags.testFlagsAll("PU"));
 
-		TcpFlags tflags = new TcpFlags("AU");
-		assertEquals(true, flags.testFlagsAll(tflags));
-	}
+        TcpFlags tflags = new TcpFlags("AU");
+        assertEquals(true, flags.testFlagsAll(tflags));
+    }
 
-	/**
-	 * Test testFlagsAny()
-	 */
-	public void testFlagsAny() {
-		System.out.println("Test flags any");
-		TcpFlags flags = new TcpFlags("ASRU");
+    /**
+     * Test testFlagsAny()
+     */
+    public void testFlagsAny() {
+        System.out.println("Test flags any");
+        TcpFlags flags = new TcpFlags("ASRU");
 
-		assertEquals(true, flags.testFlagsAny("ASRUP"));
-		assertEquals(true, flags.testFlagsAny("ASwRUP"));
-		assertEquals(false, flags.testFlagsAny("P"));
+        assertEquals(true, flags.testFlagsAny("ASRUP"));
+        assertEquals(true, flags.testFlagsAny("ASwRUP"));
+        assertEquals(false, flags.testFlagsAny("P"));
 
-		TcpFlags tflags = new TcpFlags("A");
-		assertEquals(true, flags.testFlagsAny(tflags));
-	}
+        TcpFlags tflags = new TcpFlags("A");
+        assertEquals(true, flags.testFlagsAny(tflags));
+    }
 
 
 }

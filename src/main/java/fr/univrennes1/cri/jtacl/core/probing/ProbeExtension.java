@@ -11,8 +11,9 @@ package fr.univrennes1.cri.jtacl.core.probing;
 /**
  * Probe extension can be used by equipment to store some data into a probe.
  * (by instance tag).
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public interface ProbeExtension {
-	ProbeExtension newInstance();
+    ProbeExtension newInstance();
 }

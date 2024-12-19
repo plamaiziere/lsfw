@@ -11,12 +11,13 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
 
 /**
  * Checkpoint rule action (accept/drop...)
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum CpFwRuleAction {
-	AUTH,
-	ACCEPT,
-	DROP,
-	REJECT,
+    AUTH,
+    ACCEPT,
+    DROP,
+    REJECT,
     LAYER_CALL
 }

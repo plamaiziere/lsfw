@@ -27,59 +27,62 @@ import java.util.List;
  */
 public class PxHost extends PxEquipment {
 
-	@Override
-	public boolean isHost() { return true; }
+    @Override
+    public boolean isHost() {
+        return true;
+    }
 
-	NetworkEquipmentsByName _guests = new NetworkEquipmentsByName();
+    NetworkEquipmentsByName _guests = new NetworkEquipmentsByName();
 
-	/**
-	 * Create a new {@link PxHost} with this name and this comment.<br/>
-	 * @param monitor the {@link Monitor} monitor associated with this equipment.
-	 * @param name the name of the equipment.
-	 * @param comment a free comment for this equipment.
-	 * @param configurationFileName name of the configuration file to use (may be null).
-	 */
-	public PxHost(Monitor monitor, String name, String comment, String configurationFileName) {
-		super(monitor, name, comment, configurationFileName, null);
-	}
+    /**
+     * Create a new {@link PxHost} with this name and this comment.<br/>
+     *
+     * @param monitor               the {@link Monitor} monitor associated with this equipment.
+     * @param name                  the name of the equipment.
+     * @param comment               a free comment for this equipment.
+     * @param configurationFileName name of the configuration file to use (may be null).
+     */
+    public PxHost(Monitor monitor, String name, String comment, String configurationFileName) {
+        super(monitor, name, comment, configurationFileName, null);
+    }
 
-	@Override
-	public NetworkEquipmentsByName configure() {
-		if (_configurationFileName.isEmpty())
-			return null;
+    @Override
+    public NetworkEquipmentsByName configure() {
+        if (_configurationFileName.isEmpty())
+            return null;
 
-		/*
-		 * Read the XML configuration file
-		 */
-		famAdd(_configurationFileName);
-		Document doc = XMLUtils.getXMLDocument(_configurationFileName);
-		loadOptionsFromXML(doc);
-		loadFiltersFromXML(doc);
-		loadConfiguration(doc);
+        /*
+         * Read the XML configuration file
+         */
+        famAdd(_configurationFileName);
+        Document doc = XMLUtils.getXMLDocument(_configurationFileName);
+        loadOptionsFromXML(doc);
+        loadFiltersFromXML(doc);
+        loadConfiguration(doc);
         if (_monitor.getOptions().getXref()) {
-        	crossReference();
-		}
+            crossReference();
+        }
 
-		// default policy
-		PxRule policyIn = PxRule.ofImplicitRule(null, PxRuleDirection.IN, _options.getPolicyIn());
-		PxRule policyOut = PxRule.ofImplicitRule(null, PxRuleDirection.OUT, _options.getPolicyOut());
-		_rules.add(policyIn);
-		_rules.add(policyOut);
+        // default policy
+        PxRule policyIn = PxRule.ofImplicitRule(null, PxRuleDirection.IN, _options.getPolicyIn());
+        PxRule policyOut = PxRule.ofImplicitRule(null, PxRuleDirection.OUT, _options.getPolicyOut());
+        _rules.add(policyIn);
+        _rules.add(policyOut);
 
-		loadGuests(doc);
-		return _guests;
-	}
+        loadGuests(doc);
+        return _guests;
+    }
 
-	protected void loadConfiguration(Document doc) {
+    protected void loadConfiguration(Document doc) {
 
-         /* policy */
-		NodeList list = doc.getElementsByTagName("policy");
-		if (list.getLength() != 1) {
-			throwCfgException("One policy must be specified", false);
-		}
+        /* policy */
+        NodeList list = doc.getElementsByTagName("policy");
+        if (list.getLength() != 1) {
+            throwCfgException("One policy must be specified", false);
+        }
 
-		List<String> filenames = new ArrayList<>();
-		for (int i = 0; i < list.getLength(); i++) {
+        List<String> filenames = new ArrayList<>();
+        for (int i = 0; i < list.getLength(); i++) {
             Element e = (Element) list.item(i);
             String filename = e.getAttribute("filename");
             if (!filename.isEmpty()) {
@@ -93,18 +96,18 @@ public class PxHost extends PxEquipment {
 
         famAdd(filenames.get(0));
         parsePolicy(filenames.get(0));
-	}
+    }
 
-	protected void loadGuests(Document doc) {
+    protected void loadGuests(Document doc) {
 
-         /* guests */
-		NodeList list = doc.getElementsByTagName("guests");
-		if (list.getLength() < 1) {
-			throwCfgException("At least one guests must be specified", false);
-		}
+        /* guests */
+        NodeList list = doc.getElementsByTagName("guests");
+        if (list.getLength() < 1) {
+            throwCfgException("At least one guests must be specified", false);
+        }
 
-		List<String> filenames = new ArrayList<>();
-		for (int i = 0; i < list.getLength(); i++) {
+        List<String> filenames = new ArrayList<>();
+        for (int i = 0; i < list.getLength(); i++) {
             Element e = (Element) list.item(i);
             String filename = e.getAttribute("directory");
             if (!filename.isEmpty()) {
@@ -116,30 +119,30 @@ public class PxHost extends PxEquipment {
             throwCfgException("Missing guests directory file name", false);
         }
 
-        for( String f: filenames) {
-        	_guests.putAll(createGuestsEquipments(f));
-        	famAdd(f);
-		}
-	}
+        for (String f : filenames) {
+            _guests.putAll(createGuestsEquipments(f));
+            famAdd(f);
+        }
+    }
 
-	protected NetworkEquipmentsByName createGuestsEquipments(String directory) {
+    protected NetworkEquipmentsByName createGuestsEquipments(String directory) {
 
-		NetworkEquipmentsByName equipments = new NetworkEquipmentsByName();
-		File dir = new File(directory);
-		File[] files = dir.listFiles();
-		if (files == null) {
-			throwCfgException("Cannot read directory " + directory, false);
-		}
-		for (File f: files) {
-				if (!f.isFile() || !f.getAbsolutePath().endsWith(".xml"))
-					continue;
+        NetworkEquipmentsByName equipments = new NetworkEquipmentsByName();
+        File dir = new File(directory);
+        File[] files = dir.listFiles();
+        if (files == null) {
+            throwCfgException("Cannot read directory " + directory, false);
+        }
+        for (File f : files) {
+            if (!f.isFile() || !f.getAbsolutePath().endsWith(".xml"))
+                continue;
 
-				String name = f.getName().split(".xml")[0];
-				NetworkEquipment guest = new PxGuest(_monitor, getName()+ "." + name
-						, name, dir.getAbsolutePath(), f.getAbsolutePath(), this);
-				guest.configure();
-				equipments.put(guest);
-		}
-		return equipments;
-	}
+            String name = f.getName().split(".xml")[0];
+            NetworkEquipment guest = new PxGuest(_monitor, getName() + "." + name
+                    , name, dir.getAbsolutePath(), f.getAbsolutePath(), this);
+            guest.configure();
+            equipments.put(guest);
+        }
+        return equipments;
+    }
 }

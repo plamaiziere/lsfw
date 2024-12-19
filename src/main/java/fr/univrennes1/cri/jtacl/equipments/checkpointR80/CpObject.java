@@ -11,6 +11,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
 
 /**
  * Checkpoint base object
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpObject {
@@ -21,10 +22,11 @@ public class CpObject {
 
     /**
      * Contruct a new checkpoint object.
-     * @param name name
+     *
+     * @param name      name
      * @param className class name
-     * @param comment comment
-     * @param uid object's uid
+     * @param comment   comment
+     * @param uid       object's uid
      */
     public CpObject(String name, String className, String comment, String uid) {
         this._name = name;
@@ -45,5 +47,7 @@ public class CpObject {
         return _uid;
     }
 
-    public String getComment() { return _comment; }
+    public String getComment() {
+        return _comment;
+    }
 }

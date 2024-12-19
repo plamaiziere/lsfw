@@ -10,6 +10,7 @@
 package fr.univrennes1.cri.jtacl.lib.ip;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+
 import java.util.ArrayList;
 
 /**
@@ -19,33 +20,35 @@ import java.util.ArrayList;
  */
 public class ProtocolsSpec extends ArrayList<Integer> {
 
-	/**
-	 * Returns true if a given list of protocols matches this specification.
-	 * IP matches any protocol.
-	 * @param protocols protocols list to check.
-	 * @return  true if a given list of protocols matches this specification.
-	 */
-	public MatchResult matches(ProtocolsSpec protocols) {
+    /**
+     * Returns true if a given list of protocols matches this specification.
+     * IP matches any protocol.
+     *
+     * @param protocols protocols list to check.
+     * @return true if a given list of protocols matches this specification.
+     */
+    public MatchResult matches(ProtocolsSpec protocols) {
 
-		for (Integer proto: protocols) {
-			if (this.contains(proto))
-				return MatchResult.ALL;
-		}
-		return MatchResult.NOT;
-	}
+        for (Integer proto : protocols) {
+            if (this.contains(proto))
+                return MatchResult.ALL;
+        }
+        return MatchResult.NOT;
+    }
 
-	/**
-	 * Returns true if a given protocol matches this specification.
-	 * IP matches any protocol.
-	 * @param protocol protocol to check.
-	 * @return true if a given protocol matches this specification.
-	 */
-	public MatchResult matches(Integer protocol) {
+    /**
+     * Returns true if a given protocol matches this specification.
+     * IP matches any protocol.
+     *
+     * @param protocol protocol to check.
+     * @return true if a given protocol matches this specification.
+     */
+    public MatchResult matches(Integer protocol) {
 
-		if (this.contains(protocol))
-				return MatchResult.ALL;
+        if (this.contains(protocol))
+            return MatchResult.ALL;
 
-		return MatchResult.NOT;
-	}
+        return MatchResult.NOT;
+    }
 
 }

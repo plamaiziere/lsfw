@@ -16,69 +16,71 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
 /**
  * Checkpoint IP network object
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
 public class CpNetworkIP extends CpNetworkObject {
 
-	/* ip/network address */
-	protected IPRange _ipRange;
+    /* ip/network address */
+    protected IPRange _ipRange;
 
     /* ipv6/network address */
     protected IPRange _ipRange6;
 
-	protected boolean _allowBroadcast;
+    protected boolean _allowBroadcast;
 
-	/**
-	 * Construct a new checkpoint IP network object
-	 * @param name object name name
-	 * @param className checkpoint class name
-	 * @param comment comment
-	 * @param ip ipv4/network address
-     * @param ip6 ipv6/network address
-	 * @param allowBroadcast true if the broadcast address is allowed.
-	 */
-	public CpNetworkIP(String name,	String className, String comment, String uid, IPNet ip, IPNet ip6,
-			boolean allowBroadcast) {
+    /**
+     * Construct a new checkpoint IP network object
+     *
+     * @param name           object name name
+     * @param className      checkpoint class name
+     * @param comment        comment
+     * @param ip             ipv4/network address
+     * @param ip6            ipv6/network address
+     * @param allowBroadcast true if the broadcast address is allowed.
+     */
+    public CpNetworkIP(String name, String className, String comment, String uid, IPNet ip, IPNet ip6,
+                       boolean allowBroadcast) {
 
-		super(name, className, comment, uid, CpNetworkType.IP);
-		_allowBroadcast = allowBroadcast;
-		if (ip != null) {
-		    _ipRange = new IPRange(ip, _allowBroadcast);
-		}
-		if (ip6 != null) {
+        super(name, className, comment, uid, CpNetworkType.IP);
+        _allowBroadcast = allowBroadcast;
+        if (ip != null) {
+            _ipRange = new IPRange(ip, _allowBroadcast);
+        }
+        if (ip6 != null) {
             _ipRange6 = new IPRange(ip6, _allowBroadcast);
         }
-	}
+    }
 
-	public boolean broadcastAllowed() {
-		return _allowBroadcast;
-	}
+    public boolean broadcastAllowed() {
+        return _allowBroadcast;
+    }
 
-	@Override
-	public String toString() {
-		String s = _name + ", " + _className + ", " + _comment + ", " +  _type;
-		if (_ipRange != null) {
+    @Override
+    public String toString() {
+        String s = _name + ", " + _className + ", " + _comment + ", " + _type;
+        if (_ipRange != null) {
             s += ", range=" + _ipRange.toNetString("i::");
         }
-		if (_ipRange6 != null) {
-		    s+= ", range6=" + _ipRange6.toNetString("i::");
+        if (_ipRange6 != null) {
+            s += ", range6=" + _ipRange6.toNetString("i::");
         }
         s += ", allow_broadcast=" + _allowBroadcast;
-		return s;
-	}
+        return s;
+    }
 
-	public IPRange getIpRange() {
-		return _ipRange;
-	}
+    public IPRange getIpRange() {
+        return _ipRange;
+    }
 
     public IPRange getIpRange6() {
         return _ipRange6;
     }
 
     @Override
-	public MatchResult matches(IPRangeable ip) {
-	    if (ip.isIPv4()) {
+    public MatchResult matches(IPRangeable ip) {
+        if (ip.isIPv4()) {
             if (_ipRange == null)
                 return MatchResult.NOT;
             if (_ipRange.contains(ip))
@@ -95,5 +97,5 @@ public class CpNetworkIP extends CpNetworkObject {
                 return MatchResult.MATCH;
         }
         return MatchResult.NOT;
-	}
+    }
 }

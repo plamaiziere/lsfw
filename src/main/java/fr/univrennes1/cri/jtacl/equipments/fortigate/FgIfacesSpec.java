@@ -12,18 +12,27 @@ package fr.univrennes1.cri.jtacl.equipments.fortigate;
 import java.util.LinkedList;
 
 public class FgIfacesSpec extends LinkedList<String> {
-	protected boolean _negate = false;
-    public boolean isAny() { return contains("any"); }
+    protected boolean _negate = false;
 
-	public FgIfacesSpec() { super(); }
-	public FgIfacesSpec(boolean negate) {
-		super();
-		this._negate = negate;
-	}
-	public boolean hasNegate() { return _negate; }
+    public boolean isAny() {
+        return contains("any");
+    }
 
-	@Override
-	public String toString() {
-		return _negate ? "!" + super.toString() : super.toString();
-	}
+    public FgIfacesSpec() {
+        super();
+    }
+
+    public FgIfacesSpec(boolean negate) {
+        super();
+        this._negate = negate;
+    }
+
+    public boolean hasNegate() {
+        return _negate;
+    }
+
+    @Override
+    public String toString() {
+        return _negate ? "!" + super.toString() : super.toString();
+    }
 }

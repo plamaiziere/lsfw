@@ -13,60 +13,61 @@ import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
 
 /**
  * Context of a service cross reference
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ServiceCrossRefContext {
-	protected ProtocolsSpec _protoSpec;
-	protected ServiceCrossRefType _type;
-	protected String _contextString;
-	protected String _contextName;
-	protected String _comment;
-	protected String _filename;
-	protected int _linenumber;
+    protected ProtocolsSpec _protoSpec;
+    protected ServiceCrossRefType _type;
+    protected String _contextString;
+    protected String _contextName;
+    protected String _comment;
+    protected String _filename;
+    protected int _linenumber;
 
-	public ServiceCrossRefContext(ProtocolsSpec protoSpec,
-			ServiceCrossRefType type,
-			String contextString,
-			String contextName,
-			String comment,
-			String filename,
-			int linenumber) {
+    public ServiceCrossRefContext(ProtocolsSpec protoSpec,
+                                  ServiceCrossRefType type,
+                                  String contextString,
+                                  String contextName,
+                                  String comment,
+                                  String filename,
+                                  int linenumber) {
 
-		_protoSpec = protoSpec;
-		_type = type;
-		_contextString = contextString;
-		_contextName = contextName;
-		_comment = comment;
-		_filename = filename;
-		_linenumber = linenumber;
-	}
+        _protoSpec = protoSpec;
+        _type = type;
+        _contextString = contextString;
+        _contextName = contextName;
+        _comment = comment;
+        _filename = filename;
+        _linenumber = linenumber;
+    }
 
-	public ProtocolsSpec getProtoSpec() {
-		return _protoSpec;
-	}
+    public ProtocolsSpec getProtoSpec() {
+        return _protoSpec;
+    }
 
-	public ServiceCrossRefType getType() {
-		return _type;
-	}
+    public ServiceCrossRefType getType() {
+        return _type;
+    }
 
-	public String getComment() {
-		return _comment;
-	}
+    public String getComment() {
+        return _comment;
+    }
 
-	public String getContextName() {
-		return _contextName;
-	}
+    public String getContextName() {
+        return _contextName;
+    }
 
-	public String getContextString() {
-		return _contextString;
-	}
+    public String getContextString() {
+        return _contextString;
+    }
 
-	public String getFilename() {
-		return _filename;
-	}
+    public String getFilename() {
+        return _filename;
+    }
 
-	public int getLinenumber() {
-		return _linenumber;
-	}
+    public int getLinenumber() {
+        return _linenumber;
+    }
 
 }

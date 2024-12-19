@@ -20,37 +20,37 @@ import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
  */
 public class PfIface {
 
-	protected Iface _iface;
-	protected StringsList _groups = new StringsList();
-	protected IfaceLink _firstIpV4;
-	protected IfaceLink _firstIpV6;
+    protected Iface _iface;
+    protected StringsList _groups = new StringsList();
+    protected IfaceLink _firstIpV4;
+    protected IfaceLink _firstIpV6;
 
-	public PfIface(Iface iface) {
-		_iface = iface;
-	}
+    public PfIface(Iface iface) {
+        _iface = iface;
+    }
 
-	public StringsList getGroups() {
-		return _groups;
-	}
+    public StringsList getGroups() {
+        return _groups;
+    }
 
-	public Iface getIface() {
-		return _iface;
-	}
+    public Iface getIface() {
+        return _iface;
+    }
 
-	public IfaceLink getFirstIpV4() {
-		return _firstIpV4;
-	}
+    public IfaceLink getFirstIpV4() {
+        return _firstIpV4;
+    }
 
-	public void setFirstIpV4(IfaceLink firstIpV4) {
-		_firstIpV4 = firstIpV4;
-	}
+    public void setFirstIpV4(IfaceLink firstIpV4) {
+        _firstIpV4 = firstIpV4;
+    }
 
-	public IfaceLink getFirstIpV6() {
-		return _firstIpV6;
-	}
+    public IfaceLink getFirstIpV6() {
+        return _firstIpV6;
+    }
 
-	public void setFirstIpV6(IfaceLink firstIpV6) {
-		_firstIpV6 = firstIpV6;
-	}
+    public void setFirstIpV6(IfaceLink firstIpV6) {
+        _firstIpV6 = firstIpV6;
+    }
 
 }

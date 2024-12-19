@@ -13,7 +13,7 @@ public enum FgNetworkType {
     UNHANDLED,
     IPRANGE,
     GROUP,
-	EXTERNAL_RESOURCE,
-	IPPOOL,
-	FQDN
+    EXTERNAL_RESOURCE,
+    IPPOOL,
+    FQDN
 }

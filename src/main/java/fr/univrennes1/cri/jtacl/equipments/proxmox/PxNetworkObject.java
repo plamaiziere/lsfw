@@ -14,28 +14,33 @@ import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
 
 /**
  * Proxmox network object
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public abstract class PxNetworkObject extends PxObject {
 
-	protected String _name;
-	protected PxNetworkType _type;
+    protected String _name;
+    protected PxNetworkType _type;
 
-	public PxNetworkObject(String name, PxNetworkType type, ParseContext context) {
-		super(context);
-		_name = name;
-		_type = type;
-	}
+    public PxNetworkObject(String name, PxNetworkType type, ParseContext context) {
+        super(context);
+        _name = name;
+        _type = type;
+    }
 
-	public String getName() { return _name; }
-	public PxNetworkType getType() {
-		return _type;
-	}
+    public String getName() {
+        return _name;
+    }
 
-	/**
-	 * Returns the {@link MatchResult} of the given IP address.
-	 * @param ip IP address to test.
-	 * @return the MatchResult of the given IP address.
-	 */
-	public abstract MatchResult matches(IPRangeable ip);
+    public PxNetworkType getType() {
+        return _type;
+    }
+
+    /**
+     * Returns the {@link MatchResult} of the given IP address.
+     *
+     * @param ip IP address to test.
+     * @return the MatchResult of the given IP address.
+     */
+    public abstract MatchResult matches(IPRangeable ip);
 }

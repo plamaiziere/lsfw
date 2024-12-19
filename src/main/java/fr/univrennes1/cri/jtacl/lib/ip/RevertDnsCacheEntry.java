@@ -13,30 +13,31 @@ import java.net.InetAddress;
 
 /**
  * Hostname revert entry in the dns cache.
+ *
  * @author patrick.lamaiziere@univ-rennes1.fr
  */
 
 public class RevertDnsCacheEntry {
-	protected InetAddress _address;
-	protected String _hostname;
-	protected long _date;
+    protected InetAddress _address;
+    protected String _hostname;
+    protected long _date;
 
-	public RevertDnsCacheEntry(InetAddress address, String hostname, long date) {
-		_address = address;
-		_hostname = hostname;
-		_date = date;
-	}
+    public RevertDnsCacheEntry(InetAddress address, String hostname, long date) {
+        _address = address;
+        _hostname = hostname;
+        _date = date;
+    }
 
-	public long getDate() {
-		return _date;
-	}
+    public long getDate() {
+        return _date;
+    }
 
-	public String getHostname() {
-		return _hostname;
-	}
+    public String getHostname() {
+        return _hostname;
+    }
 
-	public InetAddress getAddress() {
-		return _address;
-	}
+    public InetAddress getAddress() {
+        return _address;
+    }
 
 }

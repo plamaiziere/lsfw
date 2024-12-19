@@ -14,121 +14,122 @@ import org.parboiled.Rule;
 
 /**
  * Fortigate sub shell parser
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class FgFwShellParser extends GenericEquipmentShellParser {
 
-	protected String _service;
-	protected String _network;
+    protected String _service;
+    protected String _network;
 
 
-	@Override
-	protected boolean clear() {
-		_service = null;
-		_network = null;
-		return super.clear();
-	}
+    @Override
+    protected boolean clear() {
+        _service = null;
+        _network = null;
+        return super.clear();
+    }
 
-	public String getService() {
-		return _service;
-	}
+    public String getService() {
+        return _service;
+    }
 
-	public boolean setService(String service) {
-		_service = service;
-		return true;
-	}
+    public boolean setService(String service) {
+        _service = service;
+        return true;
+    }
 
-	public String getNetwork() {
-		return _network;
-	}
+    public String getNetwork() {
+        return _network;
+    }
 
-	public boolean setNetwork(String network) {
-		_network = network;
-		return true;
-	}
+    public boolean setNetwork(String network) {
+        _network = network;
+        return true;
+    }
 
-	public Rule CommandLine() {
-		return
-			Sequence(
-				clear(),
-				FirstOf(
-					CommandHelp(),
-					CommandXrefIp(),
-					CommandXrefService(),
-					CommandShowService(),
-					CommandShowNetwork(),
-					CommandShowRules(),
-					CommandShowPolicyRoutes(),
-					CommandShowSnatRules()
-				)
-			);
-	}
+    public Rule CommandLine() {
+        return
+                Sequence(
+                        clear(),
+                        FirstOf(
+                                CommandHelp(),
+                                CommandXrefIp(),
+                                CommandXrefService(),
+                                CommandShowService(),
+                                CommandShowNetwork(),
+                                CommandShowRules(),
+                                CommandShowPolicyRoutes(),
+                                CommandShowSnatRules()
+                        )
+                );
+    }
 
-	public Rule CommandShowService() {
-		return
-			Sequence(
-				IgnoreCase("show"),
-				WhiteSpaces(),
-				IgnoreCase("service"),
-				FirstOf(
-					WhiteSpaces(),
-					EOI
-				),
-				UntilEOI(),
-				setService(match().trim()),
-				setCommand("show-service")
-		);
-	}
+    public Rule CommandShowService() {
+        return
+                Sequence(
+                        IgnoreCase("show"),
+                        WhiteSpaces(),
+                        IgnoreCase("service"),
+                        FirstOf(
+                                WhiteSpaces(),
+                                EOI
+                        ),
+                        UntilEOI(),
+                        setService(match().trim()),
+                        setCommand("show-service")
+                );
+    }
 
-	public Rule CommandShowNetwork() {
-		return
-			Sequence(
-				IgnoreCase("show"),
-				WhiteSpaces(),
-				IgnoreCase("network"),
-				FirstOf(
-					WhiteSpaces(),
-					EOI
-				),
-				UntilEOI(),
-				setNetwork(match().trim()),
-				setCommand("show-network")
-		);
-	}
+    public Rule CommandShowNetwork() {
+        return
+                Sequence(
+                        IgnoreCase("show"),
+                        WhiteSpaces(),
+                        IgnoreCase("network"),
+                        FirstOf(
+                                WhiteSpaces(),
+                                EOI
+                        ),
+                        UntilEOI(),
+                        setNetwork(match().trim()),
+                        setCommand("show-network")
+                );
+    }
 
-	public Rule CommandShowRules() {
-		return
-			Sequence(
-				IgnoreCase("show"),
-				WhiteSpaces(),
-				IgnoreCase("rules"),
-				SkipSpaces(),
-				EOI,
-				setCommand("show-rules")
-		);
-	}
+    public Rule CommandShowRules() {
+        return
+                Sequence(
+                        IgnoreCase("show"),
+                        WhiteSpaces(),
+                        IgnoreCase("rules"),
+                        SkipSpaces(),
+                        EOI,
+                        setCommand("show-rules")
+                );
+    }
 
-	public Rule CommandShowPolicyRoutes() {
-		return
-			Sequence(
-				IgnoreCase("show"),
-				WhiteSpaces(),
-				IgnoreCase("policy-routes"),
-				SkipSpaces(),
-				EOI,
-				setCommand("show-policy-routes")
-		);
-	}
+    public Rule CommandShowPolicyRoutes() {
+        return
+                Sequence(
+                        IgnoreCase("show"),
+                        WhiteSpaces(),
+                        IgnoreCase("policy-routes"),
+                        SkipSpaces(),
+                        EOI,
+                        setCommand("show-policy-routes")
+                );
+    }
 
-	public Rule CommandShowSnatRules() {
-		return
-			Sequence(
-				IgnoreCase("show"),
-				WhiteSpaces(),
-				IgnoreCase("snat-rules"),
-				SkipSpaces(),
-				EOI,
-				setCommand("show-snat-rules")
-		);
-	}
+    public Rule CommandShowSnatRules() {
+        return
+                Sequence(
+                        IgnoreCase("show"),
+                        WhiteSpaces(),
+                        IgnoreCase("snat-rules"),
+                        SkipSpaces(),
+                        EOI,
+                        setCommand("show-snat-rules")
+                );
+    }
 }

@@ -13,27 +13,29 @@ import java.util.ArrayList;
 
 /**
  * Interface List specification in rule
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
 public class PfIfListSpec extends ArrayList<PfIfSpec> {
 
-	/**
-	 * Checks that this Interface List Specification matches at least one time
-	 * the interface name in parameter
-	 * @param ifName Interface name to check.
-	 * @return true if this Interface List Specification matches at least one time
-	 * the interface name
-	 */
-	public boolean matches(String ifName) {
-	
-		for (PfIfSpec ifspec: this) {
-			if (!ifspec.isIfNot() && ifspec.getIfName().equals(ifName))
-				return true;
-			if (ifspec.isIfNot() && !ifspec.getIfName().equals(ifName))
-				return true;
-		}
-		return false;
-	}
+    /**
+     * Checks that this Interface List Specification matches at least one time
+     * the interface name in parameter
+     *
+     * @param ifName Interface name to check.
+     * @return true if this Interface List Specification matches at least one time
+     * the interface name
+     */
+    public boolean matches(String ifName) {
+
+        for (PfIfSpec ifspec : this) {
+            if (!ifspec.isIfNot() && ifspec.getIfName().equals(ifName))
+                return true;
+            if (ifspec.isIfNot() && !ifspec.getIfName().equals(ifName))
+                return true;
+        }
+        return false;
+    }
 
 }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 /**
  * A list of {@link NetworkLink} items.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class NetworkLinks extends ArrayList<NetworkLink> {

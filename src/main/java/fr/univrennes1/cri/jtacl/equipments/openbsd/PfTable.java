@@ -18,51 +18,55 @@ import fr.univrennes1.cri.jtacl.lib.misc.StringsList;
  */
 public class PfTable extends PfGenericRule {
 
-	/**
-	 * name of the table
-	 */
-	protected String _name;
+    /**
+     * name of the table
+     */
+    protected String _name;
 
-	/**
-	 * file names
-	 */
-	protected StringsList _fileNames = new StringsList();
+    /**
+     * file names
+     */
+    protected StringsList _fileNames = new StringsList();
 
-	/**
-	 * IP specification
-	 */
-	protected PfIpSpec _ipspec = new PfIpSpec();
+    /**
+     * IP specification
+     */
+    protected PfIpSpec _ipspec = new PfIpSpec();
 
-	/**
-	 * Returns the fileNames of this table.
-	 * @return the fileNames of this table.
-	 */
-	public StringsList getFileNames() {
-		return _fileNames;
-	}
+    /**
+     * Returns the fileNames of this table.
+     *
+     * @return the fileNames of this table.
+     */
+    public StringsList getFileNames() {
+        return _fileNames;
+    }
 
-	/**
-	 * Returns the Ip specification of this table.
-	 * @return the Ip specification of this table.
-	 */
-	public PfIpSpec getIpspec() {
-		return _ipspec;
-	}
+    /**
+     * Returns the Ip specification of this table.
+     *
+     * @return the Ip specification of this table.
+     */
+    public PfIpSpec getIpspec() {
+        return _ipspec;
+    }
 
-	/**
-	 * Returns the name of this table.
-	 * @return the name of this table.
-	 */
-	public String getName() {
-		return _name;
-	}
+    /**
+     * Returns the name of this table.
+     *
+     * @return the name of this table.
+     */
+    public String getName() {
+        return _name;
+    }
 
-	/**
-	 * Sets the name of this table.
-	 * @param name name to set.
-	 */
-	public void setName(String name) {
-		_name = name;
-	}
+    /**
+     * Sets the name of this table.
+     *
+     * @param name name to set.
+     */
+    public void setName(String name) {
+        _name = name;
+    }
 
 }

@@ -16,55 +16,57 @@ import java.util.List;
 
 /**
  * Checkpoint service object
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public abstract class CpService extends CpObject {
-	protected CpServiceType _type;
-	protected String _protocolTypeName;
+    protected CpServiceType _type;
+    protected String _protocolTypeName;
     /* included in "Any" service */
     protected boolean _inAny;
-	protected List<Object> _linkedTo = new LinkedList<>();
+    protected List<Object> _linkedTo = new LinkedList<>();
 
-	public CpService(String name, String className, String comment, String uid,
+    public CpService(String name, String className, String comment, String uid,
                      CpServiceType type, String protocolTypeName, boolean inAny) {
 
-		super(name, className, comment, uid);
-		_type = type;
-		_protocolTypeName = protocolTypeName;
-		_inAny = inAny;
-	}
+        super(name, className, comment, uid);
+        _type = type;
+        _protocolTypeName = protocolTypeName;
+        _inAny = inAny;
+    }
 
-	public List<Object> getLinkedTo() {
-		return _linkedTo;
-	}
+    public List<Object> getLinkedTo() {
+        return _linkedTo;
+    }
 
-	public void linkWith(Object obj) {
-		if (!_linkedTo.contains(obj)) {
-			_linkedTo.add(obj);
-		}
-	}
+    public void linkWith(Object obj) {
+        if (!_linkedTo.contains(obj)) {
+            _linkedTo.add(obj);
+        }
+    }
 
-	public CpServiceType getType() {
-		return _type;
-	}
+    public CpServiceType getType() {
+        return _type;
+    }
 
-	public String getProtocolTypeName() {
-		return _protocolTypeName;
-	}
+    public String getProtocolTypeName() {
+        return _protocolTypeName;
+    }
 
-	public boolean hasProtocolType() {
-		return _protocolTypeName != null;
-	}
+    public boolean hasProtocolType() {
+        return _protocolTypeName != null;
+    }
 
     public boolean isInAny() {
         return _inAny;
     }
 
-	/**
-	 * Returns the {@link CpServicesMatch} of the given {@link ProbeRequest}.
-	 * @param request request to test.
-	 * @return the CpServicesMatch of the given ProbeRequest.
-	 */
-	public abstract CpServicesMatch matches(ProbeRequest request);
+    /**
+     * Returns the {@link CpServicesMatch} of the given {@link ProbeRequest}.
+     *
+     * @param request request to test.
+     * @return the CpServicesMatch of the given ProbeRequest.
+     */
+    public abstract CpServicesMatch matches(ProbeRequest request);
 
 }

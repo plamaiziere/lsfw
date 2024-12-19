@@ -21,178 +21,188 @@ package fr.univrennes1.cri.jtacl.core.probing;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ProbeOptions {
-	protected int _flags = 0;
+    protected int _flags = 0;
 
-	public static final int NOACTION = 1;
-	public static final int QUICKDENY = 2;
-	public static final int STATE = 4;
+    public static final int NOACTION = 1;
+    public static final int QUICKDENY = 2;
+    public static final int STATE = 4;
 
-	protected static final int _msk = 0xFF;
+    protected static final int _msk = 0xFF;
 
-	/**
-	 * Constructs a new and empty instance.
-	 */
-	public ProbeOptions() {
-	}
+    /**
+     * Constructs a new and empty instance.
+     */
+    public ProbeOptions() {
+    }
 
-	/**
-	 * Constructs a new instance with the flags in argument.
-	 * @param flags flags to set.
-	 */
-	public ProbeOptions(int flags) {
-		_flags = flags;
-	}
+    /**
+     * Constructs a new instance with the flags in argument.
+     *
+     * @param flags flags to set.
+     */
+    public ProbeOptions(int flags) {
+        _flags = flags;
+    }
 
-	/**
-	 * Constructs a new instance with the flags in argument.
-	 * @param flags to set
-	 */
-	public ProbeOptions(ProbeOptions flags) {
-		_flags = flags.getFlags();
-	}
+    /**
+     * Constructs a new instance with the flags in argument.
+     *
+     * @param flags to set
+     */
+    public ProbeOptions(ProbeOptions flags) {
+        _flags = flags.getFlags();
+    }
 
-	/**
-	 * Clears all the flags.
-	 */
-	public void clearAll() {
-		_flags = 0;
-	}
+    /**
+     * Clears all the flags.
+     */
+    public void clearAll() {
+        _flags = 0;
+    }
 
-	/**
-	 * Returns the flags as an integer.
-	 * @return the flags as an integer.
-	 */
-	public int getFlags() {
-		return _flags;
-	}
+    /**
+     * Returns the flags as an integer.
+     *
+     * @return the flags as an integer.
+     */
+    public int getFlags() {
+        return _flags;
+    }
 
-	/**
-	 * Sets the flags from an integer.
-	 * @param flags flags to set.
-	 */
-	public void setFlags(int flags) {
-		_flags = flags;
-	}
+    /**
+     * Sets the flags from an integer.
+     *
+     * @param flags flags to set.
+     */
+    public void setFlags(int flags) {
+        _flags = flags;
+    }
 
-	/**
-	 * Returns true if the NOACTION flag is set.
-	 * @return true if the NOACTION flag is set.
-	 */
-	public boolean hasNoAction() {
-		return (_flags & NOACTION) != 0;
-	}
+    /**
+     * Returns true if the NOACTION flag is set.
+     *
+     * @return true if the NOACTION flag is set.
+     */
+    public boolean hasNoAction() {
+        return (_flags & NOACTION) != 0;
+    }
 
-	/**
-	 * Sets the NOACTION flag.
-	 */
-	public void setNoAction() {
-		_flags |= NOACTION;
-	}
+    /**
+     * Sets the NOACTION flag.
+     */
+    public void setNoAction() {
+        _flags |= NOACTION;
+    }
 
-	/**
-	 * Clears the NOACTION flag.
-	 */
-	public void clearNoAction() {
-		_flags = (~NOACTION & _flags) & _msk;
-	}
+    /**
+     * Clears the NOACTION flag.
+     */
+    public void clearNoAction() {
+        _flags = (~NOACTION & _flags) & _msk;
+    }
 
-	/**
-	 * Sets the NOACTION flag according to the value in argument.
-	 * @param flag value to set.
-	 */
-	public void setNoAction(boolean flag) {
-		if (flag)
-			setNoAction();
-		else
-			clearNoAction();
-	}
+    /**
+     * Sets the NOACTION flag according to the value in argument.
+     *
+     * @param flag value to set.
+     */
+    public void setNoAction(boolean flag) {
+        if (flag)
+            setNoAction();
+        else
+            clearNoAction();
+    }
 
-	/**
-	 * Returns true if the QUICKDENY flag is set.
-	 * @return true if the QUICKDENY flag is set.
-	 */
-	public boolean hasQuickDeny() {
-		return (_flags & QUICKDENY) != 0;
-	}
+    /**
+     * Returns true if the QUICKDENY flag is set.
+     *
+     * @return true if the QUICKDENY flag is set.
+     */
+    public boolean hasQuickDeny() {
+        return (_flags & QUICKDENY) != 0;
+    }
 
-	/**
-	 * Sets the QUICKDENY flag.
-	 */
-	public void setQuickDeny() {
-		_flags |= QUICKDENY;
-	}
+    /**
+     * Sets the QUICKDENY flag.
+     */
+    public void setQuickDeny() {
+        _flags |= QUICKDENY;
+    }
 
-	/**
-	 * Clears the QUICKDENY flag.
-	 */
-	public void clearQuickDeny() {
-		_flags = (~QUICKDENY & _flags) & _msk;
-	}
+    /**
+     * Clears the QUICKDENY flag.
+     */
+    public void clearQuickDeny() {
+        _flags = (~QUICKDENY & _flags) & _msk;
+    }
 
-	/**
-	 * Sets the QUICKDENY flag according to the value in argument.
-	 * @param flag value to set.
-	 */
-	public void setQuickDeny(boolean flag) {
-		if (flag)
-			setQuickDeny();
-		else
-			clearQuickDeny();
-	}
+    /**
+     * Sets the QUICKDENY flag according to the value in argument.
+     *
+     * @param flag value to set.
+     */
+    public void setQuickDeny(boolean flag) {
+        if (flag)
+            setQuickDeny();
+        else
+            clearQuickDeny();
+    }
 
-	/**
-	 * Returns true if the STATE flag is set.
-	 * @return true if the STATE flag is set.
-	 */
-	public boolean hasState() {
-		return (_flags & STATE) != 0;
-	}
+    /**
+     * Returns true if the STATE flag is set.
+     *
+     * @return true if the STATE flag is set.
+     */
+    public boolean hasState() {
+        return (_flags & STATE) != 0;
+    }
 
-	/**
-	 * Sets the STATE flag.
-	 */
-	public void setState() {
-		_flags |= STATE;
-	}
+    /**
+     * Sets the STATE flag.
+     */
+    public void setState() {
+        _flags |= STATE;
+    }
 
-	/**
-	 * Clears the STATE flag.
-	 */
-	public void clearState() {
-		_flags = (~STATE & _flags) & _msk;
-	}
+    /**
+     * Clears the STATE flag.
+     */
+    public void clearState() {
+        _flags = (~STATE & _flags) & _msk;
+    }
 
-	/**
-	 * Sets the STATE flag according to the value in argument.
-	 * @param flag value to set.
-	 */
-	public void setState(boolean flag) {
-		if (flag)
-			setState();
-		else
-			clearState();
-	}
+    /**
+     * Sets the STATE flag according to the value in argument.
+     *
+     * @param flag value to set.
+     */
+    public void setState(boolean flag) {
+        if (flag)
+            setState();
+        else
+            clearState();
+    }
 
-	@Override
-	public String toString() {
-		String r = "";
+    @Override
+    public String toString() {
+        String r = "";
 
-		if (hasNoAction())
-			r += "NOACTION";
+        if (hasNoAction())
+            r += "NOACTION";
 
-		if (hasQuickDeny()) {
-			if (!r.isEmpty())
-				r += ", ";
-			r += "QUICKDENY";
-		}
+        if (hasQuickDeny()) {
+            if (!r.isEmpty())
+                r += ", ";
+            r += "QUICKDENY";
+        }
 
-		if (hasState()) {
-			if (!r.isEmpty())
-				r += ", ";
-			r += "STATE";
-		}
-		return r;
-	}
+        if (hasState()) {
+            if (!r.isEmpty())
+                r += ", ";
+            r += "STATE";
+        }
+        return r;
+    }
 
 
 }

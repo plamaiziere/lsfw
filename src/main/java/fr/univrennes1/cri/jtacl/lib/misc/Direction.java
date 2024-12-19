@@ -11,20 +11,20 @@ package fr.univrennes1.cri.jtacl.lib.misc;
 
 /**
  * Direction (in, out, in-out).
- * 
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum Direction {
-	/**
-	 * incoming
-	 */
-	IN,
-	/**
-	 * outgoing
-	 */
-	OUT,
-	/**
-	 * incoming and outgoing
-	 */
-	INOUT
+    /**
+     * incoming
+     */
+    IN,
+    /**
+     * outgoing
+     */
+    OUT,
+    /**
+     * incoming and outgoing
+     */
+    INOUT
 }

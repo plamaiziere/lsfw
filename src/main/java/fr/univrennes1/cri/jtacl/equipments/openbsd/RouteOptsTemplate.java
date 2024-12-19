@@ -15,35 +15,36 @@ import java.util.List;
 /**
  * Template to build route options. This class is used at parsing time
  * as an intermediate storage.
- * @see PfRouteOpts
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @see PfRouteOpts
  */
 public class RouteOptsTemplate {
 
-	private int _rt;
-	private List<Xhost> _hosts = new ArrayList<>();
-	private PoolOptsTemplate _poolOpts;
+    private int _rt;
+    private List<Xhost> _hosts = new ArrayList<>();
+    private PoolOptsTemplate _poolOpts;
 
-	public List<Xhost> getHosts() {
-		return _hosts;
-	}
+    public List<Xhost> getHosts() {
+        return _hosts;
+    }
 
-	public PoolOptsTemplate getPoolOpts() {
-		return _poolOpts;
-	}
+    public PoolOptsTemplate getPoolOpts() {
+        return _poolOpts;
+    }
 
-	public boolean setPoolOpts(PoolOptsTemplate poolOpts) {
-		_poolOpts = poolOpts;
-		return true;
-	}
+    public boolean setPoolOpts(PoolOptsTemplate poolOpts) {
+        _poolOpts = poolOpts;
+        return true;
+    }
 
-	public int getRt() {
-		return _rt;
-	}
+    public int getRt() {
+        return _rt;
+    }
 
-	public boolean setRt(int rt) {
-		_rt = rt;
-		return true;
-	}
+    public boolean setRt(int rt) {
+        _rt = rt;
+        return true;
+    }
 
 }

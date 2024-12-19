@@ -18,12 +18,13 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.pix;
  */
 public interface GroupTypeSearchable {
 
-	/**
-	 * Retrieves the type of the groupId in argument.
-	 * @param groupId the groupId of the group.
-	 * @return the {@link ObjectGroupType} type of the group. Null if the group
-	 * is unknown.
-	 */
-	ObjectGroupType getGroupType(String groupId);
+    /**
+     * Retrieves the type of the groupId in argument.
+     *
+     * @param groupId the groupId of the group.
+     * @return the {@link ObjectGroupType} type of the group. Null if the group
+     * is unknown.
+     */
+    ObjectGroupType getGroupType(String groupId);
 
 }

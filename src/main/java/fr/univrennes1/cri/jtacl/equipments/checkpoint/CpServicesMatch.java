@@ -10,30 +10,32 @@
 package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
+
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Match results for Checkpoint services
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
 public class CpServicesMatch extends LinkedList<CpServiceMatch> {
-	protected MatchResult _matchResult;
+    protected MatchResult _matchResult;
 
-	public MatchResult getMatchResult() {
-		return _matchResult;
-	}
+    public MatchResult getMatchResult() {
+        return _matchResult;
+    }
 
-	public void setMatchResult(MatchResult matchResult) {
-		_matchResult = matchResult;
-	}
+    public void setMatchResult(MatchResult matchResult) {
+        _matchResult = matchResult;
+    }
 
-	public boolean isInspected() {
-		for (CpServiceMatch cps: this) {
-			if (cps.isInspected())
-				return true;
-		}
-		return false;
-	}
+    public boolean isInspected() {
+        for (CpServiceMatch cps : this) {
+            if (cps.isInspected())
+                return true;
+        }
+        return false;
+    }
 }

@@ -15,7 +15,7 @@ package fr.univrennes1.cri.jtacl.lib.ip;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum AddressFamily {
-	NONE,
-	INET,
-	INET6
+    NONE,
+    INET,
+    INET6
 }

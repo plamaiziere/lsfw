@@ -16,10 +16,10 @@ package fr.univrennes1.cri.jtacl.lib.ip;
  */
 public class IPIcmp4 extends IPIcmp {
 
-	protected static IPIcmp _instance = new IPIcmp4();
+    protected static IPIcmp _instance = new IPIcmp4();
 
-	public static IPIcmp getInstance() {
-		return _instance;
-	}
+    public static IPIcmp getInstance() {
+        return _instance;
+    }
 
 }

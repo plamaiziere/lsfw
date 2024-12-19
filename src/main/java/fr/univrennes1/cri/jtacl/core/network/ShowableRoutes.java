@@ -11,12 +11,14 @@ package fr.univrennes1.cri.jtacl.core.network;
 
 /**
  * Interface on the ShowRoutes() operation.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public interface ShowableRoutes {
-	/**
-	 * Returns a {@link String} representation of the routing tables.
-	 * @return a {@link String} representation of the routing tables.
-	 */
-	String showRoutes();
+    /**
+     * Returns a {@link String} representation of the routing tables.
+     *
+     * @return a {@link String} representation of the routing tables.
+     */
+    String showRoutes();
 }

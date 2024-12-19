@@ -14,25 +14,26 @@ import org.parboiled.Rule;
 
 /**
  * PacketFilter Jtacl sub shell parser
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PacketFilterShellParser extends GenericEquipmentShellParser {
 
-	@Override
-	protected boolean clear() {
-		return super.clear();
-	}
+    @Override
+    protected boolean clear() {
+        return super.clear();
+    }
 
-	public Rule CommandLine() {
-		return
-			Sequence(
-				clear(),
-				FirstOf(
-					CommandHelp(),
-					CommandXrefIp(),
-					CommandXrefService()
-				)
-			);
-	}
+    public Rule CommandLine() {
+        return
+                Sequence(
+                        clear(),
+                        FirstOf(
+                                CommandHelp(),
+                                CommandXrefIp(),
+                                CommandXrefService()
+                        )
+                );
+    }
 
 }

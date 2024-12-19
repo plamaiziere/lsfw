@@ -10,12 +10,13 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 /**
  * Route option type
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum PfRouteOptsType {
-	NONE,
-	PF_ROUTETO,
-	PF_DUPTO,
-	PF_REPLYTO,
-	PF_FASTROUTE
+    NONE,
+    PF_ROUTETO,
+    PF_DUPTO,
+    PF_REPLYTO,
+    PF_FASTROUTE
 }

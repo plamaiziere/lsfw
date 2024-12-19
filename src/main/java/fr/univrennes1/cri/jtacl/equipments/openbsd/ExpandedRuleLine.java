@@ -19,19 +19,19 @@ import java.util.List;
  */
 public class ExpandedRuleLine {
 
-	private StringBuilder _line;
-	private List <StringBuilder>  _expanded = new ArrayList<>();
+    private StringBuilder _line;
+    private List<StringBuilder> _expanded = new ArrayList<>();
 
-	public List<StringBuilder> getExpanded() {
-		return _expanded;
-	}
+    public List<StringBuilder> getExpanded() {
+        return _expanded;
+    }
 
-	public StringBuilder getLine() {
-		return _line;
-	}
+    public StringBuilder getLine() {
+        return _line;
+    }
 
-	public void setLine(StringBuilder line) {
-		_line = line;
-	}
+    public void setLine(StringBuilder line) {
+        _line = line;
+    }
 
 }

@@ -12,41 +12,41 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 /**
  * Template to build port specification.  This class is used at parsing
  * time as an intermediate storage.
- * @see CpPortItem
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @see CpPortItem
  */
 public class PortItemTemplate {
 
-	private String _operator;
-	private String _firstPort;
-	private String _lastPort;
+    private String _operator;
+    private String _firstPort;
+    private String _lastPort;
 
-	public String getFirstPort() {
-		return _firstPort;
-	}
+    public String getFirstPort() {
+        return _firstPort;
+    }
 
-	public boolean setFirstPort(String firstPort) {
-		_firstPort = firstPort;
-		return true;
-	}
+    public boolean setFirstPort(String firstPort) {
+        _firstPort = firstPort;
+        return true;
+    }
 
-	public String getLastPort() {
-		return _lastPort;
-	}
+    public String getLastPort() {
+        return _lastPort;
+    }
 
-	public boolean setLastPort(String lastPort) {
-		_lastPort = lastPort;
-		return true;
-	}
+    public boolean setLastPort(String lastPort) {
+        _lastPort = lastPort;
+        return true;
+    }
 
-	public String getOperator() {
-		return _operator;
-	}
+    public String getOperator() {
+        return _operator;
+    }
 
-	public boolean setOperator(String operator) {
-		_operator = operator;
-		return true;
-	}
+    public boolean setOperator(String operator) {
+        _operator = operator;
+        return true;
+    }
 
 }

@@ -14,57 +14,58 @@ import org.parboiled.Rule;
 
 /**
  * PIX Jtacl sub shell parser
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PixShellParser extends GenericEquipmentShellParser {
 
-	@Override
-	protected boolean clear() {
-		return super.clear();
-	}
+    @Override
+    protected boolean clear() {
+        return super.clear();
+    }
 
-	public Rule CommandLine() {
-		return
-			Sequence(
-				clear(),
-				FirstOf(
-					CommandHelp(),
-					CommandXrefIp(),
-					CommandXrefService(),
-					CommandShow()
-				)
-			);
-	}
+    public Rule CommandLine() {
+        return
+                Sequence(
+                        clear(),
+                        FirstOf(
+                                CommandHelp(),
+                                CommandXrefIp(),
+                                CommandXrefService(),
+                                CommandShow()
+                        )
+                );
+    }
 
-	/**
-	 * show (names | enhanced-service | icmp-group | network-group | protocol-group
-	 * | service-group) | (used | unused)
-	 */
-	Rule CommandShow() {
-		return Sequence(
-			IgnoreCase("show"),
-			WhiteSpaces(),
-			FirstOf(
-				IgnoreCase("name"),
-				IgnoreCase("enhanced-service"),
-				IgnoreCase("icmp-group"),
-				IgnoreCase("network-group"),
-				IgnoreCase("protocol-group"),
-				IgnoreCase("service-group")
-			),
-			setCommand("show-".concat(match().toLowerCase())),
-			Optional(
-				Sequence(
-					WhiteSpace(),
-					FirstOf(
-						IgnoreCase("used"),
-						IgnoreCase("unused")
-					),
-					getParam().add(match().toLowerCase())
-				)
-			),
-			EOI
-		);
-	}
+    /**
+     * show (names | enhanced-service | icmp-group | network-group | protocol-group
+     * | service-group) | (used | unused)
+     */
+    Rule CommandShow() {
+        return Sequence(
+                IgnoreCase("show"),
+                WhiteSpaces(),
+                FirstOf(
+                        IgnoreCase("name"),
+                        IgnoreCase("enhanced-service"),
+                        IgnoreCase("icmp-group"),
+                        IgnoreCase("network-group"),
+                        IgnoreCase("protocol-group"),
+                        IgnoreCase("service-group")
+                ),
+                setCommand("show-".concat(match().toLowerCase())),
+                Optional(
+                        Sequence(
+                                WhiteSpace(),
+                                FirstOf(
+                                        IgnoreCase("used"),
+                                        IgnoreCase("unused")
+                                ),
+                                getParam().add(match().toLowerCase())
+                        )
+                ),
+                EOI
+        );
+    }
 
 }

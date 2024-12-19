@@ -11,13 +11,14 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
 
 /**
  * Checkpoint network object type
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum CpNetworkType {
-	UNHANDLED,
-	IP,
-	IPS,
-	RANGE,
-	GROUP,
-	ANY
+    UNHANDLED,
+    IP,
+    IPS,
+    RANGE,
+    GROUP,
+    ANY
 }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 /**
  * An {@link ArrayList} of {@link Probe} items.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ProbesList extends ArrayList<Probe> {

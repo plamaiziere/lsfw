@@ -14,27 +14,33 @@ import java.io.PrintStream;
 
 /**
  * PrintStream a la /dev/null
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public final class DevNull {
-	/**
-	 * "/dev/null" out stream.
-	 */
+    /**
+     * "/dev/null" out stream.
+     */
     public final static PrintStream out
-			= new PrintStream(new OutputStream() {
-		@Override
-        public void close() {}
-		
-		@Override
-        public void flush() {}
-		
-		@Override
-        public void write(byte[] b) {}
-		
-		@Override
-        public void write(byte[] b, int off, int len) {}
-		
-		@Override
-        public void write(int b) {}
-    } );
+            = new PrintStream(new OutputStream() {
+        @Override
+        public void close() {
+        }
+
+        @Override
+        public void flush() {
+        }
+
+        @Override
+        public void write(byte[] b) {
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) {
+        }
+
+        @Override
+        public void write(int b) {
+        }
+    });
 }

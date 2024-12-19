@@ -17,42 +17,44 @@ import java.util.List;
 
 /**
  * Fortigate network object
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public abstract class FgNetworkObject extends FgObject {
-	protected FgNetworkType _type;
-	protected String _comment;
-	protected String _uid;
+    protected FgNetworkType _type;
+    protected String _comment;
+    protected String _uid;
 
-	protected List<Object> _linkedTo =
+    protected List<Object> _linkedTo =
             new LinkedList<>();
 
-	public FgNetworkObject(String name, String originKey, String comment, String uid, FgNetworkType type) {
+    public FgNetworkObject(String name, String originKey, String comment, String uid, FgNetworkType type) {
 
-	    super(name, originKey);
-	    this._comment = comment;
-	    this._uid = uid;
-		_type = type;
-	}
+        super(name, originKey);
+        this._comment = comment;
+        this._uid = uid;
+        _type = type;
+    }
 
-	public List<Object> getLinkedTo() {
-		return _linkedTo;
-	}
+    public List<Object> getLinkedTo() {
+        return _linkedTo;
+    }
 
-	public void linkWith(Object nobj) {
-		if (!_linkedTo.contains(nobj)) {
-			_linkedTo.add(nobj);
-		}
-	}
+    public void linkWith(Object nobj) {
+        if (!_linkedTo.contains(nobj)) {
+            _linkedTo.add(nobj);
+        }
+    }
 
-	public FgNetworkType getType() {
-		return _type;
-	}
+    public FgNetworkType getType() {
+        return _type;
+    }
 
-	/**
-	 * Returns the {@link MatchResult} of the given IP address.
-	 * @param ip IP address to test.
-	 * @return the MatchResult of the given IP address.
-	 */
-	public abstract MatchResult matches(IPRangeable ip);
+    /**
+     * Returns the {@link MatchResult} of the given IP address.
+     *
+     * @param ip IP address to test.
+     * @return the MatchResult of the given IP address.
+     */
+    public abstract MatchResult matches(IPRangeable ip);
 }

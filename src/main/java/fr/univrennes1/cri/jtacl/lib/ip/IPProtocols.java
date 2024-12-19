@@ -16,10 +16,10 @@ package fr.univrennes1.cri.jtacl.lib.ip;
  */
 public class IPProtocols extends Protocols {
 
-	protected static IPProtocols _instance = new IPProtocols();
+    protected static IPProtocols _instance = new IPProtocols();
 
-	public static IPProtocols getInstance() {
-		return _instance;
-	}
+    public static IPProtocols getInstance() {
+        return _instance;
+    }
 
 }

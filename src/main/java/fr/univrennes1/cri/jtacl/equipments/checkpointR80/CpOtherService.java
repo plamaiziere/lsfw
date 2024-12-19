@@ -19,80 +19,81 @@ import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
  */
 public class CpOtherService extends CpService {
 
-	/* port */
-	protected Integer _protocol;
+    /* port */
+    protected Integer _protocol;
 
-	/* expression */
-	protected String _exp;
+    /* expression */
+    protected String _exp;
 
-	/* included in "Any" service */
-	protected boolean _inAny;
+    /* included in "Any" service */
+    protected boolean _inAny;
 
-	/**
-	 * Construct a new checkpoint other service
-	 * @param name service name
-	 * @param comment comment
-     * @param uid Object's uid
-	 * @param protocol protocol
-	 * @param exp expression
-	 * @param inAny true if this service is included in any
-	 */
-	public CpOtherService(String name,
-			String comment,
-			String uid,
-			Integer protocol,
-			String exp,
-			String protocolTypeName,
-			boolean inAny) {
+    /**
+     * Construct a new checkpoint other service
+     *
+     * @param name     service name
+     * @param comment  comment
+     * @param uid      Object's uid
+     * @param protocol protocol
+     * @param exp      expression
+     * @param inAny    true if this service is included in any
+     */
+    public CpOtherService(String name,
+                          String comment,
+                          String uid,
+                          Integer protocol,
+                          String exp,
+                          String protocolTypeName,
+                          boolean inAny) {
 
-		super(name, "service-other", comment, uid, CpServiceType.OTHER,
-				protocolTypeName, inAny);
-		_protocol = protocol;
-		_exp = exp;
-	}
+        super(name, "service-other", comment, uid, CpServiceType.OTHER,
+                protocolTypeName, inAny);
+        _protocol = protocol;
+        _exp = exp;
+    }
 
-	public Integer getProtocol() {
-		return _protocol;
-	}
+    public Integer getProtocol() {
+        return _protocol;
+    }
 
-	public String getExp() {
-		return _exp;
-	}
+    public String getExp() {
+        return _exp;
+    }
 
-	@Override
-	public String toString() {
-		return _name + ", " + _className + ", " + _comment + ", " +  _type
-				+ ", protocol=" + _protocol + ", exp=" + _exp
-				+ ", protocolType= " + _protocolTypeName
-				+ ", inAny=" + _inAny;
-	}
+    @Override
+    public String toString() {
+        return _name + ", " + _className + ", " + _comment + ", " + _type
+                + ", protocol=" + _protocol + ", exp=" + _exp
+                + ", protocolType= " + _protocolTypeName
+                + ", inAny=" + _inAny;
+    }
 
-	@Override
-	public CpServicesMatch matches(ProbeRequest request) {
+    @Override
+    public CpServicesMatch matches(ProbeRequest request) {
 
-		ProtocolsSpec reqProto = request.getProtocols();
-		CpServicesMatch servicesMatch = new CpServicesMatch();
+        ProtocolsSpec reqProto = request.getProtocols();
+        CpServicesMatch servicesMatch = new CpServicesMatch();
 
-		/*
-		 * protocol
-		 */
-		if (!reqProto.contains(_protocol)) {
-			servicesMatch.setMatchResult(MatchResult.NOT);
-			return servicesMatch;
-		}
+        /*
+         * protocol
+         */
+        if (!reqProto.contains(_protocol)) {
+            servicesMatch.setMatchResult(MatchResult.NOT);
+            return servicesMatch;
+        }
 
-		/*
-		 * we don't handle the "exp" expression
-		 */
-		if (_exp == null) {
-			servicesMatch.setMatchResult(MatchResult.ALL);
-			servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
-			return servicesMatch;
-		}
+        /*
+         * we don't handle the "exp" expression
+         */
+        if (_exp == null) {
+            servicesMatch.setMatchResult(MatchResult.ALL);
+            servicesMatch.add(new CpServiceMatch(this, MatchResult.ALL));
+            return servicesMatch;
+        }
 
-		servicesMatch.setMatchResult(MatchResult.UNKNOWN);
-		servicesMatch.add(new CpServiceMatch(this, MatchResult.UNKNOWN));
-		return servicesMatch;
-	}
+        servicesMatch.setMatchResult(MatchResult.UNKNOWN);
+        servicesMatch.add(new CpServiceMatch(this, MatchResult.UNKNOWN));
+        return servicesMatch;
+    }
 
 }

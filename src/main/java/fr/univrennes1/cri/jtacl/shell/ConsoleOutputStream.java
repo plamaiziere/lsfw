@@ -18,64 +18,68 @@ import java.io.PrintStream;
 
 /**
  * OutputStream with 'tee'
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ConsoleOutputStream extends FilterOutputStream {
 
-	protected OutputStream _out;
-	protected OutputStream _teeStream;
+    protected OutputStream _out;
+    protected OutputStream _teeStream;
 
-	public ConsoleOutputStream(OutputStream out) {
-		super(out);
-		_out = out;
-	}
+    public ConsoleOutputStream(OutputStream out) {
+        super(out);
+        _out = out;
+    }
 
-	@Override
-	public void write(int b) throws IOException {
-		super.write(b);
-		if (hasTee())
-			_teeStream.write(b);
-	}
+    @Override
+    public void write(int b) throws IOException {
+        super.write(b);
+        if (hasTee())
+            _teeStream.write(b);
+    }
 
-	@Override
-	public void close() throws IOException {
-		super.close();
-		if (hasTee())
-			unTee();
-	}
+    @Override
+    public void close() throws IOException {
+        super.close();
+        if (hasTee())
+            unTee();
+    }
 
-	@Override
-	public void flush() throws IOException {
-		super.flush();
-		if (hasTee())
-			_teeStream.flush();
-	}
+    @Override
+    public void flush() throws IOException {
+        super.flush();
+        if (hasTee())
+            _teeStream.flush();
+    }
 
-	/**
-	 * 'Tee' the specified file named filename to this stream.
-	 * @param fileName of the file to tee
-	 * @param append true if data will be appended.
-	 * @throws FileNotFoundException if the file is not found
-	 */
-	public void tee(String fileName, boolean append) throws FileNotFoundException {
-		_teeStream = new PrintStream(new FileOutputStream(fileName, append));
-	}
+    /**
+     * 'Tee' the specified file named filename to this stream.
+     *
+     * @param fileName of the file to tee
+     * @param append   true if data will be appended.
+     * @throws FileNotFoundException if the file is not found
+     */
+    public void tee(String fileName, boolean append) throws FileNotFoundException {
+        _teeStream = new PrintStream(new FileOutputStream(fileName, append));
+    }
 
-	/**
-	 * 'Untee' this stream
-	 * @throws IOException if problem occur.
-	 */
-	public void unTee() throws IOException {
-		if (hasTee())
-			_teeStream.close();
-	}
+    /**
+     * 'Untee' this stream
+     *
+     * @throws IOException if problem occur.
+     */
+    public void unTee() throws IOException {
+        if (hasTee())
+            _teeStream.close();
+    }
 
-	/**
-	 * Returns true if there is a tee on this stream.
-	 * @return true if there is a tee on this stream.
-	 */
-	public boolean hasTee() {
-		return _teeStream != null;
-	}
+    /**
+     * Returns true if there is a tee on this stream.
+     *
+     * @return true if there is a tee on this stream.
+     */
+    public boolean hasTee() {
+        return _teeStream != null;
+    }
 
 }

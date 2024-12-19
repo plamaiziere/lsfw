@@ -19,434 +19,475 @@ import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
  */
 public class AccessList {
 
-	/**
-	 * the line of configuration corresponding to this acl (may be null)
-	 */
-	protected String _configurationLine;
+    /**
+     * the line of configuration corresponding to this acl (may be null)
+     */
+    protected String _configurationLine;
 
-	/**
-	 * parse context of this acl.
-	 */
-	protected ParseContext _parseContext;
+    /**
+     * parse context of this acl.
+     */
+    protected ParseContext _parseContext;
 
-	/**
-	 * access list id
-	 */
-	protected String _accessListId;
+    /**
+     * access list id
+     */
+    protected String _accessListId;
 
-	/**
-	 * true if this ACL is an implicit rule
-	 */
-	 protected boolean _implicit;
+    /**
+     * true if this ACL is an implicit rule
+     */
+    protected boolean _implicit;
 
-	/**
-	 * action (permit, deny)
-	 */
-	protected String _action;
+    /**
+     * action (permit, deny)
+     */
+    protected String _action;
 
-	/**
-	 * protocol
-	 */
-	protected Integer _protocol;
+    /**
+     * protocol
+     */
+    protected Integer _protocol;
 
-	/**
-	 * protocol object group
-	 */
-	protected ProtocolObjectGroup _protocolGroup;
+    /**
+     * protocol object group
+     */
+    protected ProtocolObjectGroup _protocolGroup;
 
-	/**
-	 * source IP address
-	 */
-	protected IPNet _sourceIp;
+    /**
+     * source IP address
+     */
+    protected IPNet _sourceIp;
 
-	/**
-	 * source network object group
-	 */
-	protected NetworkObjectGroup _sourceNetworkGroup;
+    /**
+     * source network object group
+     */
+    protected NetworkObjectGroup _sourceNetworkGroup;
 
-	/**
-	 * source port.
-	 */
-	protected PortObject _sourcePortObject;
+    /**
+     * source port.
+     */
+    protected PortObject _sourcePortObject;
 
-	/**
-	 * source service group.
-	 */
-	protected ServiceObjectGroup _sourceServiceGroup;
+    /**
+     * source service group.
+     */
+    protected ServiceObjectGroup _sourceServiceGroup;
 
-	/**
-	 * destination IP address
-	 */
-	protected IPNet _destIp;
+    /**
+     * destination IP address
+     */
+    protected IPNet _destIp;
 
-	/**
-	 * destination network group.
-	 */
-	protected NetworkObjectGroup _destNetworkGroup;
+    /**
+     * destination network group.
+     */
+    protected NetworkObjectGroup _destNetworkGroup;
 
-	/**
-	 * destination port
-	 */
-	protected PortObject _destPortObject;
+    /**
+     * destination port
+     */
+    protected PortObject _destPortObject;
 
-	/**
-	 * destination service group.
-	 */
-	protected ServiceObjectGroup _destServiceGroup;
+    /**
+     * destination service group.
+     */
+    protected ServiceObjectGroup _destServiceGroup;
 
-	/**
-	 * enhanced service group. Also defines the protocols of the acl.
-	 */
-	protected EnhancedServiceObjectGroup _enhancedDestServiceGroup;
+    /**
+     * enhanced service group. Also defines the protocols of the acl.
+     */
+    protected EnhancedServiceObjectGroup _enhancedDestServiceGroup;
 
-	/**
-	 * icmp-type
-	 */
-	protected Integer _icmp;
+    /**
+     * icmp-type
+     */
+    protected Integer _icmp;
 
-	/**
-	 * Icmp group (icmp only)
-	 */
-	protected IcmpObjectGroup _icmpGroup;
+    /**
+     * Icmp group (icmp only)
+     */
+    protected IcmpObjectGroup _icmpGroup;
 
-	/**
-	 * true if the acl is inactive
-	 */
-	protected boolean _inactive;
+    /**
+     * true if the acl is inactive
+     */
+    protected boolean _inactive;
 
-	/**
-	 * remark
-	 */
-	protected String _remark;
+    /**
+     * remark
+     */
+    protected String _remark;
 
-	/**
-	 * Constructs a new access list with the access-list id in argument.
-	 * @param accessListId access-list id of the acl.
-	 */
-	public AccessList(String accessListId) {
-		_accessListId = accessListId;
-	}
+    /**
+     * Constructs a new access list with the access-list id in argument.
+     *
+     * @param accessListId access-list id of the acl.
+     */
+    public AccessList(String accessListId) {
+        _accessListId = accessListId;
+    }
 
-	/**
-	 * Returns the access-list id of this acl.
-	 * @return the access-list id of this acl.
-	 */
-	public String getAccessListId() {
-		return _accessListId;
-	}
+    /**
+     * Returns the access-list id of this acl.
+     *
+     * @return the access-list id of this acl.
+     */
+    public String getAccessListId() {
+        return _accessListId;
+    }
 
-	/**
-	 * Returns true if this ACL is an implicit rule.
-	 * @return true if this ACL is an implicit rule.
-	 */
-	public boolean isImplicit() {
-		return _implicit;
-	}
+    /**
+     * Returns true if this ACL is an implicit rule.
+     *
+     * @return true if this ACL is an implicit rule.
+     */
+    public boolean isImplicit() {
+        return _implicit;
+    }
 
-	/**
-	 * Sets the implicit flag of this ACL.
-	 * @param implicit flag to set
-	 */
-	public void setImplicit(boolean implicit) {
-		_implicit = implicit;
-	}
+    /**
+     * Sets the implicit flag of this ACL.
+     *
+     * @param implicit flag to set
+     */
+    public void setImplicit(boolean implicit) {
+        _implicit = implicit;
+    }
 
-	/**
-	 * Returns the action of this acl.
-	 * @return the action of this acl.
-	 */
-	public String getAction() {
-		return _action;
-	}
+    /**
+     * Returns the action of this acl.
+     *
+     * @return the action of this acl.
+     */
+    public String getAction() {
+        return _action;
+    }
 
-	/**
-	 * Sets the action of this acl.
-	 * @param action the action to set.
-	 */
-	public void setAction(String action) {
-		_action = action;
-	}
+    /**
+     * Sets the action of this acl.
+     *
+     * @param action the action to set.
+     */
+    public void setAction(String action) {
+        _action = action;
+    }
 
-	/**
-	 * Returns the line of configuration corresponding to this acl.
-	 * @return the line of configuration corresponding to this acl.
-	 */
-	public String getConfigurationLine() {
-		return _configurationLine;
-	}
+    /**
+     * Returns the line of configuration corresponding to this acl.
+     *
+     * @return the line of configuration corresponding to this acl.
+     */
+    public String getConfigurationLine() {
+        return _configurationLine;
+    }
 
-	/**
-	 * Sets the line of configuration corresponding to this acl.
-	 * @param configurationLine line to set.
-	 */
-	public void setConfigurationLine(String configurationLine) {
-		_configurationLine = configurationLine;
-	}
+    /**
+     * Sets the line of configuration corresponding to this acl.
+     *
+     * @param configurationLine line to set.
+     */
+    public void setConfigurationLine(String configurationLine) {
+        _configurationLine = configurationLine;
+    }
 
-	/**
-	 * Returns the destination network-group of this acl.
-	 * @return the destination network-group of this acl.
-	 */
-	public NetworkObjectGroup getDestNetworkGroup() {
-		return _destNetworkGroup;
-	}
+    /**
+     * Returns the destination network-group of this acl.
+     *
+     * @return the destination network-group of this acl.
+     */
+    public NetworkObjectGroup getDestNetworkGroup() {
+        return _destNetworkGroup;
+    }
 
-	/**
-	 * Sets the destination network-group of this acl.
-	 * @param destNetworkGroup destination network-group to set.
-	 */
-	public void setDestNetworkGroup(NetworkObjectGroup destNetworkGroup) {
-		_destNetworkGroup = destNetworkGroup;
-	}
+    /**
+     * Sets the destination network-group of this acl.
+     *
+     * @param destNetworkGroup destination network-group to set.
+     */
+    public void setDestNetworkGroup(NetworkObjectGroup destNetworkGroup) {
+        _destNetworkGroup = destNetworkGroup;
+    }
 
-	/**
-	 * Returns the destination port object of this acl.
-	 * @return the destination port object of this acl.
-	 */
-	public PortObject getDestPortObject() {
-		return _destPortObject;
-	}
+    /**
+     * Returns the destination port object of this acl.
+     *
+     * @return the destination port object of this acl.
+     */
+    public PortObject getDestPortObject() {
+        return _destPortObject;
+    }
 
-	/**
-	 * Sets the destination port object of this acl.
-	 * @param destPortObject destination port object to set.
-	 */
-	public void setDestPortObject(PortObject destPortObject) {
-		_destPortObject = destPortObject;
-	}
+    /**
+     * Sets the destination port object of this acl.
+     *
+     * @param destPortObject destination port object to set.
+     */
+    public void setDestPortObject(PortObject destPortObject) {
+        _destPortObject = destPortObject;
+    }
 
-	/**
-	 * Returns the destination service-group of this acl.
-	 * @return the destination service-group of this acl.
-	 */
-	public ServiceObjectGroup getDestServiceGroup() {
-		return _destServiceGroup;
-	}
+    /**
+     * Returns the destination service-group of this acl.
+     *
+     * @return the destination service-group of this acl.
+     */
+    public ServiceObjectGroup getDestServiceGroup() {
+        return _destServiceGroup;
+    }
 
-	/**
-	 * Sets the destination service-group of this acl.
-	 * @param destServiceGroup destination service-group to set.
-	 */
-	public void setDestServiceGroup(ServiceObjectGroup destServiceGroup) {
-		_destServiceGroup = destServiceGroup;
-	}
+    /**
+     * Sets the destination service-group of this acl.
+     *
+     * @param destServiceGroup destination service-group to set.
+     */
+    public void setDestServiceGroup(ServiceObjectGroup destServiceGroup) {
+        _destServiceGroup = destServiceGroup;
+    }
 
-	/**
-	 * Returns the enhanced destination service-group of this acl.
-	 * @return the enhanced destination service-group of this acl.
-	 */
-	public EnhancedServiceObjectGroup getEnhancedDestServiceGroup() {
-		return _enhancedDestServiceGroup;
-	}
+    /**
+     * Returns the enhanced destination service-group of this acl.
+     *
+     * @return the enhanced destination service-group of this acl.
+     */
+    public EnhancedServiceObjectGroup getEnhancedDestServiceGroup() {
+        return _enhancedDestServiceGroup;
+    }
 
-	/**
-	 * Sets the enhanced destination service-group of this acl.
-	 * @param enhancedDestServiceGroup enhanced service-group to set.
-	 */
-	public void setEnhancedDestServiceGroup(
-			EnhancedServiceObjectGroup enhancedDestServiceGroup) {
+    /**
+     * Sets the enhanced destination service-group of this acl.
+     *
+     * @param enhancedDestServiceGroup enhanced service-group to set.
+     */
+    public void setEnhancedDestServiceGroup(
+            EnhancedServiceObjectGroup enhancedDestServiceGroup) {
 
-		_enhancedDestServiceGroup = enhancedDestServiceGroup;
-	}
+        _enhancedDestServiceGroup = enhancedDestServiceGroup;
+    }
 
-	/**
-	 * Returns the protocol of this acl.
-	 * @return the protocol of this acl.
-	 */
-	public Integer getProtocol() {
-		return _protocol;
-	}
+    /**
+     * Returns the protocol of this acl.
+     *
+     * @return the protocol of this acl.
+     */
+    public Integer getProtocol() {
+        return _protocol;
+    }
 
-	/**
-	 * Sets the protocol of this acl.
-	 * @param protocol protocol to set
-	 */
-	public void setProtocol(Integer protocol) {
-		_protocol = protocol;
-	}
+    /**
+     * Sets the protocol of this acl.
+     *
+     * @param protocol protocol to set
+     */
+    public void setProtocol(Integer protocol) {
+        _protocol = protocol;
+    }
 
-	/**
-	 * Returns the protocol-group of this acl.
-	 * @return the protocol-group of this acl.
-	 */
-	public ProtocolObjectGroup getProtocolGroup() {
-		return _protocolGroup;
-	}
+    /**
+     * Returns the protocol-group of this acl.
+     *
+     * @return the protocol-group of this acl.
+     */
+    public ProtocolObjectGroup getProtocolGroup() {
+        return _protocolGroup;
+    }
 
-	/**
-	 * Sets the protocol-group of this acl.
-	 * @param protocolGroup protocol-group to set.
-	 */
-	public void setProtocolGroup(ProtocolObjectGroup protocolGroup) {
-		_protocolGroup = protocolGroup;
-	}
+    /**
+     * Sets the protocol-group of this acl.
+     *
+     * @param protocolGroup protocol-group to set.
+     */
+    public void setProtocolGroup(ProtocolObjectGroup protocolGroup) {
+        _protocolGroup = protocolGroup;
+    }
 
-	/**
-	 * Returns the source network-group of this acl.
-	 * @return the source network-group of this acl.
-	 */
-	public NetworkObjectGroup getSourceNetworkGroup() {
-		return _sourceNetworkGroup;
-	}
+    /**
+     * Returns the source network-group of this acl.
+     *
+     * @return the source network-group of this acl.
+     */
+    public NetworkObjectGroup getSourceNetworkGroup() {
+        return _sourceNetworkGroup;
+    }
 
-	/**
-	 * Sets the source network-group of this acl.
-	 * @param sourceNetworkGroup source network-group to set.
-	 */
-	public void setSourceNetworkGroup(NetworkObjectGroup sourceNetworkGroup) {
-		_sourceNetworkGroup = sourceNetworkGroup;
-	}
+    /**
+     * Sets the source network-group of this acl.
+     *
+     * @param sourceNetworkGroup source network-group to set.
+     */
+    public void setSourceNetworkGroup(NetworkObjectGroup sourceNetworkGroup) {
+        _sourceNetworkGroup = sourceNetworkGroup;
+    }
 
-	/**
-	 * Returns the source port object of this acl.
-	 * @return the source port object of this acl.
-	 */
-	public PortObject getSourcePortObject() {
-		return _sourcePortObject;
-	}
+    /**
+     * Returns the source port object of this acl.
+     *
+     * @return the source port object of this acl.
+     */
+    public PortObject getSourcePortObject() {
+        return _sourcePortObject;
+    }
 
-	/**
-	 * Sets the source port port object of this acl.
-	 * @param sourcePortObject source port object to set.
-	 */
-	public void setSourcePortObject(PortObject sourcePortObject) {
-		_sourcePortObject = sourcePortObject;
-	}
+    /**
+     * Sets the source port port object of this acl.
+     *
+     * @param sourcePortObject source port object to set.
+     */
+    public void setSourcePortObject(PortObject sourcePortObject) {
+        _sourcePortObject = sourcePortObject;
+    }
 
-	/**
-	 * Returns the source service-group of this acl.
-	 * @return the source service-group of this acl.
-	 */
-	public ServiceObjectGroup getSourceServiceGroup() {
-		return _sourceServiceGroup;
-	}
+    /**
+     * Returns the source service-group of this acl.
+     *
+     * @return the source service-group of this acl.
+     */
+    public ServiceObjectGroup getSourceServiceGroup() {
+        return _sourceServiceGroup;
+    }
 
-	/**
-	 * Sets the source service-group of this acl.
-	 * @param sourceServiceGroup source service-group to set.
-	 */
-	public void setSourceServiceGroup(ServiceObjectGroup sourceServiceGroup) {
-		_sourceServiceGroup = sourceServiceGroup;
-	}
+    /**
+     * Sets the source service-group of this acl.
+     *
+     * @param sourceServiceGroup source service-group to set.
+     */
+    public void setSourceServiceGroup(ServiceObjectGroup sourceServiceGroup) {
+        _sourceServiceGroup = sourceServiceGroup;
+    }
 
-	/**
-	 * Returns the destination IP address of this acl.
-	 * @return the destination IP address of this acl.
-	 */
-	public IPNet getDestIp() {
-		return _destIp;
-	}
+    /**
+     * Returns the destination IP address of this acl.
+     *
+     * @return the destination IP address of this acl.
+     */
+    public IPNet getDestIp() {
+        return _destIp;
+    }
 
-	/**
-	 * Sets the destination IP address of this acl.
-	 * @param destIp destination IP adress to set.
-	 */
-	public void setDestIp(IPNet destIp) {
-		_destIp = destIp;
-	}
+    /**
+     * Sets the destination IP address of this acl.
+     *
+     * @param destIp destination IP adress to set.
+     */
+    public void setDestIp(IPNet destIp) {
+        _destIp = destIp;
+    }
 
-	/**
-	 * Checks if this acl is inactive.
-	 * @return true if this acl is inactive.
-	 */
-	public boolean isInactive() {
-		return _inactive;
-	}
+    /**
+     * Checks if this acl is inactive.
+     *
+     * @return true if this acl is inactive.
+     */
+    public boolean isInactive() {
+        return _inactive;
+    }
 
-	/**
-	 * Sets the inactive flag  of this acl.
-	 * @param inactive inactive flag to set.
-	 */
-	public void setInactive(boolean inactive) {
-		_inactive = inactive;
-	}
+    /**
+     * Sets the inactive flag  of this acl.
+     *
+     * @param inactive inactive flag to set.
+     */
+    public void setInactive(boolean inactive) {
+        _inactive = inactive;
+    }
 
-	/**
-	 * Returns the source IP address of this acl.
-	 * @return the source IP address of this acl.
-	 */
-	public IPNet getSourceIp() {
-		return _sourceIp;
-	}
+    /**
+     * Returns the source IP address of this acl.
+     *
+     * @return the source IP address of this acl.
+     */
+    public IPNet getSourceIp() {
+        return _sourceIp;
+    }
 
-	/**
-	 * Sets the source IP address of this acl.
-	 * @param sourceIp source IP adress to set.
-	 */
-	public void setSourceIp(IPNet sourceIp) {
-		_sourceIp = sourceIp;
-	}
+    /**
+     * Sets the source IP address of this acl.
+     *
+     * @param sourceIp source IP adress to set.
+     */
+    public void setSourceIp(IPNet sourceIp) {
+        _sourceIp = sourceIp;
+    }
 
-	/**
-	 * Returns the icmp-type of this acl.
-	 * @return the icmp-type of this acl.
-	 */
-	public Integer getIcmp() {
-		return _icmp;
-	}
+    /**
+     * Returns the icmp-type of this acl.
+     *
+     * @return the icmp-type of this acl.
+     */
+    public Integer getIcmp() {
+        return _icmp;
+    }
 
-	/**
-	 * Sets the icmp-type of this acl.
-	 * @param icmp the icmp-type to set.
-	 */
-	public void setIcmp(Integer icmp) {
-		_icmp = icmp;
-	}
+    /**
+     * Sets the icmp-type of this acl.
+     *
+     * @param icmp the icmp-type to set.
+     */
+    public void setIcmp(Integer icmp) {
+        _icmp = icmp;
+    }
 
-	/**
-	 * Returns the icmp-group of this acl.
-	 * @return the icmp-group of this acl.
-	 */
-	public IcmpObjectGroup getIcmpGroup() {
-		return _icmpGroup;
-	}
+    /**
+     * Returns the icmp-group of this acl.
+     *
+     * @return the icmp-group of this acl.
+     */
+    public IcmpObjectGroup getIcmpGroup() {
+        return _icmpGroup;
+    }
 
-	/**
-	 * Sets the icmp-group of this acl.
-	 * @param icmpGroup icmp-group to set.
-	 */
-	public void setIcmpGroup(IcmpObjectGroup icmpGroup) {
-		_icmpGroup = icmpGroup;
-	}
+    /**
+     * Sets the icmp-group of this acl.
+     *
+     * @param icmpGroup icmp-group to set.
+     */
+    public void setIcmpGroup(IcmpObjectGroup icmpGroup) {
+        _icmpGroup = icmpGroup;
+    }
 
-	/**
-	 * Get the remark of this acl.
-	 * @return the remark of this acl
-	 */
-	public String getRemark() {
-		return _remark;
-	}
+    /**
+     * Get the remark of this acl.
+     *
+     * @return the remark of this acl
+     */
+    public String getRemark() {
+        return _remark;
+    }
 
-	/**
-	 * Returns true if this acl is a remark
-	 * @return true if this acl is a remark
-	 */
-	public boolean isRemark() {
-		return _remark != null;
-	}
+    /**
+     * Returns true if this acl is a remark
+     *
+     * @return true if this acl is a remark
+     */
+    public boolean isRemark() {
+        return _remark != null;
+    }
 
-	/**
-	 * Sets the remark of this acl.
-	 * @param remark remark to set
-	 */
-	public void setRemark(String remark) {
-		_remark = remark;
-	}
+    /**
+     * Sets the remark of this acl.
+     *
+     * @param remark remark to set
+     */
+    public void setRemark(String remark) {
+        _remark = remark;
+    }
 
-	/**
-	 * Returns the parse context of this acl.
-	 * @return the parse context of this acl.
-	 */
-	public ParseContext getParseContext() {
-		return _parseContext;
-	}
+    /**
+     * Returns the parse context of this acl.
+     *
+     * @return the parse context of this acl.
+     */
+    public ParseContext getParseContext() {
+        return _parseContext;
+    }
 
-	/**
-	 * Sets the parse context of this acl.
-	 * @param parseContext parse context to set.
-	 */
-	public void setParseContext(ParseContext parseContext) {
-		_parseContext = parseContext;
-	}
+    /**
+     * Sets the parse context of this acl.
+     *
+     * @param parseContext parse context to set.
+     */
+    public void setParseContext(ParseContext parseContext) {
+        _parseContext = parseContext;
+    }
 
 }

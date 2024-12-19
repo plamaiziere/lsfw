@@ -11,14 +11,15 @@ package fr.univrennes1.cri.jtacl.lib.ip;
 
 /**
  * Services definitions and lookup (singleton).
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IPServices extends Services {
 
-	protected static IPServices _instance = new IPServices();
+    protected static IPServices _instance = new IPServices();
 
-	public static IPServices getInstance() {
-		return _instance;
-	}
+    public static IPServices getInstance() {
+        return _instance;
+    }
 
 }

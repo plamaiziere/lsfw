@@ -13,25 +13,26 @@ import java.util.ArrayList;
 
 /**
  * A {@link ArrayList} list of {@link ProbePosition} items.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ProbePositions extends ArrayList<ProbePosition> {
 
-	/**
-	 * Checks if the {@link ProbePositions} positions in argument contains all
-	 * items found in this instance, regardless of the order.
-	 *
-	 * @param positions {@link ProbePositions} positions to compare.
-	 * @return true if all items are contained by this instance.
-	 */
-	public boolean sameAs(ProbePositions positions) {
+    /**
+     * Checks if the {@link ProbePositions} positions in argument contains all
+     * items found in this instance, regardless of the order.
+     *
+     * @param positions {@link ProbePositions} positions to compare.
+     * @return true if all items are contained by this instance.
+     */
+    public boolean sameAs(ProbePositions positions) {
 
-		if (size() != positions.size())
-			return false;
-		for (ProbePosition p: this) {
-			if (!positions.contains(p))
-				return false;
-		}
-		return true;
-	}
+        if (size() != positions.size())
+            return false;
+        for (ProbePosition p : this) {
+            if (!positions.contains(p))
+                return false;
+        }
+        return true;
+    }
 }

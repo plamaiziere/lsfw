@@ -15,13 +15,13 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum PfAddrType {
-	PF_ADDR_ANY,	// not in PF, added for convenience
-	PF_ADDR_ADDRMASK,
-	PF_ADDR_NOROUTE,
-	PF_ADDR_DYNIFTL,
-	PF_ADDR_TABLE,
-	PF_ADDR_RTLABEL,
-	PF_ADDR_URPFFAILED,
-	PF_ADDR_RANGE,
-	PF_ADDR_NONE
+    PF_ADDR_ANY,    // not in PF, added for convenience
+    PF_ADDR_ADDRMASK,
+    PF_ADDR_NOROUTE,
+    PF_ADDR_DYNIFTL,
+    PF_ADDR_TABLE,
+    PF_ADDR_RTLABEL,
+    PF_ADDR_URPFFAILED,
+    PF_ADDR_RANGE,
+    PF_ADDR_NONE
 }

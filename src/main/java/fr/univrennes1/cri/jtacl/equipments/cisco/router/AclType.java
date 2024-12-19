@@ -11,7 +11,7 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.router;
 
 /**
  * The type of an acl (standard, extended, named...) <br/>
- *
+ * <p>
  * 1-99            IP standard access list <br/>
  * 100-199         IP extended access list <br/>
  * 1000-1099       IPX SAP access list <br/>
@@ -28,91 +28,92 @@ package fr.univrennes1.cri.jtacl.equipments.cisco.router;
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr
  */
-public enum  AclType {
-	/**
-	 * IP standard access list.
-	 */
-	IPSTD,
-	/**
-	 * IP extended access list.
-	 */
-	IPEXT,
-	/**
-	 * IPX SAP access list.
-	 */
-	IPXSAP,
-	/**
-	 * Extended 48-bit MAC address access list.
-	 */
-	MACEXT,
-	/**
-	 * IPX summary address access list.
-	 */
-	IPXSUM,
-	/**
-	 * Protocol type-code access list.
-	 */
-	PROTO,
-	/**
-	 * DECnet access list.
-	 */
-	DECNET,
-	/**
-	 * Appletalk access list.
-	 */
-	APPLETALK,
-	/**
-	 * 48-bit MAC address access list.
-	 */
-	MACSTD,
-	/**
-	 * IPX standard access list.
-	 */
-	IPXSTD,
-	/**
-	 * IPX extended access list.
-	 */
-	IPXEXT,
-	/**
-	 * Named access list.
-	 */
-	NAMED,
-	/**
-	 * Unknown type.
-	 */
-	UNKNOWN;
+public enum AclType {
+    /**
+     * IP standard access list.
+     */
+    IPSTD,
+    /**
+     * IP extended access list.
+     */
+    IPEXT,
+    /**
+     * IPX SAP access list.
+     */
+    IPXSAP,
+    /**
+     * Extended 48-bit MAC address access list.
+     */
+    MACEXT,
+    /**
+     * IPX summary address access list.
+     */
+    IPXSUM,
+    /**
+     * Protocol type-code access list.
+     */
+    PROTO,
+    /**
+     * DECnet access list.
+     */
+    DECNET,
+    /**
+     * Appletalk access list.
+     */
+    APPLETALK,
+    /**
+     * 48-bit MAC address access list.
+     */
+    MACSTD,
+    /**
+     * IPX standard access list.
+     */
+    IPXSTD,
+    /**
+     * IPX extended access list.
+     */
+    IPXEXT,
+    /**
+     * Named access list.
+     */
+    NAMED,
+    /**
+     * Unknown type.
+     */
+    UNKNOWN;
 
-	/**
-	 * Converts the number in argument to the corresponding access-list type
-	 * @param n number to get the access-list type.
-	 * @return the {@link AclType} type corresponding.
-	 */
-	public static AclType getType(int n) {
-		if ((n >= 1 && n <= 99) || (n >= 1300 && n <= 1999))
-			return IPSTD;
-		if ((n >= 100 && n <= 199) || (n >= 2000 && n <= 2699))
-			return IPEXT;
-		if (n >= 1000 && n <= 1099)
-			return IPXSAP;
-		if (n >= 1100 && n <= 1199)
-			return MACEXT;
-		if (n >= 1200 && n <= 1299)
-			return IPXSUM;
-		if (n >= 1300 && n <= 1399)
-			return IPXSUM;
-		if (n >= 200 && n <= 299)
-			return PROTO;
-		if (n >= 300 && n <= 399)
-			return DECNET;
-		if (n >= 600 && n <= 699)
-			return APPLETALK;
-		if (n >= 700 && n <= 799)
-			return MACSTD;
-		if (n >= 800 && n <= 899)
-			return IPXSTD;
-		if (n >= 900 && n <= 999)
-			return IPXEXT;
+    /**
+     * Converts the number in argument to the corresponding access-list type
+     *
+     * @param n number to get the access-list type.
+     * @return the {@link AclType} type corresponding.
+     */
+    public static AclType getType(int n) {
+        if ((n >= 1 && n <= 99) || (n >= 1300 && n <= 1999))
+            return IPSTD;
+        if ((n >= 100 && n <= 199) || (n >= 2000 && n <= 2699))
+            return IPEXT;
+        if (n >= 1000 && n <= 1099)
+            return IPXSAP;
+        if (n >= 1100 && n <= 1199)
+            return MACEXT;
+        if (n >= 1200 && n <= 1299)
+            return IPXSUM;
+        if (n >= 1300 && n <= 1399)
+            return IPXSUM;
+        if (n >= 200 && n <= 299)
+            return PROTO;
+        if (n >= 300 && n <= 399)
+            return DECNET;
+        if (n >= 600 && n <= 699)
+            return APPLETALK;
+        if (n >= 700 && n <= 799)
+            return MACSTD;
+        if (n >= 800 && n <= 899)
+            return IPXSTD;
+        if (n >= 900 && n <= 999)
+            return IPXEXT;
 
-		return UNKNOWN;
-	}
+        return UNKNOWN;
+    }
 }

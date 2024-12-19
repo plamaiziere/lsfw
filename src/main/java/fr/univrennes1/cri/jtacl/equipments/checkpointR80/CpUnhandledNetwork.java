@@ -14,29 +14,31 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
 
 /**
  * Checkpoint network object left unhandled by lsfw
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpUnhandledNetwork extends CpNetworkObject {
 
-	/**
-	 * Construct a new unhandled service
-	 * @param name service name
-	 * @param className class name
-	 * @param comment comment
-	 */
-	public CpUnhandledNetwork(String name, String className, String comment, String uid) {
+    /**
+     * Construct a new unhandled service
+     *
+     * @param name      service name
+     * @param className class name
+     * @param comment   comment
+     */
+    public CpUnhandledNetwork(String name, String className, String comment, String uid) {
 
-		super(name, className, comment, uid, CpNetworkType.UNHANDLED);
-	}
+        super(name, className, comment, uid, CpNetworkType.UNHANDLED);
+    }
 
-	@Override
-	public String toString() {
-		return _name + ", " + _className + ", " + _comment + ", " +  _type;
-	}
+    @Override
+    public String toString() {
+        return _name + ", " + _className + ", " + _comment + ", " + _type;
+    }
 
-	@Override
-	public MatchResult matches(IPRangeable ip) {
-		return MatchResult.UNKNOWN;
-	}
+    @Override
+    public MatchResult matches(IPRangeable ip) {
+        return MatchResult.UNKNOWN;
+    }
 
 }

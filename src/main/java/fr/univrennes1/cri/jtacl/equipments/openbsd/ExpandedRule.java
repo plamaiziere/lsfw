@@ -18,34 +18,34 @@ import java.util.ArrayList;
  */
 public class ExpandedRule extends ArrayList<ExpandedRuleLine> {
 
-	public String expandedToString() {
-		StringBuilder resSb = new StringBuilder();
-		for (ExpandedRuleLine exLine: this) {
-			for (StringBuilder sb: exLine.getExpanded()) {
-				resSb.append(sb);
-			}
-		}
-		return resSb.toString();
-	}
+    public String expandedToString() {
+        StringBuilder resSb = new StringBuilder();
+        for (ExpandedRuleLine exLine : this) {
+            for (StringBuilder sb : exLine.getExpanded()) {
+                resSb.append(sb);
+            }
+        }
+        return resSb.toString();
+    }
 
-	public String lineToString() {
-		StringBuilder resSb = new StringBuilder();
-		for (ExpandedRuleLine exLine: this) {
-				resSb.append(exLine.getLine());
-		}
-		return resSb.toString();
-	}
+    public String lineToString() {
+        StringBuilder resSb = new StringBuilder();
+        for (ExpandedRuleLine exLine : this) {
+            resSb.append(exLine.getLine());
+        }
+        return resSb.toString();
+    }
 
-	public int expandedCountToLineCount(int lineCount) {
-		int lc = 1;
+    public int expandedCountToLineCount(int lineCount) {
+        int lc = 1;
 
-		for (ExpandedRuleLine exLine: this) {
-			int exLc = exLine.getExpanded().size();
-			if ((lc + exLc) > lineCount)
-				return lc;
-			else
-				lc ++;
-		}
-		return -1;
-	}
+        for (ExpandedRuleLine exLine : this) {
+            int exLc = exLine.getExpanded().size();
+            if ((lc + exLc) > lineCount)
+                return lc;
+            else
+                lc++;
+        }
+        return -1;
+    }
 }

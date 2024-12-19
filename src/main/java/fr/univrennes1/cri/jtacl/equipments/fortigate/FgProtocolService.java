@@ -40,17 +40,17 @@ public class FgProtocolService extends FgAddressService {
             servicesMatch.add(new FgServiceMatch(this, MatchResult.ALL));
             return servicesMatch;
         }
-        MatchResult mres = proto.matches(_protocol) ;
+        MatchResult mres = proto.matches(_protocol);
         if (mres == MatchResult.ALL) {
             mres = matchAddress(probe.getDestinationAddress());
         }
-		if (mres == MatchResult.NOT) {
-		    servicesMatch.setMatchResult(MatchResult.NOT);
-		    return servicesMatch;
+        if (mres == MatchResult.NOT) {
+            servicesMatch.setMatchResult(MatchResult.NOT);
+            return servicesMatch;
         }
-		servicesMatch.setMatchResult(mres);
-		servicesMatch.add(new FgServiceMatch(this, mres));
-		return servicesMatch;
+        servicesMatch.setMatchResult(mres);
+        servicesMatch.add(new FgServiceMatch(this, mres));
+        return servicesMatch;
     }
 
     @Override

@@ -11,60 +11,63 @@ package fr.univrennes1.cri.jtacl.equipments.checkpoint;
 
 import fr.univrennes1.cri.jtacl.core.probing.MatchResult;
 import fr.univrennes1.cri.jtacl.lib.ip.IPRangeable;
+
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Checkpoint network object
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public abstract class CpNetworkObject {
-	protected String _name;
-	protected String _className;
-	protected String _comment;
-	protected CpNetworkType _type;
-	protected List<Object> _linkedTo =
+    protected String _name;
+    protected String _className;
+    protected String _comment;
+    protected CpNetworkType _type;
+    protected List<Object> _linkedTo =
             new LinkedList<>();
 
-	public CpNetworkObject(String name, String className, String comment,
-			CpNetworkType type) {
+    public CpNetworkObject(String name, String className, String comment,
+                           CpNetworkType type) {
 
-		_name = name;
-		_className = className;
-		_comment = comment;
-		_type = type;
-	}
+        _name = name;
+        _className = className;
+        _comment = comment;
+        _type = type;
+    }
 
-	public List<Object> getLinkedTo() {
-		return _linkedTo;
-	}
+    public List<Object> getLinkedTo() {
+        return _linkedTo;
+    }
 
-	public void linkWith(Object nobj) {
-		if (!_linkedTo.contains(nobj)) {
-			_linkedTo.add(nobj);
-		}
-	}
+    public void linkWith(Object nobj) {
+        if (!_linkedTo.contains(nobj)) {
+            _linkedTo.add(nobj);
+        }
+    }
 
-	public String getName() {
-		return _name;
-	}
+    public String getName() {
+        return _name;
+    }
 
-	public String getClassName() {
-		return _className;
-	}
+    public String getClassName() {
+        return _className;
+    }
 
-	public String getComment() {
-		return _comment;
-	}
+    public String getComment() {
+        return _comment;
+    }
 
-	public CpNetworkType getType() {
-		return _type;
-	}
+    public CpNetworkType getType() {
+        return _type;
+    }
 
-	/**
-	 * Returns the {@link MatchResult} of the given IP address.
-	 * @param ip IP address to test.
-	 * @return the MatchResult of the given IP address.
-	 */
-	public abstract MatchResult matches(IPRangeable ip);
+    /**
+     * Returns the {@link MatchResult} of the given IP address.
+     *
+     * @param ip IP address to test.
+     * @return the MatchResult of the given IP address.
+     */
+    public abstract MatchResult matches(IPRangeable ip);
 }

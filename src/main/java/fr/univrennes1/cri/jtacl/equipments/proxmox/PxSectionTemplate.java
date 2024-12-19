@@ -11,30 +11,30 @@ package fr.univrennes1.cri.jtacl.equipments.proxmox;
 /**
  * Template to build section. This class is used at parsing time
  * as an intermediate storage.
- * @see
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @see
  */
 public class PxSectionTemplate {
-	protected String _sectionName;
-	protected String _name;
+    protected String _sectionName;
+    protected String _name;
 
 
-	public String getSectionName() {
-		return _sectionName;
-	}
+    public String getSectionName() {
+        return _sectionName;
+    }
 
-	public boolean setSectionName(String sectionName) {
-		this._sectionName = sectionName;
-		return true;
-	}
+    public boolean setSectionName(String sectionName) {
+        this._sectionName = sectionName;
+        return true;
+    }
 
-	public String getName() {
-		return _name;
-	}
+    public String getName() {
+        return _name;
+    }
 
-	public boolean setName(String name) {
-		this._name = name;
-		return true;
-	}
+    public boolean setName(String name) {
+        this._name = name;
+        return true;
+    }
 }

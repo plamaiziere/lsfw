@@ -18,16 +18,20 @@ import java.util.ArrayList;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PxGroupRules extends ArrayList<PxRule> {
-	protected String _name;
-	protected ParseContext _context;
+    protected String _name;
+    protected ParseContext _context;
 
-	public PxGroupRules(String name, ParseContext context) {
-		super();
-		_name = name;
-		_context = context;
-	}
+    public PxGroupRules(String name, ParseContext context) {
+        super();
+        _name = name;
+        _context = context;
+    }
 
-	public String getName() { return _name; }
+    public String getName() {
+        return _name;
+    }
 
-	public ParseContext getContext() { return _context; }
+    public ParseContext getContext() {
+        return _context;
+    }
 }

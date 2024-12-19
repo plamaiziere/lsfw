@@ -18,20 +18,20 @@ import java.util.Comparator;
  */
 public class PortRangeComparator implements Comparator<PortRange> {
 
-	@Override
-	public int compare(PortRange port1, PortRange port2) {
-		/*
-		 * compare first by base, then by range
-		 */
-		if (port1.getFirstPort() < port2.getFirstPort())
-			return -1;
-		if (port1.getFirstPort() > port2.getFirstPort())
-			return 1;
-		if (port1.getLastPort() < port2.getLastPort())
-			return -1;
-		if (port1.getLastPort() > port2.getLastPort())
-			return 1;
-		return 0;
+    @Override
+    public int compare(PortRange port1, PortRange port2) {
+        /*
+         * compare first by base, then by range
+         */
+        if (port1.getFirstPort() < port2.getFirstPort())
+            return -1;
+        if (port1.getFirstPort() > port2.getFirstPort())
+            return 1;
+        if (port1.getLastPort() < port2.getLastPort())
+            return -1;
+        if (port1.getLastPort() > port2.getLastPort())
+            return 1;
+        return 0;
 
-	}
+    }
 }

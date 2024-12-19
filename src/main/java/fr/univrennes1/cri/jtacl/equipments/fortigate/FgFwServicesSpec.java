@@ -11,41 +11,42 @@ package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 /**
  * Fortigate service specification firewall rule
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class FgFwServicesSpec {
 
-	protected FgServicesGroup _services = new FgServicesGroup();
-	protected boolean _notIn;
+    protected FgServicesGroup _services = new FgServicesGroup();
+    protected boolean _notIn;
 
-	public FgServicesGroup getServices() {
-		return _services;
-	}
+    public FgServicesGroup getServices() {
+        return _services;
+    }
 
-	public void addReference(String name, FgService service) {
-		_services.addReference(name, service);
-	}
+    public void addReference(String name, FgService service) {
+        _services.addReference(name, service);
+    }
 
-	public void linkTo(FgFwRule fwrule) {
-		for (FgService sobj: _services.getServices().values()) {
-			sobj.linkWith(fwrule);
-		}
-	}
+    public void linkTo(FgFwRule fwrule) {
+        for (FgService sobj : _services.getServices().values()) {
+            sobj.linkWith(fwrule);
+        }
+    }
 
-	public void setNotIn(boolean notIn) {
-		_notIn = notIn;
-	}
+    public void setNotIn(boolean notIn) {
+        _notIn = notIn;
+    }
 
-	public boolean isNotIn() {
-		return _notIn;
-	}
+    public boolean isNotIn() {
+        return _notIn;
+    }
 
-	@Override
-	public String toString() {
-		String s = "";
-		if (_notIn)
-			s= "!";
-		return s + _services.getReferencesName();
-	}
+    @Override
+    public String toString() {
+        String s = "";
+        if (_notIn)
+            s = "!";
+        return s + _services.getReferencesName();
+    }
 
 }

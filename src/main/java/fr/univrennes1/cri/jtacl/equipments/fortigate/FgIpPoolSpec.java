@@ -14,35 +14,36 @@ import java.util.List;
 
 /**
  * Fortigate IP pool specification SNAT rule
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class FgIpPoolSpec {
-    	protected List<FgNetworkIpPool> _ippools = new LinkedList<>();
+    protected List<FgNetworkIpPool> _ippools = new LinkedList<>();
 
-	public List<FgNetworkIpPool> getIpPools() {
-		return _ippools;
-	}
+    public List<FgNetworkIpPool> getIpPools() {
+        return _ippools;
+    }
 
-	public void linkTo(FgObject snatRule) {
-		for (FgNetworkObject nobj: _ippools) {
-			nobj.linkWith(snatRule);
-		}
-	}
+    public void linkTo(FgObject snatRule) {
+        for (FgNetworkObject nobj : _ippools) {
+            nobj.linkWith(snatRule);
+        }
+    }
 
-	@Override
-	public String toString() {
-		return _ippools.toString();
-	}
+    @Override
+    public String toString() {
+        return _ippools.toString();
+    }
 
-	public String toText() {
-		StringBuilder sb = new StringBuilder("[");
-		boolean first = true;
-		for (FgNetworkIpPool nobj: _ippools) {
-			if (!first) sb.append(", ");
-			sb.append(nobj.getName());
-			first = false;
-		}
-		sb.append("]");
-		return sb.toString();
-	}
+    public String toText() {
+        StringBuilder sb = new StringBuilder("[");
+        boolean first = true;
+        for (FgNetworkIpPool nobj : _ippools) {
+            if (!first) sb.append(", ");
+            sb.append(nobj.getName());
+            first = false;
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

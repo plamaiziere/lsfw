@@ -11,57 +11,58 @@ package fr.univrennes1.cri.jtacl.lib.misc;
 
 /**
  * Context while parsing
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class ParseContext {
 
-	protected String _fileName;
-	protected int _lineNumber;
-	protected String _line;
+    protected String _fileName;
+    protected int _lineNumber;
+    protected String _line;
 
-	public String getFileName() {
-		return _fileName;
-	}
+    public String getFileName() {
+        return _fileName;
+    }
 
-	public String getLine() {
-		return _line;
-	}
+    public String getLine() {
+        return _line;
+    }
 
-	public int getLineNumber() {
-		return _lineNumber;
-	}
+    public int getLineNumber() {
+        return _lineNumber;
+    }
 
-	public static ParseContext of(String fileName, int lineNumber, String line)  {
-		ParseContext p = new ParseContext();
-		p.set(fileName, lineNumber, line);
-		return p;
-	}
+    public static ParseContext of(String fileName, int lineNumber, String line) {
+        ParseContext p = new ParseContext();
+        p.set(fileName, lineNumber, line);
+        return p;
+    }
 
-	public void set(String fileName, int lineNumber, String line) {
-		_fileName = fileName;
-		_lineNumber = lineNumber;
-		_line = line;
-	}
+    public void set(String fileName, int lineNumber, String line) {
+        _fileName = fileName;
+        _lineNumber = lineNumber;
+        _line = line;
+    }
 
-	public void setLine(String line) {
-		_line = line;
-	}
+    public void setLine(String line) {
+        _line = line;
+    }
 
-	public void setLineNumber(int lineNumber) {
-		_lineNumber = lineNumber;
-	}
+    public void setLineNumber(int lineNumber) {
+        _lineNumber = lineNumber;
+    }
 
-	public void setFileName(String fileName) {
-		_fileName = fileName;
-	}
+    public void setFileName(String fileName) {
+        _fileName = fileName;
+    }
 
-	@Override
-	public String toString() {
-		return "File: " + _fileName + " line#: " + _lineNumber +
-			" "  + _line.trim() + " : ";
-	}
+    @Override
+    public String toString() {
+        return "File: " + _fileName + " line#: " + _lineNumber +
+                " " + _line.trim() + " : ";
+    }
 
-	public String getFileNameAndLine() {
-		return _fileName + " #" + _lineNumber;
-	}
+    public String getFileNameAndLine() {
+        return _fileName + " #" + _lineNumber;
+    }
 }

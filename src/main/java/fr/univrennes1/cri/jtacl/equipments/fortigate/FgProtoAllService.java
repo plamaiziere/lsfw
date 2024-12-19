@@ -26,7 +26,7 @@ public class FgProtoAllService extends FgAddressService {
 
         super(name, originKey, comment, ipRanges, fqdn, FgServiceType.ALL);
         _service = new FgTcpUdpSctpService(name, originKey, comment, ipRanges, fqdn, udpPortsSpec
-            , tcpPortsSpec, sctpPortsSpec);
+                , tcpPortsSpec, sctpPortsSpec);
     }
 
     @Override

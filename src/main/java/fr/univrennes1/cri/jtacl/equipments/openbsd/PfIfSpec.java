@@ -11,31 +11,32 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
 
 /**
  * Interface specification in rule
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PfIfSpec {
-	protected String _ifName;
-	protected boolean _ifNot = false;
-	
-	public PfIfSpec(boolean ifNot, String ifName) {
-		_ifNot = ifNot;
-		_ifName = ifName;
-	}
-	
-	public String getIfName() {
-		return _ifName;
-	}
-	
-	public boolean isIfNot() {
-		return _ifNot;
-	}
+    protected String _ifName;
+    protected boolean _ifNot = false;
 
-	@Override
-	public String toString() {
-		if (_ifNot)
-			return "!" + _ifName;
-		else
-			return _ifName;
-	}
+    public PfIfSpec(boolean ifNot, String ifName) {
+        _ifNot = ifNot;
+        _ifName = ifName;
+    }
+
+    public String getIfName() {
+        return _ifName;
+    }
+
+    public boolean isIfNot() {
+        return _ifNot;
+    }
+
+    @Override
+    public String toString() {
+        if (_ifNot)
+            return "!" + _ifName;
+        else
+            return _ifName;
+    }
 
 }

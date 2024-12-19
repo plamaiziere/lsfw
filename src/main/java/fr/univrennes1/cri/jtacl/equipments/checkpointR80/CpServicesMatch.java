@@ -15,25 +15,26 @@ import java.util.LinkedList;
 
 /**
  * Match results for Checkpoint services
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 
 public class CpServicesMatch extends LinkedList<CpServiceMatch> {
-	protected MatchResult _matchResult;
+    protected MatchResult _matchResult;
 
-	public MatchResult getMatchResult() {
-		return _matchResult;
-	}
+    public MatchResult getMatchResult() {
+        return _matchResult;
+    }
 
-	public void setMatchResult(MatchResult matchResult) {
-		_matchResult = matchResult;
-	}
+    public void setMatchResult(MatchResult matchResult) {
+        _matchResult = matchResult;
+    }
 
-	public boolean isInspected() {
-		for (CpServiceMatch cps: this) {
-			if (cps.isInspected())
-				return true;
-		}
-		return false;
-	}
+    public boolean isInspected() {
+        for (CpServiceMatch cps : this) {
+            if (cps.isInspected())
+                return true;
+        }
+        return false;
+    }
 }

@@ -16,14 +16,14 @@ import fr.univrennes1.cri.jtacl.lib.misc.ParseContext;
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class PxObject {
-	protected ParseContext _context;
+    protected ParseContext _context;
 
-	public PxObject(ParseContext context) {
-		_context = context;
-	}
+    public PxObject(ParseContext context) {
+        _context = context;
+    }
 
-	public ParseContext getContext() {
-		return _context;
-	}
+    public ParseContext getContext() {
+        return _context;
+    }
 
 }

@@ -13,29 +13,29 @@ import java.util.List;
 /**
  * Template to build alias. This class is used at parsing time
  * as an intermediate storage.
- * @see PxVeParser
  *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
+ * @see PxVeParser
  */
 public class PxAliasTemplate {
-	protected String _name;
-	protected List<String> _ipspec;
+    protected String _name;
+    protected List<String> _ipspec;
 
-	public String getName() {
-		return _name;
-	}
+    public String getName() {
+        return _name;
+    }
 
-	public boolean setName(String _name) {
-		this._name = _name;
-		return true;
-	}
+    public boolean setName(String _name) {
+        this._name = _name;
+        return true;
+    }
 
-	public List<String> getIpSpec() {
-		return _ipspec;
-	}
+    public List<String> getIpSpec() {
+        return _ipspec;
+    }
 
-	public boolean setIpSpec(List<String> _ipspec) {
-		this._ipspec = _ipspec;
-		return true;
-	}
+    public boolean setIpSpec(List<String> _ipspec) {
+        this._ipspec = _ipspec;
+        return true;
+    }
 }

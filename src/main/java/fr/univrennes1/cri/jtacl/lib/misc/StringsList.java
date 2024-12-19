@@ -16,22 +16,23 @@ import java.util.ArrayList;
 
 /**
  * An  {@link ArrayList} list of String items.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class StringsList extends ArrayList<String> {
 
-	public void readFromFile(String fileName)
-			throws IOException {
+    public void readFromFile(String fileName)
+            throws IOException {
 
-		clear();
-		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-			for (; ; ) {
-				String s = reader.readLine();
-				if (s != null)
-					add(s);
-				else
-					break;
-			}
-		}
-	}
+        clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            for (; ; ) {
+                String s = reader.readLine();
+                if (s != null)
+                    add(s);
+                else
+                    break;
+            }
+        }
+    }
 }

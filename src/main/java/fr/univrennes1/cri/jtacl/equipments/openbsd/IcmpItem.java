@@ -16,25 +16,25 @@ package fr.univrennes1.cri.jtacl.equipments.openbsd;
  */
 public class IcmpItem {
 
-	private String _icmpType;
-	private String _icmpCode;
+    private String _icmpType;
+    private String _icmpCode;
 
-	public String getIcmpCode() {
-		return _icmpCode;
-	}
+    public String getIcmpCode() {
+        return _icmpCode;
+    }
 
-	public boolean setIcmpCode(String icmpCode) {
-		_icmpCode = icmpCode;
-		return true;
-	}
+    public boolean setIcmpCode(String icmpCode) {
+        _icmpCode = icmpCode;
+        return true;
+    }
 
-	public String getIcmpType() {
-		return _icmpType;
-	}
+    public String getIcmpType() {
+        return _icmpType;
+    }
 
-	public boolean setIcmpType(String icmpType) {
-		_icmpType = icmpType;
-		return true;
-	}
+    public boolean setIcmpType(String icmpType) {
+        _icmpType = icmpType;
+        return true;
+    }
 
 }

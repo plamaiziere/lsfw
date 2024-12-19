@@ -11,6 +11,7 @@ package fr.univrennes1.cri.jtacl.equipments.fortigate;
 
 /**
  * Fortigate base object
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class FgObject {
@@ -19,7 +20,8 @@ public class FgObject {
 
     /**
      * Contruct a new Fg object.
-     * @param name name
+     *
+     * @param name      name
      * @param originKey
      */
     public FgObject(String name, String originKey) {

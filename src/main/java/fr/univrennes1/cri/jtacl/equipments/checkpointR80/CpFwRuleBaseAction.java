@@ -11,6 +11,7 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
 
 /**
  * Checkpoint object rule base action (accept/drop...)
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class CpFwRuleBaseAction extends CpObject {
@@ -22,5 +23,7 @@ public class CpFwRuleBaseAction extends CpObject {
         _action = action;
     }
 
-    public CpFwRuleAction getAction() { return _action; }
+    public CpFwRuleAction getAction() {
+        return _action;
+    }
 }

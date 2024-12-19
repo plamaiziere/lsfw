@@ -25,45 +25,45 @@ import java.util.logging.Logger;
  */
 public class Log {
 
-	protected static final Logger _debug = Logger.getLogger("jtacl.debug");
-	protected static final Logger _notifier = Logger.getLogger("jtacl.notifier");
-	protected static final Logger _config = Logger.getLogger("jtacl.config");
-	protected static final Handler _consoleHandler =
-			_debug.getParent().getHandlers()[0];
+    protected static final Logger _debug = Logger.getLogger("jtacl.debug");
+    protected static final Logger _notifier = Logger.getLogger("jtacl.notifier");
+    protected static final Logger _config = Logger.getLogger("jtacl.config");
+    protected static final Handler _consoleHandler =
+            _debug.getParent().getHandlers()[0];
 
-	public static Logger debug() {
-		return _debug;
-	}
+    public static Logger debug() {
+        return _debug;
+    }
 
-	public static Logger notifier() {
-		return _notifier;
-	}
+    public static Logger notifier() {
+        return _notifier;
+    }
 
-	public static Logger config() {
-		return _config;
-	}
+    public static Logger config() {
+        return _config;
+    }
 
-	public static Handler consoleHandler() {
-		return _consoleHandler;
-	}
+    public static Handler consoleHandler() {
+        return _consoleHandler;
+    }
 
-	public static void install() {
-		class ShortFormatter extends Formatter {
-			// inefficient implementation
-			public String format(LogRecord record) {
-				return "[" + record.getLevel() + "]" +
-				 record.getMessage() + "\n";
-			}
-		}
+    public static void install() {
+        class ShortFormatter extends Formatter {
+            // inefficient implementation
+            public String format(LogRecord record) {
+                return "[" + record.getLevel() + "]" +
+                        record.getMessage() + "\n";
+            }
+        }
 
-		ShortFormatter fmt = new ShortFormatter();
+        ShortFormatter fmt = new ShortFormatter();
 
-		_consoleHandler.setFormatter(fmt);
-		_debug.getParent().setLevel(Level.ALL);
-		_notifier.setLevel(Level.WARNING);
-		_debug.setLevel(Level.OFF);
-		_config.setLevel(Level.SEVERE);
-	}
+        _consoleHandler.setFormatter(fmt);
+        _debug.getParent().setLevel(Level.ALL);
+        _notifier.setLevel(Level.WARNING);
+        _debug.setLevel(Level.OFF);
+        _config.setLevel(Level.SEVERE);
+    }
 
 
 }

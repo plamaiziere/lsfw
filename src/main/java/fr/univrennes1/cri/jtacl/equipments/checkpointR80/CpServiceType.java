@@ -11,13 +11,14 @@ package fr.univrennes1.cri.jtacl.equipments.checkpointR80;
 
 /**
  * Checkpoint service type
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public enum CpServiceType {
-	UNHANDLED,
-	TCP,
-	UDP,
-	ICMP,
-	GROUP,
-	OTHER
+    UNHANDLED,
+    TCP,
+    UDP,
+    ICMP,
+    GROUP,
+    OTHER
 }

@@ -23,127 +23,125 @@ import java.util.Map;
 
 /**
  * Fortigate fw sub shell command
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class FgFwShell extends GenericEquipmentShell {
 
-	protected FgFw _fgfw;
-	protected FgFwShellParser _shellParser;
-	protected ReportingParseRunner _parseRunner;
-	protected PrintStream _outStream;
+    protected FgFw _fgfw;
+    protected FgFwShellParser _shellParser;
+    protected ReportingParseRunner _parseRunner;
+    protected PrintStream _outStream;
 
-	@Override
-	public void shellHelp(PrintStream output) {
-		printHelp(output, "/help/fortigate");
-	}
+    @Override
+    public void shellHelp(PrintStream output) {
+        printHelp(output, "/help/fortigate");
+    }
 
-	public FgFwShell(FgFw cpfw) {
-		_fgfw = cpfw;
-		_shellParser = Parboiled.createParser(FgFwShellParser.class);
-		_parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
-	}
+    public FgFwShell(FgFw cpfw) {
+        _fgfw = cpfw;
+        _shellParser = Parboiled.createParser(FgFwShellParser.class);
+        _parseRunner = new ReportingParseRunner(_shellParser.CommandLine());
+    }
 
-	public void commandShowService(PrintStream output, FgFwShellParser parser) {
+    public void commandShowService(PrintStream output, FgFwShellParser parser) {
 
-		String service = parser.getService();
-		Map<String, FgService> services = _fgfw.getFgServices();
+        String service = parser.getService();
+        Map<String, FgService> services = _fgfw.getFgServices();
 
-		if (!service.isEmpty()) {
-			FgService servobj = services.get(service);
-			if (servobj == null) {
-				output.println("No such service: " + service);
-			} else {
-				output.println(servobj.toString());
-			}
-		} else {
-			List<String> snames = _fgfw.getServicesName();
-			for (String name: snames) {
-				FgService servobj = services.get(name);
-				output.println(servobj.toString());
-			}
-		}
-	}
+        if (!service.isEmpty()) {
+            FgService servobj = services.get(service);
+            if (servobj == null) {
+                output.println("No such service: " + service);
+            } else {
+                output.println(servobj.toString());
+            }
+        } else {
+            List<String> snames = _fgfw.getServicesName();
+            for (String name : snames) {
+                FgService servobj = services.get(name);
+                output.println(servobj.toString());
+            }
+        }
+    }
 
-	public void commandShowNetwork(PrintStream output, FgFwShellParser parser) {
+    public void commandShowNetwork(PrintStream output, FgFwShellParser parser) {
 
-		String network = parser.getNetwork();
-		Map<String, FgNetworkObject> networks = _fgfw.getFgNetworks();
+        String network = parser.getNetwork();
+        Map<String, FgNetworkObject> networks = _fgfw.getFgNetworks();
 
-		if (!network.isEmpty()) {
-			FgNetworkObject netobj = networks.get(network);
-			if (netobj == null) {
-				output.println("No such network: " + network);
-			} else {
-				output.println(netobj.toString());
-			}
-		} else {
-			List<String> snames = _fgfw.getNetworksName();
-			for (String name: snames) {
-				FgNetworkObject netobj = networks.get(name);
-				output.println(netobj.toString());
-			}
-		}
-	}
+        if (!network.isEmpty()) {
+            FgNetworkObject netobj = networks.get(network);
+            if (netobj == null) {
+                output.println("No such network: " + network);
+            } else {
+                output.println(netobj.toString());
+            }
+        } else {
+            List<String> snames = _fgfw.getNetworksName();
+            for (String name : snames) {
+                FgNetworkObject netobj = networks.get(name);
+                output.println(netobj.toString());
+            }
+        }
+    }
 
-	public void commandShowRules(PrintStream output, FgFwShellParser parser)
-    {
-        for(FgFwRule r: _fgfw.getFgRules()) {
+    public void commandShowRules(PrintStream output, FgFwShellParser parser) {
+        for (FgFwRule r : _fgfw.getFgRules()) {
             output.println(r.toText());
         }
-	}
+    }
 
-	public void commandShowPolicyRouteRules(PrintStream output, FgFwShellParser parser)
-    {
-        for(FgPolicyRouteRule r: _fgfw.getPolicyRoutesRules()) {
+    public void commandShowPolicyRouteRules(PrintStream output, FgFwShellParser parser) {
+        for (FgPolicyRouteRule r : _fgfw.getPolicyRoutesRules()) {
             output.println(r.toText());
         }
-	}
+    }
 
-	public void commandShowSnatRules(PrintStream output, FgFwShellParser parser)
-    {
-        for(FgSnatRule r: _fgfw.getSnatRules()) {
+    public void commandShowSnatRules(PrintStream output, FgFwShellParser parser) {
+        for (FgSnatRule r : _fgfw.getSnatRules()) {
             output.println(r.toText());
         }
-	}
+    }
 
-	@Override
-	public void shellCommand(String command, PrintStream output) {
-		_outStream = output;
-		_parseRunner.getParseErrors().clear();
-		ParsingResult<?> result = _parseRunner.run(command);
+    @Override
+    public void shellCommand(String command, PrintStream output) {
+        _outStream = output;
+        _parseRunner.getParseErrors().clear();
+        ParsingResult<?> result = _parseRunner.run(command);
 
-		if (!result.matched) {
-			if (result.hasErrors()) {
-				ParseError error = result.parseErrors.get(0);
-				InputBuffer buf = error.getInputBuffer();
-				_outStream.println("Syntax error: " +
-					buf.extract(0, error.getStartIndex()));
-			}
-			return;
-		}
+        if (!result.matched) {
+            if (result.hasErrors()) {
+                ParseError error = result.parseErrors.get(0);
+                InputBuffer buf = error.getInputBuffer();
+                _outStream.println("Syntax error: " +
+                        buf.extract(0, error.getStartIndex()));
+            }
+            return;
+        }
 
-		String shellCmd = _shellParser.getCommand();
+        String shellCmd = _shellParser.getCommand();
 
-		if (shellCmd.equals("help"))
-			shellHelp(_outStream);
-		if (shellCmd.equals("xref-ip"))
-			printXrefIp(_outStream, _fgfw.getNetCrossRef(), _shellParser);
-		if (shellCmd.equals("xref-service"))
-			printXrefService(_outStream, _fgfw.getServiceCrossRef(), _shellParser);
-		if (shellCmd.equals("show-service"))
-			commandShowService(_outStream, _shellParser);
-		if (shellCmd.equals("show-network"))
-			commandShowNetwork(_outStream, _shellParser);
-		if (shellCmd.equals("show-rules"))
-			commandShowRules(_outStream, _shellParser);
-		if (shellCmd.equals("show-policy-routes"))
-			commandShowPolicyRouteRules(_outStream, _shellParser);
-		if (shellCmd.equals("show-snat-rules"))
-			commandShowSnatRules(_outStream, _shellParser);
-	}
+        if (shellCmd.equals("help"))
+            shellHelp(_outStream);
+        if (shellCmd.equals("xref-ip"))
+            printXrefIp(_outStream, _fgfw.getNetCrossRef(), _shellParser);
+        if (shellCmd.equals("xref-service"))
+            printXrefService(_outStream, _fgfw.getServiceCrossRef(), _shellParser);
+        if (shellCmd.equals("show-service"))
+            commandShowService(_outStream, _shellParser);
+        if (shellCmd.equals("show-network"))
+            commandShowNetwork(_outStream, _shellParser);
+        if (shellCmd.equals("show-rules"))
+            commandShowRules(_outStream, _shellParser);
+        if (shellCmd.equals("show-policy-routes"))
+            commandShowPolicyRouteRules(_outStream, _shellParser);
+        if (shellCmd.equals("show-snat-rules"))
+            commandShowSnatRules(_outStream, _shellParser);
+    }
 
-	@Override
-	public NetworkEquipment getEquipment() {
-		return _fgfw;
-	}
+    @Override
+    public NetworkEquipment getEquipment() {
+        return _fgfw;
+    }
 }

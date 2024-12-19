@@ -19,153 +19,166 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
  * {@link IPNet}.<br/><br/>
  * An IfaceLink has one IP address for the interface {@link IPNet}
  * and one network IP address {@link IPNet}.
+ *
  * @author Patrick Lamaiziere <patrick.lamaiziere@univ-rennes1.fr>
  */
 public class IfaceLink {
 
-	/**
-	 * Iface owner of this link.
-	 */
-	protected Iface _iface;
-
-	/**
-	 * the address IP of this link.
-	 */
-	protected IPNet	_ip;
-
-	/**
-	 * the network address of this link.
-	 */
-	protected IPNet _network;
-
-	/**
-	 * the network link connected to this link.
-	 */
-	protected NetworkLink _networkLink;
-
-	/**
-	 * a reference to the monitor.
-	 */
-	protected Monitor _monitor;
-
-	/**
-	 * Creates a new {@link IfaceLink} link associated with a {@link Iface} interface.
-	 * @param monitor the {@link Monitor} monitor associated with this link.
-	 * @param iface the {@link Iface} interface to associate.
-	 * @param ip the {@link IPNet} IP address of the link.
-	 * @param network the {@link IPNet} IP address of the network's link.
-	 */
-	public IfaceLink(Monitor monitor, Iface iface, IPNet ip, IPNet network) {
-		_iface = iface;
-		_ip = ip;
-		_network = network;
-		_monitor = monitor;
-	}
-
-	/**
-	 * Returns the {@link Iface} interface associated to this {@link IfaceLink} link.
-	 * @return the {@link Iface} interface associated to this {@link IfaceLink} link.
-	 */
-	public Iface getIface() {
-		return _iface;
-	}
-
-	/**
-	 * Returns the name of the {@link Iface} interface associated to this
-	 * {@link IfaceLink} link. This is a shortcut for getIface().getName().
-	 * @return the name of the {@link Iface} interface associated to this link.
-	 */
-	public String getIfaceName() {
-		return _iface.getName();
-	}
+    /**
+     * Iface owner of this link.
+     */
+    protected Iface _iface;
 
     /**
-	 * Returns true if the {@link Iface} interface associated to this
-	 * {@link IfaceLink} link is a loopback interface.
-	 * @return Returns true if the {@link Iface} interface associated to this
-     * {@link IfaceLink} link is a loopback interface.
-	 */
-	public boolean isLoopback() {
-	    return _iface.isLoopback();
+     * the address IP of this link.
+     */
+    protected IPNet _ip;
+
+    /**
+     * the network address of this link.
+     */
+    protected IPNet _network;
+
+    /**
+     * the network link connected to this link.
+     */
+    protected NetworkLink _networkLink;
+
+    /**
+     * a reference to the monitor.
+     */
+    protected Monitor _monitor;
+
+    /**
+     * Creates a new {@link IfaceLink} link associated with a {@link Iface} interface.
+     *
+     * @param monitor the {@link Monitor} monitor associated with this link.
+     * @param iface   the {@link Iface} interface to associate.
+     * @param ip      the {@link IPNet} IP address of the link.
+     * @param network the {@link IPNet} IP address of the network's link.
+     */
+    public IfaceLink(Monitor monitor, Iface iface, IPNet ip, IPNet network) {
+        _iface = iface;
+        _ip = ip;
+        _network = network;
+        _monitor = monitor;
     }
 
-	/**
-	 * Returns the {@link NetworkEquipment} equipment associated to this
-	 * {@link IfaceLink} link. This is a shortcut for getIface().getEquipment().
-	 * @return the {@link NetworkEquipment} equipment associated to this
-	 * {@link IfaceLink} link.
-	 */
-	public NetworkEquipment getEquipment() {
-		return _iface.getEquipment();
-	}
+    /**
+     * Returns the {@link Iface} interface associated to this {@link IfaceLink} link.
+     *
+     * @return the {@link Iface} interface associated to this {@link IfaceLink} link.
+     */
+    public Iface getIface() {
+        return _iface;
+    }
 
-	/**
-	 * Returns the name of the equipment associated to this {@link IfaceLink}
-	 * link. This is a shortcut for getIface().getEquipment().getName()
-	 * @return the name of the equipment associated to this {@link IfaceLink}
-	 * link.
-	 */
-	public String getEquipmentName() {
-		return _iface.getEquipment().getName();
-	}
+    /**
+     * Returns the name of the {@link Iface} interface associated to this
+     * {@link IfaceLink} link. This is a shortcut for getIface().getName().
+     *
+     * @return the name of the {@link Iface} interface associated to this link.
+     */
+    public String getIfaceName() {
+        return _iface.getName();
+    }
 
-	/**
-	 * Returns the {@link IPNet} IP address of this {@link IfaceLink} link.
-	 * @return the {@link IPNet} IP address of this {@link IfaceLink} link.
-	 */
-	public IPNet getIp() {
-		return _ip;
-	}
+    /**
+     * Returns true if the {@link Iface} interface associated to this
+     * {@link IfaceLink} link is a loopback interface.
+     *
+     * @return Returns true if the {@link Iface} interface associated to this
+     * {@link IfaceLink} link is a loopback interface.
+     */
+    public boolean isLoopback() {
+        return _iface.isLoopback();
+    }
 
-	/**
-	 * Returns the {@link IPNet} IP network address of this {@link IfaceLink} link.
-	 * @return the {@link IPNet} IP network address of this {@link IfaceLink} link.
-	 */
-	public IPNet getNetwork() {
-		return _network;
-	}
+    /**
+     * Returns the {@link NetworkEquipment} equipment associated to this
+     * {@link IfaceLink} link. This is a shortcut for getIface().getEquipment().
+     *
+     * @return the {@link NetworkEquipment} equipment associated to this
+     * {@link IfaceLink} link.
+     */
+    public NetworkEquipment getEquipment() {
+        return _iface.getEquipment();
+    }
 
-	/**
-	 * Returns the {@link NetworkLink} network link of this {@link IfaceLink} link.
-	 * @return the {@link NetworkLink} network link of this {@link IfaceLink} link.
-	 */
-	public NetworkLink getNetworkLink() {
-		return _networkLink;
-	}
+    /**
+     * Returns the name of the equipment associated to this {@link IfaceLink}
+     * link. This is a shortcut for getIface().getEquipment().getName()
+     *
+     * @return the name of the equipment associated to this {@link IfaceLink}
+     * link.
+     */
+    public String getEquipmentName() {
+        return _iface.getEquipment().getName();
+    }
 
-	/**
-	 * Sets the {@link NetworkLink} network link of this {@link IfaceLink} link.
-	 * @param networkLink the {@link NetworkLink} network link.
-	 */
-	public void setNetworkLink(NetworkLink networkLink) {
-		_networkLink = networkLink;
-	}
+    /**
+     * Returns the {@link IPNet} IP address of this {@link IfaceLink} link.
+     *
+     * @return the {@link IPNet} IP address of this {@link IfaceLink} link.
+     */
+    public IPNet getIp() {
+        return _ip;
+    }
 
-	@Override
-	public String toString() {
-		return _iface.getName() + " - " + _ip.toString("i") + " - " + _network.toString("i");
-	}
+    /**
+     * Returns the {@link IPNet} IP network address of this {@link IfaceLink} link.
+     *
+     * @return the {@link IPNet} IP network address of this {@link IfaceLink} link.
+     */
+    public IPNet getNetwork() {
+        return _network;
+    }
 
-	/**
-	 * This method is called when a {@link Probe} probe is received on this
-	 * {@link IfaceLink} link.
-	 * @param probe the {@link Probe} received
-	 */
-	public void incoming(Probe probe) {
-		probe.setExtension(null);
-		_iface.incoming(this, probe);
-	}
+    /**
+     * Returns the {@link NetworkLink} network link of this {@link IfaceLink} link.
+     *
+     * @return the {@link NetworkLink} network link of this {@link IfaceLink} link.
+     */
+    public NetworkLink getNetworkLink() {
+        return _networkLink;
+    }
 
-	/**
-	 * This method is called when a {@link Probe} probe is sent on this
-	 * {@link IfaceLink} link.
-	 * @param probe the {@link Probe} to send.
-	 * @param nextHop the {@link IPNet} IP address of the next hop.
-	 */
-	public void outgoing(Probe probe, IPNet nextHop) {
-		probe.setExtension(null);
-		_monitor.receiveProbe(this, probe, nextHop);
-	}
+    /**
+     * Sets the {@link NetworkLink} network link of this {@link IfaceLink} link.
+     *
+     * @param networkLink the {@link NetworkLink} network link.
+     */
+    public void setNetworkLink(NetworkLink networkLink) {
+        _networkLink = networkLink;
+    }
+
+    @Override
+    public String toString() {
+        return _iface.getName() + " - " + _ip.toString("i") + " - " + _network.toString("i");
+    }
+
+    /**
+     * This method is called when a {@link Probe} probe is received on this
+     * {@link IfaceLink} link.
+     *
+     * @param probe the {@link Probe} received
+     */
+    public void incoming(Probe probe) {
+        probe.setExtension(null);
+        _iface.incoming(this, probe);
+    }
+
+    /**
+     * This method is called when a {@link Probe} probe is sent on this
+     * {@link IfaceLink} link.
+     *
+     * @param probe   the {@link Probe} to send.
+     * @param nextHop the {@link IPNet} IP address of the next hop.
+     */
+    public void outgoing(Probe probe, IPNet nextHop) {
+        probe.setExtension(null);
+        _monitor.receiveProbe(this, probe, nextHop);
+    }
 
 
 }

@@ -26,136 +26,143 @@ import fr.univrennes1.cri.jtacl.lib.ip.IPNet;
  */
 public class ProbePosition {
 
-	private IfaceLink _incoming;
-	private IfaceLink _outgoing;
-	private IPNet _nextHop;
+    private IfaceLink _incoming;
+    private IfaceLink _outgoing;
+    private IPNet _nextHop;
 
-	/**
-	 * Returns the incoming {@link IfaceLink} link on this position.
-	 * @return the incoming {@link IfaceLink} link on this position.
-	 */
-	public IfaceLink getIncoming() {
-		return _incoming;
-	}
+    /**
+     * Returns the incoming {@link IfaceLink} link on this position.
+     *
+     * @return the incoming {@link IfaceLink} link on this position.
+     */
+    public IfaceLink getIncoming() {
+        return _incoming;
+    }
 
-	/**
-	 * Sets the incoming {@link IfaceLink} link on this position. This method
-	 * must not be called after the ougoing link was seted.
-	 * @param link the incoming {@link IfaceLink} link to associate with this
-	 * position.
-	 */
-	public void setIncoming(IfaceLink link) {
-		if (_outgoing != null)
-			throw new JtaclInternalException("The 'incoming' IfaceLink must be set before the 'outgoing' IfaceLink");
-		_incoming = link;
-	}
+    /**
+     * Sets the incoming {@link IfaceLink} link on this position. This method
+     * must not be called after the ougoing link was seted.
+     *
+     * @param link the incoming {@link IfaceLink} link to associate with this
+     *             position.
+     */
+    public void setIncoming(IfaceLink link) {
+        if (_outgoing != null)
+            throw new JtaclInternalException("The 'incoming' IfaceLink must be set before the 'outgoing' IfaceLink");
+        _incoming = link;
+    }
 
-	/**
-	 * Returns the {@link IPNet} nexthop IP address on this position.
-	 * @return the {@link IPNet} nexthop IP address on this position.
-	 */
-	public IPNet getNextHop() {
-		return _nextHop;
-	}
+    /**
+     * Returns the {@link IPNet} nexthop IP address on this position.
+     *
+     * @return the {@link IPNet} nexthop IP address on this position.
+     */
+    public IPNet getNextHop() {
+        return _nextHop;
+    }
 
-	/**
-	 * Sets the {@link IPNet} nexthop IP address on this position.
-	 * @param nextHop the {@link IPNet} nexthop IP address to associate on this
-	 * position.
-	 */
-	public void setNextHop(IPNet nextHop) {
-		_nextHop = nextHop;
-	}
+    /**
+     * Sets the {@link IPNet} nexthop IP address on this position.
+     *
+     * @param nextHop the {@link IPNet} nexthop IP address to associate on this
+     *                position.
+     */
+    public void setNextHop(IPNet nextHop) {
+        _nextHop = nextHop;
+    }
 
-	/**
-	 * Returns the outgoing {@link IfaceLink} link on this position.
-	 * @return the outgoing {@link IfaceLink} link on this position.
-	 */
-	public IfaceLink getOutgoing() {
-		return _outgoing;
-	}
+    /**
+     * Returns the outgoing {@link IfaceLink} link on this position.
+     *
+     * @return the outgoing {@link IfaceLink} link on this position.
+     */
+    public IfaceLink getOutgoing() {
+        return _outgoing;
+    }
 
-	/**
-	 * Sets the outgoing {@link IfaceLink} link and the {@link IPNet} nexthop
-	 * IP address on this position. This method must not be called after the
-	 * ougoing link was seted.
-	 * @param link the outgoing {@link IfaceLink} link to associate with this
-	 * position.
-	 */
-	public void setOutgoing(IfaceLink link, IPNet nextHop) {
-		if (_incoming == null)
-			throw new JtaclInternalException("The 'outgoing' IfaceLink must" +
-					" be set after the 'incoming' IfaceLink");
+    /**
+     * Sets the outgoing {@link IfaceLink} link and the {@link IPNet} nexthop
+     * IP address on this position. This method must not be called after the
+     * ougoing link was seted.
+     *
+     * @param link the outgoing {@link IfaceLink} link to associate with this
+     *             position.
+     */
+    public void setOutgoing(IfaceLink link, IPNet nextHop) {
+        if (_incoming == null)
+            throw new JtaclInternalException("The 'outgoing' IfaceLink must" +
+                    " be set after the 'incoming' IfaceLink");
 
-		_outgoing = link;
-		_nextHop = nextHop;
+        _outgoing = link;
+        _nextHop = nextHop;
 
-		if (!_incoming.getEquipment().equals(_outgoing.getEquipment()))
-			throw new JtaclInternalException("The 'incoming' and 'outgoing'" +
-					" IfaceLink must refered to the same equipment");
-	}
+        if (!_incoming.getEquipment().equals(_outgoing.getEquipment()))
+            throw new JtaclInternalException("The 'incoming' and 'outgoing'" +
+                    " IfaceLink must refered to the same equipment");
+    }
 
-	/**
-	 * Creates and returns a new copy of this instance.
-	 * @return a new copy of this instance.
-	 */
-	public ProbePosition newInstance() {
-		ProbePosition pos = new ProbePosition();
-		pos._incoming = _incoming;
-		pos._outgoing = _outgoing;
-		return pos;
-	}
+    /**
+     * Creates and returns a new copy of this instance.
+     *
+     * @return a new copy of this instance.
+     */
+    public ProbePosition newInstance() {
+        ProbePosition pos = new ProbePosition();
+        pos._incoming = _incoming;
+        pos._outgoing = _outgoing;
+        return pos;
+    }
 
-	@Override
-	public String toString() {
-		String str = "";
+    @Override
+    public String toString() {
+        String str = "";
 
-		if (_incoming != null) {
-			str += _incoming.getEquipmentName() + "(";
-			str += _incoming.getIfaceName() + "-";
-		} else
-			return "none";
+        if (_incoming != null) {
+            str += _incoming.getEquipmentName() + "(";
+            str += _incoming.getIfaceName() + "-";
+        } else
+            return "none";
 
-		if (_outgoing != null) {
-			str += _outgoing.getIfaceName();
-			str += "[" +_nextHop.toString("i") + "]";
-		} else
-			str += "none";
-		str += ")";
-		return str;
-	}
+        if (_outgoing != null) {
+            str += _outgoing.getIfaceName();
+            str += "[" + _nextHop.toString("i") + "]";
+        } else
+            str += "none";
+        str += ")";
+        return str;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ProbePosition other = (ProbePosition) obj;
-		if (_incoming != other._incoming &&
-				(_incoming == null || !_incoming.equals(other._incoming))) {
-			return false;
-		}
-		if (_outgoing != other._outgoing &&
-				(_outgoing == null || !_outgoing.equals(other._outgoing))) {
-			return false;
-		}
-		if (_nextHop != other._nextHop &&
-				(_nextHop == null || !_nextHop.equals(other._nextHop))) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ProbePosition other = (ProbePosition) obj;
+        if (_incoming != other._incoming &&
+                (_incoming == null || !_incoming.equals(other._incoming))) {
+            return false;
+        }
+        if (_outgoing != other._outgoing &&
+                (_outgoing == null || !_outgoing.equals(other._outgoing))) {
+            return false;
+        }
+        if (_nextHop != other._nextHop &&
+                (_nextHop == null || !_nextHop.equals(other._nextHop))) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 3;
-		hash = 37 * hash + (_incoming != null ? _incoming.hashCode() : 0);
-		hash = 37 * hash + (_outgoing != null ? _outgoing.hashCode() : 0);
-		hash = 37 * hash + (_nextHop != null ? _nextHop.hashCode() : 0);
-		return hash;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + (_incoming != null ? _incoming.hashCode() : 0);
+        hash = 37 * hash + (_outgoing != null ? _outgoing.hashCode() : 0);
+        hash = 37 * hash + (_nextHop != null ? _nextHop.hashCode() : 0);
+        return hash;
+    }
 
 }

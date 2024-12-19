@@ -18,55 +18,59 @@ import fr.univrennes1.cri.jtacl.lib.misc.Direction;
  */
 public class AccessGroup {
 
-	/**
-	 * name of this access group.
-	 */
-	String _name;
+    /**
+     * name of this access group.
+     */
+    String _name;
 
-	/**
-	 * name of the iface linked with this access group.
-	 */
-	String _ifName;
+    /**
+     * name of the iface linked with this access group.
+     */
+    String _ifName;
 
-	/**
-	 * the direction (IN/OUT) associated to this access group.
-	 */
-	Direction _direction;
+    /**
+     * the direction (IN/OUT) associated to this access group.
+     */
+    Direction _direction;
 
-	/**
-	 * Contructs a new access group.
-	 * @param name name of the access group.
-	 * @param ifName the name of the iface linked to this access group.
-	 * @param direction the direction associated to this access group.
-	 */
-	public AccessGroup(String name, String ifName, Direction direction) {
-		_name = name;
-		_ifName = ifName;
-		_direction = direction;
-	}
+    /**
+     * Contructs a new access group.
+     *
+     * @param name      name of the access group.
+     * @param ifName    the name of the iface linked to this access group.
+     * @param direction the direction associated to this access group.
+     */
+    public AccessGroup(String name, String ifName, Direction direction) {
+        _name = name;
+        _ifName = ifName;
+        _direction = direction;
+    }
 
-	/**
-	 * Returns the name of the iface linked to this access group.
-	 * @return the name of the iface linked to this access group.
-	 */
-	public String getIfName() {
-		return _ifName;
-	}
+    /**
+     * Returns the name of the iface linked to this access group.
+     *
+     * @return the name of the iface linked to this access group.
+     */
+    public String getIfName() {
+        return _ifName;
+    }
 
-	/**
-	 * Returns the name of this access group.
-	 * @return the name of this access group.
-	 */
-	public String getName() {
-		return _name;
-	}
+    /**
+     * Returns the name of this access group.
+     *
+     * @return the name of this access group.
+     */
+    public String getName() {
+        return _name;
+    }
 
-	/**
-	 * Returns the direction of this access group.
-	 * @return the direction of this access group.
-	 */
-		public Direction getDirection() {
-		return _direction;
-	}
+    /**
+     * Returns the direction of this access group.
+     *
+     * @return the direction of this access group.
+     */
+    public Direction getDirection() {
+        return _direction;
+    }
 
 }

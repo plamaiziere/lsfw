@@ -18,64 +18,68 @@ import fr.univrennes1.cri.jtacl.lib.ip.ProtocolsSpec;
  */
 public class ProtocolObjectGroup extends ObjectGroup {
 
-	/**
-	 * Constructs a new {@link ProtocolObjectGroup} group with the group Id
-	 * in argument.
-	 * @param groupId the group Id of this group.
-	 */
-	public ProtocolObjectGroup(String groupId) {
-		super(ObjectGroupType.PROTOCOL, groupId);
-	}
+    /**
+     * Constructs a new {@link ProtocolObjectGroup} group with the group Id
+     * in argument.
+     *
+     * @param groupId the group Id of this group.
+     */
+    public ProtocolObjectGroup(String groupId) {
+        super(ObjectGroupType.PROTOCOL, groupId);
+    }
 
-	/**
-	 * Checks if at least one item of this group matches the protocols
-	 *  in argument.
-	 * @param protocols protocols value to check.
-	 * @return true if an item of this group matches the protocol in argument.
-	 */
-	public boolean matches(ProtocolsSpec protocols) {
-		for (ObjectGroupItem item: this) {
-			ProtocolObjectGroupItem pitem = (ProtocolObjectGroupItem) item;
-			if (pitem.isGroup())
-				continue;
-			if (pitem.matches(protocols))
-				return true;
-		}
-		return false;
-	}
+    /**
+     * Checks if at least one item of this group matches the protocols
+     * in argument.
+     *
+     * @param protocols protocols value to check.
+     * @return true if an item of this group matches the protocol in argument.
+     */
+    public boolean matches(ProtocolsSpec protocols) {
+        for (ObjectGroupItem item : this) {
+            ProtocolObjectGroupItem pitem = (ProtocolObjectGroupItem) item;
+            if (pitem.isGroup())
+                continue;
+            if (pitem.matches(protocols))
+                return true;
+        }
+        return false;
+    }
 
-	/**
-	 * Returns an expanded group. Nested object groups
-	 * are expended recursively.
-	 * @return a group with nested object groups expanded
-	 * recursively.
-	 */
-	public ProtocolObjectGroup expand() {
-		ProtocolObjectGroup group = new ProtocolObjectGroup(_groupId);
-		group.setDescription(_description);
+    /**
+     * Returns an expanded group. Nested object groups
+     * are expended recursively.
+     *
+     * @return a group with nested object groups expanded
+     * recursively.
+     */
+    public ProtocolObjectGroup expand() {
+        ProtocolObjectGroup group = new ProtocolObjectGroup(_groupId);
+        group.setDescription(_description);
 
-		for (ObjectGroupItem obj: this) {
-			if (obj.isGroup())
-				group.addAll(((ProtocolObjectGroup)obj.getGroup()).expand());
-			else
-				group.add(obj);
-		}
-		return group;
-	}
+        for (ObjectGroupItem obj : this) {
+            if (obj.isGroup())
+                group.addAll(((ProtocolObjectGroup) obj.getGroup()).expand());
+            else
+                group.add(obj);
+        }
+        return group;
+    }
 
-	/**
-	 * Returns the protocols contained in this group.
-	 * @return the protocols contained in this group.
-	 */
-	public ProtocolsSpec getProtocols() {
-		ProtocolsSpec protoSpec = new ProtocolsSpec();
+    /**
+     * Returns the protocols contained in this group.
+     *
+     * @return the protocols contained in this group.
+     */
+    public ProtocolsSpec getProtocols() {
+        ProtocolsSpec protoSpec = new ProtocolsSpec();
 
-		for (ObjectGroupItem obj: this) {
-			if (!obj.isGroup()) {
-				ProtocolObjectGroupItem item = (ProtocolObjectGroupItem) obj;
-				protoSpec.add(item.getProtocol());
-			}
-		}
-		return protoSpec;
-	}
+        for (ObjectGroupItem obj : this) {
+            if (!obj.isGroup()) {
+                ProtocolObjectGroupItem item = (ProtocolObjectGroupItem) obj;
+                protoSpec.add(item.getProtocol());
+            }
+        }
+        return protoSpec;
+    }
 }

@@ -13,30 +13,31 @@ import java.net.InetAddress;
 
 /**
  * InetAddress entry in the dns cache.
+ *
  * @author patrick.lamaiziere@univ-rennes1.fr
  */
 
 public class DnsCacheEntry {
-	protected String _hostname;
-	protected InetAddress _ips [];
-	protected long _date;
+    protected String _hostname;
+    protected InetAddress _ips[];
+    protected long _date;
 
-	public DnsCacheEntry(String hostname, InetAddress ips [], long date) {
-		_hostname = hostname;
-		_ips = ips;
-		_date = date;
-	}
+    public DnsCacheEntry(String hostname, InetAddress ips[], long date) {
+        _hostname = hostname;
+        _ips = ips;
+        _date = date;
+    }
 
-	public long getDate() {
-		return _date;
-	}
+    public long getDate() {
+        return _date;
+    }
 
-	public InetAddress[] getIps() {
-		return _ips;
-	}
+    public InetAddress[] getIps() {
+        return _ips;
+    }
 
-	public String getHostname() {
-		return _hostname;
-	}
+    public String getHostname() {
+        return _hostname;
+    }
 
 }

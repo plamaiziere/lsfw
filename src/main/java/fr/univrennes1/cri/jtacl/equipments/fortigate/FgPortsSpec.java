@@ -21,60 +21,71 @@ public class FgPortsSpec {
         _destPorts = destPorts;
     }
 
-    public PortSpec getSourcePorts() { return _sourcePorts; }
-    public PortSpec getDestPorts() { return _destPorts; }
-    public boolean hasSourcePortSpec() {return _sourcePorts != null;}
-    public boolean hasDestPortSpec() {return _destPorts != null;}
+    public PortSpec getSourcePorts() {
+        return _sourcePorts;
+    }
+
+    public PortSpec getDestPorts() {
+        return _destPorts;
+    }
+
+    public boolean hasSourcePortSpec() {
+        return _sourcePorts != null;
+    }
+
+    public boolean hasDestPortSpec() {
+        return _destPorts != null;
+    }
 
     @Override
     public String toString() {
         String s = "";
-        if (hasSourcePortSpec()) s+= "src.ports=" + _sourcePorts + (hasDestPortSpec() ? ", " : "");
-        if (hasDestPortSpec()) s+= "dst.ports=" + _destPorts;
+        if (hasSourcePortSpec()) s += "src.ports=" + _sourcePorts + (hasDestPortSpec() ? ", " : "");
+        if (hasDestPortSpec()) s += "dst.ports=" + _destPorts;
         return s;
     }
 
-	public MatchResult matches(ProbeRequest request) {
+    public MatchResult matches(ProbeRequest request) {
 
-		/*
-		 * source port
-		 */
-		PortSpec port = request.getSourcePort();
-		int sourceMay = 0;
-		MatchResult mres = MatchResult.ALL;
-		if (port != null && _sourcePorts != null) {
-			mres = _sourcePorts.matches(port);
-			/*
-			 * does not match at all
-			 */
-			if (mres == MatchResult.NOT) {
-				return MatchResult.NOT;
-			}
-		}
-		if (mres != MatchResult.ALL)
-			sourceMay++;
+        /*
+         * source port
+         */
+        PortSpec port = request.getSourcePort();
+        int sourceMay = 0;
+        MatchResult mres = MatchResult.ALL;
+        if (port != null && _sourcePorts != null) {
+            mres = _sourcePorts.matches(port);
+            /*
+             * does not match at all
+             */
+            if (mres == MatchResult.NOT) {
+                return MatchResult.NOT;
+            }
+        }
+        if (mres != MatchResult.ALL)
+            sourceMay++;
 
-		/*
-		 * destination port
-		 */
-		port = request.getDestinationPort();
-		int destMay = 0;
-		mres = MatchResult.ALL;
-		if (port != null && _destPorts != null) {
-			mres = _destPorts.matches(port);
-			/*
-			 * does not match at all
-			 */
-			if (mres == MatchResult.NOT) {
-				return MatchResult.NOT;
-			}
-		}
-		if (mres != MatchResult.ALL)
-			destMay++;
-		if (sourceMay == 0 && destMay == 0) {
-			return MatchResult.ALL;
-		}
+        /*
+         * destination port
+         */
+        port = request.getDestinationPort();
+        int destMay = 0;
+        mres = MatchResult.ALL;
+        if (port != null && _destPorts != null) {
+            mres = _destPorts.matches(port);
+            /*
+             * does not match at all
+             */
+            if (mres == MatchResult.NOT) {
+                return MatchResult.NOT;
+            }
+        }
+        if (mres != MatchResult.ALL)
+            destMay++;
+        if (sourceMay == 0 && destMay == 0) {
+            return MatchResult.ALL;
+        }
 
-		return MatchResult.MATCH;
+        return MatchResult.MATCH;
     }
 }
