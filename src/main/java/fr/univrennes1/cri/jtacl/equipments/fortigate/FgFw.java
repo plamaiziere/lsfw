@@ -749,12 +749,15 @@ public class FgFw extends GenericEquipment {
      * parse and load policy routes rules from JSON
      */
     protected void loadJsonPolicyRouteRules(JsonNode jrules) {
+		int rule_number = 1;
         Iterator<JsonNode> it = jrules.elements();
         while (it.hasNext()) {
             JsonNode n = it.next();
             _parseContext = new ParseContext();
             _parseContext.setLine(n.toString());
-			Integer iseqNum = n.path("seq-num").asInt();
+			Integer num = rule_number++;
+			Integer id = n.path("seq-num").asInt();
+
             String soriginKey = n.path("q_origin_key").textValue();
             String scomment = n.path("comments").textValue();
 
@@ -820,7 +823,7 @@ public class FgFw extends GenericEquipment {
             if (saction.equals("deny")) action = FgFwRuleAction.DROP;
             //TODO if (action == null) throwCfgException("Unknown action " + saction, true);
 
-			FgPolicyRouteRule rule = FgPolicyRouteRule.newPolicyRouteRule(soriginKey, scomment, iseqNum, disable
+			FgPolicyRouteRule rule = FgPolicyRouteRule.newPolicyRouteRule(soriginKey, scomment, num, id, disable
 				, srcIfaces, src, dst, protocolsSpec, portsSpec, gateway, soutputIface);
 
             src.linkTo(rule);

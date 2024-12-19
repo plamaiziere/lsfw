@@ -21,6 +21,7 @@ import java.util.Comparator;
 public class FgPolicyRouteRule extends FgObject {
 
 	protected Integer _number;
+	protected Integer _id;
 	protected boolean _disabled;
 	protected FgFwIpSpec _sourceIp;
 	protected FgFwIpSpec _destIp;
@@ -34,6 +35,8 @@ public class FgPolicyRouteRule extends FgObject {
 	public Integer getNumber() {
 		return _number;
 	}
+
+	public Integer getId() { return _id; }
 
 	public boolean isDisabled() {
 		return _disabled;
@@ -80,7 +83,9 @@ public class FgPolicyRouteRule extends FgObject {
      * @return new policy route rule
      */
     static public FgPolicyRouteRule newPolicyRouteRule(String originKey, String comment,
-                                    Integer number, boolean disabled,
+                                    Integer number,
+									Integer id,
+								    boolean disabled,
                                     FgIfacesSpec sourceIfaces,
                                     FgFwIpSpec srcIpSpec, FgFwIpSpec dstIpSpec,
                                     ProtocolsSpec protocolsSpec,
@@ -90,6 +95,7 @@ public class FgPolicyRouteRule extends FgObject {
 
 	    FgPolicyRouteRule rule = new FgPolicyRouteRule(originKey, originKey, comment);
         rule._number = number;
+		rule._id = id;
         rule._disabled = disabled;
         rule._sourceIfaces = sourceIfaces;
         rule._sourceIp = srcIpSpec;
@@ -115,6 +121,7 @@ public class FgPolicyRouteRule extends FgObject {
 	    String s = "Route rule name=" + _name + ", originKey=" + _originKey
 				+ ", comment=" + _comment;
 	    s+= ", number=" + _number
+				+ ", id=" + _id
                 + ", disabled=" + _disabled
 				+ ", srcIfaces: " + _sourceIfaces
 				+ ", from: " + _sourceIp
@@ -133,7 +140,7 @@ public class FgPolicyRouteRule extends FgObject {
 		String srcNot = _sourceIp.isNotIn() ? "!" : "";
 		String destNot = _destIp.isNotIn() ? "!" : "";
 
-		s += ", " + senabled + ", srcIfaces: " + ifacesNot + _sourceIfaces + ", from: " + srcNot +
+		s += ", id: " + _id + ", " + senabled + ", srcIfaces: " + ifacesNot + _sourceIfaces + ", from: " + srcNot +
 			_sourceIp.getNetworks().getBaseReferencesName() +
 			", to: " + destNot +
 			_destIp.getNetworks().getBaseReferencesName()
